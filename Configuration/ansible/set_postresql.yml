@@ -2,6 +2,8 @@
 
 - hosts: all
   become: true
+  vars_files:
+    - vars/passwd.yml
   tasks:
     - name: Install PostgreSQL
       apt:
@@ -22,7 +24,7 @@
     - name: Create user
       postgresql_user:
         name: admin
-        password: toor
+        password: "{{ vault_postgres_admin_password }}"
         db: prod_db
         role_attr_flags: SUPERUSER
       become: true
@@ -51,7 +53,7 @@
     - name: Create tables in the db
       postgresql_query:
         db: prod_db
-        query: "{{ lookup('file', 'queries/inzynierka_create(1).sql') }}"
+        query: "{{ lookup('file', 'queries/create_tables.sql') }}"
       become: true
       become_user: postgres
 
