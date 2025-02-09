@@ -1,5 +1,4 @@
 import pluginJs from '@eslint/js';
-import tsParser from '@typescript-eslint/parser';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import pluginReact from 'eslint-plugin-react';
@@ -14,9 +13,16 @@ export default [
         version: 'detect',
       },
     },
+  },
+  {
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
     files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
     languageOptions: {
-      parser: tsParser,
+      parser: '@typescript-eslint/parser',
       parserOptions: {
         ecmaVersion: 'latest',
         project: ['./tsconfig.app.json', './tsconfig.node.json'],
@@ -24,7 +30,7 @@ export default [
       },
       globals: { ...globals.browser, ...globals.node },
     },
-    ignores: ['./dist/*', './node_modules/*'],
+    ignores: ['./dist/*', './node_modules/*', 'eslint.config.js'],
   },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,

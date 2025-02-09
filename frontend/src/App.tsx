@@ -8,8 +8,6 @@ export const App = () => {
           <Button>recepta na medyczną marihuane kliknij tutaj!!!</Button>
         </Paper>
       </div>
-
-
     </>
   );
 };

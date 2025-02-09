@@ -14,7 +14,7 @@
       "npm run --prefix frontend lint:errors"
     ],
     "frontend/**/*.{js,tsx,ts,css,scss,jsx}": [
-      "npm run --prefix frontend prettier:fix"
+      "npm run --prefix frontend prettier:check"
     ]
   },
   "keywords": [],

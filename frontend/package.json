@@ -9,6 +9,7 @@
     "lint:errors": "tsc --project ./tsconfig.app.json && eslint \"**/*.{js,tsx,ts,jsx}\" --quiet",
     "lint:fix": "eslint \"**/*.{js,tsx,ts,jsx}\" --fix",
     "prettier:fix": "prettier --write \"**/*.{js,tsx,ts,css,scss,jsx}\"",
+    "prettier:check": "prettier --check \"**/*.{js,tsx,ts,css,scss,jsx}\"",
     "lint": "eslint .",
     "preview": "vite preview"
   },
