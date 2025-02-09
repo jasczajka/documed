@@ -33,5 +33,5 @@ jobs:
 
 
       - name: Run Linters on Changed Files
-        run: npx lint-staged --diff="origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF}"
+        run: npx lint-staged --config ../../package.json --diff="origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF}"
         
