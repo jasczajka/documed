@@ -1,0 +1,36 @@
+name: "Validate PR frontend"
+
+on:
+  pull_request:
+    paths:
+      - "frontend/**"
+
+env:
+  NODE_VERSION: '20.x'
+  CI: 'false'
+
+defaults:
+  run:
+    working-directory: frontend
+
+jobs:
+  validate-frontend:
+    name: "Validate PR frontend"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Lint-Staged
+        run: npx lint-staged
+
+      - name: Build
+        run: npm run build
