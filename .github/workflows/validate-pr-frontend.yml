@@ -16,7 +16,7 @@ defaults:
 jobs:
   validate-frontend:
     name: "Validate PR frontend"
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
