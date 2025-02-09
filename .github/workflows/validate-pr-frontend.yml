@@ -31,5 +31,7 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
+
       - name: Run Linters on Changed Files
         run: npx lint-staged --diff="origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF}"
+        
