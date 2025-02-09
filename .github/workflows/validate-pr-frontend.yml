@@ -20,7 +20,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
-        with: { fetch-depth: 0 }
 
       - name: Use Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v3
@@ -31,8 +30,5 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-
-      - name: Run Linters on Changed Files
-        run: npx lint-staged --config ../../package.json --diff="origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF}"
-        working-directory: .
-        
+      - name: Run Linting (Errors Only)
+        run: npm run lint:errors
