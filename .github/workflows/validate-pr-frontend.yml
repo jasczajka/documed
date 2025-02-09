@@ -32,3 +32,6 @@ jobs:
 
       - name: Run Linting (Errors Only)
         run: npm run lint:errors
+
+      - name: Run Build
+        run: npm run build
