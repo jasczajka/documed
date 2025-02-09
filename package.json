@@ -1,0 +1,27 @@
+{
+  "name": "documed",
+  "version": "1.0.0",
+  "main": "index.js",
+  "private": "true",
+  "repository": "https://github.com/jasczajka/documed",
+  "author": "czajka.jan12@gmail.com",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install"
+  },
+  "lint-staged": {
+      "frontend/**/*.{js,tsx,ts,jsx}": [
+      "npm run --prefix frontend lint:errors"
+    ],
+    "frontend/**/*.{js,tsx,ts,css,scss,jsx}": [
+      "npm run --prefix frontend prettier:check"
+    ]
+  },
+  "keywords": [],
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "husky": "^8.0.0",
+    "lint-staged": "^15.4.3"
+  }
+}
