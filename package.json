@@ -10,11 +10,11 @@
     "prepare": "husky install"
   },
   "lint-staged": {
-    "frontend/**/*.{js,tsx,ts,jsx}": [
+      "frontend/**/*.{js,tsx,ts,jsx}": [
       "npm run --prefix frontend lint:errors"
     ],
-  "frontend/**/*.{js,tsx,ts,css,scss,jsx}": [
-      "npm run --prefix frontend prettier:check"
+    "frontend/**/*.{js,tsx,ts,css,scss,jsx}": [
+      "npm run --prefix frontend prettier:fix"
     ]
   },
   "keywords": [],
