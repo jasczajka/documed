@@ -1,7 +1,6 @@
-import { Button, Paper } from '@mui/material'
+import { Button, Paper } from '@mui/material';
 
-export const App = ()  => {
-
+export const App = () => {
   return (
     <>
       <div>
@@ -9,9 +8,8 @@ export const App = ()  => {
           <Button>recepta na medyczną marihuane kliknij tutaj!!!</Button>
         </Paper>
       </div>
-        
-      </> 
-  )
-}
+    </>
+  );
+};
 
-export default App
+export default App;
