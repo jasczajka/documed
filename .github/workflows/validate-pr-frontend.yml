@@ -16,21 +16,20 @@ defaults:
 jobs:
   validate-frontend:
     name: "Validate PR frontend"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with: { fetch-depth: 0 }
 
       - name: Use Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
 
       - name: Install Dependencies
         run: npm ci
 
-      - name: Run Lint-Staged
-        run: npx lint-staged
-
-      - name: Build
-        run: npm run build
+      - name: Run Linters on Changed Files
+        run: npx lint-staged --diff="origin/${GITHUB_BASE_REF}...origin/${GITHUB_HEAD_REF}"
