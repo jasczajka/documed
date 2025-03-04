@@ -1,7 +1,9 @@
 package com.documed.backend.prescription;
 
 import com.documed.backend.medicines.Medicine;
+import lombok.AllArgsConstructor;
 
+@AllArgsConstructor
 public class MedicinePrescription {
     private Medicine medicine;
     private Prescription prescription;

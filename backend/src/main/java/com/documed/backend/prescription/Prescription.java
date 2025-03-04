@@ -1,15 +1,21 @@
 package com.documed.backend.prescription;
 
 import com.documed.backend.visits.Visit;
+import lombok.Data;
+import lombok.NonNull;
 
 import java.util.Date;
 
+@Data
 public class Prescription {
-    int id;
-    int accessCode;
-    String description;
-    Date date;
-    int pesel;
-    String passportNumber;
-    Visit visit;
+    private final int id;
+    private int accessCode;
+    private String description;
+    private final Date date;
+    @NonNull
+    private Date expirationDate;
+    private int pesel;
+    private String passportNumber;
+    @NonNull
+    private Visit visit;
 }
