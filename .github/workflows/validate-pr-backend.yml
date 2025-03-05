@@ -1,0 +1,37 @@
+name: "Validate PR backend"
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+
+env:
+  JAVA_VERSION: '21'
+  CI: 'false'
+
+defaults:
+  run:
+    working-directory: backend
+
+jobs:
+  validate-backend:
+    name: "Validate PR backend"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: 'gradle'
+
+      - name: Install Dependencies
+        run: ./gradlew clean build --no-daemon
+
+      - name: Run Spotless Check
+        run: ./gradlew spotlessCheck
+

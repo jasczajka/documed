@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class SubscriptionService {
-    private Subscription subscription;
-    private Service service;
-    private int discount;
+  private Subscription subscription;
+  private Service service;
+  private int discount;
 }
