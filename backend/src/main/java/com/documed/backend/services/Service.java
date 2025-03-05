@@ -6,6 +6,7 @@ import com.documed.backend.visits.Visit;
 import lombok.Data;
 import lombok.NonNull;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -14,7 +15,7 @@ public class Service {
     @NonNull
     private String name;
     @NonNull
-    private float price;
+    private BigDecimal price;
     @NonNull
     private ServiceType type;
     private int estimatedTime;

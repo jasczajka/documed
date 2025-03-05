@@ -18,7 +18,7 @@ public class AdditionalService {
     @NonNull
     private Date date;
     @NonNull
-    private User performer; //TODO name???
+    private User fulfiller;
     @NonNull
     private Service service;
     @NonNull

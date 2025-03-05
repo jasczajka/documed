@@ -1,6 +1,5 @@
-package com.documed.backend.others;
+package com.documed.backend.visits;
 
-import com.documed.backend.visits.Visit;
 import lombok.Data;
 
 @Data

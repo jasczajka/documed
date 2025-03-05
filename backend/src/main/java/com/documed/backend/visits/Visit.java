@@ -2,8 +2,6 @@ package com.documed.backend.visits;
 
 import com.documed.backend.attachments.Attachment;
 import com.documed.backend.notifications.Notification;
-import com.documed.backend.others.Facility;
-import com.documed.backend.others.Feedback;
 import com.documed.backend.prescription.Prescription;
 import com.documed.backend.referrals.Referral;
 import com.documed.backend.schedules.TimeSlot;
@@ -12,6 +10,7 @@ import com.documed.backend.users.User;
 import lombok.Data;
 import lombok.NonNull;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
@@ -22,7 +21,7 @@ public class Visit {
     private String interview;
     private String diagnosis;
     private String recommendations;
-    private float totalCost;
+    private BigDecimal totalCost;
     @NonNull
     private Facility facility;
     @NonNull
