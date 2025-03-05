@@ -6,6 +6,6 @@ echo 'running pre-commiting checks...'
 npx lint-staged
 
 # Run Spotless for backend
-(cd backend && ./gradlew spotlessApply)
+(cd backend && ./gradlew spotlessCheck)
 
 echo 'pre-commiting checks completed'
