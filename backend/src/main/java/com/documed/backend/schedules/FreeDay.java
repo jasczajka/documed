@@ -1,15 +1,14 @@
 package com.documed.backend.schedules;
 
 import com.documed.backend.users.User;
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
-import java.util.Date;
 
 @AllArgsConstructor
 @Data
 public class FreeDay {
-    private final int id;
-    Date date;
-    User user;
+  private final int id;
+  Date date;
+  User user;
 }

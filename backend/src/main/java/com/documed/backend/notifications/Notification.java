@@ -7,9 +7,8 @@ import lombok.NonNull;
 
 @Data
 public class Notification {
-    private final int id;
-    @NonNull
-    private NotificationStatus status;
-    private Visit visit;
-    private AdditionalService additionalService;
+  private final int id;
+  @NonNull private NotificationStatus status;
+  private Visit visit;
+  private AdditionalService additionalService;
 }

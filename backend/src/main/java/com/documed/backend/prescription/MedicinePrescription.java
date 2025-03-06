@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class MedicinePrescription {
-    private Medicine medicine;
-    private Prescription prescription;
-    private int amount;
+  private Medicine medicine;
+  private Prescription prescription;
+  private int amount;
 }

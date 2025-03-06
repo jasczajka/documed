@@ -2,5 +2,10 @@
 . "$(dirname -- "$0")/_/husky.sh"
 
 echo 'running pre-commiting checks...'
+# Run lint-staged for frontend
 npx lint-staged
+
+# Run Spotless for backend
+(cd backend && ./gradlew spotlessCheck)
+
 echo 'pre-commiting checks completed'
