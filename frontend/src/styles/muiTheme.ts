@@ -11,5 +11,17 @@ export const theme = createTheme({
   },
   typography: {
     fontFamily: 'Roboto, sans-serif',
+    allVariants: {
+      color: '#3E3E3E',
+    },
+  },
+  components: {
+    MuiSvgIcon: {
+      styleOverrides: {
+        root: {
+          color: '#3E3E3E',
+        },
+      },
+    },
   },
 });

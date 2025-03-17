@@ -1,6 +1,18 @@
-import { Button, Paper } from '@mui/material';
+import { lazy } from 'react';
 import { createBrowserRouter, RouteObject, RouterProvider } from 'react-router';
+import { ProtectedRoute } from 'shared/components/ProtectedRoute';
 import { LoggedLayout } from '../modules/layouts/LoggedLayout';
+
+const VisitsPage = lazy(() => import('./VisitsPage'));
+const PatientsPage = lazy(() => import('./PatientsPage'));
+const SpecialistsPage = lazy(() => import('./SpecialistsPage'));
+const ReferralsPage = lazy(() => import('./ReferralsPage'));
+const PrescriptionsPage = lazy(() => import('./PrescriptionsPage'));
+const AdministrationPage = lazy(() => import('./AdministrationPage'));
+
+// @TODO replace these with a useRoles hook that will determine whether user is backoffice / admin / patient
+const isAdmin = true;
+const isPatient = true;
 
 const defaultRoutes: RouteObject[] = [
   {
@@ -8,23 +20,35 @@ const defaultRoutes: RouteObject[] = [
     element: <LoggedLayout />,
     children: [
       {
-        path: '/',
+        path: '/visits',
+        element: <VisitsPage />,
+      },
+      {
+        path: '/patients',
         element: (
-          <div className="flex h-full w-full items-center justify-center">
-            <Paper>
-              <Button>recepta na medyczną dsad dijas tutaj!!!</Button>
-            </Paper>
-          </div>
+          <ProtectedRoute element={<PatientsPage />} isAllowed={!isPatient} redirectTo="/visits" />
         ),
       },
       {
-        path: '/test',
+        path: '/specialists',
+        element: <SpecialistsPage />,
+      },
+      {
+        path: '/referrals',
+        element: <ReferralsPage />,
+      },
+      {
+        path: '/prescriptions',
+        element: <PrescriptionsPage />,
+      },
+      {
+        path: '/admin',
         element: (
-          <div className="flex h-full w-full items-center justify-center">
-            <Paper>
-              <Button>recepta na medyczną dsad dijas tutaj!!!</Button>
-            </Paper>
-          </div>
+          <ProtectedRoute
+            element={<AdministrationPage />}
+            isAllowed={isAdmin}
+            redirectTo="/visits"
+          />
         ),
       },
     ],
