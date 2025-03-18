@@ -1,3 +1,4 @@
+import { Register } from 'modules/auth/Register';
 import { lazy } from 'react';
 import { createBrowserRouter, RouteObject, RouterProvider } from 'react-router';
 import { ProtectedRoute } from 'shared/components/ProtectedRoute';
@@ -13,8 +14,16 @@ const AdministrationPage = lazy(() => import('./AdministrationPage'));
 // @TODO replace these with a useRoles hook that will determine whether user is backoffice / admin / patient
 const isAdmin = true;
 const isPatient = true;
+const isAuthenticated = false;
 
 const defaultRoutes: RouteObject[] = [
+  {
+    path: '/register',
+    element: <Register />,
+  },
+];
+
+const authRoutes: RouteObject[] = [
   {
     path: '/',
     element: <LoggedLayout />,
@@ -56,6 +65,6 @@ const defaultRoutes: RouteObject[] = [
 ];
 
 export const AppRouter = () => {
-  const router = createBrowserRouter(defaultRoutes);
+  const router = createBrowserRouter(isAuthenticated ? authRoutes : defaultRoutes);
   return <RouterProvider router={router} />;
 };
