@@ -1,9 +1,10 @@
-import { Register } from 'modules/auth/Register';
 import { lazy } from 'react';
-import { createBrowserRouter, RouteObject, RouterProvider } from 'react-router';
+import { createBrowserRouter, Navigate, RouteObject, RouterProvider } from 'react-router';
 import { ProtectedRoute } from 'shared/components/ProtectedRoute';
 import { LoggedLayout } from '../modules/layouts/LoggedLayout';
 
+const LoginPage = lazy(() => import('../modules/auth/LoginPage'));
+const RegisterPage = lazy(() => import('../modules/auth/RegisterPage'));
 const VisitsPage = lazy(() => import('./VisitsPage'));
 const PatientsPage = lazy(() => import('./PatientsPage'));
 const SpecialistsPage = lazy(() => import('./SpecialistsPage'));
@@ -18,8 +19,16 @@ const isAuthenticated = false;
 
 const defaultRoutes: RouteObject[] = [
   {
+    path: '/',
+    element: <Navigate to="/register" replace />,
+  },
+  {
     path: '/register',
-    element: <Register />,
+    element: <RegisterPage />,
+  },
+  {
+    path: '/login',
+    element: <LoginPage />,
   },
 ];
 
@@ -28,6 +37,10 @@ const authRoutes: RouteObject[] = [
     path: '/',
     element: <LoggedLayout />,
     children: [
+      {
+        path: '/',
+        element: <Navigate to="/visits" replace />,
+      },
       {
         path: '/visits',
         element: <VisitsPage />,
