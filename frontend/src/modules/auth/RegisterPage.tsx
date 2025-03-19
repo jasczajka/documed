@@ -25,7 +25,7 @@ const validationSchema = Yup.object({
     .required('Wpisz hasło ponownie'),
 });
 
-export const Register: FC = () => {
+export const RegisterPage: FC = () => {
   const {
     control,
     handleSubmit,
@@ -207,3 +207,5 @@ export const Register: FC = () => {
     </main>
   );
 };
+
+export default RegisterPage;
