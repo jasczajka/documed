@@ -18,6 +18,7 @@ import { DocuMedLogo } from 'shared/icons/DocuMedLogo';
 const isAdmin = true;
 const isPatient = true;
 
+// @TODO replace these after sitemap is implemented (https://dokumentacjamedyczna.atlassian.net/browse/MED-91)
 const paths = [
   { path: '/visits', label: 'Wizyty' },
   ...(!isPatient ? [{ path: '/patients', label: 'Pacjenci' }] : []),
