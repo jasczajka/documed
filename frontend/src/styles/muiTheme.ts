@@ -18,10 +18,13 @@ export const theme = createTheme({
   },
   components: {
     MuiSvgIcon: {
+      defaultProps: {
+        color: 'inherit',
+      },
       styleOverrides: {
-        root: {
-          color: '#3E3E3E',
-        },
+        root: ({ ownerState }) => ({
+          color: ownerState.color === 'inherit' ? '#3E3E3E' : undefined,
+        }),
       },
     },
   },

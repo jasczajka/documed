@@ -1,7 +1,9 @@
 import { lazy } from 'react';
 import { createBrowserRouter, Navigate, RouteObject, RouterProvider } from 'react-router';
+import { FileUpload } from 'shared/components/FileUpload/FileUpload';
 import { ProtectedRoute } from 'shared/components/ProtectedRoute';
 import { LoggedLayout } from '../modules/layouts/LoggedLayout';
+import { TestBlankPage } from './TestBlankPage';
 
 const LoginPage = lazy(() => import('../modules/auth/LoginPage'));
 const RegisterPage = lazy(() => import('../modules/auth/RegisterPage'));
@@ -18,6 +20,15 @@ const isPatient = true;
 const isAuthenticated = false;
 
 const defaultRoutes: RouteObject[] = [
+  // test path for testing purposes only @TODO to remove in the future
+  {
+    path: '/test',
+    element: (
+      <TestBlankPage>
+        <FileUpload />
+      </TestBlankPage>
+    ),
+  },
   {
     path: '/',
     element: <Navigate to="/register" replace />,
