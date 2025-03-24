@@ -1,28 +1,25 @@
 package com.documed.backend;
 
-import com.documed.backend.visits.FacilityDAO;
-import jakarta.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHttpSession;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.SQLException;
-
+@EnableJdbcHttpSession
 @SpringBootApplication
 public class BackendApplication {
-
-  @Autowired
-  FacilityDAO facilityDAO;
 
   public static void main(String[] args) {
     SpringApplication.run(BackendApplication.class, args);
   }
 
-  @PostConstruct
-  public void init() throws SQLException {
-    System.out.println(facilityDAO.getAll());
+  @RestController
+  public static class SimpleController {
+
+    @GetMapping("/hello")
+    public String hello() {
+      return "Hello, World!";
+    }
   }
-
 }
-
-

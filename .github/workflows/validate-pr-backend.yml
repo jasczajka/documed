@@ -35,3 +35,6 @@ jobs:
       - name: Run Spotless Check
         run: ./gradlew spotlessCheck
 
+      - name: Run Tests
+        run: ./gradlew test --no-daemon
+
