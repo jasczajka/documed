@@ -1,4 +1,12 @@
-export interface Prescription {
+import { PrescribedMedicine } from './PrescribedMedicine';
+import { VisitLite } from './Visit';
+
+export interface Prescription extends PrescriptionLite {
+  visit: VisitLite;
+}
+
+export interface PrescriptionLite {
+  medicines: PrescribedMedicine[];
   id: number;
   accessCode: number | null;
   description: string | null;
@@ -6,5 +14,4 @@ export interface Prescription {
   expirationDate: Date;
   pesel: number | null;
   passportNumber: string | null;
-  visitId: number;
 }

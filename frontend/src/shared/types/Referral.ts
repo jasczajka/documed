@@ -1,9 +1,13 @@
 import { ReferralType } from './enums';
+import { VisitLite } from './Visit';
 
-export interface Referral {
+export interface Referall extends ReferralLite {
+  visit: VisitLite;
+}
+
+export interface ReferralLite {
   id: number;
   diagnosis: string | null;
   type: ReferralType;
-  visitId: number;
   expirationDate: Date | null;
 }

@@ -1,8 +1,13 @@
-export interface TimeSlot {
+import { UserLite } from './User';
+
+export interface TimeSlot extends TimeSlotLite {
+  doctor: UserLite;
+}
+
+export interface TimeSlotLite {
   id: number;
-  doctorId: number;
-  startTime: Date;
-  endTime: Date;
+  startTime: string;
+  endTime: string;
   date: Date;
   isBusy: boolean;
 }
