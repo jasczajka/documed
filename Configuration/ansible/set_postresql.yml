@@ -53,7 +53,7 @@
     - name: Create tables in the db
       postgresql_query:
         db: prod_db
-        query: "{{ lookup('file', 'queries/create_tables.sql') }}"
+        query: "{{ lookup('file', 'queries/documed_ddl.sql') }}"
       become: true
       become_user: postgres
 

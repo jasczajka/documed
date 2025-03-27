@@ -7,7 +7,7 @@ import lombok.NonNull;
 
 @Data
 public class Attachment {
-  private final int id;
+  private int id;
   @NonNull private String url;
   private Visit visit;
   private AdditionalService additionalService;

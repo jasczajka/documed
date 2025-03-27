@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class WorkTime {
-  private final int id;
+  private int id;
   private final User user;
   private final DayOfWeek dayOfWeek;
   private LocalTime startTime;

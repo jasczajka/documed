@@ -14,7 +14,7 @@ import lombok.NonNull;
 
 @Data
 public class Visit {
-  private final int id;
+  private int id;
   @NonNull private VisitStatus status;
   private String interview;
   private String diagnosis;
@@ -26,7 +26,7 @@ public class Visit {
   @NonNull private User patient;
   @NonNull private User doctor;
   private Feedback feedback;
-  private Attachment attachment;
+  private List<Attachment> attachments;
   private List<Prescription> prescriptions;
   private List<Referral> referrals;
   private List<Notification> notifications;

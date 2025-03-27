@@ -7,7 +7,7 @@ import lombok.NonNull;
 
 @Data
 public class Prescription {
-  private final int id;
+  private int id;
   private int accessCode;
   private String description;
   private final Date date;

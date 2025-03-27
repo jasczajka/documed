@@ -10,7 +10,7 @@ import lombok.NonNull;
 
 @Data
 public class Service {
-  private final int id;
+  private int id;
   @NonNull private String name;
   @NonNull private BigDecimal price;
   @NonNull private ServiceType type;

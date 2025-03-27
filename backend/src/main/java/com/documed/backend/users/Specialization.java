@@ -7,7 +7,7 @@ import lombok.NonNull;
 
 @Data
 public class Specialization {
-  private final int id;
+  private int id;
   @NonNull private String name;
   private List<Service> services;
   private List<User> users;

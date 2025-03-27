@@ -13,7 +13,7 @@ import lombok.NonNull;
 @Data
 public class User {
 
-  private final int id;
+  private int id;
   @NonNull private String firstName;
   @NonNull private String lastName;
   private String pesel;
@@ -27,7 +27,7 @@ public class User {
   private String pwzNumber;
   @NonNull private UserRole role;
   private Subscription subscription;
-  private List<Specialization> specialisations;
+  private List<Specialization> specializations;
   private List<TimeSlot> timeSlots;
   private List<WorkTime> workTimes;
   private List<FreeDay> freeDays;
