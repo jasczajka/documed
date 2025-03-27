@@ -2,10 +2,10 @@ package com.documed.backend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-//import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHttpSession;
+import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHttpSession;
 
 
-//@EnableJdbcHttpSession
+@EnableJdbcHttpSession
 @SpringBootApplication
 public class BackendApplication {
 

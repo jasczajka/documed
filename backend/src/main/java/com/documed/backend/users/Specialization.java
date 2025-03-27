@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NonNull;
 
 @Data
-public class Specialisation {
+public class Specialization {
   private int id;
   @NonNull private String name;
   private List<Service> services;

@@ -11,4 +11,5 @@ public class Notification {
   @NonNull private NotificationStatus status;
   private Visit visit;
   private AdditionalService additionalService;
+  private NotificationType type;
 }

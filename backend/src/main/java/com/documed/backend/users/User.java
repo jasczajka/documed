@@ -27,7 +27,7 @@ public class User {
   private String pwzNumber;
   @NonNull private UserRole role;
   private Subscription subscription;
-  private List<Specialisation> specialisations;
+  private List<Specialization> specializations;
   private List<TimeSlot> timeSlots;
   private List<WorkTime> workTimes;
   private List<FreeDay> freeDays;
