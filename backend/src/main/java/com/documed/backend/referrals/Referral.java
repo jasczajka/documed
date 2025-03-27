@@ -7,7 +7,7 @@ import lombok.NonNull;
 
 @Data
 public class Referral {
-  private final int id;
+  private int id;
   private String diagnosis;
   @NonNull private ReferralType type;
   private final Visit visit;

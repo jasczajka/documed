@@ -7,7 +7,7 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class TimeSlot {
-  private final int id;
+  private int id;
   private final User doctor;
   private final LocalTime startTime;
   private final LocalTime endTime;

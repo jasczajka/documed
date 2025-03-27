@@ -12,7 +12,7 @@ import lombok.NonNull;
 
 @Data
 public class AdditionalService {
-  private final int id;
+  private int id;
   private String description;
   @NonNull private Date date;
   @NonNull private User fulfiller;

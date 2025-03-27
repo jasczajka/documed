@@ -8,7 +8,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class FreeDay {
-  private final int id;
+  private int id;
   Date date;
   User user;
 }

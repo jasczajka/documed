@@ -13,7 +13,7 @@ import lombok.NonNull;
 @Data
 public class User {
 
-  private final int id;
+  private int id;
   @NonNull private String firstName;
   @NonNull private String lastName;
   private String pesel;
