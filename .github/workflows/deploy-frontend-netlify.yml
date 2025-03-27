@@ -1,9 +1,11 @@
 name: "Deploy frontend to Netlify"
 
 on:
-    push:
-      branches:
-        - main 
+  push:
+    branches:
+      - main 
+    paths:
+      - 'frontend/**'
 
 env:
   NODE_VERSION: '20.x'
