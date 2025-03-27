@@ -13,7 +13,6 @@ public class Facility {
   @NonNull private String city;
   private List<Visit> visits;
 
-
   public Facility(int id, @NonNull String address, @NonNull String city) {
     this.id = id;
     this.address = address;
