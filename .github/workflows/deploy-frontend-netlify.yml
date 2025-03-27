@@ -6,6 +6,7 @@ on:
       - main 
     paths:
       - 'frontend/**'
+  workflow_dispatch:
 
 env:
   NODE_VERSION: '20.x'
