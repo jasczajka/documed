@@ -113,7 +113,7 @@ export const LoggedLayout: FC = () => {
             </PopupState>
           </div>
         </header>
-        <div className="h-full w-full bg-white pt-28 pl-28">
+        <div className="h-full w-full bg-white px-28 pt-4">
           <Outlet />
         </div>
       </main>

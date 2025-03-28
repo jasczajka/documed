@@ -1,19 +1,17 @@
 import { AttachmentLite } from './Attachment';
-import { VisitStatus } from './enums';
+import { UserRole, VisitStatus } from './enums';
 import { FacilityLite } from './Facility';
 import { FeedbackLite } from './Feedback';
 import { NotificationLite } from './Notification';
 import { PrescriptionLite } from './Prescription';
 import { ReferralLite } from './Referral';
 import { ServiceLite } from './Service';
-import { TimeSlot } from './TimeSlot';
+import { TimeSlotLite } from './TimeSlot';
 import { UserLite } from './User';
 
 export interface Visit {
   facility: FacilityLite;
   service: ServiceLite;
-  patient: UserLite;
-  doctor: UserLite;
   feedback: FeedbackLite | null;
   attachments: AttachmentLite[] | null;
   prescriptions: PrescriptionLite[] | null;
@@ -28,6 +26,588 @@ export interface VisitLite {
   diagnosis: string | null;
   recommendations: string | null;
   totalCost: number | null;
-  timeSlots: TimeSlot[];
+  timeSlots: TimeSlotLite[];
   patientInformation: string | null;
+  patient: UserLite;
+  doctor: UserLite;
 }
+
+export const exampleVisits: VisitLite[] = [
+  {
+    id: 1,
+    status: VisitStatus.PLANNED,
+    interview: 'Patient reports headaches and dizziness',
+    diagnosis: null,
+    recommendations: null,
+    totalCost: 150.0,
+    timeSlots: [
+      {
+        id: 101,
+        startTime: '09:00',
+        endTime: '09:30',
+        date: new Date('2023-06-15'),
+        isBusy: true,
+      },
+    ],
+    patientInformation: 'Allergic to penicillin',
+    patient: {
+      id: 1,
+      firstName: 'Jan',
+      lastName: 'Kowalski',
+      email: 'jan.kowalski@example.com',
+      role: UserRole.PATIENT,
+      pwzNumber: null,
+      pesel: '90010112345',
+      passportNumber: null,
+      address: 'ul. Kwiatowa 1, Warszawa',
+      phoneNumber: '+48123123123',
+      status: 'ACTIVE',
+      birthDate: new Date('1990-01-01'),
+    },
+    doctor: {
+      id: 101,
+      firstName: 'Anna',
+      lastName: 'Nowak',
+      email: 'a.nowak@clinic.com',
+      role: UserRole.DOCTOR,
+      pwzNumber: '1234567',
+      pesel: null,
+      passportNumber: 'AB123456',
+      address: 'ul. Medyczna 5, Warszawa',
+      phoneNumber: '+48111122233',
+      status: 'ACTIVE',
+      birthDate: new Date('1985-05-15'),
+    },
+  },
+  {
+    id: 2,
+    status: VisitStatus.IN_PROGRESS,
+    interview: 'Follow-up for diabetes management',
+    diagnosis: 'Type 2 diabetes',
+    recommendations: 'Continue current medication',
+    totalCost: 200.0,
+    timeSlots: [
+      {
+        id: 102,
+        startTime: '10:00',
+        endTime: '10:45',
+        date: new Date('2023-06-15'),
+        isBusy: true,
+      },
+    ],
+    patientInformation: 'HbA1c: 6.5%',
+    patient: {
+      id: 2,
+      firstName: 'Marta',
+      lastName: 'Wiśniewska',
+      email: 'm.wisniewska@example.com',
+      role: UserRole.PATIENT,
+      pwzNumber: null,
+      pesel: '85020254321',
+      passportNumber: null,
+      address: 'ul. Słoneczna 12, Kraków',
+      phoneNumber: '+48234234234',
+      status: 'ACTIVE',
+      birthDate: new Date('1985-02-02'),
+    },
+    doctor: {
+      id: 102,
+      firstName: 'Piotr',
+      lastName: 'Wójcik',
+      email: 'p.wojcik@clinic.com',
+      role: UserRole.DOCTOR,
+      pwzNumber: '7654321',
+      pesel: null,
+      passportNumber: 'CD654321',
+      address: 'ul. Lekarska 8, Kraków',
+      phoneNumber: '+48222233344',
+      status: 'ACTIVE',
+      birthDate: new Date('1978-08-20'),
+    },
+  },
+  {
+    id: 3,
+    status: VisitStatus.CLOSED,
+    interview: 'Annual physical examination',
+    diagnosis: 'Healthy',
+    recommendations: 'Maintain current lifestyle',
+    totalCost: 180.0,
+    timeSlots: [
+      {
+        id: 103,
+        startTime: '11:00',
+        endTime: '11:30',
+        date: new Date('2023-06-14'),
+        isBusy: false,
+      },
+    ],
+    patientInformation: 'Blood pressure: 120/80',
+    patient: {
+      id: 3,
+      firstName: 'Adam',
+      lastName: 'Lewandowski',
+      email: 'a.lewandowski@example.com',
+      role: UserRole.PATIENT,
+      pwzNumber: null,
+      pesel: '92030398765',
+      passportNumber: null,
+      address: 'ul. Leśna 3, Gdańsk',
+      phoneNumber: '+48345345345',
+      status: 'ACTIVE',
+      birthDate: new Date('1992-03-03'),
+    },
+    doctor: {
+      id: 103,
+      firstName: 'Katarzyna',
+      lastName: 'Kowalczyk',
+      email: 'k.kowalczyk@clinic.com',
+      role: UserRole.DOCTOR,
+      pwzNumber: '9876543',
+      pesel: null,
+      passportNumber: 'EF987654',
+      address: 'ul. Szpitalna 10, Gdańsk',
+      phoneNumber: '+48333344455',
+      status: 'ACTIVE',
+      birthDate: new Date('1980-11-10'),
+    },
+  },
+  {
+    id: 4,
+    status: VisitStatus.CANCELLED,
+    interview: null,
+    diagnosis: null,
+    recommendations: null,
+    totalCost: null,
+    timeSlots: [
+      {
+        id: 104,
+        startTime: '14:00',
+        endTime: '14:30',
+        date: new Date('2023-06-13'),
+        isBusy: false,
+      },
+    ],
+    patientInformation: null,
+    patient: {
+      id: 4,
+      firstName: 'Agnieszka',
+      lastName: 'Dąbrowska',
+      email: 'a.dabrowska@example.com',
+      role: UserRole.PATIENT,
+      pwzNumber: null,
+      pesel: '88040445678',
+      passportNumber: null,
+      address: 'ul. Polna 4, Wrocław',
+      phoneNumber: '+48456456456',
+      status: 'ACTIVE',
+      birthDate: new Date('1988-04-04'),
+    },
+    doctor: {
+      id: 104,
+      firstName: 'Marek',
+      lastName: 'Kamiński',
+      email: 'm.kaminski@clinic.com',
+      role: UserRole.DOCTOR,
+      pwzNumber: '4567890',
+      pesel: null,
+      passportNumber: 'GH456789',
+      address: 'ul. Kliniczna 15, Wrocław',
+      phoneNumber: '+48444455566',
+      status: 'ACTIVE',
+      birthDate: new Date('1975-12-05'),
+    },
+  },
+];
+
+// export const exampleVisits: VisitLite[] = [
+//   {
+//     id: 1,
+//     status: VisitStatus.PLANNED,
+//     interview: 'Patient reports headaches and dizziness',
+//     diagnosis: null,
+//     recommendations: null,
+//     totalCost: 150.0,
+//     timeSlots: [
+//       {
+//         id: 101,
+//         startTime: '09:00',
+//         endTime: '09:30',
+//         date: new Date('2023-06-15'),
+//         isBusy: true,
+//       },
+//     ],
+//     patientInformation: 'Allergic to penicillin',
+//   },
+//   {
+//     id: 2,
+//     status: VisitStatus.IN_PROGRESS,
+//     interview: 'Follow-up for diabetes management',
+//     diagnosis: 'Type 2 diabetes',
+//     recommendations: 'Continue current medication',
+//     totalCost: 200.0,
+//     timeSlots: [
+//       {
+//         id: 102,
+//         startTime: '10:00',
+//         endTime: '10:45',
+//         date: new Date('2023-06-15'),
+//         isBusy: true,
+//       },
+//     ],
+//     patientInformation: 'HbA1c: 6.5%',
+//   },
+//   {
+//     id: 3,
+//     status: VisitStatus.CLOSED,
+//     interview: 'Annual physical examination',
+//     diagnosis: 'Healthy',
+//     recommendations: 'Maintain current lifestyle',
+//     totalCost: 180.0,
+//     timeSlots: [
+//       {
+//         id: 103,
+//         startTime: '11:00',
+//         endTime: '11:30',
+//         date: new Date('2023-06-14'),
+//         isBusy: false,
+//       },
+//     ],
+//     patientInformation: 'Blood pressure: 120/80',
+//   },
+//   {
+//     id: 4,
+//     status: VisitStatus.CANCELLED,
+//     interview: null,
+//     diagnosis: null,
+//     recommendations: null,
+//     totalCost: null,
+//     timeSlots: [
+//       {
+//         id: 104,
+//         startTime: '14:00',
+//         endTime: '14:30',
+//         date: new Date('2023-06-13'),
+//         isBusy: false,
+//       },
+//     ],
+//     patientInformation: null,
+//   },
+//   {
+//     id: 5,
+//     status: VisitStatus.PLANNED,
+//     interview: null,
+//     diagnosis: null,
+//     recommendations: null,
+//     totalCost: 90.0,
+//     timeSlots: [
+//       {
+//         id: 105,
+//         startTime: '08:30',
+//         endTime: '09:00',
+//         date: new Date('2023-06-16'),
+//         isBusy: true,
+//       },
+//     ],
+//     patientInformation: 'New patient',
+//   },
+//   {
+//     id: 6,
+//     status: VisitStatus.IN_PROGRESS,
+//     interview: 'Knee pain evaluation',
+//     diagnosis: 'Possible meniscus tear',
+//     recommendations: 'MRI recommended',
+//     totalCost: 250.0,
+//     timeSlots: [
+//       {
+//         id: 106,
+//         startTime: '13:00',
+//         endTime: '13:45',
+//         date: new Date('2023-06-15'),
+//         isBusy: true,
+//       },
+//     ],
+//     patientInformation: 'History of sports injuries',
+//   },
+//   {
+//     id: 7,
+//     status: VisitStatus.CLOSED,
+//     interview: 'Vaccination appointment',
+//     diagnosis: 'Completed vaccination schedule',
+//     recommendations: 'Next dose in 6 months',
+//     totalCost: 75.0,
+//     timeSlots: [
+//       {
+//         id: 107,
+//         startTime: '15:00',
+//         endTime: '15:15',
+//         date: new Date('2023-06-12'),
+//         isBusy: false,
+//       },
+//     ],
+//     patientInformation: 'No adverse reactions',
+//   },
+//   {
+//     id: 8,
+//     status: VisitStatus.PLANNED,
+//     interview: null,
+//     diagnosis: null,
+//     recommendations: null,
+//     totalCost: 120.0,
+//     timeSlots: [
+//       {
+//         id: 108,
+//         startTime: '16:00',
+//         endTime: '16:30',
+//         date: new Date('2023-06-17'),
+//         isBusy: true,
+//       },
+//       {
+//         id: 109,
+//         startTime: '16:30',
+//         endTime: '17:00',
+//         date: new Date('2023-06-17'),
+//         isBusy: true,
+//       },
+//     ],
+//     patientInformation: 'Requires interpreter',
+//   },
+//   {
+//     id: 9,
+//     status: VisitStatus.CLOSED,
+//     interview: 'Chronic back pain management',
+//     diagnosis: 'Degenerative disc disease',
+//     recommendations: 'Physical therapy prescribed',
+//     totalCost: 300.0,
+//     timeSlots: [
+//       {
+//         id: 110,
+//         startTime: '09:30',
+//         endTime: '10:30',
+//         date: new Date('2023-06-10'),
+//         isBusy: false,
+//       },
+//     ],
+//     patientInformation: 'Previous surgery in 2018',
+//   },
+//   {
+//     id: 10,
+//     status: VisitStatus.CANCELLED,
+//     interview: null,
+//     diagnosis: null,
+//     recommendations: null,
+//     totalCost: null,
+//     timeSlots: [
+//       {
+//         id: 111,
+//         startTime: '11:30',
+//         endTime: '12:00',
+//         date: new Date('2023-06-11'),
+//         isBusy: false,
+//       },
+//     ],
+//     patientInformation: null,
+//   },
+//   {
+//     id: 11,
+//     status: VisitStatus.PLANNED,
+//     interview: 'Prenatal checkup',
+//     diagnosis: null,
+//     recommendations: null,
+//     totalCost: 175.0,
+//     timeSlots: [
+//       {
+//         id: 112,
+//         startTime: '14:00',
+//         endTime: '14:45',
+//         date: new Date('2023-06-18'),
+//         isBusy: true,
+//       },
+//     ],
+//     patientInformation: '24 weeks pregnant',
+//   },
+//   {
+//     id: 12,
+//     status: VisitStatus.IN_PROGRESS,
+//     interview: 'Mental health consultation',
+//     diagnosis: 'Generalized anxiety disorder',
+//     recommendations: 'Cognitive behavioral therapy',
+//     totalCost: 225.0,
+//     timeSlots: [
+//       {
+//         id: 113,
+//         startTime: '10:15',
+//         endTime: '11:15',
+//         date: new Date('2023-06-15'),
+//         isBusy: true,
+//       },
+//     ],
+//     patientInformation: 'On SSRIs',
+//   },
+//   {
+//     id: 13,
+//     status: VisitStatus.CLOSED,
+//     interview: 'Post-operative follow-up',
+//     diagnosis: 'Healing well',
+//     recommendations: 'Continue wound care',
+//     totalCost: 150.0,
+//     timeSlots: [
+//       {
+//         id: 114,
+//         startTime: '08:00',
+//         endTime: '08:30',
+//         date: new Date('2023-06-09'),
+//         isBusy: false,
+//       },
+//     ],
+//     patientInformation: 'Surgery date: 2023-05-25',
+//   },
+//   {
+//     id: 14,
+//     status: VisitStatus.PLANNED,
+//     interview: null,
+//     diagnosis: null,
+//     recommendations: null,
+//     totalCost: 95.0,
+//     timeSlots: [
+//       {
+//         id: 115,
+//         startTime: '13:30',
+//         endTime: '14:00',
+//         date: new Date('2023-06-19'),
+//         isBusy: true,
+//       },
+//       {
+//         id: 116,
+//         startTime: '14:00',
+//         endTime: '14:30',
+//         date: new Date('2023-06-19'),
+//         isBusy: true,
+//       },
+//     ],
+//     patientInformation: 'First visit',
+//   },
+//   {
+//     id: 15,
+//     status: VisitStatus.CANCELLED,
+//     interview: null,
+//     diagnosis: null,
+//     recommendations: null,
+//     totalCost: null,
+//     timeSlots: [
+//       {
+//         id: 117,
+//         startTime: '15:30',
+//         endTime: '16:00',
+//         date: new Date('2023-06-12'),
+//         isBusy: false,
+//       },
+//     ],
+//     patientInformation: null,
+//   },
+//   {
+//     id: 16,
+//     status: VisitStatus.CLOSED,
+//     interview: 'Allergy testing',
+//     diagnosis: 'Pollen allergy',
+//     recommendations: 'Antihistamines prescribed',
+//     totalCost: 275.0,
+//     timeSlots: [
+//       {
+//         id: 118,
+//         startTime: '09:45',
+//         endTime: '10:45',
+//         date: new Date('2023-06-08'),
+//         isBusy: false,
+//       },
+//     ],
+//     patientInformation: 'No asthma',
+//   },
+//   {
+//     id: 17,
+//     status: VisitStatus.IN_PROGRESS,
+//     interview: 'Hypertension management',
+//     diagnosis: 'Controlled hypertension',
+//     recommendations: 'Continue current treatment',
+//     totalCost: 160.0,
+//     timeSlots: [
+//       {
+//         id: 119,
+//         startTime: '11:45',
+//         endTime: '12:15',
+//         date: new Date('2023-06-15'),
+//         isBusy: true,
+//       },
+//     ],
+//     patientInformation: 'BP: 130/85',
+//   },
+//   {
+//     id: 18,
+//     status: VisitStatus.PLANNED,
+//     interview: null,
+//     diagnosis: null,
+//     recommendations: null,
+//     totalCost: 200.0,
+//     timeSlots: [
+//       {
+//         id: 120,
+//         startTime: '08:15',
+//         endTime: '09:00',
+//         date: new Date('2023-06-20'),
+//         isBusy: true,
+//       },
+//       {
+//         id: 121,
+//         startTime: '09:00',
+//         endTime: '09:45',
+//         date: new Date('2023-06-20'),
+//         isBusy: true,
+//       },
+//       {
+//         id: 122,
+//         startTime: '09:45',
+//         endTime: '10:30',
+//         date: new Date('2023-06-20'),
+//         isBusy: true,
+//       },
+//     ],
+//     patientInformation: 'Comprehensive physical exam',
+//   },
+//   {
+//     id: 19,
+//     status: VisitStatus.CLOSED,
+//     interview: 'Child wellness check',
+//     diagnosis: 'Normal development',
+//     recommendations: 'Vaccines up to date',
+//     totalCost: 125.0,
+//     timeSlots: [
+//       {
+//         id: 123,
+//         startTime: '10:30',
+//         endTime: '11:00',
+//         date: new Date('2023-06-07'),
+//         isBusy: false,
+//       },
+//     ],
+//     patientInformation: '2 years old',
+//   },
+//   {
+//     id: 20,
+//     status: VisitStatus.CANCELLED,
+//     interview: null,
+//     diagnosis: null,
+//     recommendations: null,
+//     totalCost: null,
+//     timeSlots: [
+//       {
+//         id: 124,
+//         startTime: '14:45',
+//         endTime: '15:30',
+//         date: new Date('2023-06-11'),
+//         isBusy: false,
+//       },
+//     ],
+//     patientInformation: null,
+//   },
+// ];
+
+// export default exampleVisits;
