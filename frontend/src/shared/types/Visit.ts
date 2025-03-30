@@ -30,10 +30,12 @@ export interface VisitLite {
   patientInformation: string | null;
   patient: UserLite;
   doctor: UserLite;
+  feedbackRating: number | null;
 }
 
 export const exampleVisits: VisitLite[] = [
   {
+    feedbackRating: 4,
     id: 1,
     service: {
       id: 1,
@@ -87,6 +89,7 @@ export const exampleVisits: VisitLite[] = [
     },
   },
   {
+    feedbackRating: 4,
     id: 2,
     status: VisitStatus.IN_PROGRESS,
     service: {
@@ -140,6 +143,7 @@ export const exampleVisits: VisitLite[] = [
     },
   },
   {
+    feedbackRating: 4,
     id: 3,
     status: VisitStatus.CLOSED,
     service: {
@@ -193,6 +197,7 @@ export const exampleVisits: VisitLite[] = [
     },
   },
   {
+    feedbackRating: null,
     id: 4,
     status: VisitStatus.CANCELLED,
     service: {
@@ -246,6 +251,7 @@ export const exampleVisits: VisitLite[] = [
     },
   },
   {
+    feedbackRating: 4,
     id: 5,
     status: VisitStatus.CANCELLED,
     service: {
@@ -299,6 +305,7 @@ export const exampleVisits: VisitLite[] = [
     },
   },
   {
+    feedbackRating: null,
     id: 6,
     status: VisitStatus.CANCELLED,
     service: {
@@ -352,6 +359,7 @@ export const exampleVisits: VisitLite[] = [
     },
   },
   {
+    feedbackRating: null,
     id: 7,
     status: VisitStatus.CANCELLED,
     service: {
@@ -405,6 +413,7 @@ export const exampleVisits: VisitLite[] = [
     },
   },
   {
+    feedbackRating: null,
     id: 8,
     status: VisitStatus.CANCELLED,
     service: {
@@ -458,6 +467,7 @@ export const exampleVisits: VisitLite[] = [
     },
   },
   {
+    feedbackRating: 3,
     id: 9,
     status: VisitStatus.CANCELLED,
     service: {
@@ -511,6 +521,7 @@ export const exampleVisits: VisitLite[] = [
     },
   },
   {
+    feedbackRating: null,
     id: 10,
     status: VisitStatus.CANCELLED,
     service: {

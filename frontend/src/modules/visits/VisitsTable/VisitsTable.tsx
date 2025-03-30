@@ -26,6 +26,8 @@ interface VisitTableProps {
 const columns = (
   onEdit?: (id: number) => void,
   onDelete?: (id: number) => void,
+  onAddReview?: (id: number) => void,
+  showReviewOption?: boolean,
 ): GridColDef<VisitLite>[] => [
   {
     field: 'index',
@@ -99,6 +101,16 @@ const columns = (
         showInMenu
         sx={{ color: 'error.main' }}
       />,
+      ...(showReviewOption && !params.row.feedbackRating
+        ? [
+            <GridActionsCellItem
+              key={`review-${params.row.id}`}
+              label="Dodaj opinię"
+              onClick={() => onAddReview?.(params.row.id)}
+              showInMenu
+            />,
+          ]
+        : []),
     ],
   },
 ];
@@ -113,6 +125,8 @@ export const VisitsTable: FC<VisitTableProps> = ({ visits, onEdit, onDelete }) =
     dateTo: '',
   });
 
+  // @TODO replace with useRoles logic when they're done
+  const isPatient = true;
   const { visitsFilterConfig, filteredVisits } = useVisitsTable({ visits, filters });
 
   const handleFilterChange = useCallback((name: keyof VisitsFilters, value: string) => {
@@ -155,7 +169,8 @@ export const VisitsTable: FC<VisitTableProps> = ({ visits, onEdit, onDelete }) =
       <Paper sx={{ flexGrow: 1 }}>
         <DataGrid
           rows={filteredVisits}
-          columns={columns(onEdit, onDelete)}
+          // @TODO replace with opening modal https://dokumentacjamedyczna.atlassian.net/browse/MED-62
+          columns={columns(onEdit, onDelete, () => {}, isPatient)}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },
