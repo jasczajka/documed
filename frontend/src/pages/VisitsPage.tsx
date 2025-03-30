@@ -1,8 +1,15 @@
-import { Typography } from '@mui/material';
+import { CardHeader } from '@mui/material';
+import { VisitsTable } from 'modules/visits/VisitsTable/VisitsTable';
 import { FC } from 'react';
+import { exampleVisits } from 'shared/types/Visit';
 
 const VisitsPage: FC = () => {
-  return <Typography>Wizyty</Typography>;
+  return (
+    <div className="flex flex-col pb-10">
+      <CardHeader title={'Wizyty i Usługi Dodatkowe'} />
+      <VisitsTable visits={exampleVisits} />
+    </div>
+  );
 };
 
 export default VisitsPage;

@@ -3,7 +3,6 @@ import { createBrowserRouter, Navigate, RouteObject, RouterProvider } from 'reac
 import { FileUpload } from 'shared/components/FileUpload/FileUpload';
 import { ProtectedRoute } from 'shared/components/ProtectedRoute';
 import { LoggedLayout } from '../modules/layouts/LoggedLayout';
-import { TestBlankPage } from './TestBlankPage';
 
 const LoginPage = lazy(() => import('../modules/auth/LoginPage'));
 const RegisterPage = lazy(() => import('../modules/auth/RegisterPage'));
@@ -13,11 +12,12 @@ const SpecialistsPage = lazy(() => import('./SpecialistsPage'));
 const ReferralsPage = lazy(() => import('./ReferralsPage'));
 const PrescriptionsPage = lazy(() => import('./PrescriptionsPage'));
 const AdministrationPage = lazy(() => import('./AdministrationPage'));
+const TestBlankPage = lazy(() => import('./TestBlankPage'));
 
 // @TODO replace these with a useRoles hook that will determine whether user is backoffice / admin / patient
 const isAdmin = true;
 const isPatient = true;
-const isAuthenticated = false;
+const isAuthenticated = true;
 
 const defaultRoutes: RouteObject[] = [
   // test path for testing purposes only @TODO to remove in the future
@@ -40,6 +40,10 @@ const defaultRoutes: RouteObject[] = [
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '*',
+    element: <Navigate to="/login" replace />,
   },
 ];
 
@@ -83,6 +87,10 @@ const authRoutes: RouteObject[] = [
             redirectTo="/visits"
           />
         ),
+      },
+      {
+        path: '*',
+        element: <Navigate to="/visits" replace />,
       },
     ],
   },

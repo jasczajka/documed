@@ -26,7 +26,6 @@ export interface UserLite {
   pesel: string | null;
   passportNumber: string | null;
   address: string;
-  password: string;
   phoneNumber: string | null;
   status: string;
   birthDate: Date | null;
