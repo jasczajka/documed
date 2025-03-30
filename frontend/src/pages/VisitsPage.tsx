@@ -5,7 +5,7 @@ import { exampleVisits } from 'shared/types/Visit';
 
 const VisitsPage: FC = () => {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col pb-10">
       <CardHeader title={'Wizyty i Usługi Dodatkowe'} />
       <VisitsTable visits={exampleVisits} />
     </div>

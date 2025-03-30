@@ -1,10 +1,10 @@
 import { Box, Button, MenuItem, Stack, TextField } from '@mui/material';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useCallback, useMemo } from 'react';
 
 export type FilterConfig = {
   name: string;
   label: string;
-  type: 'text' | 'select' | 'date';
+  type: 'text' | 'select' | 'datetime';
   options?: { value: string; label: string }[];
   width?: number | string;
 };
@@ -14,7 +14,6 @@ interface TableFiltersProps<T extends Record<string, string>> {
   filterConfig: FilterConfig[];
   onFilterChange: (name: keyof T, value: string) => void;
   onReset: () => void;
-  resultsCount: number;
 }
 
 export const TableFilters = <T extends Record<string, string>>({
@@ -23,17 +22,27 @@ export const TableFilters = <T extends Record<string, string>>({
   onFilterChange,
   onReset,
 }: TableFiltersProps<T>) => {
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    onFilterChange(name as keyof T, value);
-  };
+  const handleChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const { name, value } = e.target;
+      onFilterChange(name as keyof T, value);
+    },
+    [onFilterChange],
+  );
+
+  const anyFilterActive = useMemo(
+    () => Object.values(filters).some((value) => value !== ''),
+    [filters],
+  );
 
   return (
-    <Box sx={{ mb: 2 }}>
-      <Button variant="outlined" onClick={onReset} sx={{ mr: 2 }}>
-        Wyczyść filtry
-      </Button>
-      <Stack direction="row" spacing={2} sx={{ mb: 2 }} flexWrap="wrap">
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <Box sx={{ display: 'flex' }}>
+        <Button variant={anyFilterActive ? 'contained' : 'outlined'} onClick={onReset}>
+          Wyczyść filtry
+        </Button>
+      </Box>
+      <Stack direction="row" spacing={2} sx={{ gap: 2, mb: 6 }} flexWrap="wrap" useFlexGap>
         {filterConfig.map((filter) => {
           const commonProps = {
             key: filter.name,
@@ -49,7 +58,7 @@ export const TableFilters = <T extends Record<string, string>>({
             case 'select':
               return (
                 <TextField select {...commonProps}>
-                  <MenuItem value="">All</MenuItem>
+                  <MenuItem value="">Wszystkie</MenuItem>
                   {filter.options?.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
                       {option.label}
@@ -57,11 +66,11 @@ export const TableFilters = <T extends Record<string, string>>({
                   ))}
                 </TextField>
               );
-            case 'date':
+            case 'datetime':
               return (
                 <TextField
                   {...commonProps}
-                  type="date"
+                  type="datetime-local"
                   slotProps={{
                     inputLabel: {
                       shrink: true,

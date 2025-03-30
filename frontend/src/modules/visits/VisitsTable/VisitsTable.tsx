@@ -1,16 +1,20 @@
-import { Box, Paper } from '@mui/material';
+import { Box, Button, Paper } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 
-import { format } from 'date-fns';
-import { FC, useEffect, useState } from 'react';
-import { FilterConfig, TableFilters } from 'shared/components/TableFilters';
+import { endOfDay, format, startOfDay } from 'date-fns';
+import { FC, useCallback, useState } from 'react';
+import { appConfig } from 'shared/appConfig';
+import { TableFilters } from 'shared/components/TableFilters';
 import { VisitLite } from 'shared/types/Visit';
+import { useVisitsTable } from './useVisitsTable';
 
-type VisitsFilters = {
+export type VisitsFilters = {
+  serviceType: string;
   patientName: string;
-  date: string;
   service: string;
   specialist: string;
+  dateFrom: string;
+  dateTo: string;
 };
 
 interface VisitTableProps {
@@ -18,38 +22,6 @@ interface VisitTableProps {
   onEdit?: (id: number) => void;
   onDelete?: (id: number) => void;
 }
-
-const visitsFilterConfig: FilterConfig[] = [
-  {
-    name: 'patientName',
-    label: 'Patient',
-    type: 'text',
-    width: 200,
-  },
-  {
-    name: 'date',
-    label: 'Date',
-    type: 'date',
-    width: 200,
-  },
-  {
-    name: 'service',
-    label: 'Service',
-    type: 'select',
-    options: [
-      { value: '', label: 'All' },
-      { value: 'Kardiologia', label: 'Kardiologia' },
-      { value: 'Stomatologia', label: 'Stomatologia' },
-    ],
-    width: 200,
-  },
-  {
-    name: 'specialist',
-    label: 'Specialist',
-    type: 'text',
-    width: 200,
-  },
-];
 
 const columns = (
   onEdit?: (id: number) => void,
@@ -75,7 +47,9 @@ const columns = (
     minWidth: 200,
     flex: 1,
     valueGetter: (_, row) => {
-      return row.timeSlots[0]?.date ? format(new Date(row.timeSlots[0].date), 'PP') : 'Brak daty';
+      return row.timeSlots[0]?.date
+        ? format(new Date(row.timeSlots[0].date), 'dd.MM.yyyy')
+        : 'Brak daty';
     },
   },
   {
@@ -87,14 +61,16 @@ const columns = (
       return row.timeSlots[0].startTime ? `${row.timeSlots[0].startTime}` : 'Brak godziny';
     },
   },
-  // {
-  //   field: 'service',
-  //   headerName: 'Usługa',
-  //   minWidth: 200,
-  //   flex: 1,
-  //   valueGetter: (_, row) => 'Kardiologia',
-  //   // || 'Brak usługi',
-  // },
+  // @TODO to be finished when we define types for services
+  {
+    field: 'service',
+    headerName: 'Usługa',
+    minWidth: 200,
+    flex: 1,
+    // valueGetter: (_, row) => 'Kardiologia',
+    valueGetter: () => 'Kardiologia',
+    // || 'Brak usługi',
+  },
   {
     field: 'specialist',
     headerName: 'Specjalista',
@@ -128,58 +104,55 @@ const columns = (
 ];
 
 export const VisitsTable: FC<VisitTableProps> = ({ visits, onEdit, onDelete }) => {
-  const [filteredVisits, setFilteredVisits] = useState<VisitLite[]>(visits);
   const [filters, setFilters] = useState<VisitsFilters>({
+    serviceType: '',
     patientName: '',
-    date: '',
     service: '',
     specialist: '',
+    dateFrom: '',
+    dateTo: '',
   });
 
-  useEffect(() => {
-    const filtered = visits.filter((visit) => {
-      const patientFullName = `${visit.patient.firstName} ${visit.patient.lastName}`.toLowerCase();
-      const visitDate = visit.timeSlots[0]?.date
-        ? format(new Date(visit.timeSlots[0].date), 'yyyy-MM-dd')
-        : '';
-      const doctorFullName = visit.doctor
-        ? `${visit.doctor.firstName} ${visit.doctor.lastName}`.toLowerCase()
-        : '';
+  const { visitsFilterConfig, filteredVisits } = useVisitsTable({ visits, filters });
 
-      return (
-        patientFullName.includes(filters.patientName.toLowerCase()) &&
-        visitDate.includes(filters.date) &&
-        'Kardiologia'.toLowerCase().includes(filters.service.toLowerCase()) &&
-        doctorFullName.includes(filters.specialist.toLowerCase())
-      );
-    });
-
-    setFilteredVisits(filtered);
-  }, [visits, filters]);
-
-  const handleFilterChange = (name: keyof VisitsFilters, value: string) => {
+  const handleFilterChange = useCallback((name: keyof VisitsFilters, value: string) => {
+    console.log(value);
     setFilters((prev) => ({ ...prev, [name]: value }));
-  };
+  }, []);
 
-  const resetFilters = () => {
+  const setFilterDateToToday = useCallback(() => {
+    const todayStart = format(startOfDay(new Date()), appConfig.dateTimeFormat);
+    const todayEnd = format(endOfDay(new Date()), appConfig.dateTimeFormat);
+
+    handleFilterChange('dateFrom', todayStart);
+    handleFilterChange('dateTo', todayEnd);
+  }, [handleFilterChange]);
+
+  const resetFilters = useCallback(() => {
     setFilters({
+      serviceType: '',
       patientName: '',
-      date: '',
       service: '',
       specialist: '',
+      dateFrom: '',
+      dateTo: '',
     });
-  };
+  }, []);
 
   return (
-    <Paper sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', p: 2 }}>
+    <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', p: 2 }}>
+      <Box sx={{ paddingBottom: 2 }}>
+        <Button variant="contained" onClick={setFilterDateToToday}>
+          Pokaż dzisiejsze
+        </Button>
+      </Box>
       <TableFilters<VisitsFilters>
         filters={filters}
         filterConfig={visitsFilterConfig}
         onFilterChange={handleFilterChange}
         onReset={resetFilters}
-        resultsCount={filteredVisits.length}
       />
-      <Box sx={{ flexGrow: 1 }}>
+      <Paper sx={{ flexGrow: 1 }}>
         <DataGrid
           rows={filteredVisits}
           columns={columns(onEdit, onDelete)}
@@ -189,13 +162,12 @@ export const VisitsTable: FC<VisitTableProps> = ({ visits, onEdit, onDelete }) =
             },
           }}
           pageSizeOptions={[5, 10, 25]}
-          disableRowSelectionOnClick
-          sx={{
-            border: 0,
-          }}
+          paginationMode="client"
+          rowHeight={32}
+          disableColumnFilter
         />
-      </Box>
-    </Paper>
+      </Paper>
+    </Box>
   );
 };
 
