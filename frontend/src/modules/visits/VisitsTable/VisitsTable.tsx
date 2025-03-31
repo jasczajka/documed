@@ -137,7 +137,6 @@ export const VisitsTable: FC<VisitTableProps> = ({ visits, onEdit, onDelete }) =
   const { visitsFilterConfig, filteredVisits } = useVisitsTable({ visits, filters });
 
   const handleFilterChange = useCallback((name: keyof VisitsFilters, value: string) => {
-    console.log(value);
     setFilters((prev) => ({ ...prev, [name]: value }));
   }, []);
 
@@ -164,7 +163,6 @@ export const VisitsTable: FC<VisitTableProps> = ({ visits, onEdit, onDelete }) =
           onCancel={() => closeModal('reviewModal')}
         />,
       );
-      console.log('Modal should be open now');
     },
     [openModal, closeModal],
   );
