@@ -39,7 +39,7 @@ export const exampleVisits: VisitLite[] = [
     id: 1,
     service: {
       id: 1,
-      name: 'test_service',
+      name: 'Kardiologia',
       price: 350.23,
       type: ServiceType.ADDITIONAL_SERVICE,
       estimatedTime: 30,
