@@ -4,7 +4,9 @@ import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { FC, useCallback, useState } from 'react';
 import { appConfig } from 'shared/appConfig';
+import { ReviewModal } from 'shared/components/ReviewModal';
 import { TableFilters } from 'shared/components/TableFilters';
+import { useModal } from 'shared/hooks/useModal';
 import { VisitLite } from 'shared/types/Visit';
 import { useVisitsTable } from './useVisitsTable';
 
@@ -26,7 +28,7 @@ interface VisitTableProps {
 const columns = (
   onEdit?: (id: number) => void,
   onDelete?: (id: number) => void,
-  onAddReview?: (id: number) => void,
+  onAddReview?: (id: number, doctorFullName: string) => void,
   showReviewOption?: boolean,
 ): GridColDef<VisitLite>[] => [
   {
@@ -106,7 +108,12 @@ const columns = (
             <GridActionsCellItem
               key={`review-${params.row.id}`}
               label="Dodaj opinię"
-              onClick={() => onAddReview?.(params.row.id)}
+              onClick={() =>
+                onAddReview?.(
+                  params.row.id,
+                  `${params.row.doctor?.firstName && params.row.doctor?.lastName ? `${params.row.doctor?.firstName} ${params.row.doctor?.lastName}` : 'Nieznany specjalista'}`,
+                )
+              }
               showInMenu
             />,
           ]
@@ -130,7 +137,6 @@ export const VisitsTable: FC<VisitTableProps> = ({ visits, onEdit, onDelete }) =
   const { visitsFilterConfig, filteredVisits } = useVisitsTable({ visits, filters });
 
   const handleFilterChange = useCallback((name: keyof VisitsFilters, value: string) => {
-    console.log(value);
     setFilters((prev) => ({ ...prev, [name]: value }));
   }, []);
 
@@ -141,6 +147,25 @@ export const VisitsTable: FC<VisitTableProps> = ({ visits, onEdit, onDelete }) =
     handleFilterChange('dateFrom', todayStart);
     handleFilterChange('dateTo', todayEnd);
   }, [handleFilterChange]);
+
+  const { openModal, closeModal } = useModal();
+  const handleAddReviewClick = useCallback(
+    (visitId: number, specialistFullName: string) => {
+      openModal(
+        'reviewModal',
+        <ReviewModal
+          visitId={visitId.toString()}
+          specialistFullName={specialistFullName}
+          onConfirm={(rating, visitId, additionalInfo) => {
+            console.log('Review Submitted:', { rating, visitId, additionalInfo });
+            closeModal('reviewModal');
+          }}
+          onCancel={() => closeModal('reviewModal')}
+        />,
+      );
+    },
+    [openModal, closeModal],
+  );
 
   const resetFilters = useCallback(() => {
     setFilters({
@@ -169,8 +194,7 @@ export const VisitsTable: FC<VisitTableProps> = ({ visits, onEdit, onDelete }) =
       <Paper sx={{ flexGrow: 1 }}>
         <DataGrid
           rows={filteredVisits}
-          // @TODO replace with opening modal https://dokumentacjamedyczna.atlassian.net/browse/MED-62
-          columns={columns(onEdit, onDelete, () => {}, isPatient)}
+          columns={columns(onEdit, onDelete, handleAddReviewClick, isPatient)}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },

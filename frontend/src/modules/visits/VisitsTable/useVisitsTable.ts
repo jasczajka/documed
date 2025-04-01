@@ -111,8 +111,6 @@ export const useVisitsTable = ({
       filterByDateRange,
     ].filter(Boolean) as ((visit: VisitLite) => boolean)[];
 
-    console.log('active filters: ', activeFilters);
-
     if (activeFilters.length === 0) return visits;
 
     return visits.filter((visit) => activeFilters.every((filterFn) => filterFn(visit)));
