@@ -3,6 +3,7 @@ package com.documed.backend.visits;
 import com.documed.backend.ReadDAO;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,7 +20,7 @@ public class FacilityDAO implements ReadDAO<Facility> {
   }
 
   @Override
-  public Facility getById(int id) throws SQLException {
+  public Optional<Facility> getById(int id) throws SQLException {
     String sql = "SELECT * FROM facility WHERE id = ?";
 
     List<Facility> facilities =
@@ -27,7 +28,7 @@ public class FacilityDAO implements ReadDAO<Facility> {
             sql,
             (rs, rowNum) -> new Facility(id, rs.getString("address"), rs.getString("city")),
             id);
-    return facilities.stream().findFirst().orElse(null);
+    return Optional.ofNullable(facilities.stream().findFirst().orElse(null));
   }
 
   @Override

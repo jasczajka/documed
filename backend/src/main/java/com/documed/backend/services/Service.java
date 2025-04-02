@@ -6,8 +6,10 @@ import com.documed.backend.visits.Visit;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+@NoArgsConstructor
 @Data
 public class Service {
   private int id;
@@ -18,4 +20,20 @@ public class Service {
   private List<Specialization> specializations;
   private List<Visit> visits;
   private List<AdditionalService> additionalServices;
+
+  public Service(int id, @NonNull String name, @NonNull BigDecimal price, @NonNull ServiceType type, int estimatedTime) {
+    this.id = id;
+    this.name = name;
+    this.price = price;
+    this.type = type;
+    this.estimatedTime = estimatedTime;
+  }
+
+  public Service(@NonNull String name, @NonNull BigDecimal price, @NonNull ServiceType type, int estimatedTime) {
+    this.name = name;
+    this.price = price;
+    this.type = type;
+    this.estimatedTime = estimatedTime;
+  }
+
 }
