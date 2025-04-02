@@ -1,6 +1,5 @@
 package com.documed.backend.visits;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,7 +18,7 @@ public class FacilityEndpoint {
   FacilityService facilityService;
 
   @GetMapping
-  public ResponseEntity<List<Facility>> getAllFacilities() throws SQLException {
+  public ResponseEntity<List<Facility>> getAllFacilities() {
     List<Facility> facilities = facilityService.getAll();
     if(facilities.isEmpty()) {
       return ResponseEntity.notFound().build();
@@ -29,7 +28,7 @@ public class FacilityEndpoint {
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<Facility> getFacility(@PathVariable int id) throws SQLException {
+  public ResponseEntity<Facility> getFacility(@PathVariable int id) {
     Optional<Facility> facility = facilityService.getById(id);
     if(facility.isEmpty()) {
       return ResponseEntity.notFound().build();

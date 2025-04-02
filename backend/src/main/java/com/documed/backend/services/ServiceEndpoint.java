@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +17,7 @@ public class ServiceEndpoint {
     private final ServiceService serviceService;
 
     @GetMapping
-    public ResponseEntity<List<Service>> getAllServices() throws SQLException {
+    public ResponseEntity<List<Service>> getAllServices() {
         List<Service> services = serviceService.getAll();
         if (services.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -28,7 +27,7 @@ public class ServiceEndpoint {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Service>> getService(@PathVariable int id) throws SQLException {
+    public ResponseEntity<Optional<Service>> getService(@PathVariable int id) {
         Optional<Service> service = serviceService.getById(id);
         if(service.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -46,8 +45,8 @@ public class ServiceEndpoint {
             } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create service.");
             }
-        } catch (SQLException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Database error: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
@@ -60,8 +59,8 @@ public class ServiceEndpoint {
             } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete service.");
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to delete service.");
         }
     }
 
@@ -76,6 +75,8 @@ public class ServiceEndpoint {
             }
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update service. Illegal argument.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 
@@ -90,6 +91,8 @@ public class ServiceEndpoint {
             }
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to update service. Illegal argument.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
 

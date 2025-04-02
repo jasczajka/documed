@@ -1,6 +1,5 @@
 package com.documed.backend.visits;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,11 +12,11 @@ public class FacilityService {
 
   private final FacilityDAO facilityDAO;
 
-  List<Facility> getAll() throws SQLException {
+  List<Facility> getAll() {
     return facilityDAO.getAll();
   }
 
-  Optional<Facility> getById(int id) throws SQLException {
+  Optional<Facility> getById(int id) {
     return facilityDAO.getById(id);
   }
 }

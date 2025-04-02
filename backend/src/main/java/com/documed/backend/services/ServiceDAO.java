@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,24 +20,24 @@ public class ServiceDAO implements FullDAO<Service> {
 
 
     @Override
-    public int create(Service obj) throws SQLException {
+    public int create(Service obj) {
         String sql = "INSERT INTO service (name, price, type, estimated_time) VALUES (?, ?, ?, ?)";
         return jdbcTemplate.update(sql, obj.getName(), obj.getPrice(), obj.getType().name(), obj.getEstimatedTime());
     }
 
     @Override
-    public int update(Service obj) throws SQLException {
+    public int update(Service obj) {
         return 0;
     }
 
     @Override
-    public int delete(int id) throws SQLException {
+    public int delete(int id){
         String sql = "DELETE FROM service WHERE id = ?";
         return jdbcTemplate.update(sql, id);
     }
 
     @Override
-    public Optional<Service> getById(int id) throws SQLException {
+    public Optional<Service> getById(int id) {
         String sql = "SELECT * FROM service WHERE id = ?";
 
         List<Service> services =
@@ -47,11 +46,11 @@ public class ServiceDAO implements FullDAO<Service> {
                         (rs, rowNum) -> new Service(id, rs.getString("name"), rs.getBigDecimal("price"),
                                 ServiceType.valueOf(rs.getString("type")), rs.getInt("estimated_time")),
                         id);
-        return Optional.ofNullable(services.stream().findFirst().orElse(null));
+        return services.stream().findFirst();
     }
 
     @Override
-    public List<Service> getAll() throws SQLException {
+    public List<Service> getAll() {
         String sql = "SELECT * FROM service";
 
         return jdbcTemplate.query(

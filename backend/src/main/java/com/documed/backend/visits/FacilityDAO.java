@@ -1,7 +1,6 @@
 package com.documed.backend.visits;
 
 import com.documed.backend.ReadDAO;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import javax.sql.DataSource;
@@ -20,7 +19,7 @@ public class FacilityDAO implements ReadDAO<Facility> {
   }
 
   @Override
-  public Optional<Facility> getById(int id) throws SQLException {
+  public Optional<Facility> getById(int id) {
     String sql = "SELECT * FROM facility WHERE id = ?";
 
     List<Facility> facilities =
@@ -32,7 +31,7 @@ public class FacilityDAO implements ReadDAO<Facility> {
   }
 
   @Override
-  public List<Facility> getAll() throws SQLException {
+  public List<Facility> getAll() {
     String sql = "SELECT * FROM facility";
     return jdbcTemplate.query(
         sql,

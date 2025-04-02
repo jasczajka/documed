@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,22 +13,22 @@ public class ServiceService {
 
     ServiceDAO serviceDAO;
 
-    List<com.documed.backend.services.Service> getAll() throws SQLException {
+    List<com.documed.backend.services.Service> getAll() {
         return serviceDAO.getAll();
     }
 
-    Optional<com.documed.backend.services.Service> getById(int id) throws SQLException {
+    Optional<com.documed.backend.services.Service> getById(int id) {
         return serviceDAO.getById(id);
     }
 
-    int create(String name, BigDecimal price, ServiceType type, int estimatedTime) throws SQLException {
+    int create(String name, BigDecimal price, ServiceType type, int estimatedTime) {
 
         com.documed.backend.services.Service service = new com.documed.backend.services.Service(name, price, type, estimatedTime);
 
         return serviceDAO.create(service);
     }
 
-    int delete(int id) throws SQLException {
+    int delete(int id) {
         return serviceDAO.delete(id);
     }
 
