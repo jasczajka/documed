@@ -96,4 +96,20 @@ public class ServiceEndpoint {
         }
     }
 
+    @PostMapping("/{id}/specialization")
+    public ResponseEntity<String> addSpecializationToService(@PathVariable int id, @RequestBody int specializationId) {
+        try {
+            int result = serviceService.addSpecializationToService(id, specializationId);
+            if (result > 0) {
+                return ResponseEntity.status(HttpStatus.OK).body("Added specialization successfully.");
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add specialization to service.");
+            }
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to add specialization to service. Illegal argument.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
 }

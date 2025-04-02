@@ -76,4 +76,9 @@ public class ServiceDAO implements FullDAO<Service> {
         return jdbcTemplate.update(sql, estimatedTime, id);
     }
 
+    public int addSpecializationToService(int serviceId, int specializationId) {
+        String sql = "INSERT INTO specialization_service (service_id, specialization_id) VALUES (?, ?)";
+        return jdbcTemplate.update(sql, serviceId, specializationId);
+    }
+
 }

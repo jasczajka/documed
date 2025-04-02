@@ -1,7 +1,6 @@
 package com.documed.backend.services;
 
 import com.documed.backend.additionalservices.AdditionalService;
-import com.documed.backend.users.Specialization;
 import com.documed.backend.visits.Visit;
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,7 +16,6 @@ public class Service {
   @NonNull private BigDecimal price;
   @NonNull private ServiceType type;
   private int estimatedTime;
-  private List<Specialization> specializations;
   private List<Visit> visits;
   private List<AdditionalService> additionalServices;
 

@@ -1,14 +1,12 @@
 package com.documed.backend.users;
 
-import com.documed.backend.services.Service;
-import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 
 @Data
+@AllArgsConstructor
 public class Specialization {
   private int id;
   @NonNull private String name;
-  private List<Service> services;
-  private List<User> users;
 }

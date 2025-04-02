@@ -46,4 +46,8 @@ public class ServiceService {
         return serviceDAO.updateEstimatedTime(serviceId, time);
     }
 
+    int addSpecializationToService(int serviceId, int specializationId) {
+        return serviceDAO.addSpecializationToService(serviceId, specializationId);
+    }
+
 }
