@@ -10,12 +10,9 @@ import java.util.Map;
 import java.util.function.Function;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.context.annotation.Role;
 import org.springframework.stereotype.Service;
 
 @Service
-@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 public class JwtUtil {
   @Value("${jwt.secret}")
   private String secret;
