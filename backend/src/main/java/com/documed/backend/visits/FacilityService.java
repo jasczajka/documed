@@ -2,7 +2,6 @@ package com.documed.backend.visits;
 
 import java.util.List;
 import java.util.Optional;
-
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

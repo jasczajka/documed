@@ -1,53 +1,56 @@
 package com.documed.backend.services;
 
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
 public class ServiceService {
 
-    ServiceDAO serviceDAO;
+  ServiceDAO serviceDAO;
 
-    List<com.documed.backend.services.Service> getAll() {
-        return serviceDAO.getAll();
+  List<com.documed.backend.services.Service> getAll() {
+    return serviceDAO.getAll();
+  }
+
+  Optional<com.documed.backend.services.Service> getById(int id) {
+    return serviceDAO.getById(id);
+  }
+
+  int create(String name, BigDecimal price, ServiceType type, int estimatedTime) {
+
+    com.documed.backend.services.Service service =
+        new com.documed.backend.services.Service(name, price, type, estimatedTime);
+
+    return serviceDAO.create(service);
+  }
+
+  int delete(int id) {
+    return serviceDAO.delete(id);
+  }
+
+  int updatePrice(int serviceId, BigDecimal price) {
+    if (price.compareTo(BigDecimal.ZERO) <= 0) {
+      throw new IllegalArgumentException("Price must be greater than zero");
     }
+    return serviceDAO.updatePrice(serviceId, price);
+  }
 
-    Optional<com.documed.backend.services.Service> getById(int id) {
-        return serviceDAO.getById(id);
+  int updateEstimatedTime(int serviceId, int time) {
+    if (time <= 0) {
+      throw new IllegalArgumentException("Time must be greater than zero");
     }
+    return serviceDAO.updateEstimatedTime(serviceId, time);
+  }
 
-    int create(String name, BigDecimal price, ServiceType type, int estimatedTime) {
+  int addSpecializationToService(int serviceId, int specializationId) {
+    return serviceDAO.addSpecializationToService(serviceId, specializationId);
+  }
 
-        com.documed.backend.services.Service service = new com.documed.backend.services.Service(name, price, type, estimatedTime);
-
-        return serviceDAO.create(service);
-    }
-
-    int delete(int id) {
-        return serviceDAO.delete(id);
-    }
-
-    int updatePrice(int serviceId, BigDecimal price) {
-        if (price.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Price must be greater than zero");
-        }
-        return serviceDAO.updatePrice(serviceId, price);
-    }
-
-    int updateEstimatedTime(int serviceId, int time) {
-        if (time <= 0) {
-            throw new IllegalArgumentException("Time must be greater than zero");
-        }
-        return serviceDAO.updateEstimatedTime(serviceId, time);
-    }
-
-    int addSpecializationToService(int serviceId, int specializationId) {
-        return serviceDAO.addSpecializationToService(serviceId, specializationId);
-    }
-
+  int removeSpecializationFromService(int serviceId, int specializationId) {
+    return serviceDAO.removeSpecializationFromService(serviceId, specializationId);
+  }
 }

@@ -1,8 +1,6 @@
 package com.documed.backend.visits;
 
 import java.util.List;
-import java.util.Optional;
-
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +18,7 @@ public class FacilityEndpoint {
   @GetMapping
   public ResponseEntity<List<Facility>> getAllFacilities() {
     List<Facility> facilities = facilityService.getAll();
-    if(facilities.isEmpty()) {
+    if (facilities.isEmpty()) {
       return ResponseEntity.notFound().build();
     } else {
       return ResponseEntity.ok(facilities);
@@ -29,11 +27,9 @@ public class FacilityEndpoint {
 
   @GetMapping("/{id}")
   public ResponseEntity<Facility> getFacility(@PathVariable int id) {
-    Optional<Facility> facility = facilityService.getById(id);
-    if(facility.isEmpty()) {
-      return ResponseEntity.notFound().build();
-    } else {
-      return ResponseEntity.ok(facility.get());
-    }
+    return facilityService
+        .getById(id)
+        .map(ResponseEntity::ok)
+        .orElseGet(() -> ResponseEntity.notFound().build());
   }
 }
