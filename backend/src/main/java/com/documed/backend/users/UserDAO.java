@@ -28,7 +28,7 @@ public class UserDAO implements FullDAO<User> {
             .email(rs.getString("email"))
             .address(rs.getString("address"))
             .password(rs.getString("password"))
-            .status(rs.getString("status"))
+            .accountStatus(AccountStatus.valueOf(rs.getString("account_status")))
             .role(UserRole.valueOf(rs.getString("role")))
             .birthDate(rs.getDate("birthdate"))
             // Optional fields
@@ -68,7 +68,7 @@ public class UserDAO implements FullDAO<User> {
         user.getEmail(),
         user.getAddress(),
         user.getPassword(),
-        user.getStatus(),
+        user.getAccountStatus(),
         user.getRole().toString(),
         user.getPesel(),
         user.getPhoneNumber(),
@@ -91,7 +91,7 @@ public class UserDAO implements FullDAO<User> {
         user.getEmail(),
         user.getAddress(),
         user.getPassword(),
-        user.getStatus(),
+        user.getAccountStatus().toString(),
         user.getRole().toString(),
         user.getPesel(),
         user.getPhoneNumber(),
@@ -126,7 +126,7 @@ public class UserDAO implements FullDAO<User> {
 
   public User createAndReturn(User user) {
     String sql =
-        "INSERT INTO \"User\" (first_name, last_name, email, address, password, status, role, "
+        "INSERT INTO \"User\" (first_name, last_name, email, address, password, account_status, role, "
             + "pesel, phone_number, birthdate, pwz) "
             + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
             + "RETURNING id";
@@ -140,7 +140,7 @@ public class UserDAO implements FullDAO<User> {
             user.getEmail(),
             user.getAddress(),
             user.getPassword(),
-            user.getStatus(),
+            user.getAccountStatus().toString(),
             user.getRole().toString(),
             user.getPesel(),
             user.getPhoneNumber(),

@@ -163,7 +163,7 @@ CREATE TABLE "User" (
     address varchar(255)  NULL,
     password varchar(255)  NOT NULL,
     phone_number varchar(255)  NULL,
-    status varchar(255)  NOT NULL,
+    account_status varchar(255)  NOT NULL,
     birthdate date  NOT NULL,
     pwz varchar(255)  NULL,
     role varchar(255)  NOT NULL,

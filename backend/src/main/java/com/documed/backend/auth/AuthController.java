@@ -65,4 +65,11 @@ public class AuthController {
 
     return ResponseEntity.status(HttpStatus.OK).build();
   }
+
+  // @TODO along with simplified UserService
+  //  @PostMapping("/delete_user/{id}")
+  //  public ResponseEntity<Void> delete_account() {
+  //    User userToDelete = authService.
+  //
+  //  }
 }

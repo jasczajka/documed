@@ -48,8 +48,7 @@ public class AuthService {
               .phoneNumber(phoneNumber)
               .address(address)
               .password(passwordEncoder.encode(password))
-              // @TODO what was status?
-              .status("ACTIVE")
+              .accountStatus(AccountStatus.ACTIVE)
               .role(UserRole.PATIENT)
               .birthDate(Date.valueOf(birthDate))
               .build();

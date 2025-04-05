@@ -11,7 +11,8 @@
     "prettier:fix": "prettier --write \"**/*.{js,tsx,ts,css,scss,jsx}\"",
     "prettier:check": "prettier --check \"**/*.{js,tsx,ts,css,scss,jsx}\"",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate:api": "orval"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -21,6 +22,8 @@
     "@mui/material": "^6.4.8",
     "@mui/x-data-grid": "^7.28.1",
     "@tailwindcss/vite": "^4.0.5",
+    "@tanstack/react-query": "^5.71.5",
+    "axios": "^1.8.4",
     "date-fns": "^4.1.0",
     "material-ui-popup-state": "^5.3.3",
     "react": "^19.0.0",
@@ -47,6 +50,7 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
+    "orval": "^7.8.0",
     "prettier": "3.4.2",
     "prettier-plugin-organize-imports": "^4.1.0",
     "prettier-plugin-tailwindcss": "^0.6.11",

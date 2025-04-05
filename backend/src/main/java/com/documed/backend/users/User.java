@@ -25,7 +25,7 @@ public class User {
   @NonNull private String address;
   @ToString.Exclude private String password;
   private String phoneNumber;
-  @NonNull private String status;
+  @NonNull private AccountStatus accountStatus;
   private Date birthDate;
   private String pwzNumber;
   @NonNull private UserRole role;
