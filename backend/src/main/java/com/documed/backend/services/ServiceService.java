@@ -1,5 +1,6 @@
 package com.documed.backend.services;
 
+import com.documed.backend.users.Specialization;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +21,8 @@ public class ServiceService {
     return serviceDAO.getById(id);
   }
 
-  int create(String name, BigDecimal price, ServiceType type, int estimatedTime) {
+  com.documed.backend.services.Service create(
+      String name, BigDecimal price, ServiceType type, int estimatedTime) {
 
     com.documed.backend.services.Service service =
         new com.documed.backend.services.Service(name, price, type, estimatedTime);
@@ -32,21 +34,21 @@ public class ServiceService {
     return serviceDAO.delete(id);
   }
 
-  int updatePrice(int serviceId, BigDecimal price) {
+  com.documed.backend.services.Service updatePrice(int serviceId, BigDecimal price) {
     if (price.compareTo(BigDecimal.ZERO) <= 0) {
       throw new IllegalArgumentException("Price must be greater than zero");
     }
     return serviceDAO.updatePrice(serviceId, price);
   }
 
-  int updateEstimatedTime(int serviceId, int time) {
+  com.documed.backend.services.Service updateEstimatedTime(int serviceId, int time) {
     if (time <= 0) {
       throw new IllegalArgumentException("Time must be greater than zero");
     }
     return serviceDAO.updateEstimatedTime(serviceId, time);
   }
 
-  int addSpecializationToService(int serviceId, int specializationId) {
+  Specialization addSpecializationToService(int serviceId, int specializationId) {
     return serviceDAO.addSpecializationToService(serviceId, specializationId);
   }
 

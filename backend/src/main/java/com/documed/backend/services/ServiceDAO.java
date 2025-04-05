@@ -1,32 +1,60 @@
 package com.documed.backend.services;
 
 import com.documed.backend.FullDAO;
+import com.documed.backend.users.Specialization;
+import com.documed.backend.users.SpecializationDAO;
 import java.math.BigDecimal;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class ServiceDAO implements FullDAO<Service> {
 
   private final JdbcTemplate jdbcTemplate;
+  private final SpecializationDAO specializationDAO;
 
-  public ServiceDAO(DataSource dataSource) {
+  public ServiceDAO(DataSource dataSource, SpecializationDAO specializationDAO) {
     this.jdbcTemplate = new JdbcTemplate(dataSource);
+    this.specializationDAO = specializationDAO;
   }
 
   @Override
-  public int create(Service obj) {
-    String sql = "INSERT INTO service (name, price, type, estimated_time) VALUES (?, ?, ?, ?)";
-    return jdbcTemplate.update(
-        sql, obj.getName(), obj.getPrice(), obj.getType().name(), obj.getEstimatedTime());
+  public Service create(Service obj) {
+    String sql =
+        "INSERT INTO service (name, price, type, estimated_time) VALUES (?, ?, ?, ?) RETURNING id";
+
+    KeyHolder keyHolder = new GeneratedKeyHolder();
+
+    jdbcTemplate.update(
+        connection -> {
+          PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+          ps.setString(1, obj.getName());
+          ps.setBigDecimal(2, obj.getPrice());
+          ps.setString(3, obj.getType().name());
+          ps.setInt(4, obj.getEstimatedTime());
+          return ps;
+        },
+        keyHolder);
+
+    if (keyHolder.getKey() != null) {
+      obj.setId(keyHolder.getKey().intValue());
+    } else {
+      throw new RuntimeException("Failed retrieve id value");
+    }
+
+    return obj;
   }
 
   @Override
-  public int update(Service obj) {
-    return 0;
+  public Service update(Service obj) {
+    return null;
   }
 
   @Override
@@ -69,19 +97,39 @@ public class ServiceDAO implements FullDAO<Service> {
         });
   }
 
-  public int updatePrice(int id, BigDecimal price) {
+  public Service updatePrice(int id, BigDecimal price) {
     String sql = "UPDATE service SET price = ? WHERE id = ?";
-    return jdbcTemplate.update(sql, price, id);
+    int affectedRows = jdbcTemplate.update(sql, price, id);
+
+    if (affectedRows == 1) {
+      return getById(id).orElseThrow(RuntimeException::new);
+    } else {
+      throw new RuntimeException("Failed to update price");
+    }
   }
 
-  public int updateEstimatedTime(int id, int estimatedTime) {
+  public Service updateEstimatedTime(int id, int estimatedTime) {
     String sql = "UPDATE service SET estimated_time = ? WHERE id = ?";
-    return jdbcTemplate.update(sql, estimatedTime, id);
+
+    int affectedRows = jdbcTemplate.update(sql, estimatedTime, id);
+
+    if (affectedRows == 1) {
+      return getById(id).orElseThrow(RuntimeException::new);
+    } else {
+      throw new RuntimeException("Failed to update estimated time");
+    }
   }
 
-  public int addSpecializationToService(int serviceId, int specializationId) {
+  public Specialization addSpecializationToService(int serviceId, int specializationId) {
     String sql = "INSERT INTO specialization_service (service_id, specialization_id) VALUES (?, ?)";
-    return jdbcTemplate.update(sql, serviceId, specializationId);
+
+    int affectedRows = jdbcTemplate.update(sql, serviceId, specializationId);
+
+    if (affectedRows == 1) {
+      return specializationDAO.getById(specializationId).orElseThrow(RuntimeException::new);
+    } else {
+      throw new RuntimeException("Failed to add specialization to the service");
+    }
   }
 
   public int removeSpecializationFromService(int serviceId, int specializationId) {

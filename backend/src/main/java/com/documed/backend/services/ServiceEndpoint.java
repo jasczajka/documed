@@ -1,6 +1,8 @@
 package com.documed.backend.services;
 
+import com.documed.backend.users.Specialization;
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -36,19 +38,17 @@ public class ServiceEndpoint {
   }
 
   @PostMapping()
-  public ResponseEntity<String> createService(@RequestBody Service service) {
+  public ResponseEntity<Service> createService(@RequestBody Service service) {
     try {
-      int result =
+      Service createdService =
           serviceService.create(
               service.getName(), service.getPrice(), service.getType(), service.getEstimatedTime());
-      if (result > 0) {
-        return ResponseEntity.status(HttpStatus.CREATED).body("Service created successfully.");
-      } else {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("Failed to create service.");
-      }
+
+      URI location = URI.create("/api/services/" + createdService.getId());
+
+      return ResponseEntity.created(location).body(createdService);
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
   }
 
@@ -69,59 +69,36 @@ public class ServiceEndpoint {
   }
 
   @PatchMapping("/{id}/price")
-  public ResponseEntity<String> updateServicePrice(
+  public ResponseEntity<Service> updateServicePrice(
       @PathVariable int id, @RequestBody BigDecimal price) {
     try {
-      int result = serviceService.updatePrice(id, price);
-      if (result > 0) {
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Service updated successfully.");
-      } else {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("Failed to update service.");
-      }
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body("Failed to update service. Illegal argument.");
+      Service updatedService = serviceService.updatePrice(id, price);
+      return new ResponseEntity<>(updatedService, HttpStatus.OK);
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
   }
 
   @PatchMapping("/{id}/time")
-  public ResponseEntity<String> updateServiceTime(
+  public ResponseEntity<Service> updateServiceTime(
       @PathVariable int id, @RequestBody int estimatedTime) {
     try {
-      int result = serviceService.updateEstimatedTime(id, estimatedTime);
-      if (result > 0) {
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Service updated successfully.");
-      } else {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("Failed to update service.");
-      }
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body("Failed to update service. Illegal argument.");
+      Service updatedService = serviceService.updateEstimatedTime(id, estimatedTime);
+      return new ResponseEntity<>(updatedService, HttpStatus.CREATED);
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
   }
 
   @PostMapping("/{id}/specialization")
-  public ResponseEntity<String> addSpecializationToService(
+  public ResponseEntity<Specialization> addSpecializationToService(
       @PathVariable int id, @RequestBody int specializationId) {
     try {
-      int result = serviceService.addSpecializationToService(id, specializationId);
-      if (result > 0) {
-        return ResponseEntity.status(HttpStatus.OK).body("Added specialization successfully.");
-      } else {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("Failed to add specialization to service.");
-      }
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body("Failed to add specialization to service. Illegal argument.");
+      Specialization addedSpecialization =
+          serviceService.addSpecializationToService(id, specializationId);
+      return new ResponseEntity<>(addedSpecialization, HttpStatus.OK);
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
   }
 
