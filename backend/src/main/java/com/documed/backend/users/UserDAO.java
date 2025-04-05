@@ -3,7 +3,6 @@ package com.documed.backend.users;
 import com.documed.backend.FullDAO;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -14,7 +13,6 @@ public class UserDAO implements FullDAO<User> {
 
   private final JdbcTemplate jdbcTemplate;
 
-  @Autowired
   public UserDAO(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
   }
@@ -102,7 +100,7 @@ public class UserDAO implements FullDAO<User> {
 
   @Override
   public int delete(int id) {
-    String sql = "DELETE FROM \"User\" WHERE id = ?";
+    String sql = "UPDATE \"User\" SET account_status = 'DEACTIVATED' WHERE id = ?";
     return jdbcTemplate.update(sql, id);
   }
 

@@ -5,6 +5,7 @@ export default {
     },
     output: {
       target: './src/shared/api/generated/generated.ts',
+      mode: 'tags-split',
       client: 'react-query',
       clean: true,
       prettier: true,

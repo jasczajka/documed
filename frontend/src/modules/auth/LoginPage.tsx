@@ -2,9 +2,15 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Button, TextField, Typography } from '@mui/material';
 import { FC } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
+import { useAuth } from 'shared/hooks/useAuth';
 import { DocuMedLogo } from 'shared/icons/DocuMedLogo';
 import * as Yup from 'yup';
+
+type FormData = {
+  login: string;
+  password: string;
+};
 
 const validationSchema = Yup.object({
   login: Yup.string()
@@ -18,6 +24,8 @@ const validationSchema = Yup.object({
 });
 
 export const LoginPage: FC = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const {
     control,
     handleSubmit,
@@ -30,8 +38,13 @@ export const LoginPage: FC = () => {
     },
   });
 
-  const onSubmit = (data: any) => {
-    console.log('Form data:', data);
+  const onSubmit = async (data: FormData) => {
+    try {
+      await login(data);
+      navigate('/');
+    } catch (error) {
+      console.error('Login error:', error);
+    }
   };
 
   return (
@@ -84,9 +97,10 @@ export const LoginPage: FC = () => {
           Zaloguj się
         </Button>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', paddingTop: 3 }}>
+          {/* @TODO when Email Module is ready, implement forgot password functionality with sending a new password
           <Button variant="outlined" sx={{ width: '50%' }}>
             Zapomniałem hasła
-          </Button>
+          </Button> */}
           <Box sx={{ display: 'flex', paddingTop: 1 }}>
             <Typography variant="body1">Nie masz konta?&nbsp;</Typography>
             <Link to="/register">

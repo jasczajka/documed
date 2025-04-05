@@ -2,6 +2,7 @@ import { lazy } from 'react';
 import { createBrowserRouter, Navigate, RouteObject, RouterProvider } from 'react-router';
 import { FileUpload } from 'shared/components/FileUpload/FileUpload';
 import { ProtectedRoute } from 'shared/components/ProtectedRoute';
+import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { LoggedLayout } from '../modules/layouts/LoggedLayout';
 
 const LoginPage = lazy(() => import('../modules/auth/LoginPage'));
@@ -17,7 +18,6 @@ const TestBlankPage = lazy(() => import('./TestBlankPage'));
 // @TODO replace these with a useRoles hook that will determine whether user is backoffice / admin / patient
 const isAdmin = true;
 const isPatient = true;
-const isAuthenticated = true;
 
 const defaultRoutes: RouteObject[] = [
   // test path for testing purposes only @TODO to remove in the future
@@ -97,6 +97,8 @@ const authRoutes: RouteObject[] = [
 ];
 
 export const AppRouter = () => {
+  const { user } = useAuthStore();
+  const isAuthenticated = user !== null;
   const router = createBrowserRouter(isAuthenticated ? authRoutes : defaultRoutes);
   return <RouterProvider router={router} />;
 };
