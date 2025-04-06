@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class FacilityService {
 
-  FacilityDAO facilityDAO;
+  private final FacilityDAO facilityDAO;
 
   List<Facility> getAll() {
     return facilityDAO.getAll();

@@ -1,13 +1,13 @@
 package com.documed.backend.services;
 
-import com.documed.backend.additionalservices.AdditionalService;
-import com.documed.backend.users.Specialization;
-import com.documed.backend.visits.Visit;
 import java.math.BigDecimal;
-import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class Service {
   private int id;
@@ -15,7 +15,15 @@ public class Service {
   @NonNull private BigDecimal price;
   @NonNull private ServiceType type;
   private int estimatedTime;
-  private List<Specialization> specializations;
-  private List<Visit> visits;
-  private List<AdditionalService> additionalServices;
+
+  public Service(
+      @NonNull String name,
+      @NonNull BigDecimal price,
+      @NonNull ServiceType type,
+      int estimatedTime) {
+    this.name = name;
+    this.price = price;
+    this.type = type;
+    this.estimatedTime = estimatedTime;
+  }
 }

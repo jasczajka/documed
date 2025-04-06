@@ -10,14 +10,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping(("/api/facilities"))
+@RequestMapping("/api/facilities")
 public class FacilityEndpoint {
 
   FacilityService facilityService;
 
   @GetMapping
-  public List<Facility> getAllFacilities() {
-    return facilityService.getAll();
+  public ResponseEntity<List<Facility>> getAllFacilities() {
+    List<Facility> facilities = facilityService.getAll();
+    if (facilities.isEmpty()) {
+      return ResponseEntity.notFound().build();
+    } else {
+      return ResponseEntity.ok(facilities);
+    }
   }
 
   @GetMapping("/{id}")

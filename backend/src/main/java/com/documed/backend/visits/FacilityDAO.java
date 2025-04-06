@@ -25,7 +25,7 @@ public class FacilityDAO implements ReadDAO<Facility> {
             sql,
             (rs, rowNum) -> new Facility(id, rs.getString("address"), rs.getString("city")),
             id);
-    return facilities.stream().findFirst();
+    return Optional.ofNullable(facilities.stream().findFirst().orElse(null));
   }
 
   @Override
