@@ -1,4 +1,4 @@
-package com.documed.backend.prescription;
+package com.documed.backend.prescriptions;
 
 import com.documed.backend.visits.Visit;
 import java.util.Date;

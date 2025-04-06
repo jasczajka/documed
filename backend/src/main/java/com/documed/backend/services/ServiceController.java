@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/services")
-public class ServiceEndpoint {
+public class ServiceController {
 
   private final ServiceService serviceService;
 

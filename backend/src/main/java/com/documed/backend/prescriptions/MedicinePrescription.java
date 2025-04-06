@@ -1,4 +1,4 @@
-package com.documed.backend.prescription;
+package com.documed.backend.prescriptions;
 
 import com.documed.backend.medicines.model.Medicine;
 import lombok.AllArgsConstructor;

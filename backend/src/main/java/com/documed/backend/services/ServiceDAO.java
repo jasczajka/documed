@@ -53,11 +53,6 @@ public class ServiceDAO implements FullDAO<Service> {
   }
 
   @Override
-  public Service update(Service obj) {
-    return null;
-  }
-
-  @Override
   public int delete(int id) {
     String sql = "DELETE FROM service WHERE id = ?";
     return jdbcTemplate.update(sql, id);

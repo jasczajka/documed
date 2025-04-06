@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/specializations")
-public class SpecializationEndpoint {
+public class SpecializationController {
 
   private final SpecializationService specializationService;
 
