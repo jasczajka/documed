@@ -53,49 +53,63 @@ public class UserDAO implements FullDAO<User> {
   }
 
   @Override
-  public int create(User user) {
+  public User create(User user) {
     String sql =
-        "INSERT INTO \"User\" (first_name, last_name, email, address, password, status, role, "
+        "INSERT INTO \"User\" (first_name, last_name, email, address, password, account_status, role, "
             + "pesel, phone_number, birthdate, pwz) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+            + "RETURNING id";
 
-    return jdbcTemplate.update(
-        sql,
-        user.getFirstName(),
-        user.getLastName(),
-        user.getEmail(),
-        user.getAddress(),
-        user.getPassword(),
-        user.getAccountStatus(),
-        user.getRole().toString(),
-        user.getPesel(),
-        user.getPhoneNumber(),
-        user.getBirthDate() != null ? new java.sql.Date(user.getBirthDate().getTime()) : null,
-        user.getPwzNumber());
+    Integer generatedId =
+        jdbcTemplate.queryForObject(
+            sql,
+            (rs, rowNum) -> rs.getInt("id"),
+            user.getFirstName(),
+            user.getLastName(),
+            user.getEmail(),
+            user.getAddress(),
+            user.getPassword(),
+            user.getAccountStatus().toString(),
+            user.getRole().toString(),
+            user.getPesel(),
+            user.getPhoneNumber(),
+            user.getBirthDate() != null ? new java.sql.Date(user.getBirthDate().getTime()) : null,
+            user.getPwzNumber());
+
+    return getById(generatedId)
+        .orElseThrow(() -> new IllegalStateException("Failed to retrieve created user"));
   }
 
   @Override
-  public int update(User user) {
+  public User update(User user) {
     String sql =
         "UPDATE \"User\" SET first_name = ?, last_name = ?, email = ?, address = ?, "
-            + "password = ?, status = ?, role = ?, "
+            + "password = ?, account_status = ?, role = ?, "
             + "pesel = ?, phone_number = ?, birthdate = ?, pwz = ? "
             + "WHERE id = ?";
 
-    return jdbcTemplate.update(
-        sql,
-        user.getFirstName(),
-        user.getLastName(),
-        user.getEmail(),
-        user.getAddress(),
-        user.getPassword(),
-        user.getAccountStatus().toString(),
-        user.getRole().toString(),
-        user.getPesel(),
-        user.getPhoneNumber(),
-        user.getBirthDate() != null ? new java.sql.Date(user.getBirthDate().getTime()) : null,
-        user.getPwzNumber(),
-        user.getId());
+    int rowsAffected =
+        jdbcTemplate.update(
+            sql,
+            user.getFirstName(),
+            user.getLastName(),
+            user.getEmail(),
+            user.getAddress(),
+            user.getPassword(),
+            user.getAccountStatus().toString(),
+            user.getRole().toString(),
+            user.getPesel(),
+            user.getPhoneNumber(),
+            user.getBirthDate() != null ? new java.sql.Date(user.getBirthDate().getTime()) : null,
+            user.getPwzNumber(),
+            user.getId());
+
+    if (rowsAffected == 0) {
+      throw new IllegalStateException("Failed to update user with id " + user.getId());
+    }
+
+    return getById(user.getId())
+        .orElseThrow(() -> new IllegalStateException("Failed to retrieve updated user"));
   }
 
   @Override
