@@ -55,16 +55,22 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
+            set -e
+            echo "Logging into ECR..."
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
 
+            echo "Pulling the latest Docker image from ECR..."
             docker pull ${{ secrets.ECR_REGISTRY }}:latest
 
+            echo "Stopping existing container if it exists..."
             docker stop documed-backend || true
             docker rm documed-backend || true
 
+            echo "Starting the new container..."
             docker run -d --name documed-backend -p 8080:8080 \
               -e SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }} \
               -e SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }} \
               -e SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
               -e SPRING_ALLOWED_ORIGINS=${{ secrets.SPRING_ALLOWED_ORIGINS }} \
               ${{ secrets.ECR_REGISTRY }}:latest
+            echo "Deployment completed successfully."
