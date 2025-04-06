@@ -50,7 +50,7 @@ const validationSchema = Yup.object({
 
 export const RegisterPage: FC = () => {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register, registerError } = useAuth();
   const {
     control,
     handleSubmit,
@@ -266,6 +266,18 @@ export const RegisterPage: FC = () => {
         <Button variant="contained" type="submit">
           Zarejestruj się
         </Button>
+
+        {registerError && (
+          <Typography
+            color="error"
+            variant="body2"
+            sx={{
+              alignSelf: 'center',
+            }}
+          >
+            {registerError.message}
+          </Typography>
+        )}
 
         <Box sx={{ display: 'flex', justifyContent: 'center', paddingTop: 3 }}>
           <Typography variant="body1">Mam już konto.&nbsp;</Typography>

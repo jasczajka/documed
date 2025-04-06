@@ -45,7 +45,6 @@ export const TableFilters = <T extends Record<string, string>>({
       <Stack direction="row" spacing={2} sx={{ gap: 2, mb: 6 }} flexWrap="wrap" useFlexGap>
         {filterConfig.map((filter) => {
           const commonProps = {
-            key: filter.name,
             label: filter.label,
             name: filter.name,
             value: filters[filter.name] || '',
@@ -57,7 +56,7 @@ export const TableFilters = <T extends Record<string, string>>({
           switch (filter.type) {
             case 'select':
               return (
-                <TextField select {...commonProps}>
+                <TextField select key={filter.name} {...commonProps}>
                   <MenuItem value="">Wszystkie</MenuItem>
                   {filter.options?.map((option) => (
                     <MenuItem key={option.value} value={option.value}>
@@ -69,6 +68,7 @@ export const TableFilters = <T extends Record<string, string>>({
             case 'datetime':
               return (
                 <TextField
+                  key={filter.name}
                   {...commonProps}
                   type="datetime-local"
                   slotProps={{
@@ -80,7 +80,7 @@ export const TableFilters = <T extends Record<string, string>>({
               );
             case 'text':
             default:
-              return <TextField {...commonProps} />;
+              return <TextField key={filter.name} {...commonProps} />;
           }
         })}
       </Stack>

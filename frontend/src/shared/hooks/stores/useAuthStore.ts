@@ -1,27 +1,30 @@
 import { UserRole } from 'shared/api/generated/generated.schemas';
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 export type AuthUser = {
   id: number;
   role: UserRole;
 } | null;
 
-type AuthState = {
+interface AuthStoreType {
+  authenticated: boolean;
   user: AuthUser;
-  setUser: (user: AuthUser) => void;
+  authenticateUser: (user: AuthUser) => void;
   clearUser: () => void;
-};
+}
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
+export const useAuthStore = create<AuthStoreType>()((set) => ({
+  authenticated: false,
+  user: null,
+  authenticateUser: (user: AuthUser) => {
+    console.log('Authenticating user', user);
+    set(() => ({ user, authenticated: !!user }));
+  },
+  clearUser: () => {
+    console.log('Clearing user');
+    set({
       user: null,
-      setUser: (user) => set({ user }),
-      clearUser: () => set({ user: null }),
-    }),
-    {
-      name: 'auth-storage',
-    },
-  ),
-);
+      authenticated: false,
+    });
+  },
+}));

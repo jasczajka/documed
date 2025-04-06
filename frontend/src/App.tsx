@@ -1,7 +1,13 @@
+import { Suspense } from 'react';
+import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
 import { AppRouter } from './pages/AppRouter';
 
 export const App = () => {
-  return <AppRouter />;
+  return (
+    <Suspense fallback={<FullPageLoadingSpinner />}>
+      <AppRouter />;
+    </Suspense>
+  );
 };
 
 export default App;
