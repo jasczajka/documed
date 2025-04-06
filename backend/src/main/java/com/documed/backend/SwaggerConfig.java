@@ -20,10 +20,11 @@ public class SwaggerConfig {
     // when running with 'local' profile allow all requests to swagger
     boolean isLocal = env.acceptsProfiles("local");
 
-    http.securityMatcher("/swagger-ui/**", "/v3/api-docs/**")
-        .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+    http.securityMatcher("/swagger-ui/**", "/v3/api-docs/**");
 
-    if (!isLocal) {
+    if (isLocal) {
+      http.authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+    } else {
       http.authorizeHttpRequests(auth -> auth.anyRequest().authenticated());
     }
 
