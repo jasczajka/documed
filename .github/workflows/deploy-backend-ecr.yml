@@ -56,22 +56,23 @@ jobs:
           key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
           script: |
             set -e
+            APP_PORT=8080
 
             if ! command -v caddy &> /dev/null; then
               echo "Installing Caddy..."
-              sudo apt update
-              sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https
-              curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
-              echo "deb [signed-by=/usr/share/keyrings/caddy-stable-archive-keyring.gpg] https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main" | sudo tee /etc/apt/sources.list.d/caddy-stable.list
-              sudo apt update
-              sudo apt install caddy
+              sudo yum install -y tar
+              curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/setup.rpm.sh' | sudo bash
+              sudo yum install -y caddy
             fi
 
             echo "Deploying Caddy config..."
             echo "${{ secrets.EC2_HOST }} {
-              reverse_proxy localhost:8080
+              reverse_proxy localhost:${APP_PORT}
               tls internal
             }" | sudo tee /etc/caddy/Caddyfile
+
+            sudo systemctl enable caddy
+            sudo systemctl restart caddy
 
         
             echo "Logging into ECR..."
