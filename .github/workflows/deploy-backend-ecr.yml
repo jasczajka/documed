@@ -59,10 +59,12 @@ jobs:
             APP_PORT=8080
 
             if ! command -v caddy &> /dev/null; then
-              echo "Installing Caddy..."
-              sudo yum -y install yum-plugin-copr
-              sudo yum -y copr enable @caddy/caddy epel-10-$(arch)
-              sudo yum -y install caddy
+              echo "Installing Caddy for Amazon Linux 2023..."
+              sudo dnf -y install dnf-plugins-core
+              sudo dnf -y copr enable @caddy/caddy epel-9-$(arch)
+              sudo dnf -y install caddy
+            else
+              echo "Caddy is already installed."
             fi
 
             echo "Deploying Caddy config..."
