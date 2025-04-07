@@ -60,10 +60,9 @@ jobs:
 
             if ! command -v caddy &> /dev/null; then
               echo "Installing Caddy..."
-              sudo yum install -y tar
-              sudo dnf install -y 'dnf-command(copr)'
-              sudo dnf copr enable -y @caddy/caddy
-              sudo dnf install -y caddy
+              sudo yum install -y yum-utils
+              sudo yum-config-manager --add-repo https://dl.cloudsmith.io/public/caddy/stable/rpm/linux/any-version/main.repo
+              sudo yum install -y caddy
             fi
 
             echo "Deploying Caddy config..."
