@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class ServiceService {
 
-  ServiceDAO serviceDAO;
+  private final ServiceDAO serviceDAO;
 
   List<com.documed.backend.services.Service> getAll() {
     return serviceDAO.getAll();
