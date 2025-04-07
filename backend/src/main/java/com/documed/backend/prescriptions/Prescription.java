@@ -12,7 +12,17 @@ public class Prescription {
   private String description;
   private final Date date;
   @NonNull private Date expirationDate;
-  private int pesel;
+  private String pesel;
   private String passportNumber;
   @NonNull private Visit visit;
+
+  public Prescription(int id, int accessCode, String description, Date date, @NonNull Date expirationDate, String pesel, String passportNumber) {
+    this.id = id;
+    this.accessCode = accessCode;
+    this.description = description;
+    this.date = date;
+    this.expirationDate = expirationDate;
+    this.pesel = pesel;
+    this.passportNumber = passportNumber;
+  }
 }
