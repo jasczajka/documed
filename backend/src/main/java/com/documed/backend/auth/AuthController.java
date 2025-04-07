@@ -62,8 +62,8 @@ public class AuthController {
     jwtCookie.setHttpOnly(true);
     jwtCookie.setPath("/");
     jwtCookie.setMaxAge(60 * 60 * 24 * 7); // 1 week
-    jwtCookie.setAttribute("SameSite", "Lax");
-    jwtCookie.setSecure(false);
+    jwtCookie.setAttribute("SameSite", "None");
+    jwtCookie.setSecure(true);
 
     servletResponse.addCookie(jwtCookie);
     logger.debug("JWT cookie set for user {}", authResponse.getUserId());
@@ -144,8 +144,8 @@ public class AuthController {
     jwtCookie.setHttpOnly(true);
     jwtCookie.setPath("/");
     jwtCookie.setMaxAge(0);
-    jwtCookie.setSecure(false);
-    jwtCookie.setAttribute("SameSite", "Lax");
+    jwtCookie.setAttribute("SameSite", "None");
+    jwtCookie.setSecure(true);
     response.addCookie(jwtCookie);
   }
 }
