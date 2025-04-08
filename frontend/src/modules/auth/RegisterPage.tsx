@@ -1,9 +1,9 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Button, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Snackbar, TextField, Typography } from '@mui/material';
 import dayjs from 'dayjs';
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import { useAuth } from 'shared/hooks/useAuth';
 import { DocuMedLogo } from 'shared/icons/DocuMedLogo';
 import * as Yup from 'yup';
@@ -49,7 +49,7 @@ const validationSchema = Yup.object({
 });
 
 export const RegisterPage: FC = () => {
-  const navigate = useNavigate();
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const { register, registerError } = useAuth();
   const {
     control,
@@ -84,7 +84,7 @@ export const RegisterPage: FC = () => {
         address: data.address,
         birthdate: data.birthdate,
       });
-      navigate('/login');
+      setSnackbarOpen(true);
     } catch (error) {
       console.error('Registration error:', error);
     }
@@ -287,6 +287,18 @@ export const RegisterPage: FC = () => {
             </Typography>
           </Link>
         </Box>
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={150000}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+          <Alert severity="success" sx={{ width: '100%' }}>
+            Użytkownik zarejestrowany pomyślnie.{' '}
+            <Link to="/login" style={{ color: 'inherit', textDecoration: 'underline' }}>
+              Kliknij tutaj, aby się zalogować
+            </Link>
+          </Alert>
+        </Snackbar>
       </Box>
     </main>
   );

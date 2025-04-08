@@ -48,6 +48,12 @@ export const mapLoginError = (error: any): AuthError => {
         message: 'Zbyt wiele prób logowania. Spróbuj później.',
         code: 'RATE_LIMITED',
       };
+    case 409:
+      return {
+        status,
+        message: 'Istnieje już użytkownik z podanym numerem PESEL lub adresem e-mail.',
+        code: 'CONFLICT',
+      };
     case 500:
     default:
       return {
