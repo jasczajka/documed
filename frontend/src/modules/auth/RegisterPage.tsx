@@ -1,14 +1,37 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Button, TextField, Typography } from '@mui/material';
-import { FC } from 'react';
+import { Alert, Box, Button, Snackbar, TextField, Typography } from '@mui/material';
+import dayjs from 'dayjs';
+import { FC, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Link } from 'react-router';
+import { useAuth } from 'shared/hooks/useAuth';
 import { DocuMedLogo } from 'shared/icons/DocuMedLogo';
 import * as Yup from 'yup';
+import { getBirthDateFromPESEL } from './utils';
+
+type FormData = {
+  firstName: string;
+  lastName: string;
+  pesel: string;
+  birthdate: string;
+  phoneNumber: string;
+  email: string;
+  address: string;
+  password: string;
+  confirmPassword: string;
+};
 
 const validationSchema = Yup.object({
   firstName: Yup.string().required('Imię jest wymagane'),
   lastName: Yup.string().required('Nazwisko jest wymagane'),
+  birthdate: Yup.string()
+    .required('Data urodzenia jest wymagana')
+    .matches(/^\d{4}-\d{2}-\d{2}$/, 'Data musi być w formacie RRRR-MM-DD')
+    .test(
+      'is-adult',
+      'Musisz mieć co najmniej 18 lat',
+      (value) => dayjs().diff(dayjs(value, 'YYYY-MM-DD'), 'years') >= 18,
+    ),
   pesel: Yup.string()
     .matches(/^\d{11}$/, 'PESEL musi mieć dokładnie 11 cyfr')
     .required('PESEL jest wymagany'),
@@ -26,16 +49,20 @@ const validationSchema = Yup.object({
 });
 
 export const RegisterPage: FC = () => {
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const { register, registerError } = useAuth();
   const {
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
       firstName: '',
       lastName: '',
       pesel: '',
+      birthdate: '',
       phoneNumber: '',
       email: '',
       address: '',
@@ -44,8 +71,23 @@ export const RegisterPage: FC = () => {
     },
   });
 
-  const onSubmit = (data: any) => {
-    console.log('Form data:', data);
+  const onSubmit = async (data: FormData) => {
+    try {
+      await register({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        pesel: data.pesel,
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+        phoneNumber: data.phoneNumber,
+        address: data.address,
+        birthdate: data.birthdate,
+      });
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error('Registration error:', error);
+    }
   };
 
   return (
@@ -107,9 +149,20 @@ export const RegisterPage: FC = () => {
                 error={!!errors.pesel}
                 helperText={errors.pesel?.message}
                 fullWidth
+                onChange={(e) => {
+                  field.onChange(e);
+                  const value = e.target.value;
+                  field.onChange(value);
+
+                  if (value.length === 11) {
+                    const date = getBirthDateFromPESEL(value);
+                    setValue('birthdate', dayjs(date).format('YYYY-MM-DD'));
+                  }
+                }}
               />
             )}
           />
+
           <Controller
             name="phoneNumber"
             control={control}
@@ -125,21 +178,40 @@ export const RegisterPage: FC = () => {
             )}
           />
         </Box>
-
-        <Controller
-          name="email"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              label="Adres-email"
-              placeholder="Wprowadź swój adres-email"
-              error={!!errors.email}
-              helperText={errors.email?.message}
-              fullWidth
-            />
-          )}
-        />
+        <Box sx={{ display: 'flex', width: '100%', gap: 6 }}>
+          <Controller
+            name="email"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Adres-email"
+                placeholder="Wprowadź swój adres-email"
+                error={!!errors.email}
+                helperText={errors.email?.message}
+                fullWidth
+              />
+            )}
+          />
+          <Controller
+            name="birthdate"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Data urodzenia"
+                type="date"
+                slotProps={{
+                  inputLabel: { shrink: true },
+                  htmlInput: { max: dayjs().subtract(18, 'years').format('YYYY-MM-DD') },
+                }}
+                error={!!errors.birthdate}
+                helperText={errors.birthdate?.message}
+                fullWidth
+              />
+            )}
+          />
+        </Box>
 
         <Controller
           name="address"
@@ -195,6 +267,18 @@ export const RegisterPage: FC = () => {
           Zarejestruj się
         </Button>
 
+        {registerError && (
+          <Typography
+            color="error"
+            variant="body2"
+            sx={{
+              alignSelf: 'center',
+            }}
+          >
+            {registerError.message}
+          </Typography>
+        )}
+
         <Box sx={{ display: 'flex', justifyContent: 'center', paddingTop: 3 }}>
           <Typography variant="body1">Mam już konto.&nbsp;</Typography>
           <Link to="/login">
@@ -203,6 +287,18 @@ export const RegisterPage: FC = () => {
             </Typography>
           </Link>
         </Box>
+        <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={150000}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+          <Alert severity="success" sx={{ width: '100%' }}>
+            Użytkownik zarejestrowany pomyślnie.{' '}
+            <Link to="/login" style={{ color: 'inherit', textDecoration: 'underline' }}>
+              Kliknij tutaj, aby się zalogować
+            </Link>
+          </Alert>
+        </Snackbar>
       </Box>
     </main>
   );

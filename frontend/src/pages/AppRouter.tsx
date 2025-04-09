@@ -1,7 +1,9 @@
-import { lazy } from 'react';
+import { lazy, useLayoutEffect, useMemo } from 'react';
 import { createBrowserRouter, Navigate, RouteObject, RouterProvider } from 'react-router';
-import { FileUpload } from 'shared/components/FileUpload/FileUpload';
+import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
 import { ProtectedRoute } from 'shared/components/ProtectedRoute';
+import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
+import { useAuth } from 'shared/hooks/useAuth';
 import { LoggedLayout } from '../modules/layouts/LoggedLayout';
 
 const LoginPage = lazy(() => import('../modules/auth/LoginPage'));
@@ -12,26 +14,15 @@ const SpecialistsPage = lazy(() => import('./SpecialistsPage'));
 const ReferralsPage = lazy(() => import('./ReferralsPage'));
 const PrescriptionsPage = lazy(() => import('./PrescriptionsPage'));
 const AdministrationPage = lazy(() => import('./AdministrationPage'));
-const TestBlankPage = lazy(() => import('./TestBlankPage'));
 
 // @TODO replace these with a useRoles hook that will determine whether user is backoffice / admin / patient
 const isAdmin = true;
 const isPatient = true;
-const isAuthenticated = true;
 
 const defaultRoutes: RouteObject[] = [
-  // test path for testing purposes only @TODO to remove in the future
-  {
-    path: '/test',
-    element: (
-      <TestBlankPage>
-        <FileUpload />
-      </TestBlankPage>
-    ),
-  },
   {
     path: '/',
-    element: <Navigate to="/register" replace />,
+    element: <Navigate to="/login" replace />,
   },
   {
     path: '/register',
@@ -97,6 +88,22 @@ const authRoutes: RouteObject[] = [
 ];
 
 export const AppRouter = () => {
-  const router = createBrowserRouter(isAuthenticated ? authRoutes : defaultRoutes);
-  return <RouterProvider router={router} />;
+  const { verifyAuthentication, loading } = useAuth();
+  const authenticated = useAuthStore((state) => state.authenticated);
+  console.log('re-rendering app router');
+  console.log('authenticated? ', authenticated);
+  const router = useMemo(() => {
+    const routes = authenticated ? authRoutes : defaultRoutes;
+    return createBrowserRouter(routes);
+  }, [authenticated]);
+
+  useLayoutEffect(() => {
+    verifyAuthentication();
+  }, []);
+
+  if (loading) {
+    return <FullPageLoadingSpinner />;
+  }
+
+  return <RouterProvider router={router} key={authenticated ? 'auth' : 'default'} />;
 };

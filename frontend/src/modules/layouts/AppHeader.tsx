@@ -1,6 +1,6 @@
-// AppHeader.tsx
 import { Logout, Person, Settings } from '@mui/icons-material';
 import {
+  CircularProgress,
   ClickAwayListener,
   Fade,
   IconButton,
@@ -10,13 +10,18 @@ import {
   Popper,
 } from '@mui/material';
 import PopupState, { bindPopper, bindToggle } from 'material-ui-popup-state';
-import { memo, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { NavLink } from 'react-router';
+import { useAuth } from 'shared/hooks/useAuth';
 import { useSitemap } from 'shared/hooks/useSitemap';
 import { DocuMedLogo } from 'shared/icons/DocuMedLogo';
 
 export const AppHeader = memo(() => {
   const sitemap = useSitemap();
+  const { logout, loading } = useAuth();
+  const handleLogout = useCallback(async () => {
+    await logout();
+  }, []);
 
   const paths = useMemo(() => {
     // @TODO replace these with a useRoles hook that will determine whether user is backoffice / admin / patient
@@ -71,7 +76,12 @@ export const AppHeader = memo(() => {
               <IconButton {...bindToggle(popupState)} color="primary">
                 <Settings />
               </IconButton>
-              <ClickAwayListener onClickAway={() => popupState.close} mouseEvent="onMouseDown">
+              <ClickAwayListener
+                onClickAway={() => {
+                  if (!loading) popupState.close();
+                }}
+                mouseEvent="onMouseDown"
+              >
                 <Popper
                   {...bindPopper(popupState)}
                   transition
@@ -87,8 +97,8 @@ export const AppHeader = memo(() => {
                           <MenuItem className="flex gap-2">
                             <Person /> Konto
                           </MenuItem>
-                          <MenuItem className="flex gap-2">
-                            <Logout /> Wyloguj się
+                          <MenuItem className="flex gap-2" onClick={handleLogout}>
+                            {loading ? <CircularProgress size={24} /> : <Logout />}Wyloguj się
                           </MenuItem>
                         </MenuList>
                       </Paper>
