@@ -119,22 +119,22 @@ public class AuthController {
     return ResponseEntity.ok().build();
   }
 
-  @PostMapping("/delete_user/{id}")
-  public ResponseEntity<Void> delete_account(@PathVariable int id) {
-    logger.info("Account deletion request for user ID: {}", id);
+  @PostMapping("/deactivate_account/{id}")
+  public ResponseEntity<Void> deactivate_account(@PathVariable int id) {
+    logger.info("Account deactivation request for user ID: {}", id);
 
     Optional<User> user = userService.getById(id);
     if (user.isEmpty()) {
-      logger.warn("User not found for deletion: ID {}", id);
+      logger.warn("User not found for account deactivation: ID {}", id);
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     boolean deactivated = userService.deactivateUser(id);
     if (deactivated) {
-      logger.info("User deactivated successfully: ID {}", id);
+      logger.info("User account deactivated successfully: ID {}", id);
       return ResponseEntity.noContent().build();
     } else {
-      logger.error("Failed to deactivate user: ID {}", id);
+      logger.error("Failed to deactivate account for user: ID {}", id);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
   }

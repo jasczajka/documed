@@ -12,7 +12,6 @@ import lombok.*;
 
 @Data
 @Builder
-@AllArgsConstructor
 public class User {
 
   @Schema(required = true)
