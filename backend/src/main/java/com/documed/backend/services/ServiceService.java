@@ -21,7 +21,7 @@ public class ServiceService {
     return serviceDAO.getById(id);
   }
 
-  com.documed.backend.services.Service create(
+  com.documed.backend.services.Service createService(
       String name, BigDecimal price, ServiceType type, int estimatedTime) {
 
     com.documed.backend.services.Service service =

@@ -41,8 +41,9 @@ public class ServiceController {
   public ResponseEntity<Service> createService(@RequestBody Service service) {
     try {
       Service createdService =
-          serviceService.create(
-              service.getName(), service.getPrice(), service.getType(), service.getEstimatedTime());
+          serviceService.createService(
+              service.getName(), service.getPrice(), service.getType(), service.getEstimatedTime()
+          );
 
       URI location = URI.create("/api/services/" + createdService.getId());
 
