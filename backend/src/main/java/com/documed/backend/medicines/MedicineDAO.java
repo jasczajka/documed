@@ -23,6 +23,7 @@ public class MedicineDAO implements FullDAO<Medicine> {
           Medicine.builder()
               .id(rs.getString("id"))
               .name(rs.getString("name"))
+              .power(rs.getString("power"))
               .commonName(rs.getString("common_name"))
               .packaging(rs.getString("packaging"))
               .build();
@@ -32,6 +33,7 @@ public class MedicineDAO implements FullDAO<Medicine> {
           LiteMedicine.builder()
               .id(rs.getString("id"))
               .name(rs.getString("name"))
+              .power(rs.getString("power"))
               .commonName(rs.getString("common_name"))
               .build();
 
@@ -43,10 +45,11 @@ public class MedicineDAO implements FullDAO<Medicine> {
   public Medicine createOrUpdate(Medicine medicine) {
     String sql =
         """
-            INSERT INTO medicine (id, name, common_name, packaging)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO medicine (id, name, power, common_name, packaging)
+            VALUES (?, ?, ?, ?, ?)
             ON CONFLICT (id) DO UPDATE SET
               name = EXCLUDED.name,
+              power = EXCLUDED.power,
               common_name = EXCLUDED.common_name,
               packaging = EXCLUDED.packaging
         """;
@@ -55,6 +58,7 @@ public class MedicineDAO implements FullDAO<Medicine> {
         sql,
         medicine.getId(),
         medicine.getName(),
+        medicine.getPower(),
         medicine.getCommonName(),
         medicine.getPackaging());
 
@@ -89,7 +93,7 @@ public class MedicineDAO implements FullDAO<Medicine> {
   public List<LiteMedicine> searchLite(String query, int limit) {
     String sql =
         """
-            SELECT id, name, common_name FROM medicine
+            SELECT id, name, power, common_name FROM medicine
             WHERE LOWER(name) LIKE LOWER(?) OR LOWER(common_name) LIKE LOWER(?)
             LIMIT ?
             """;

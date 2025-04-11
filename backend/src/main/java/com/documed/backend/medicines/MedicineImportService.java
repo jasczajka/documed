@@ -97,10 +97,11 @@ public class MedicineImportService {
 
             String upsertSql =
                 """
-                    INSERT INTO medicine (id, name, common_name, packaging)
-                    VALUES (?, ?, ?, ?)
+                    INSERT INTO medicine (id, name, power, common_name, packaging)
+                    VALUES (?, ?, ?, ?, ?)
                     ON CONFLICT (id) DO UPDATE SET
                         name = EXCLUDED.name,
+                        power = EXCLUDED.power,
                         common_name = EXCLUDED.common_name,
                         packaging = EXCLUDED.packaging
                     """;
@@ -116,10 +117,16 @@ public class MedicineImportService {
                     public void setValues(PreparedStatement ps, int index) throws SQLException {
                       Row row = batch.get(index);
                       try {
-                        ps.setString(1, getStringValue(row.getCell(0)));
-                        ps.setString(2, getStringValue(row.getCell(1)));
-                        ps.setString(3, getStringValue(row.getCell(2)));
-                        ps.setString(4, getStringValue(row.getCell(14)));
+                        ps.setString(1, getStringValue(row.getCell(0))); // id - column 1
+                        ps.setString(2, getStringValue(row.getCell(1))); // name - column 2
+                        ps.setString(
+                            3,
+                            getStringValue(row.getCell(7)).length() > 100
+                                ? getStringValue(row.getCell(7)).substring(0, 100)
+                                : getStringValue(
+                                    row.getCell(7))); // power - column 8, trim to 100 characters
+                        ps.setString(4, getStringValue(row.getCell(2))); // common name - column 3
+                        ps.setString(5, getStringValue(row.getCell(14))); // packaging - column 15
                         processed.incrementAndGet();
                       } catch (Exception e) {
                         logger.warn("Skipping row {}: {}", row.getRowNum(), e.getMessage());
@@ -128,6 +135,7 @@ public class MedicineImportService {
                         ps.setString(2, "");
                         ps.setString(3, "");
                         ps.setString(4, "");
+                        ps.setString(5, "");
                       }
                     }
 
@@ -188,7 +196,7 @@ public class MedicineImportService {
       logger.info("Packaging length analysis completed");
       logger.info("Total rows analyzed: {}", totalRowsAnalyzed);
       logger.info("Longest packaging string ({} characters):", maxLength);
-      logger.info("Found at row {}: {}", rowWithLongest, longestPackaging);
+      logger.info("Found at row {}:", rowWithLongest);
       logger.info(
           "Preview (first 100 chars): {}",
           longestPackaging.substring(0, Math.min(100, longestPackaging.length())));

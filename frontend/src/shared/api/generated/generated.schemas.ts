@@ -81,6 +81,7 @@ export interface LoginRequestDTO {
 export interface Medicine {
   id: string;
   name: string;
+  power: string;
   commonName: string;
   packaging: string;
 }
@@ -88,6 +89,7 @@ export interface Medicine {
 export interface LiteMedicine {
   id: string;
   name: string;
+  power: string;
   commonName: string;
 }
 

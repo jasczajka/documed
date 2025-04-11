@@ -45,7 +45,7 @@ export const MedicineSearch = () => {
       onOpen={handleOpen}
       onClose={handleClose}
       isOptionEqualToValue={(option, value) => option.id === value.id}
-      getOptionLabel={(option) => option.name}
+      getOptionLabel={(option) => `${option.name} ${option.power}`}
       options={options}
       loading={isFetching}
       onInputChange={(_, value) => setMedicineQuery(value)}

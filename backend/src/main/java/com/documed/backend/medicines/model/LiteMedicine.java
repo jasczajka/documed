@@ -14,5 +14,8 @@ public class LiteMedicine {
   private String name;
 
   @Schema(required = true)
+  private String power;
+
+  @Schema(required = true)
   private String commonName;
 }
