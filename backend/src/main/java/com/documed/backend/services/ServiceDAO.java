@@ -20,8 +20,8 @@ public class ServiceDAO implements FullDAO<Service> {
   private final JdbcTemplate jdbcTemplate;
   private final SpecializationDAO specializationDAO;
 
-  public ServiceDAO(DataSource dataSource, SpecializationDAO specializationDAO) {
-    this.jdbcTemplate = new JdbcTemplate(dataSource);
+  public ServiceDAO(JdbcTemplate jdbcTemplate, SpecializationDAO specializationDAO) {
+    this.jdbcTemplate = jdbcTemplate;
     this.specializationDAO = specializationDAO;
   }
 

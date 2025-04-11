@@ -2,28 +2,53 @@ package com.documed.backend.prescriptions;
 
 import com.documed.backend.FullDAO;
 import com.documed.backend.medicines.Medicine;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+@AllArgsConstructor
 @Repository
 public class PrescriptionDAO implements FullDAO<Prescription> {
 
     private final JdbcTemplate jdbcTemplate;
 
-    @Autowired
-    public PrescriptionDAO(DataSource dataSource) {
-        this.jdbcTemplate = new JdbcTemplate(dataSource);
-    }
-
     @Override
     public Prescription create(Prescription obj) {
-        return null;
+        String sql =
+                "INSERT INTO prescription (access_code, visit_id, description, date, pesel, passport_number) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(
+                connection -> {
+                    PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                    ps.setInt(1, obj.getAccessCode());
+                    ps.setInt(2, obj.getVisit().getId());
+                    ps.setString(3, obj.getDescription());
+                    ps.setDate(4, (java.sql.Date) obj.getDate());
+                    ps.setString(5, obj.getPesel());
+                    ps.setString(6, obj.getPassportNumber());
+                    return ps;
+                },
+                keyHolder);
+
+        if (keyHolder.getKey() != null) {
+            obj.setId(keyHolder.getKey().intValue());
+        } else {
+            throw new RuntimeException("Failed retrieve id value");
+        }
+
+        return obj;
     }
 
     @Override
@@ -52,20 +77,30 @@ public class PrescriptionDAO implements FullDAO<Prescription> {
         return Optional.ofNullable(prescriptions.stream().findFirst().orElse(null));
     }
 
-    @Override
-    public List<Prescription> getAll() {
-        String sql = "SELECT * FROM prescription";
+    public List<Prescription> getAll(){
+        return null;
+    }
+
+    public List<Prescription> getAllPrescriptionsForVisit(int visitId) {
+        String sql = "SELECT * FROM prescription WHERE visit_id = ?";
         return jdbcTemplate.query(
                 sql,
                 (rs, rowNum) -> {
                     int id = rs.getInt("id");
-                    int access_code = rs.getInt("access_code");
+                    int accessCode = rs.getInt("access_code");
                     String description = rs.getString("description");
                     Date date = rs.getDate("date");
                     Date expirationDate = rs.getDate("expiration_date");
                     String pesel = rs.getString("pesel");
                     String passportNumber = rs.getString("passport_number");
-                    return new Prescription(id, access_code, description, date, expirationDate, pesel, passportNumber);
+                    return new Prescription(id, accessCode, description, date, expirationDate, pesel, passportNumber);
                 });
     }
+
+    public int removePrescriptionFromVisit(int prescriptionId) {
+        jdbcTemplate.update("DELETE FROM medicine_prescription WHERE prescription_id = ?", prescriptionId);
+        return jdbcTemplate.update("DELETE FROM prescription WHERE id = ?", prescriptionId);
+    }
+
+
 }
