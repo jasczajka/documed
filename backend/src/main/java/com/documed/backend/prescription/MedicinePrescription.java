@@ -1,6 +1,6 @@
 package com.documed.backend.prescription;
 
-import com.documed.backend.medicines.Medicine;
+import com.documed.backend.medicines.model.Medicine;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

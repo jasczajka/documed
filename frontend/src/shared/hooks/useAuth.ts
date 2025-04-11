@@ -1,5 +1,5 @@
 import {
-  useDeleteAccount,
+  useDeactivateAccount,
   useGetCurrentUser,
   useLogin,
   useLogout,
@@ -27,7 +27,7 @@ export const useAuth = () => {
     mutateAsync: deleteAccountMutation,
     isPending: isDeleteAccountPending,
     error: deleteAccountError,
-  } = useDeleteAccount();
+  } = useDeactivateAccount();
   const { refetch: fetchCurrentUser, isLoading: isGetCurrentUserLoading } = useGetCurrentUser({
     query: {
       enabled: false,
