@@ -1,6 +1,6 @@
 package com.documed.backend.schedules;
 
-import com.documed.backend.users.User;
+import com.documed.backend.users.model.User;
 import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Data;

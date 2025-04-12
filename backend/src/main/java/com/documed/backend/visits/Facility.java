@@ -1,12 +1,15 @@
 package com.documed.backend.visits;
 
 import java.util.List;
+
+import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 @Data
 @RequiredArgsConstructor
+@Builder
 public class Facility {
   private int id;
   @NonNull private String address;

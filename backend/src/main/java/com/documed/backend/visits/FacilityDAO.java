@@ -23,7 +23,12 @@ public class FacilityDAO implements ReadDAO<Facility> {
     List<Facility> facilities =
         jdbcTemplate.query(
             sql,
-            (rs, rowNum) -> new Facility(id, rs.getString("address"), rs.getString("city")),
+            (rs, rowNum) -> Facility
+                    .builder()
+                    .id(id)
+                    .address(rs.getString("address"))
+                    .city(rs.getString("city"))
+                    .build(),
             id);
     return Optional.ofNullable(facilities.stream().findFirst().orElse(null));
   }
@@ -37,7 +42,11 @@ public class FacilityDAO implements ReadDAO<Facility> {
           int id = rs.getInt("id");
           String address = rs.getString("address");
           String city = rs.getString("city");
-          return new Facility(id, address, city);
+          return Facility.builder()
+                  .id(id)
+                  .address(address)
+                  .city(city)
+                  .build();
         });
   }
 }

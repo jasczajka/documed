@@ -87,6 +87,7 @@ CREATE TABLE Prescription (
     date date  NOT NULL,
     pesel int  NULL,
     passport_number varchar(10)  NULL,
+    status varchar(255)  NOT NULL,
     CONSTRAINT Prescription_pk PRIMARY KEY (id)
 );
 

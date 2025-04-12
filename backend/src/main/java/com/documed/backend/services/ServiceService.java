@@ -1,6 +1,6 @@
 package com.documed.backend.services;
 
-import com.documed.backend.users.Specialization;
+import com.documed.backend.users.model.Specialization;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +25,13 @@ public class ServiceService {
       String name, BigDecimal price, ServiceType type, int estimatedTime) {
 
     com.documed.backend.services.Service service =
-        new com.documed.backend.services.Service(name, price, type, estimatedTime);
+            com.documed.backend.services.Service
+                    .builder()
+                    .name(name)
+                    .price(price)
+                    .type(type)
+                    .estimatedTime(estimatedTime)
+                    .build();
 
     return serviceDAO.create(service);
   }
