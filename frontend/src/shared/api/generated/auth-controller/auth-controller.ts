@@ -40,7 +40,10 @@ export const register = (registerRequestDTO: RegisterRequestDTO, signal?: AbortS
   });
 };
 
-export const getRegisterMutationOptions = <TError = ErrorType<void>, TContext = unknown>(options?: {
+export const getRegisterMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof register>>,
     TError,
@@ -74,9 +77,9 @@ export const getRegisterMutationOptions = <TError = ErrorType<void>, TContext = 
 
 export type RegisterMutationResult = NonNullable<Awaited<ReturnType<typeof register>>>;
 export type RegisterMutationBody = RegisterRequestDTO;
-export type RegisterMutationError = ErrorType<void>;
+export type RegisterMutationError = ErrorType<unknown>;
 
-export const useRegister = <TError = ErrorType<void>, TContext = unknown>(
+export const useRegister = <TError = ErrorType<unknown>, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof register>>,
@@ -100,7 +103,10 @@ export const logout = (signal?: AbortSignal) => {
   return customInstance<void>({ url: `/api/auth/logout`, method: 'POST', signal });
 };
 
-export const getLogoutMutationOptions = <TError = ErrorType<void>, TContext = unknown>(options?: {
+export const getLogoutMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
   mutation?: UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError, void, TContext>;
 }): UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError, void, TContext> => {
   const mutationKey = ['logout'];
@@ -119,9 +125,9 @@ export const getLogoutMutationOptions = <TError = ErrorType<void>, TContext = un
 
 export type LogoutMutationResult = NonNullable<Awaited<ReturnType<typeof logout>>>;
 
-export type LogoutMutationError = ErrorType<void>;
+export type LogoutMutationError = ErrorType<unknown>;
 
-export const useLogout = <TError = ErrorType<void>, TContext = unknown>(
+export const useLogout = <TError = ErrorType<unknown>, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<Awaited<ReturnType<typeof logout>>, TError, void, TContext>;
   },
@@ -141,7 +147,7 @@ export const login = (loginRequestDTO: LoginRequestDTO, signal?: AbortSignal) =>
   });
 };
 
-export const getLoginMutationOptions = <TError = ErrorType<void>, TContext = unknown>(options?: {
+export const getLoginMutationOptions = <TError = ErrorType<unknown>, TContext = unknown>(options?: {
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof login>>,
     TError,
@@ -175,9 +181,9 @@ export const getLoginMutationOptions = <TError = ErrorType<void>, TContext = unk
 
 export type LoginMutationResult = NonNullable<Awaited<ReturnType<typeof login>>>;
 export type LoginMutationBody = LoginRequestDTO;
-export type LoginMutationError = ErrorType<void>;
+export type LoginMutationError = ErrorType<unknown>;
 
-export const useLogin = <TError = ErrorType<void>, TContext = unknown>(
+export const useLogin = <TError = ErrorType<unknown>, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof login>>,
@@ -197,52 +203,59 @@ export const useLogin = <TError = ErrorType<void>, TContext = unknown>(
 
   return useMutation(mutationOptions, queryClient);
 };
-export const deleteAccount = (id: number, signal?: AbortSignal) => {
-  return customInstance<void>({ url: `/api/auth/delete_user/${id}`, method: 'POST', signal });
+export const deactivateAccount = (id: number, signal?: AbortSignal) => {
+  return customInstance<void>({
+    url: `/api/auth/deactivate_account/${id}`,
+    method: 'POST',
+    signal,
+  });
 };
 
-export const getDeleteAccountMutationOptions = <
-  TError = ErrorType<void>,
+export const getDeactivateAccountMutationOptions = <
+  TError = ErrorType<unknown>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteAccount>>,
+    Awaited<ReturnType<typeof deactivateAccount>>,
     TError,
     { id: number },
     TContext
   >;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteAccount>>,
+  Awaited<ReturnType<typeof deactivateAccount>>,
   TError,
   { id: number },
   TContext
 > => {
-  const mutationKey = ['deleteAccount'];
+  const mutationKey = ['deactivateAccount'];
   const { mutation: mutationOptions } = options
     ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
       ? options
       : { ...options, mutation: { ...options.mutation, mutationKey } }
     : { mutation: { mutationKey } };
 
-  const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteAccount>>, { id: number }> = (
-    props,
-  ) => {
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deactivateAccount>>,
+    { id: number }
+  > = (props) => {
     const { id } = props ?? {};
 
-    return deleteAccount(id);
+    return deactivateAccount(id);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type DeleteAccountMutationResult = NonNullable<Awaited<ReturnType<typeof deleteAccount>>>;
+export type DeactivateAccountMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deactivateAccount>>
+>;
 
-export type DeleteAccountMutationError = ErrorType<void>;
+export type DeactivateAccountMutationError = ErrorType<unknown>;
 
-export const useDeleteAccount = <TError = ErrorType<void>, TContext = unknown>(
+export const useDeactivateAccount = <TError = ErrorType<unknown>, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof deleteAccount>>,
+      Awaited<ReturnType<typeof deactivateAccount>>,
       TError,
       { id: number },
       TContext
@@ -250,12 +263,12 @@ export const useDeleteAccount = <TError = ErrorType<void>, TContext = unknown>(
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof deleteAccount>>,
+  Awaited<ReturnType<typeof deactivateAccount>>,
   TError,
   { id: number },
   TContext
 > => {
-  const mutationOptions = getDeleteAccountMutationOptions(options);
+  const mutationOptions = getDeactivateAccountMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
@@ -269,7 +282,7 @@ export const getGetCurrentUserQueryKey = () => {
 
 export const getGetCurrentUserQueryOptions = <
   TData = Awaited<ReturnType<typeof getCurrentUser>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<unknown>,
 >(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;
 }) => {
@@ -288,11 +301,11 @@ export const getGetCurrentUserQueryOptions = <
 };
 
 export type GetCurrentUserQueryResult = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
-export type GetCurrentUserQueryError = ErrorType<void>;
+export type GetCurrentUserQueryError = ErrorType<unknown>;
 
 export function useGetCurrentUser<
   TData = Awaited<ReturnType<typeof getCurrentUser>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<unknown>,
 >(
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>> &
@@ -309,7 +322,7 @@ export function useGetCurrentUser<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetCurrentUser<
   TData = Awaited<ReturnType<typeof getCurrentUser>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<unknown>,
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>> &
@@ -326,7 +339,7 @@ export function useGetCurrentUser<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetCurrentUser<
   TData = Awaited<ReturnType<typeof getCurrentUser>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<unknown>,
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;
@@ -336,7 +349,7 @@ export function useGetCurrentUser<
 
 export function useGetCurrentUser<
   TData = Awaited<ReturnType<typeof getCurrentUser>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<unknown>,
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getCurrentUser>>, TError, TData>>;

@@ -4,6 +4,27 @@
  * OpenAPI definition
  * OpenAPI spec version: v0
  */
+export type ServiceType = (typeof ServiceType)[keyof typeof ServiceType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ServiceType = {
+  REGULAR_SERVICE: 'REGULAR_SERVICE',
+  ADDITIONAL_SERVICE: 'ADDITIONAL_SERVICE',
+} as const;
+
+export interface Service {
+  id?: number;
+  name?: string;
+  price?: number;
+  type?: ServiceType;
+  estimatedTime?: number;
+}
+
+export interface Specialization {
+  id?: number;
+  name?: string;
+}
+
 export interface RegisterRequestDTO {
   /** @minLength 1 */
   firstName?: string;
@@ -55,6 +76,13 @@ export interface LoginRequestDTO {
   login?: string;
   /** @minLength 1 */
   password?: string;
+}
+
+export interface Medicine {
+  id: string;
+  name: string;
+  commonName: string;
+  dosage: string;
 }
 
 export type AdditionalServiceStatus =
@@ -157,35 +185,11 @@ export interface Referral {
   expirationDate?: string;
 }
 
-export type ServiceType = (typeof ServiceType)[keyof typeof ServiceType];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ServiceType = {
-  REGULAR_SERVICE: 'REGULAR_SERVICE',
-  ADDITIONAL_SERVICE: 'ADDITIONAL_SERVICE',
-} as const;
-
-export interface Service {
-  id?: number;
-  name?: string;
-  price?: number;
-  type?: ServiceType;
-  estimatedTime?: number;
-  specializations?: Specialization[];
-  additionalServices?: AdditionalService[];
-}
-
-export interface Specialization {
-  id?: number;
-  name?: string;
-  services?: Service[];
-  users?: User[];
-}
-
 export interface Subscription {
   id?: number;
   name?: string;
   price?: number;
+  users?: User[];
   subscriptionServices?: SubscriptionService[];
 }
 
@@ -231,6 +235,7 @@ export interface User {
   pwzNumber?: string;
   role: UserRole;
   subscription?: Subscription;
+  specializations?: Specialization[];
   timeSlots?: TimeSlot[];
   workTimes?: WorkTime[];
   freeDays?: FreeDay[];
@@ -270,3 +275,21 @@ export interface Visit {
 export interface WorkTime {
   [key: string]: unknown;
 }
+
+export type GetAllMedicinesParams = {
+  /**
+   * Maximum results to return
+   */
+  limit?: number;
+};
+
+export type SearchMedicinesParams = {
+  /**
+   * Search query
+   */
+  q: string;
+  /**
+   * Maximum results to return
+   */
+  limit?: number;
+};

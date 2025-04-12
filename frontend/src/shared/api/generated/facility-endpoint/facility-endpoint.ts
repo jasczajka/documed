@@ -32,7 +32,7 @@ export const getGetAllFacilitiesQueryKey = () => {
 
 export const getGetAllFacilitiesQueryOptions = <
   TData = Awaited<ReturnType<typeof getAllFacilities>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<unknown>,
 >(options?: {
   query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllFacilities>>, TError, TData>>;
 }) => {
@@ -51,11 +51,11 @@ export const getGetAllFacilitiesQueryOptions = <
 };
 
 export type GetAllFacilitiesQueryResult = NonNullable<Awaited<ReturnType<typeof getAllFacilities>>>;
-export type GetAllFacilitiesQueryError = ErrorType<void>;
+export type GetAllFacilitiesQueryError = ErrorType<unknown>;
 
 export function useGetAllFacilities<
   TData = Awaited<ReturnType<typeof getAllFacilities>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<unknown>,
 >(
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllFacilities>>, TError, TData>> &
@@ -72,7 +72,7 @@ export function useGetAllFacilities<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetAllFacilities<
   TData = Awaited<ReturnType<typeof getAllFacilities>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<unknown>,
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllFacilities>>, TError, TData>> &
@@ -89,7 +89,7 @@ export function useGetAllFacilities<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetAllFacilities<
   TData = Awaited<ReturnType<typeof getAllFacilities>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<unknown>,
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllFacilities>>, TError, TData>>;
@@ -99,7 +99,7 @@ export function useGetAllFacilities<
 
 export function useGetAllFacilities<
   TData = Awaited<ReturnType<typeof getAllFacilities>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<unknown>,
 >(
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllFacilities>>, TError, TData>>;
@@ -127,7 +127,7 @@ export const getGetFacilityQueryKey = (id: number) => {
 
 export const getGetFacilityQueryOptions = <
   TData = Awaited<ReturnType<typeof getFacility>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<unknown>,
 >(
   id: number,
   options?: {
@@ -149,11 +149,11 @@ export const getGetFacilityQueryOptions = <
 };
 
 export type GetFacilityQueryResult = NonNullable<Awaited<ReturnType<typeof getFacility>>>;
-export type GetFacilityQueryError = ErrorType<void>;
+export type GetFacilityQueryError = ErrorType<unknown>;
 
 export function useGetFacility<
   TData = Awaited<ReturnType<typeof getFacility>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<unknown>,
 >(
   id: number,
   options: {
@@ -171,7 +171,7 @@ export function useGetFacility<
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetFacility<
   TData = Awaited<ReturnType<typeof getFacility>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<unknown>,
 >(
   id: number,
   options?: {
@@ -189,7 +189,7 @@ export function useGetFacility<
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 export function useGetFacility<
   TData = Awaited<ReturnType<typeof getFacility>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<unknown>,
 >(
   id: number,
   options?: {
@@ -200,7 +200,7 @@ export function useGetFacility<
 
 export function useGetFacility<
   TData = Awaited<ReturnType<typeof getFacility>>,
-  TError = ErrorType<void>,
+  TError = ErrorType<unknown>,
 >(
   id: number,
   options?: {

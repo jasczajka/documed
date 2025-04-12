@@ -120,7 +120,7 @@ public class AuthController {
   }
 
   @PostMapping("/deactivate_account/{id}")
-  public ResponseEntity<Void> deactivate_account(@PathVariable int id) {
+  public ResponseEntity<Void> deactivateAccount(@PathVariable int id) {
     logger.info("Account deactivation request for user ID: {}", id);
 
     Optional<User> user = userService.getById(id);

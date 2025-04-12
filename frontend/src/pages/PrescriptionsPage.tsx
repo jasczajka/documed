@@ -1,8 +1,8 @@
-import { Typography } from '@mui/material';
 import { FC } from 'react';
+import { MedicineSearch } from 'shared/components/MedicineSearch/MedicineSearch';
 
 const PrescriptionsPage: FC = () => {
-  return <Typography>Recepty</Typography>;
+  return <MedicineSearch />;
 };
 
 export default PrescriptionsPage;
