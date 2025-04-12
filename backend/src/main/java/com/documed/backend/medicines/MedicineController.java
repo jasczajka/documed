@@ -1,6 +1,5 @@
 package com.documed.backend.medicines;
 
-import com.documed.backend.medicines.model.LiteMedicine;
 import com.documed.backend.medicines.model.Medicine;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,7 +16,7 @@ public class MedicineController {
 
   @GetMapping("/search")
   @Operation(summary = "Search medicines (lite version for async select)")
-  public List<LiteMedicine> searchMedicines(
+  public List<Medicine> searchMedicines(
       @Parameter(description = "Search query") @RequestParam(value = "q") String query,
       @Parameter(description = "Maximum results to return", example = "20")
           @RequestParam(value = "limit", defaultValue = "20")
@@ -29,7 +28,7 @@ public class MedicineController {
   @Operation(summary = "Get all medicines (full version)")
   public List<Medicine> getAllMedicines(
       @Parameter(description = "Maximum results to return", example = "20")
-          @RequestParam(value = "limit", defaultValue = "20")
+          @RequestParam(value = "limit", defaultValue = "500")
           int limit) {
     return medicineService.getLimited(limit);
   }

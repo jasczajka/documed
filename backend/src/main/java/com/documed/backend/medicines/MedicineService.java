@@ -1,6 +1,5 @@
 package com.documed.backend.medicines;
 
-import com.documed.backend.medicines.model.LiteMedicine;
 import com.documed.backend.medicines.model.Medicine;
 import java.util.List;
 import java.util.Optional;
@@ -21,8 +20,8 @@ public class MedicineService {
     return medicineDAO.getById(id);
   }
 
-  public List<LiteMedicine> search(String query, int limit) {
-    return medicineDAO.searchLite(query, limit);
+  public List<Medicine> search(String query, int limit) {
+    return medicineDAO.search(query, limit);
   }
 
   public List<Medicine> getLimited(int limit) {

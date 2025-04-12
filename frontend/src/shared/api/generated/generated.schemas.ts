@@ -81,16 +81,8 @@ export interface LoginRequestDTO {
 export interface Medicine {
   id: string;
   name: string;
-  power: string;
   commonName: string;
-  packaging: string;
-}
-
-export interface LiteMedicine {
-  id: string;
-  name: string;
-  power: string;
-  commonName: string;
+  dosage: string;
 }
 
 export type AdditionalServiceStatus =

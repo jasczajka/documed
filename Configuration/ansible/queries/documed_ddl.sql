@@ -56,9 +56,8 @@ CREATE TABLE Free_day (
 CREATE TABLE Medicine (
     id varchar(50) NOT NULL,
     name varchar(500) NOT NULL,
-    power varchar(100) NOT NULL,
     common_name varchar(500) NOT NULL,
-    packaging TEXT NOT NULL,
+    dosage varchar(100) NOT NULL,
     CONSTRAINT Medicine_pk PRIMARY KEY (id)
 );
 

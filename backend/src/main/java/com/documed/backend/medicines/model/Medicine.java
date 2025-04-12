@@ -14,11 +14,8 @@ public class Medicine {
   private String name;
 
   @Schema(required = true)
-  private String power;
-
-  @Schema(required = true)
   private String commonName;
 
   @Schema(required = true)
-  private String packaging;
+  private String dosage;
 }

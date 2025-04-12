@@ -17,12 +17,7 @@ import type {
 } from '@tanstack/react-query';
 import { useQuery } from '@tanstack/react-query';
 
-import type {
-  GetAllMedicinesParams,
-  LiteMedicine,
-  Medicine,
-  SearchMedicinesParams,
-} from '../generated.schemas';
+import type { GetAllMedicinesParams, Medicine, SearchMedicinesParams } from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
@@ -247,7 +242,7 @@ export function useGetMedicine<
  * @summary Search medicines (lite version for async select)
  */
 export const searchMedicines = (params: SearchMedicinesParams, signal?: AbortSignal) => {
-  return customInstance<LiteMedicine[]>({
+  return customInstance<Medicine[]>({
     url: `/api/medicines/search`,
     method: 'GET',
     params,

@@ -1,7 +1,6 @@
 package com.documed.backend.medicines;
 
 import com.documed.backend.FullDAO;
-import com.documed.backend.medicines.model.LiteMedicine;
 import com.documed.backend.medicines.model.Medicine;
 import java.util.List;
 import java.util.Optional;
@@ -23,18 +22,8 @@ public class MedicineDAO implements FullDAO<Medicine> {
           Medicine.builder()
               .id(rs.getString("id"))
               .name(rs.getString("name"))
-              .power(rs.getString("power"))
               .commonName(rs.getString("common_name"))
-              .packaging(rs.getString("packaging"))
-              .build();
-
-  private final RowMapper<LiteMedicine> liteMedicineMapper =
-      (rs, rowNum) ->
-          LiteMedicine.builder()
-              .id(rs.getString("id"))
-              .name(rs.getString("name"))
-              .power(rs.getString("power"))
-              .commonName(rs.getString("common_name"))
+              .dosage(rs.getString("dosage"))
               .build();
 
   public Optional<Medicine> getById(int id) {
@@ -49,18 +38,12 @@ public class MedicineDAO implements FullDAO<Medicine> {
             VALUES (?, ?, ?, ?, ?)
             ON CONFLICT (id) DO UPDATE SET
               name = EXCLUDED.name,
-              power = EXCLUDED.power,
               common_name = EXCLUDED.common_name,
-              packaging = EXCLUDED.packaging
+              dosage = EXCLUDED.dosage,
         """;
 
     jdbcTemplate.update(
-        sql,
-        medicine.getId(),
-        medicine.getName(),
-        medicine.getPower(),
-        medicine.getCommonName(),
-        medicine.getPackaging());
+        sql, medicine.getId(), medicine.getName(), medicine.getCommonName(), medicine.getDosage());
 
     return medicine;
   }
@@ -90,14 +73,14 @@ public class MedicineDAO implements FullDAO<Medicine> {
     return jdbcTemplate.query(sql, rowMapper, limit);
   }
 
-  public List<LiteMedicine> searchLite(String query, int limit) {
+  public List<Medicine> search(String query, int limit) {
     String sql =
         """
-            SELECT id, name, power, common_name FROM medicine
+            SELECT id, name, common_name, dosage FROM medicine
             WHERE LOWER(name) LIKE LOWER(?) OR LOWER(common_name) LIKE LOWER(?)
             LIMIT ?
             """;
     String likeQuery = "%" + query + "%";
-    return jdbcTemplate.query(sql, liteMedicineMapper, likeQuery, likeQuery, limit);
+    return jdbcTemplate.query(sql, rowMapper, likeQuery, likeQuery, limit);
   }
 }
