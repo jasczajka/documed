@@ -1,6 +1,6 @@
 package com.documed.backend.schedules;
 
-import com.documed.backend.users.User;
+import com.documed.backend.users.model.User;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
 import lombok.AllArgsConstructor;

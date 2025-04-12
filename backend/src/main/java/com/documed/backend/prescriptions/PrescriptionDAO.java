@@ -2,6 +2,7 @@ package com.documed.backend.prescriptions;
 
 import com.documed.backend.FullDAO;
 import com.documed.backend.medicines.Medicine;
+import com.documed.backend.services.ServiceType;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -63,15 +64,16 @@ public class PrescriptionDAO implements FullDAO<Prescription> {
         List<Prescription> prescriptions =
                 jdbcTemplate.query(
                         sql,
-                        (rs, rowNum) -> new Prescription(
-                                id,
-                                rs.getInt("access_code"),
-                                rs.getString("description"),
-                                rs.getDate("date"),
-                                rs.getDate("expiration_date"),
-                                rs.getString("pesel"),
-                                rs.getString("passport_number")
-                                ),
+                        (rs, rowNum) -> Prescription.builder()
+                                .id(id)
+                                .accessCode(rs.getInt("access_code"))
+                                .description(rs.getString("description"))
+                                .date(rs.getDate("date"))
+                                .expirationDate(rs.getDate("expiration_date"))
+                                .pesel(rs.getString("pesel"))
+                                .passportNumber(rs.getString("passport_number"))
+                                .status(PrescriptionStatus.valueOf(rs.getString("status")))
+                                .build(),
                         id);
 
         return Optional.ofNullable(prescriptions.stream().findFirst().orElse(null));
@@ -93,7 +95,16 @@ public class PrescriptionDAO implements FullDAO<Prescription> {
                     Date expirationDate = rs.getDate("expiration_date");
                     String pesel = rs.getString("pesel");
                     String passportNumber = rs.getString("passport_number");
-                    return new Prescription(id, accessCode, description, date, expirationDate, pesel, passportNumber);
+
+                    return Prescription.builder()
+                            .id(id)
+                            .accessCode(accessCode)
+                            .description(description)
+                            .date(date)
+                            .expirationDate(expirationDate)
+                            .pesel(pesel)
+                            .passportNumber(passportNumber)
+                            .build();
                 });
     }
 

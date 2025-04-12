@@ -1,4 +1,4 @@
-package com.documed.backend.users;
+package com.documed.backend.users.model;
 
 import com.documed.backend.services.Service;
 import lombok.AllArgsConstructor;

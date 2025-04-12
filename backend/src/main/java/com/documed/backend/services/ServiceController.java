@@ -1,6 +1,6 @@
 package com.documed.backend.services;
 
-import com.documed.backend.users.Specialization;
+import com.documed.backend.users.model.Specialization;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
