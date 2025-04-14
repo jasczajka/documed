@@ -12,8 +12,6 @@ public class Prescription {
   private int accessCode;
   private final Date date;
   private Date expirationDate;
-  private String pesel;
-  private String passportNumber;
   private PrescriptionStatus status;
 
 }

@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/prescriptions")
@@ -16,15 +18,20 @@ public class PrescriptionController {
     @PostMapping("/visit/{visit_id}")
     @Operation(summary = "Create Prescription")
     public ResponseEntity<Prescription> createPrescription(@PathVariable("visit_id") int visitId) {
-        return ResponseEntity.ok(prescriptionService.createPrescription(visitId, "11111111111", "testValue"));
+        return ResponseEntity.ok(prescriptionService.createPrescription(visitId));
     }
 
     @GetMapping("/visit/{visit_id}")
     @Operation(summary = "Get Prescription For Visit")
     public ResponseEntity<Prescription> getPrescriptionForVisit(@PathVariable("visit_id") int visitId) {
         Prescription prescription = prescriptionService.getPrescriptionForVisit(visitId);
-
         return ResponseEntity.ok(prescription);
+    }
+
+    @GetMapping("/user/{user_id}")
+    public ResponseEntity<List<Prescription>> getPrescriptionsForUser(@PathVariable("user_id") int userId) {
+        List<Prescription> prescriptions = prescriptionService.getPrescriptionsForUser(userId);
+        return ResponseEntity.ok(prescriptions);
     }
 
     @DeleteMapping("/{prescription_id}")

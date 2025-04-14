@@ -14,16 +14,16 @@ public class PrescriptionService {
     private final PrescriptionDAO prescriptionDAO;
 
 
-    Prescription createPrescription(int visitId, String pesel, String passportNumber) {
-        return prescriptionDAO.create(visitId, pesel, passportNumber);
+    Prescription createPrescription(int visitId) {
+        return prescriptionDAO.create(visitId);
     }
 
     Prescription getPrescriptionForVisit(int visitId) {
         return prescriptionDAO.getPrescriptionForVisit(visitId);
     }
 
-    List<Prescription> getAllPrescriptionsForUser(int userId) {
-        return prescriptionDAO.getAllPrescriptionsForUser(userId);
+    List<Prescription> getPrescriptionsForUser(int userId) {
+        return prescriptionDAO.getPrescriptionsForUser(userId);
     }
 
     Optional<Medicine> addMedicineToPrescription(int prescriptionId, String medicineId, int amount) {
