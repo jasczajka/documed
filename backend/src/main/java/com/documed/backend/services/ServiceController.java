@@ -39,7 +39,6 @@ public class ServiceController {
 
   @PostMapping()
   public ResponseEntity<Service> createService(@RequestBody Service service) {
-    try {
       Service createdService =
           serviceService.createService(
               service.getName(), service.getPrice(), service.getType(), service.getEstimatedTime()
@@ -48,14 +47,10 @@ public class ServiceController {
       URI location = URI.create("/api/services/" + createdService.getId());
 
       return ResponseEntity.created(location).body(createdService);
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<String> deleteService(@PathVariable int id) {
-    try {
       int result = serviceService.delete(id);
       if (result > 0) {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Service deleted successfully.");
@@ -63,50 +58,33 @@ public class ServiceController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body("Failed to delete service.");
       }
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body("Failed to delete service.");
-    }
   }
 
   @PatchMapping("/{id}/price")
   public ResponseEntity<Service> updateServicePrice(
       @PathVariable int id, @RequestBody BigDecimal price) {
-    try {
       Service updatedService = serviceService.updatePrice(id, price);
       return new ResponseEntity<>(updatedService, HttpStatus.OK);
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
   }
 
   @PatchMapping("/{id}/time")
   public ResponseEntity<Service> updateServiceTime(
       @PathVariable int id, @RequestBody int estimatedTime) {
-    try {
       Service updatedService = serviceService.updateEstimatedTime(id, estimatedTime);
       return new ResponseEntity<>(updatedService, HttpStatus.CREATED);
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
   }
 
   @PostMapping("/{id}/specialization")
   public ResponseEntity<Specialization> addSpecializationToService(
       @PathVariable int id, @RequestBody int specializationId) {
-    try {
       Specialization addedSpecialization =
           serviceService.addSpecializationToService(id, specializationId);
       return new ResponseEntity<>(addedSpecialization, HttpStatus.OK);
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-    }
   }
 
   @DeleteMapping("/{id}/specialization")
   public ResponseEntity<String> removeSpecializationFromService(
       @PathVariable int id, @RequestBody int specializationId) {
-    try {
       int result = serviceService.removeSpecializationFromService(id, specializationId);
       if (result > 0) {
         return ResponseEntity.status(HttpStatus.OK).body("Removed specialization successfully.");
@@ -114,11 +92,5 @@ public class ServiceController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
             .body("Failed to remove specialization from service.");
       }
-    } catch (IllegalArgumentException e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-          .body("Failed to remove specialization from service. Illegal argument.");
-    } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-    }
   }
 }

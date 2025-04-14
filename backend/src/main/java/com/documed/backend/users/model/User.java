@@ -4,34 +4,63 @@ import com.documed.backend.additionalservices.AdditionalService;
 import com.documed.backend.schedules.FreeDay;
 import com.documed.backend.schedules.TimeSlot;
 import com.documed.backend.schedules.WorkTime;
+import com.documed.backend.users.AccountStatus;
 import com.documed.backend.users.UserRole;
 import com.documed.backend.visits.Visit;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Date;
 import java.util.List;
-import lombok.Data;
-import lombok.NonNull;
+import lombok.*;
 
 @Data
+@Builder
 public class User {
 
+  @Schema(required = true)
+  @Setter(AccessLevel.NONE)
   private int id;
+
+  @Schema(required = true)
   @NonNull private String firstName;
+
+  @Schema(required = true)
   @NonNull private String lastName;
-  private String pesel;
-  private String passportNumber;
+
+  @Schema private String pesel;
+
+  @Schema private String passportNumber;
+
+  @Schema(required = true)
   @NonNull private String email;
+
+  @Schema(required = true)
   @NonNull private String address;
-  @NonNull private String password;
-  private String phoneNumber;
-  @NonNull private String status;
-  private Date birthDate;
-  private String pwzNumber;
+
+  @Schema @ToString.Exclude private String password;
+
+  @Schema private String phoneNumber;
+
+  @Schema(required = true)
+  @NonNull private AccountStatus accountStatus;
+
+  @Schema private Date birthDate;
+
+  @Schema private String pwzNumber;
+
+  @Schema(required = true)
   @NonNull private UserRole role;
-  private Subscription subscription;
-  private List<Specialization> specializations;
-  private List<TimeSlot> timeSlots;
-  private List<WorkTime> workTimes;
-  private List<FreeDay> freeDays;
-  private List<Visit> visits;
-  private List<AdditionalService> additionalServices;
+
+  @Schema private Subscription subscription;
+
+  @Schema private List<Specialization> specializations;
+
+  @Schema private List<TimeSlot> timeSlots;
+
+  @Schema private List<WorkTime> workTimes;
+
+  @Schema private List<FreeDay> freeDays;
+
+  @Schema private List<Visit> visits;
+
+  @Schema private List<AdditionalService> additionalServices;
 }

@@ -20,12 +20,12 @@ public class SpecializationDAO implements ReadDAO<Specialization> {
     String sql = "SELECT * FROM specialization WHERE id = ?";
 
     List<Specialization> specializations =
-        jdbcTemplate.query(sql, (rs, rowNum) -> Specialization
-                .builder()
-                .id(id)
-                .name(rs.getString("name"))
-                .build(),
-                id);
+            jdbcTemplate.query(sql, (rs, rowNum) -> Specialization
+                            .builder()
+                            .id(id)
+                            .name(rs.getString("name"))
+                            .build(),
+                    id);
 
     return specializations.stream().findFirst();
   }
@@ -34,17 +34,17 @@ public class SpecializationDAO implements ReadDAO<Specialization> {
   public List<Specialization> getAll() {
     String sql = "SELECT * FROM specialization";
 
-    return jdbcTemplate.query(
-        sql,
-        (rs, rowNum) -> {
-          int id = rs.getInt("id");
-          String name = rs.getString("name");
+      return jdbcTemplate.query(
+              sql,
+              (rs, rowNum) -> {
+                  int id = rs.getInt("id");
+                  String name = rs.getString("name");
 
-          return Specialization
-                  .builder()
-                  .id(id)
-                  .name(name)
-                  .build();
-        });
+                  return Specialization
+                          .builder()
+                          .id(id)
+                          .name(name)
+                          .build();
+              });
   }
 }
