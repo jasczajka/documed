@@ -28,8 +28,6 @@ public class PrescriptionDAO implements FullDAO<Prescription> {
                     .accessCode(rs.getInt("access_code"))
                     .date(rs.getDate("date"))
                     .expirationDate(rs.getDate("expiration_date"))
-                    .pesel(rs.getString("pesel"))
-                    .passportNumber(rs.getString("passport_number"))
                     .status(PrescriptionStatus.valueOf(rs.getString("status")))
                     .build();
 
@@ -38,9 +36,9 @@ public class PrescriptionDAO implements FullDAO<Prescription> {
         throw new UnsupportedOperationException();
     }
 
-    public Prescription create(int visitId, String pesel, String passportNumber) {
+    public Prescription create(int visitId) {
         String sql =
-                "INSERT INTO prescription (visit_id, pesel, passport_number) VALUES (?, ?, ?) RETURNING id";
+                "INSERT INTO prescription (visit_id) VALUES (?) RETURNING id";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -48,8 +46,6 @@ public class PrescriptionDAO implements FullDAO<Prescription> {
                 connection -> {
                     PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
                     ps.setInt(1, visitId);
-                    ps.setString(2, pesel);
-                    ps.setString(3, passportNumber);
                     return ps;
                 },
                 keyHolder);
@@ -59,8 +55,6 @@ public class PrescriptionDAO implements FullDAO<Prescription> {
         if (key != null) {
              return Prescription.builder()
                     .id(key.intValue())
-                    .pesel(pesel)
-                    .passportNumber(passportNumber)
                     .build();
         } else {
             throw new IllegalStateException("Failed retrieve id value");
@@ -105,8 +99,13 @@ public class PrescriptionDAO implements FullDAO<Prescription> {
         return jdbcTemplate.update(sql, prescriptionId, medicineId);
     }
 
-    public List<Prescription> getAllPrescriptionsForUser(int userId) {
-        String sql = "SELECT * FROM prescription WHERE user_id = ?";//TODO
+    public List<Prescription> getPrescriptionsForUser(int userId) {
+        String sql = """
+                        SELECT *
+                        FROM prescription
+                        JOIN visit ON prescription.visit_id = visit.id
+                        WHERE patient_id = ?
+             """;
         return jdbcTemplate.query(sql, rowMapper, userId);
     }
 
