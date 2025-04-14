@@ -27,6 +27,10 @@ public class MedicineDAO implements FullDAO<Medicine> {
               .build();
 
   public Optional<Medicine> getById(int id) {
+    throw new UnsupportedOperationException();
+  }
+
+  public Optional<Medicine> getById(String id) {
     String sql = "SELECT * FROM medicine WHERE id = ?";
     return jdbcTemplate.query(sql, rowMapper, id).stream().findFirst();
   }
@@ -58,7 +62,6 @@ public class MedicineDAO implements FullDAO<Medicine> {
     return createOrUpdate(medicine);
   }
 
-  @Override
   public Medicine update(Medicine medicine) {
     return createOrUpdate(medicine);
   }
