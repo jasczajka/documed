@@ -1,10 +1,9 @@
 package com.documed.backend.users;
 
 import com.documed.backend.FullDAO;
+import com.documed.backend.users.model.User;
 import java.util.List;
 import java.util.Optional;
-
-import com.documed.backend.users.model.User;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;

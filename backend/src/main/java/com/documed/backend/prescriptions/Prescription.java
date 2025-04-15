@@ -1,7 +1,6 @@
 package com.documed.backend.prescriptions;
 
 import java.util.Date;
-
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,5 +12,4 @@ public class Prescription {
   private final Date date;
   private Date expirationDate;
   private PrescriptionStatus status;
-
 }

@@ -6,10 +6,9 @@ import com.documed.backend.auth.exceptions.InvalidCredentialsException;
 import com.documed.backend.auth.exceptions.UserAlreadyExistsException;
 import com.documed.backend.auth.exceptions.UserNotFoundException;
 import com.documed.backend.users.*;
+import com.documed.backend.users.model.User;
 import java.sql.Date;
 import java.time.LocalDate;
-
-import com.documed.backend.users.model.User;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

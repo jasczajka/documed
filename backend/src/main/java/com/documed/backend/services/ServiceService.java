@@ -25,13 +25,12 @@ public class ServiceService {
       String name, BigDecimal price, ServiceType type, int estimatedTime) {
 
     com.documed.backend.services.Service service =
-            com.documed.backend.services.Service
-                    .builder()
-                    .name(name)
-                    .price(price)
-                    .type(type)
-                    .estimatedTime(estimatedTime)
-                    .build();
+        com.documed.backend.services.Service.builder()
+            .name(name)
+            .price(price)
+            .type(type)
+            .estimatedTime(estimatedTime)
+            .build();
 
     return serviceDAO.create(service);
   }

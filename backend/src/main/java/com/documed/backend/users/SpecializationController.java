@@ -1,8 +1,7 @@
 package com.documed.backend.users;
 
-import java.util.List;
-
 import com.documed.backend.users.model.Specialization;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

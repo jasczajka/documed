@@ -1,7 +1,6 @@
 package com.documed.backend.visits;
 
 import java.util.List;
-
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -13,5 +12,4 @@ public class Facility {
   @NonNull private String address;
   @NonNull private String city;
   private List<Visit> visits;
-
 }

@@ -39,58 +39,57 @@ public class ServiceController {
 
   @PostMapping()
   public ResponseEntity<Service> createService(@RequestBody Service service) {
-      Service createdService =
-          serviceService.createService(
-              service.getName(), service.getPrice(), service.getType(), service.getEstimatedTime()
-          );
+    Service createdService =
+        serviceService.createService(
+            service.getName(), service.getPrice(), service.getType(), service.getEstimatedTime());
 
-      URI location = URI.create("/api/services/" + createdService.getId());
+    URI location = URI.create("/api/services/" + createdService.getId());
 
-      return ResponseEntity.created(location).body(createdService);
+    return ResponseEntity.created(location).body(createdService);
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<String> deleteService(@PathVariable int id) {
-      int result = serviceService.delete(id);
-      if (result > 0) {
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Service deleted successfully.");
-      } else {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("Failed to delete service.");
-      }
+    int result = serviceService.delete(id);
+    if (result > 0) {
+      return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Service deleted successfully.");
+    } else {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Failed to delete service.");
+    }
   }
 
   @PatchMapping("/{id}/price")
   public ResponseEntity<Service> updateServicePrice(
       @PathVariable int id, @RequestBody BigDecimal price) {
-      Service updatedService = serviceService.updatePrice(id, price);
-      return new ResponseEntity<>(updatedService, HttpStatus.OK);
+    Service updatedService = serviceService.updatePrice(id, price);
+    return new ResponseEntity<>(updatedService, HttpStatus.OK);
   }
 
   @PatchMapping("/{id}/time")
   public ResponseEntity<Service> updateServiceTime(
       @PathVariable int id, @RequestBody int estimatedTime) {
-      Service updatedService = serviceService.updateEstimatedTime(id, estimatedTime);
-      return new ResponseEntity<>(updatedService, HttpStatus.CREATED);
+    Service updatedService = serviceService.updateEstimatedTime(id, estimatedTime);
+    return new ResponseEntity<>(updatedService, HttpStatus.CREATED);
   }
 
   @PostMapping("/{id}/specialization")
   public ResponseEntity<Specialization> addSpecializationToService(
       @PathVariable int id, @RequestBody int specializationId) {
-      Specialization addedSpecialization =
-          serviceService.addSpecializationToService(id, specializationId);
-      return new ResponseEntity<>(addedSpecialization, HttpStatus.OK);
+    Specialization addedSpecialization =
+        serviceService.addSpecializationToService(id, specializationId);
+    return new ResponseEntity<>(addedSpecialization, HttpStatus.OK);
   }
 
   @DeleteMapping("/{id}/specialization")
   public ResponseEntity<String> removeSpecializationFromService(
       @PathVariable int id, @RequestBody int specializationId) {
-      int result = serviceService.removeSpecializationFromService(id, specializationId);
-      if (result > 0) {
-        return ResponseEntity.status(HttpStatus.OK).body("Removed specialization successfully.");
-      } else {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("Failed to remove specialization from service.");
-      }
+    int result = serviceService.removeSpecializationFromService(id, specializationId);
+    if (result > 0) {
+      return ResponseEntity.status(HttpStatus.OK).body("Removed specialization successfully.");
+    } else {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+          .body("Failed to remove specialization from service.");
+    }
   }
 }
