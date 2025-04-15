@@ -27,7 +27,8 @@ public class MedicineDAO implements FullDAO<Medicine> {
               .build();
 
   public Optional<Medicine> getById(int id) {
-    throw new UnsupportedOperationException();
+    String sql = "SELECT * FROM medicine WHERE id = ?";
+    return jdbcTemplate.query(sql, rowMapper, id).stream().findFirst();
   }
 
   public Optional<Medicine> getById(String id) {
@@ -38,7 +39,7 @@ public class MedicineDAO implements FullDAO<Medicine> {
   public Medicine createOrUpdate(Medicine medicine) {
     String sql =
         """
-            INSERT INTO medicine (id, name, power, common_name, packaging)
+            INSERT INTO medicine (id, name, dosage, common_name, packaging)
             VALUES (?, ?, ?, ?, ?)
             ON CONFLICT (id) DO UPDATE SET
               name = EXCLUDED.name,

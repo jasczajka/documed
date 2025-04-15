@@ -108,6 +108,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     cookie.setHttpOnly(true);
     cookie.setPath("/");
     cookie.setAttribute("SameSite", "None");
+    cookie.setSecure(true);
     cookie.setMaxAge(0);
     response.addCookie(cookie);
   }

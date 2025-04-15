@@ -10,16 +10,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-  private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-  @ExceptionHandler(Exception.class)
-  public ResponseEntity<String> handleException(Exception ex) {
-    ResponseStatus responseStatus =
-        AnnotationUtils.findAnnotation(ex.getClass(), ResponseStatus.class);
-    if (responseStatus != null) {
-      return ResponseEntity.status(responseStatus.value()).body(ex.getMessage());
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleException(Exception ex) {
+        ResponseStatus responseStatus =
+                AnnotationUtils.findAnnotation(ex.getClass(), ResponseStatus.class);
+        if (responseStatus != null) {
+            return ResponseEntity.status(responseStatus.value()).body(ex.getMessage());
+        }
+        logger.error("Unexpected error", ex);
+        return ResponseEntity.internalServerError().body("Internal server error");
     }
-    logger.error("Unexpected error", ex);
-    return ResponseEntity.internalServerError().body("Internal server error");
-  }
 }

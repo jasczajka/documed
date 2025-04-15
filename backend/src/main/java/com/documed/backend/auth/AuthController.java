@@ -3,7 +3,7 @@ package com.documed.backend.auth;
 import com.documed.backend.auth.dtos.AuthResponseDTO;
 import com.documed.backend.auth.dtos.LoginRequestDTO;
 import com.documed.backend.auth.dtos.RegisterRequestDTO;
-import com.documed.backend.users.User;
+import com.documed.backend.users.model.User;
 import com.documed.backend.users.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
