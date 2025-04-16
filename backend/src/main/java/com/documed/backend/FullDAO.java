@@ -1,8 +1,8 @@
 package com.documed.backend;
 
-public interface FullDAO<T> extends ReadDAO<T> {
+public interface FullDAO<T, C> extends ReadDAO<T> {
 
-  T create(T obj);
+  T create(C creationObject);
 
   int delete(int id);
 }

@@ -9,7 +9,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class MedicineDAO implements FullDAO<Medicine> {
+public class MedicineDAO implements FullDAO<Medicine, Medicine> {
 
   private final JdbcTemplate jdbcTemplate;
 

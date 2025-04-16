@@ -6,6 +6,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,9 +44,10 @@ public class ServiceController {
         serviceService.createService(
             service.getName(), service.getPrice(), service.getType(), service.getEstimatedTime());
 
-    URI location = URI.create("/api/services/" + createdService.getId());
+    HttpHeaders headers = new HttpHeaders();
+    headers.setLocation(URI.create("/api/services/" + createdService.getId()));
 
-    return ResponseEntity.created(location).body(createdService);
+    return new ResponseEntity<>(createdService, headers, HttpStatus.CREATED);
   }
 
   @DeleteMapping("/{id}")

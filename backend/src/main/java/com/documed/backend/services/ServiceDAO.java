@@ -14,7 +14,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ServiceDAO implements FullDAO<Service> {
+public class ServiceDAO implements FullDAO<Service, Service> {
 
   private final JdbcTemplate jdbcTemplate;
   private final SpecializationDAO specializationDAO;

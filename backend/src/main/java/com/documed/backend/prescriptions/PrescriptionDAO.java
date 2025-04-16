@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository;
 
 @AllArgsConstructor
 @Repository
-public class PrescriptionDAO implements FullDAO<Prescription> {
+public class PrescriptionDAO implements FullDAO<Prescription, Integer> {
 
   private final JdbcTemplate jdbcTemplate;
   private final MedicineService medicineService;
@@ -32,11 +32,7 @@ public class PrescriptionDAO implements FullDAO<Prescription> {
               .build();
 
   @Override
-  public Prescription create(Prescription obj) {
-    throw new UnsupportedOperationException();
-  }
-
-  public Prescription create(int visitId) {
+  public Prescription create(Integer visitId) {
     String sql = "INSERT INTO prescription (visit_id) VALUES (?) RETURNING id";
 
     KeyHolder keyHolder = new GeneratedKeyHolder();

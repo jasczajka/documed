@@ -4,6 +4,7 @@ import com.documed.backend.medicines.model.Medicine;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ public class PrescriptionController {
   @PostMapping("/visit/{visit_id}")
   @Operation(summary = "Create Prescription")
   public ResponseEntity<Prescription> createPrescription(@PathVariable("visit_id") int visitId) {
-    return ResponseEntity<>(prescriptionService.createPrescription(visitId), HttpStatus.OK);
+    return new ResponseEntity<>(prescriptionService.createPrescription(visitId), HttpStatus.OK);
   }
 
   @GetMapping("/visit/{visit_id}")

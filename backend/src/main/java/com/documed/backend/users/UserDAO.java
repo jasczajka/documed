@@ -10,7 +10,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class UserDAO implements FullDAO<User> {
+public class UserDAO implements FullDAO<User, User> {
 
   private final JdbcTemplate jdbcTemplate;
 

@@ -30,7 +30,7 @@ public class FacilityDAO implements ReadDAO<Facility> {
                     .city(rs.getString("city"))
                     .build(),
             id);
-    return Optional.ofNullable(facilities.stream().findFirst().orElse(null));
+    return facilities.stream().findFirst();
   }
 
   @Override
