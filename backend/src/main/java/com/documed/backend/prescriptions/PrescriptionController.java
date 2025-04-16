@@ -17,7 +17,7 @@ public class PrescriptionController {
   @PostMapping("/visit/{visit_id}")
   @Operation(summary = "Create Prescription")
   public ResponseEntity<Prescription> createPrescription(@PathVariable("visit_id") int visitId) {
-    return ResponseEntity.ok(prescriptionService.createPrescription(visitId));
+    return ResponseEntity<>(prescriptionService.createPrescription(visitId), HttpStatus.OK);
   }
 
   @GetMapping("/visit/{visit_id}")
