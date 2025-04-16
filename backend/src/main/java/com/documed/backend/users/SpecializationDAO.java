@@ -1,6 +1,7 @@
 package com.documed.backend.users;
 
 import com.documed.backend.ReadDAO;
+import com.documed.backend.users.model.Specialization;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,10 @@ public class SpecializationDAO implements ReadDAO<Specialization> {
     String sql = "SELECT * FROM specialization WHERE id = ?";
 
     List<Specialization> specializations =
-        jdbcTemplate.query(sql, (rs, rowNum) -> new Specialization(id, rs.getString("name")), id);
+        jdbcTemplate.query(
+            sql,
+            (rs, rowNum) -> Specialization.builder().id(id).name(rs.getString("name")).build(),
+            id);
 
     return specializations.stream().findFirst();
   }
@@ -33,7 +37,7 @@ public class SpecializationDAO implements ReadDAO<Specialization> {
           int id = rs.getInt("id");
           String name = rs.getString("name");
 
-          return new Specialization(id, name);
+          return Specialization.builder().id(id).name(name).build();
         });
   }
 }

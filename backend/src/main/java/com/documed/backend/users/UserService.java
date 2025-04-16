@@ -1,5 +1,6 @@
 package com.documed.backend.users;
 
+import com.documed.backend.users.model.User;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
 

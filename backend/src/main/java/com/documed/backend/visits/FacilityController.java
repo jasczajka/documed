@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/facilities")
-public class FacilityEndpoint {
+public class FacilityController {
 
   FacilityService facilityService;
 

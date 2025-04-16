@@ -1,5 +1,6 @@
 package com.documed.backend.users;
 
+import com.documed.backend.users.model.Specialization;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/specializations")
-public class SpecializationEndpoint {
+public class SpecializationController {
 
   private final SpecializationService specializationService;
 

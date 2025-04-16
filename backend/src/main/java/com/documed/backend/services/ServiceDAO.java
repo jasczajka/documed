@@ -1,27 +1,26 @@
 package com.documed.backend.services;
 
 import com.documed.backend.FullDAO;
-import com.documed.backend.users.Specialization;
 import com.documed.backend.users.SpecializationDAO;
+import com.documed.backend.users.model.Specialization;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
-import javax.sql.DataSource;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class ServiceDAO implements FullDAO<Service> {
+public class ServiceDAO implements FullDAO<Service, Service> {
 
   private final JdbcTemplate jdbcTemplate;
   private final SpecializationDAO specializationDAO;
 
-  public ServiceDAO(DataSource dataSource, SpecializationDAO specializationDAO) {
-    this.jdbcTemplate = new JdbcTemplate(dataSource);
+  public ServiceDAO(JdbcTemplate jdbcTemplate, SpecializationDAO specializationDAO) {
+    this.jdbcTemplate = jdbcTemplate;
     this.specializationDAO = specializationDAO;
   }
 
@@ -53,11 +52,6 @@ public class ServiceDAO implements FullDAO<Service> {
   }
 
   @Override
-  public Service update(Service obj) {
-    return null;
-  }
-
-  @Override
   public int delete(int id) {
     String sql = "DELETE FROM service WHERE id = ?";
     return jdbcTemplate.update(sql, id);
@@ -71,13 +65,15 @@ public class ServiceDAO implements FullDAO<Service> {
         jdbcTemplate.query(
             sql,
             (rs, rowNum) ->
-                new Service(
-                    id,
-                    rs.getString("name"),
-                    rs.getBigDecimal("price"),
-                    ServiceType.valueOf(rs.getString("type")),
-                    rs.getInt("estimated_time")),
+                Service.builder()
+                    .id(id)
+                    .name(rs.getString("name"))
+                    .price(rs.getBigDecimal("price"))
+                    .type(ServiceType.valueOf(rs.getString("type")))
+                    .estimatedTime(rs.getInt("estimated_time"))
+                    .build(),
             id);
+
     return services.stream().findFirst();
   }
 
@@ -93,7 +89,13 @@ public class ServiceDAO implements FullDAO<Service> {
           BigDecimal price = rs.getBigDecimal("price");
           ServiceType type = ServiceType.valueOf(rs.getString("type"));
           int estimatedTime = rs.getInt("estimated_time");
-          return new Service(id, name, price, type, estimatedTime);
+          return Service.builder()
+              .id(id)
+              .name(name)
+              .price(price)
+              .type(type)
+              .estimatedTime(estimatedTime)
+              .build();
         });
   }
 

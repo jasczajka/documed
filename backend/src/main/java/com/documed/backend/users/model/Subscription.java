@@ -1,4 +1,4 @@
-package com.documed.backend.users;
+package com.documed.backend.users.model;
 
 import java.math.BigDecimal;
 import java.util.List;

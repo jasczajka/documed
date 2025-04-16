@@ -1,6 +1,6 @@
 package com.documed.backend.services;
 
-import com.documed.backend.users.Specialization;
+import com.documed.backend.users.model.Specialization;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class ServiceService {
 
-  ServiceDAO serviceDAO;
+  private final ServiceDAO serviceDAO;
 
   List<com.documed.backend.services.Service> getAll() {
     return serviceDAO.getAll();
@@ -21,11 +21,16 @@ public class ServiceService {
     return serviceDAO.getById(id);
   }
 
-  com.documed.backend.services.Service create(
+  com.documed.backend.services.Service createService(
       String name, BigDecimal price, ServiceType type, int estimatedTime) {
 
     com.documed.backend.services.Service service =
-        new com.documed.backend.services.Service(name, price, type, estimatedTime);
+        com.documed.backend.services.Service.builder()
+            .name(name)
+            .price(price)
+            .type(type)
+            .estimatedTime(estimatedTime)
+            .build();
 
     return serviceDAO.create(service);
   }

@@ -1,6 +1,7 @@
 package com.documed.backend.users;
 
 import com.documed.backend.FullDAO;
+import com.documed.backend.users.model.User;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -9,7 +10,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public class UserDAO implements FullDAO<User> {
+public class UserDAO implements FullDAO<User, User> {
 
   private final JdbcTemplate jdbcTemplate;
 
@@ -80,7 +81,6 @@ public class UserDAO implements FullDAO<User> {
         .orElseThrow(() -> new IllegalStateException("Failed to retrieve created user"));
   }
 
-  @Override
   public User update(User user) {
     String sql =
         "UPDATE \"User\" SET first_name = ?, last_name = ?, email = ?, address = ?, "

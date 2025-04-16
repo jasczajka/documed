@@ -2,11 +2,11 @@ package com.documed.backend.visits;
 
 import com.documed.backend.attachments.Attachment;
 import com.documed.backend.notifications.Notification;
-import com.documed.backend.prescription.Prescription;
+import com.documed.backend.prescriptions.Prescription;
 import com.documed.backend.referrals.Referral;
 import com.documed.backend.schedules.TimeSlot;
 import com.documed.backend.services.Service;
-import com.documed.backend.users.User;
+import com.documed.backend.users.model.User;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.Data;

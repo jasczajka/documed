@@ -16,7 +16,7 @@ public class MedicineService {
     return medicineDAO.getAll();
   }
 
-  public Optional<Medicine> getById(int id) {
+  public Optional<Medicine> getById(String id) {
     return medicineDAO.getById(id);
   }
 

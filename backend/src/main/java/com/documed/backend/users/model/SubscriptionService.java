@@ -1,7 +1,6 @@
-package com.documed.backend.users;
+package com.documed.backend.users.model;
 
 import com.documed.backend.services.Service;
-import com.documed.backend.users.model.Subscription;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor

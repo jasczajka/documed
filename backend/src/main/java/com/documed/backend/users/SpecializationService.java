@@ -1,5 +1,6 @@
 package com.documed.backend.users;
 
+import com.documed.backend.users.model.Specialization;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
