@@ -25,6 +25,29 @@ export interface Specialization {
   name?: string;
 }
 
+export interface Medicine {
+  id: string;
+  name: string;
+  commonName: string;
+  dosage: string;
+}
+
+export type PrescriptionStatus = (typeof PrescriptionStatus)[keyof typeof PrescriptionStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PrescriptionStatus = {
+  NEW: 'NEW',
+  ISSUED: 'ISSUED',
+} as const;
+
+export interface Prescription {
+  id?: number;
+  accessCode?: number;
+  date?: string;
+  expirationDate?: string;
+  status?: PrescriptionStatus;
+}
+
 export interface RegisterRequestDTO {
   /** @minLength 1 */
   firstName?: string;
@@ -76,13 +99,6 @@ export interface LoginRequestDTO {
   login?: string;
   /** @minLength 1 */
   password?: string;
-}
-
-export interface Medicine {
-  id: string;
-  name: string;
-  commonName: string;
-  dosage: string;
 }
 
 export type AdditionalServiceStatus =
@@ -157,17 +173,6 @@ export interface Notification {
   visit?: Visit;
   additionalService?: AdditionalService;
   type?: NotificationType;
-}
-
-export interface Prescription {
-  id?: number;
-  accessCode?: number;
-  description?: string;
-  date?: string;
-  expirationDate?: string;
-  pesel?: number;
-  passportNumber?: string;
-  visit?: Visit;
 }
 
 export type ReferralType = (typeof ReferralType)[keyof typeof ReferralType];
@@ -275,6 +280,10 @@ export interface Visit {
 export interface WorkTime {
   [key: string]: unknown;
 }
+
+export type AddMedicineToPrescriptionParams = {
+  amount?: number;
+};
 
 export type GetAllMedicinesParams = {
   /**
