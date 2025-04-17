@@ -84,7 +84,7 @@ public class MedicineDAO implements FullDAO<Medicine, Medicine> {
             WHERE LOWER(name) LIKE LOWER(?) OR LOWER(common_name) LIKE LOWER(?)
             LIMIT ?
             """;
-    String likeQuery = "%" + query + "%";
+    String likeQuery = query + "%";
     return jdbcTemplate.query(sql, rowMapper, likeQuery, likeQuery, limit);
   }
 }
