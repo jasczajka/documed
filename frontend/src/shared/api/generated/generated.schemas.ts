@@ -41,11 +41,11 @@ export const PrescriptionStatus = {
 } as const;
 
 export interface Prescription {
-  id?: number;
-  accessCode?: number;
-  date?: string;
-  expirationDate?: string;
-  status?: PrescriptionStatus;
+  id: number;
+  accessCode: number;
+  date: string;
+  expirationDate: string;
+  status: PrescriptionStatus;
 }
 
 export interface RegisterRequestDTO {
@@ -99,6 +99,14 @@ export interface LoginRequestDTO {
   login?: string;
   /** @minLength 1 */
   password?: string;
+}
+
+export interface MedicineWithAmount {
+  id: string;
+  name: string;
+  commonName: string;
+  dosage: string;
+  amount: number;
 }
 
 export type AdditionalServiceStatus =

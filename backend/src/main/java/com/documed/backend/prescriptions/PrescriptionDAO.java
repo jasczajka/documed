@@ -73,7 +73,12 @@ public class PrescriptionDAO implements FullDAO<Prescription, Integer> {
   }
 
   public List<Prescription> getAll() {
-    throw new UnsupportedOperationException();
+    String sql =
+        """
+                SELECT *
+                FROM prescription
+                 """;
+    return jdbcTemplate.query(sql, rowMapper);
   }
 
   public Prescription getPrescriptionForVisit(int visitId) {
@@ -97,11 +102,11 @@ public class PrescriptionDAO implements FullDAO<Prescription, Integer> {
   public List<Prescription> getPrescriptionsForUser(int userId) {
     String sql =
         """
-                        SELECT *
-                        FROM prescription
-                        JOIN visit ON prescription.visit_id = visit.id
-                        WHERE patient_id = ?
-             """;
+            SELECT *
+            FROM prescription
+            JOIN visit ON prescription.visit_id = visit.id
+            WHERE patient_id = ?
+        """;
     return jdbcTemplate.query(sql, rowMapper, userId);
   }
 

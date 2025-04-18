@@ -21,11 +21,7 @@ public class ServiceController {
   @GetMapping
   public ResponseEntity<List<Service>> getAllServices() {
     List<Service> services = serviceService.getAll();
-    if (services.isEmpty()) {
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    } else {
-      return new ResponseEntity<>(services, HttpStatus.OK);
-    }
+    return new ResponseEntity<>(services, HttpStatus.OK);
   }
 
   @GetMapping("/{id}")

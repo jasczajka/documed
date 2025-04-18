@@ -20,7 +20,12 @@ import type {
 } from '@tanstack/react-query';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import type { AddMedicineToPrescriptionParams, Medicine, Prescription } from '../generated.schemas';
+import type {
+  AddMedicineToPrescriptionParams,
+  Medicine,
+  MedicineWithAmount,
+  Prescription,
+} from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
@@ -525,6 +530,230 @@ export const useIssuePrescription = <TError = ErrorType<unknown>, TContext = unk
 
   return useMutation(mutationOptions, queryClient);
 };
+export const getAllPrescriptions = (signal?: AbortSignal) => {
+  return customInstance<Prescription[]>({ url: `/api/prescriptions`, method: 'GET', signal });
+};
+
+export const getGetAllPrescriptionsQueryKey = () => {
+  return [`/api/prescriptions`] as const;
+};
+
+export const getGetAllPrescriptionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAllPrescriptions>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPrescriptions>>, TError, TData>>;
+}) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetAllPrescriptionsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllPrescriptions>>> = ({ signal }) =>
+    getAllPrescriptions(signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAllPrescriptions>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAllPrescriptionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAllPrescriptions>>
+>;
+export type GetAllPrescriptionsQueryError = ErrorType<unknown>;
+
+export function useGetAllPrescriptions<
+  TData = Awaited<ReturnType<typeof getAllPrescriptions>>,
+  TError = ErrorType<unknown>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllPrescriptions>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllPrescriptions>>,
+          TError,
+          Awaited<ReturnType<typeof getAllPrescriptions>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAllPrescriptions<
+  TData = Awaited<ReturnType<typeof getAllPrescriptions>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllPrescriptions>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllPrescriptions>>,
+          TError,
+          Awaited<ReturnType<typeof getAllPrescriptions>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAllPrescriptions<
+  TData = Awaited<ReturnType<typeof getAllPrescriptions>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllPrescriptions>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useGetAllPrescriptions<
+  TData = Awaited<ReturnType<typeof getAllPrescriptions>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllPrescriptions>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetAllPrescriptionsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const getMedicinesForPrescription = (prescriptionId: number, signal?: AbortSignal) => {
+  return customInstance<MedicineWithAmount[]>({
+    url: `/api/prescriptions/${prescriptionId}/medicines`,
+    method: 'GET',
+    signal,
+  });
+};
+
+export const getGetMedicinesForPrescriptionQueryKey = (prescriptionId: number) => {
+  return [`/api/prescriptions/${prescriptionId}/medicines`] as const;
+};
+
+export const getGetMedicinesForPrescriptionQueryOptions = <
+  TData = Awaited<ReturnType<typeof getMedicinesForPrescription>>,
+  TError = ErrorType<unknown>,
+>(
+  prescriptionId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMedicinesForPrescription>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetMedicinesForPrescriptionQueryKey(prescriptionId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getMedicinesForPrescription>>> = ({
+    signal,
+  }) => getMedicinesForPrescription(prescriptionId, signal);
+
+  return { queryKey, queryFn, enabled: !!prescriptionId, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getMedicinesForPrescription>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetMedicinesForPrescriptionQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getMedicinesForPrescription>>
+>;
+export type GetMedicinesForPrescriptionQueryError = ErrorType<unknown>;
+
+export function useGetMedicinesForPrescription<
+  TData = Awaited<ReturnType<typeof getMedicinesForPrescription>>,
+  TError = ErrorType<unknown>,
+>(
+  prescriptionId: number,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMedicinesForPrescription>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMedicinesForPrescription>>,
+          TError,
+          Awaited<ReturnType<typeof getMedicinesForPrescription>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetMedicinesForPrescription<
+  TData = Awaited<ReturnType<typeof getMedicinesForPrescription>>,
+  TError = ErrorType<unknown>,
+>(
+  prescriptionId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMedicinesForPrescription>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getMedicinesForPrescription>>,
+          TError,
+          Awaited<ReturnType<typeof getMedicinesForPrescription>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetMedicinesForPrescription<
+  TData = Awaited<ReturnType<typeof getMedicinesForPrescription>>,
+  TError = ErrorType<unknown>,
+>(
+  prescriptionId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMedicinesForPrescription>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useGetMedicinesForPrescription<
+  TData = Awaited<ReturnType<typeof getMedicinesForPrescription>>,
+  TError = ErrorType<unknown>,
+>(
+  prescriptionId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getMedicinesForPrescription>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetMedicinesForPrescriptionQueryOptions(prescriptionId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
 export const getPrescriptionsForUser = (userId: number, signal?: AbortSignal) => {
   return customInstance<Prescription[]>({
     url: `/api/prescriptions/user/${userId}`,

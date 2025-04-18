@@ -2,6 +2,7 @@ package com.documed.backend.medicines;
 
 import com.documed.backend.FullDAO;
 import com.documed.backend.medicines.model.Medicine;
+import com.documed.backend.medicines.model.MedicineWithAmount;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -17,7 +18,7 @@ public class MedicineDAO implements FullDAO<Medicine, Medicine> {
     this.jdbcTemplate = jdbcTemplate;
   }
 
-  private final RowMapper<Medicine> rowMapper =
+  private final RowMapper<Medicine> medicineRowMapper =
       (rs, rowNum) ->
           Medicine.builder()
               .id(rs.getString("id"))
@@ -26,14 +27,24 @@ public class MedicineDAO implements FullDAO<Medicine, Medicine> {
               .dosage(rs.getString("dosage"))
               .build();
 
+  private final RowMapper<MedicineWithAmount> medicineWithAmountRowMapper =
+      (rs, rowNum) ->
+          MedicineWithAmount.builder()
+              .id(rs.getString("id"))
+              .name(rs.getString("name"))
+              .commonName(rs.getString("common_name"))
+              .dosage(rs.getString("dosage"))
+              .amount(rs.getInt("amount"))
+              .build();
+
   public Optional<Medicine> getById(int id) {
     String sql = "SELECT * FROM medicine WHERE id = ?";
-    return jdbcTemplate.query(sql, rowMapper, id).stream().findFirst();
+    return jdbcTemplate.query(sql, medicineRowMapper, id).stream().findFirst();
   }
 
   public Optional<Medicine> getById(String id) {
     String sql = "SELECT * FROM medicine WHERE id = ?";
-    return jdbcTemplate.query(sql, rowMapper, id).stream().findFirst();
+    return jdbcTemplate.query(sql, medicineRowMapper, id).stream().findFirst();
   }
 
   public Medicine createOrUpdate(Medicine medicine) {
@@ -55,7 +66,7 @@ public class MedicineDAO implements FullDAO<Medicine, Medicine> {
 
   @Override
   public List<Medicine> getAll() {
-    return jdbcTemplate.query("SELECT * FROM medicine", rowMapper);
+    return jdbcTemplate.query("SELECT * FROM medicine", medicineRowMapper);
   }
 
   @Override
@@ -74,7 +85,7 @@ public class MedicineDAO implements FullDAO<Medicine, Medicine> {
 
   public List<Medicine> getLimited(int limit) {
     String sql = "SELECT * FROM medicine LIMIT ?";
-    return jdbcTemplate.query(sql, rowMapper, limit);
+    return jdbcTemplate.query(sql, medicineRowMapper, limit);
   }
 
   public List<Medicine> search(String query, int limit) {
@@ -85,6 +96,17 @@ public class MedicineDAO implements FullDAO<Medicine, Medicine> {
             LIMIT ?
             """;
     String likeQuery = query + "%";
-    return jdbcTemplate.query(sql, rowMapper, likeQuery, likeQuery, limit);
+    return jdbcTemplate.query(sql, medicineRowMapper, likeQuery, likeQuery, limit);
+  }
+
+  public List<MedicineWithAmount> getForPrescription(int prescriptionId) {
+    String sql =
+        """
+            SELECT m.id, m.name, m.common_name, m.dosage, mc.amount
+            FROM medicine m
+            JOIN medicine_prescription mc ON m.id = mc.medicine_id
+            WHERE mc.prescription_id = ?
+        """;
+    return jdbcTemplate.query(sql, medicineWithAmountRowMapper, prescriptionId);
   }
 }
