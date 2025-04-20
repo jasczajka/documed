@@ -7,7 +7,7 @@ export const LoggedLayoutComponent: FC = () => {
   return (
     <>
       <ModalContainer />
-      <main className="min-h-full-device w-full">
+      <main className="min-h-full-device w-full min-w-[1440px]">
         <AppHeader />
         <div className="h-full w-full bg-white px-28 pt-4">
           <Outlet />

@@ -22,7 +22,11 @@ public class ServiceService {
   }
 
   com.documed.backend.services.Service createService(
-      String name, BigDecimal price, ServiceType type, int estimatedTime) {
+      String name,
+      BigDecimal price,
+      ServiceType type,
+      int estimatedTime,
+      List<Integer> specializationIds) {
 
     com.documed.backend.services.Service service =
         com.documed.backend.services.Service.builder()
@@ -32,7 +36,10 @@ public class ServiceService {
             .estimatedTime(estimatedTime)
             .build();
 
-    return serviceDAO.create(service);
+    com.documed.backend.services.Service createdService = serviceDAO.create(service);
+    addSpecializationsToService(createdService.getId(), specializationIds);
+
+    return createdService;
   }
 
   int delete(int id) {
@@ -55,6 +62,11 @@ public class ServiceService {
 
   Specialization addSpecializationToService(int serviceId, int specializationId) {
     return serviceDAO.addSpecializationToService(serviceId, specializationId);
+  }
+
+  com.documed.backend.services.Service addSpecializationsToService(
+      int serviceId, List<Integer> specializationIds) {
+    return serviceDAO.addSpecializationsToService(serviceId, specializationIds);
   }
 
   int removeSpecializationFromService(int serviceId, int specializationId) {

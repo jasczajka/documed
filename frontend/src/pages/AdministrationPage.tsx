@@ -1,8 +1,8 @@
-import { Typography } from '@mui/material';
+import { AdminTabs } from 'modules/admin/AdminTabs';
 import { FC } from 'react';
 
 const AdministrationPage: FC = () => {
-  return <Typography>Administracja</Typography>;
+  return <AdminTabs />;
 };
 
 export default AdministrationPage;

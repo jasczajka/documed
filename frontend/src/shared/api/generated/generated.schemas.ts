@@ -4,6 +4,24 @@
  * OpenAPI definition
  * OpenAPI spec version: v0
  */
+export type CreateServiceDTOType = (typeof CreateServiceDTOType)[keyof typeof CreateServiceDTOType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateServiceDTOType = {
+  REGULAR_SERVICE: 'REGULAR_SERVICE',
+  ADDITIONAL_SERVICE: 'ADDITIONAL_SERVICE',
+} as const;
+
+export interface CreateServiceDTO {
+  /** @minLength 1 */
+  name?: string;
+  price: number;
+  type: CreateServiceDTOType;
+  estimatedTime?: number;
+  /** @minItems 1 */
+  specializationIds?: number[];
+}
+
 export type ServiceType = (typeof ServiceType)[keyof typeof ServiceType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -14,15 +32,15 @@ export const ServiceType = {
 
 export interface Service {
   id?: number;
-  name?: string;
-  price?: number;
-  type?: ServiceType;
-  estimatedTime?: number;
+  name: string;
+  price: number;
+  type: ServiceType;
+  estimatedTime: number;
 }
 
 export interface Specialization {
-  id?: number;
-  name?: string;
+  id: number;
+  name: string;
 }
 
 export interface Medicine {

@@ -6,6 +6,7 @@ import com.documed.backend.users.model.Specialization;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -131,6 +132,28 @@ public class ServiceDAO implements FullDAO<Service, Service> {
       return specializationDAO.getById(specializationId).orElseThrow(RuntimeException::new);
     } else {
       throw new RuntimeException("Failed to add specialization to the service");
+    }
+  }
+
+  public Service addSpecializationsToService(int serviceId, List<Integer> specializationIds) {
+    String sql =
+        "INSERT INTO specialization_service (specialization_id, service_id) VALUES (?, ?) ON CONFLICT DO NOTHING";
+
+    int[][] affectedMatrix =
+        jdbcTemplate.batchUpdate(
+            sql,
+            specializationIds,
+            specializationIds.size(),
+            (ps, specializationId) -> {
+              ps.setInt(1, specializationId);
+              ps.setInt(2, serviceId);
+            });
+
+    int totalAffected = Arrays.stream(affectedMatrix).flatMapToInt(Arrays::stream).sum();
+    if (totalAffected > 1) {
+      return getById(serviceId).orElseThrow(RuntimeException::new);
+    } else {
+      throw new RuntimeException("Failed to add specializations to the service");
     }
   }
 
