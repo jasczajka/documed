@@ -9,7 +9,7 @@ import lombok.Data;
 @Builder
 public class StaffRegisterRequestDTO {
 
-  @NotBlank(message = "Rola użytkownika jest wymagana") private UserRole role;
+  @NotNull(message = "Rola użytkownika jest wymagana") private UserRole role;
 
   @NotBlank(message = "Imię jest wymagane") private String firstName;
 
@@ -18,6 +18,4 @@ public class StaffRegisterRequestDTO {
   @Email(message = "Nieprawidłowy adres email") @NotBlank(message = "Adres email jest wymagany") private String email;
 
   @Size(min = 6, message = "Hasło musi mieć co najmniej 6 znaków") @NotBlank(message = "Hasło jest wymagane") private String password;
-
-  @NotBlank(message = "Wpisz hasło ponownie") private String confirmPassword;
 }

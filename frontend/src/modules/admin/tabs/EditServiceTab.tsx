@@ -1,15 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import {
-  Alert,
-  Box,
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Snackbar,
-  TextField,
-} from '@mui/material';
+import { Box, Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Service } from 'shared/api/generated/generated.schemas';
@@ -18,8 +8,8 @@ import {
   useUpdateServicePrice,
   useUpdateServiceTime,
 } from 'shared/api/generated/service-controller/service-controller';
-import { appConfig } from 'shared/appConfig';
 import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
+import { useNotification } from 'shared/hooks/useNotification';
 import * as Yup from 'yup';
 
 type FormData = {
@@ -38,8 +28,7 @@ export const EditServiceTab = () => {
   const { data: services, isLoading: isServicesLoading, refetch } = useGetAllServices();
   const [selectedService, setSelectedService] = useState<Service | null>(null);
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const { showNotification, NotificationComponent } = useNotification();
 
   const {
     control,
@@ -67,11 +56,9 @@ export const EditServiceTab = () => {
         }),
       ]);
       await refetch();
-      setSnackbarMessage('Usługa została zaktualizowana pomyślnie!');
-      setSnackbarOpen(true);
+      showNotification('Usługa została zaktualizowana pomyślnie!', 'success');
     } catch (error) {
-      setSnackbarMessage('Wystąpił błąd podczas aktualizowania usługi');
-      setSnackbarOpen(true);
+      showNotification('Wystąpił błąd podczas aktualizowania usługi', 'error');
       console.error('Service update error:', error);
     }
   };
@@ -169,17 +156,7 @@ export const EditServiceTab = () => {
           )}
         />
       </Box>
-
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={appConfig.snackBarDuration}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-      >
-        <Alert severity="success" sx={{ width: '100%' }}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      <NotificationComponent />
       <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
         <Button
           loading={isLoading}

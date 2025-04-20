@@ -3,6 +3,7 @@ import { Box, Paper, Tab, Tabs } from '@mui/material';
 import { AddServiceTab } from 'modules/admin/tabs/AddServiceTab';
 import { EditServiceTab } from 'modules/admin/tabs/EditServiceTab';
 import { RegisterDoctorTab } from 'modules/admin/tabs/RegisterDoctorTab';
+import { RegisterStaffTab } from 'modules/admin/tabs/RegisterStaffTab';
 import { FC, useState } from 'react';
 
 export const AdminTabs: FC = () => {
@@ -35,7 +36,7 @@ export const AdminTabs: FC = () => {
       <Paper elevation={1} className="h-full min-h-[532px] w-full p-8">
         {index === 0 && <AddServiceTab />}
         {index === 1 && <EditServiceTab />}
-        {index === 2 && <div>Dodaj pracownika content here</div>}
+        {index === 2 && <RegisterStaffTab />}
         {index === 3 && <RegisterDoctorTab />}
       </Paper>
     </Box>

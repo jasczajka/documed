@@ -1,12 +1,12 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Alert, Box, Button, FormControlLabel, Snackbar, Switch, TextField } from '@mui/material';
-import { FC, useState } from 'react';
+import { Box, Button, FormControlLabel, Switch, TextField } from '@mui/material';
+import { FC } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { ServiceType } from 'shared/api/generated/generated.schemas';
 import { useCreateService } from 'shared/api/generated/service-controller/service-controller';
 import { useGetAllSpecializations } from 'shared/api/generated/specialization-controller/specialization-controller';
-import { appConfig } from 'shared/appConfig';
 import { SpecializationSelect } from 'shared/components/SpecializationSelect';
+import { useNotification } from 'shared/hooks/useNotification';
 import * as Yup from 'yup';
 
 type FormData = {
@@ -35,8 +35,8 @@ const validationSchema = Yup.object({
 export const AddServiceTab: FC = () => {
   const { data: specializations } = useGetAllSpecializations();
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const { showNotification, NotificationComponent } = useNotification();
+
   const methods = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
@@ -58,13 +58,11 @@ export const AddServiceTab: FC = () => {
   const { mutateAsync: createService, isPending: isLoading } = useCreateService({
     mutation: {
       onSuccess: () => {
-        setSnackbarMessage('Usługa została dodana pomyślnie!');
-        setSnackbarOpen(true);
+        showNotification('Usługa została dodana pomyślnie!', 'success');
         reset();
       },
       onError: (error) => {
-        setSnackbarMessage('Wystąpił błąd podczas dodawania usługi');
-        setSnackbarOpen(true);
+        showNotification('Wystąpił błąd podczas dodawania usługi', 'error');
         console.error('Error creating service:', error);
       },
     },
@@ -183,16 +181,7 @@ export const AddServiceTab: FC = () => {
             </Button>
           </Box>
         </Box>
-        <Snackbar
-          open={snackbarOpen}
-          onClose={() => setSnackbarOpen(false)}
-          autoHideDuration={appConfig.snackBarDuration}
-          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        >
-          <Alert severity="success" sx={{ width: '100%' }}>
-            {snackbarMessage}
-          </Alert>
-        </Snackbar>
+        <NotificationComponent />
       </Box>
     </FormProvider>
   );

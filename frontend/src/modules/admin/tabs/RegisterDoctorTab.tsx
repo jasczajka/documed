@@ -1,12 +1,12 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Alert, Box, Button, Snackbar, TextField } from '@mui/material';
-import { FC, useState } from 'react';
+import { Box, Button, TextField } from '@mui/material';
+import { FC } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useRegisterDoctor } from 'shared/api/generated/auth-controller/auth-controller';
 import { useGetAllSpecializations } from 'shared/api/generated/specialization-controller/specialization-controller';
-import { appConfig } from 'shared/appConfig';
 import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
 import { SpecializationSelect } from 'shared/components/SpecializationSelect';
+import { useNotification } from 'shared/hooks/useNotification';
 import * as Yup from 'yup';
 
 type FormData = {
@@ -39,8 +39,7 @@ const validationSchema = Yup.object({
 });
 
 export const RegisterDoctorTab: FC = () => {
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const { showNotification, NotificationComponent } = useNotification();
   const { data: specializations, isLoading: isSpecializationsLoading } = useGetAllSpecializations();
 
   const methods = useForm({
@@ -65,13 +64,11 @@ export const RegisterDoctorTab: FC = () => {
   const { mutateAsync: registerDoctor, isPending: isLoading } = useRegisterDoctor({
     mutation: {
       onSuccess: () => {
-        setSnackbarMessage('Pomyślnie dodano konto lekarza!');
-        setSnackbarOpen(true);
+        showNotification('Pomyślnie dodano konto lekarza!', 'success');
         reset();
       },
       onError: (error) => {
-        setSnackbarMessage('Wystąpił błąd podczas dodawania konta lekarza');
-        setSnackbarOpen(true);
+        showNotification('Wystąpił błąd podczas dodawania konta lekarza', 'error');
         console.error('Error registering doctor:', error);
       },
     },
@@ -195,17 +192,7 @@ export const RegisterDoctorTab: FC = () => {
               />
             )}
           />
-
-          <Snackbar
-            open={snackbarOpen}
-            onClose={() => setSnackbarOpen(false)}
-            autoHideDuration={appConfig.snackBarDuration}
-            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-          >
-            <Alert severity="success" sx={{ width: '100%' }}>
-              {snackbarMessage}
-            </Alert>
-          </Snackbar>
+          <NotificationComponent />
         </Box>
         <SpecializationSelect
           specializations={specializations ?? []}
