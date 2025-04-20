@@ -150,7 +150,7 @@ public class ServiceDAO implements FullDAO<Service, Service> {
             });
 
     int totalAffected = Arrays.stream(affectedMatrix).flatMapToInt(Arrays::stream).sum();
-    if (totalAffected > 1) {
+    if (totalAffected >= 1) {
       return getById(serviceId).orElseThrow(RuntimeException::new);
     } else {
       throw new RuntimeException("Failed to add specializations to the service");

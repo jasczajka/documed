@@ -52,7 +52,9 @@ public class SecurityConfig {
             auth -> {
               auth.requestMatchers(HttpMethod.OPTIONS, "/**")
                   .permitAll()
-                  .requestMatchers("/api/auth/**")
+                  .requestMatchers("/api/auth/login")
+                  .permitAll()
+                  .requestMatchers("/api/auth/register")
                   .permitAll()
                   .requestMatchers("/actuator/health")
                   .permitAll();

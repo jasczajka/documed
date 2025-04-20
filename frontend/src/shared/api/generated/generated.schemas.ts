@@ -13,13 +13,12 @@ export const CreateServiceDTOType = {
 } as const;
 
 export interface CreateServiceDTO {
-  /** @minLength 1 */
-  name?: string;
+  name: string;
   price: number;
   type: CreateServiceDTOType;
-  estimatedTime?: number;
+  estimatedTime: number;
   /** @minItems 1 */
-  specializationIds?: number[];
+  specializationIds: number[];
 }
 
 export type ServiceType = (typeof ServiceType)[keyof typeof ServiceType];

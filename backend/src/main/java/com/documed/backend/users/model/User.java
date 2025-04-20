@@ -31,7 +31,7 @@ public class User {
   @Schema(required = true)
   @NonNull private String email;
 
-  @NonNull private String address;
+  @Schema private String address;
 
   @Schema @ToString.Exclude private String password;
 

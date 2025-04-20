@@ -11,15 +11,15 @@ import lombok.Data;
 @Builder
 public class CreateServiceDTO {
 
-  @NotBlank(message = "Nazwa jest wymagana") private String name;
+  @NotNull(message = "Nazwa jest wymagana") private String name;
 
   @NotNull(message = "Cena jest wymagana") @Positive(message = "Cena musi być większa od zera") private BigDecimal price;
 
   @NotNull(message = "Rodzaj usługi jest wymagany") private ServiceType type;
 
-  @Positive(message = "Czas trwania musi być większy od zera") private int estimatedTime;
+  @NotNull @Positive(message = "Czas trwania musi być większy od zera") private int estimatedTime;
 
-  @NotEmpty(message = "Musisz podać przynajmniej jedną specjalizację") private List<
+  @NotNull @NotEmpty(message = "Musisz podać przynajmniej jedną specjalizację") private List<
           @NotNull(message = "ID specjalizacji nie może być puste") @Positive(message = "ID specjalizacji musi być większe od zera") Integer>
       specializationIds;
 }

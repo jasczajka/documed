@@ -54,7 +54,7 @@ public class AuthController {
 
   @AdminOnly
   @PostMapping("/register_doctor")
-  public ResponseEntity<AuthResponseDTO> register(
+  public ResponseEntity<AuthResponseDTO> register_doctor(
       @Valid @RequestBody DoctorRegisterRequestDTO request) {
     logger.info("Registration attempt for email: {}", request.getEmail());
     AuthResponseDTO response =
@@ -67,13 +67,13 @@ public class AuthController {
             request.getPhoneNumber(),
             request.getSpecializationIds());
 
-    logger.debug("Doctor registered successfully with ID: {}", response.getUserId());
+    logger.info("Doctor registered successfully with ID: {}", response.getUserId());
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   @AdminOnly
   @PostMapping("/register_staff")
-  public ResponseEntity<AuthResponseDTO> register(
+  public ResponseEntity<AuthResponseDTO> register_staff(
       @Valid @RequestBody StaffRegisterRequestDTO request) {
     logger.info("Registration attempt for email: {}", request.getEmail());
     AuthResponseDTO response =
@@ -84,7 +84,7 @@ public class AuthController {
             request.getPassword(),
             String.valueOf(request.getRole()));
 
-    logger.debug("User registered successfully with ID: {}", response.getUserId());
+    logger.info("Staff user registered successfully with ID: {}", response.getUserId());
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 

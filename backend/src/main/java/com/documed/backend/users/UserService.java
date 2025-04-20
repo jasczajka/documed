@@ -1,5 +1,6 @@
 package com.documed.backend.users;
 
+import com.documed.backend.auth.exceptions.UserNotFoundException;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
 import java.util.List;
@@ -24,9 +25,11 @@ public class UserService {
     return rowsAffected > 0;
   }
 
-  public Optional<User> addSpecializationsToUser(int userId, List<Integer> specializationIds) {
+  public User addSpecializationsToUser(int userId, List<Integer> specializationIds) {
     Optional<User> optionalUser = getById(userId);
-    if (optionalUser.isEmpty()) return Optional.empty();
+    if (optionalUser.isEmpty()) {
+      throw new UserNotFoundException("User not found.");
+    }
 
     User user = optionalUser.get();
     if (user.getRole() != UserRole.DOCTOR) {

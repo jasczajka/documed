@@ -166,7 +166,7 @@ CREATE TABLE "User" (
     password varchar(255)  NOT NULL,
     phone_number varchar(255)  NULL,
     account_status varchar(255)  NOT NULL,
-    birthdate date  NOT NULL,
+    birthdate date  NULL,
     pwz varchar(255)  NULL,
     role varchar(255)  NOT NULL,
     subscription_id int  NULL,

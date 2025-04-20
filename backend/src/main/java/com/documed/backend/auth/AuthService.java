@@ -12,6 +12,8 @@ import com.documed.backend.users.model.UserRole;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ public class AuthService {
   private final JwtUtil jwtUtil;
 
   private final UserService userService;
+
+  private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
   public AuthService(
       UserDAO userDAO, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, UserService userService) {
@@ -72,6 +76,7 @@ public class AuthService {
           .role(createdUser.getRole())
           .build();
     } catch (DataAccessException e) {
+      logger.error("Error in registerPatient()", e);
       throw new AuthServiceException("Database error during registration", e);
     }
   }
@@ -113,6 +118,7 @@ public class AuthService {
           .role(createdUser.getRole())
           .build();
     } catch (DataAccessException e) {
+      logger.error("Error in registerDoctor()", e);
       throw new AuthServiceException("Database error during registration", e);
     }
   }
@@ -143,6 +149,7 @@ public class AuthService {
           .role(createdUser.getRole())
           .build();
     } catch (DataAccessException e) {
+      logger.error("Error in registerStaff()", e);
       throw new AuthServiceException("Database error during registration", e);
     }
   }
@@ -167,6 +174,7 @@ public class AuthService {
           .role(user.getRole())
           .build();
     } catch (DataAccessException e) {
+      logger.error("Error in login()", e);
       throw new AuthServiceException("Database error during login", e);
     }
   }
