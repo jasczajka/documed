@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import { FC, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Link } from 'react-router';
+import { appConfig } from 'shared/appConfig';
 import { useAuth } from 'shared/hooks/useAuth';
 import { DocuMedLogo } from 'shared/icons/DocuMedLogo';
 import * as Yup from 'yup';
@@ -289,7 +290,8 @@ export const RegisterPage: FC = () => {
         </Box>
         <Snackbar
           open={snackbarOpen}
-          autoHideDuration={150000}
+          onClose={() => setSnackbarOpen(false)}
+          autoHideDuration={appConfig.snackBarDuration}
           anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         >
           <Alert severity="success" sx={{ width: '100%' }}>

@@ -7,6 +7,7 @@ import lombok.*;
 @Data
 @Builder
 public class Service {
+  @Schema(required = true)
   private int id;
 
   @Schema(required = true)

@@ -6,7 +6,7 @@ import {
   useRegister,
 } from 'shared/api/generated/auth-controller/auth-controller';
 import { UserRole } from 'shared/api/generated/generated.schemas';
-import { mapLoginError } from 'shared/utils.ts/mapAuthError';
+import { mapLoginError } from 'shared/utils/mapAuthError';
 import { useAuthStore } from './stores/useAuthStore';
 
 export const useAuth = () => {

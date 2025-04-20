@@ -19,6 +19,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { ServiceType, Specialization } from 'shared/api/generated/generated.schemas';
 import { useCreateService } from 'shared/api/generated/service-controller/service-controller';
 import { useGetAllSpecializations } from 'shared/api/generated/specialization-controller/specialization-controller';
+import { appConfig } from 'shared/appConfig';
 import * as Yup from 'yup';
 
 type FormData = {
@@ -228,7 +229,8 @@ export const AddServiceTab: FC = () => {
       </Box>
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={150000}
+        onClose={() => setSnackbarOpen(false)}
+        autoHideDuration={appConfig.snackBarDuration}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
         <Alert severity="success" sx={{ width: '100%' }}>

@@ -31,7 +31,7 @@ export const ServiceType = {
 } as const;
 
 export interface Service {
-  id?: number;
+  id: number;
   name: string;
   price: number;
   type: ServiceType;
