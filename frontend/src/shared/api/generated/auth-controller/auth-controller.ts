@@ -22,20 +22,25 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import type {
   AuthResponseDTO,
+  DoctorRegisterRequestDTO,
   LoginRequestDTO,
-  RegisterRequestDTO,
+  PatientRegisterRequestDTO,
+  StaffRegisterRequestDTO,
   User,
 } from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
 
-export const register = (registerRequestDTO: RegisterRequestDTO, signal?: AbortSignal) => {
+export const register = (
+  staffRegisterRequestDTO: StaffRegisterRequestDTO,
+  signal?: AbortSignal,
+) => {
   return customInstance<AuthResponseDTO>({
-    url: `/api/auth/register`,
+    url: `/api/auth/register_staff`,
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    data: registerRequestDTO,
+    data: staffRegisterRequestDTO,
     signal,
   });
 };
@@ -47,13 +52,13 @@ export const getRegisterMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof register>>,
     TError,
-    { data: RegisterRequestDTO },
+    { data: StaffRegisterRequestDTO },
     TContext
   >;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof register>>,
   TError,
-  { data: RegisterRequestDTO },
+  { data: StaffRegisterRequestDTO },
   TContext
 > => {
   const mutationKey = ['register'];
@@ -65,7 +70,7 @@ export const getRegisterMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof register>>,
-    { data: RegisterRequestDTO }
+    { data: StaffRegisterRequestDTO }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -76,7 +81,7 @@ export const getRegisterMutationOptions = <
 };
 
 export type RegisterMutationResult = NonNullable<Awaited<ReturnType<typeof register>>>;
-export type RegisterMutationBody = RegisterRequestDTO;
+export type RegisterMutationBody = StaffRegisterRequestDTO;
 export type RegisterMutationError = ErrorType<unknown>;
 
 export const useRegister = <TError = ErrorType<unknown>, TContext = unknown>(
@@ -84,7 +89,7 @@ export const useRegister = <TError = ErrorType<unknown>, TContext = unknown>(
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof register>>,
       TError,
-      { data: RegisterRequestDTO },
+      { data: StaffRegisterRequestDTO },
       TContext
     >;
   },
@@ -92,10 +97,154 @@ export const useRegister = <TError = ErrorType<unknown>, TContext = unknown>(
 ): UseMutationResult<
   Awaited<ReturnType<typeof register>>,
   TError,
-  { data: RegisterRequestDTO },
+  { data: StaffRegisterRequestDTO },
   TContext
 > => {
   const mutationOptions = getRegisterMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+export const register1 = (
+  doctorRegisterRequestDTO: DoctorRegisterRequestDTO,
+  signal?: AbortSignal,
+) => {
+  return customInstance<AuthResponseDTO>({
+    url: `/api/auth/register_doctor`,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: doctorRegisterRequestDTO,
+    signal,
+  });
+};
+
+export const getRegister1MutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof register1>>,
+    TError,
+    { data: DoctorRegisterRequestDTO },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof register1>>,
+  TError,
+  { data: DoctorRegisterRequestDTO },
+  TContext
+> => {
+  const mutationKey = ['register1'];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof register1>>,
+    { data: DoctorRegisterRequestDTO }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return register1(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type Register1MutationResult = NonNullable<Awaited<ReturnType<typeof register1>>>;
+export type Register1MutationBody = DoctorRegisterRequestDTO;
+export type Register1MutationError = ErrorType<unknown>;
+
+export const useRegister1 = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof register1>>,
+      TError,
+      { data: DoctorRegisterRequestDTO },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof register1>>,
+  TError,
+  { data: DoctorRegisterRequestDTO },
+  TContext
+> => {
+  const mutationOptions = getRegister1MutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+export const register2 = (
+  patientRegisterRequestDTO: PatientRegisterRequestDTO,
+  signal?: AbortSignal,
+) => {
+  return customInstance<AuthResponseDTO>({
+    url: `/api/auth/register`,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: patientRegisterRequestDTO,
+    signal,
+  });
+};
+
+export const getRegister2MutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof register2>>,
+    TError,
+    { data: PatientRegisterRequestDTO },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof register2>>,
+  TError,
+  { data: PatientRegisterRequestDTO },
+  TContext
+> => {
+  const mutationKey = ['register2'];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof register2>>,
+    { data: PatientRegisterRequestDTO }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return register2(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type Register2MutationResult = NonNullable<Awaited<ReturnType<typeof register2>>>;
+export type Register2MutationBody = PatientRegisterRequestDTO;
+export type Register2MutationError = ErrorType<unknown>;
+
+export const useRegister2 = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof register2>>,
+      TError,
+      { data: PatientRegisterRequestDTO },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof register2>>,
+  TError,
+  { data: PatientRegisterRequestDTO },
+  TContext
+> => {
+  const mutationOptions = getRegister2MutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

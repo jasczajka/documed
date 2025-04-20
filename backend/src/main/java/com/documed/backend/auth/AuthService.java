@@ -6,12 +6,16 @@ import com.documed.backend.auth.exceptions.InvalidCredentialsException;
 import com.documed.backend.auth.exceptions.UserAlreadyExistsException;
 import com.documed.backend.auth.exceptions.UserNotFoundException;
 import com.documed.backend.users.*;
+import com.documed.backend.users.model.AccountStatus;
 import com.documed.backend.users.model.User;
+import com.documed.backend.users.model.UserRole;
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.List;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthService {
@@ -19,18 +23,23 @@ public class AuthService {
   private final PasswordEncoder passwordEncoder;
   private final JwtUtil jwtUtil;
 
-  public AuthService(UserDAO userDAO, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+  private final UserService userService;
+
+  public AuthService(
+      UserDAO userDAO, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, UserService userService) {
     this.userDAO = userDAO;
     this.passwordEncoder = passwordEncoder;
     this.jwtUtil = jwtUtil;
+    this.userService = userService;
   }
 
-  public AuthResponseDTO registerUser(
+  public AuthResponseDTO registerPatient(
       String firstName,
       String lastName,
       String email,
       String pesel,
       String password,
+      String role,
       String phoneNumber,
       String address,
       LocalDate birthDate) {
@@ -50,8 +59,79 @@ public class AuthService {
               .address(address)
               .password(passwordEncoder.encode(password))
               .accountStatus(AccountStatus.ACTIVE)
-              .role(UserRole.PATIENT)
+              .role(UserRole.valueOf(role))
               .birthDate(Date.valueOf(birthDate))
+              .build();
+
+      User createdUser = userDAO.createAndReturn(user);
+      String token = jwtUtil.generateToken(createdUser.getId(), createdUser.getRole().name());
+
+      return AuthResponseDTO.builder()
+          .token(token)
+          .userId(createdUser.getId())
+          .role(createdUser.getRole())
+          .build();
+    } catch (DataAccessException e) {
+      throw new AuthServiceException("Database error during registration", e);
+    }
+  }
+
+  @Transactional
+  public AuthResponseDTO registerDoctor(
+      String firstName,
+      String lastName,
+      String email,
+      String pwz,
+      String password,
+      String phoneNumber,
+      List<Integer> specializationIds) {
+    try {
+      if (userDAO.getByEmail(email).isPresent()) {
+        throw new UserAlreadyExistsException("User with given email  already exists");
+      }
+
+      User user =
+          User.builder()
+              .firstName(firstName)
+              .lastName(lastName)
+              .email(email)
+              .pwzNumber(pwz)
+              .phoneNumber(phoneNumber)
+              .password(passwordEncoder.encode(password))
+              .accountStatus(AccountStatus.ACTIVE)
+              .role(UserRole.DOCTOR)
+              .build();
+
+      User createdUser = userDAO.createAndReturn(user);
+
+      userService.addSpecializationsToUser(createdUser.getId(), specializationIds);
+      String token = jwtUtil.generateToken(createdUser.getId(), createdUser.getRole().name());
+
+      return AuthResponseDTO.builder()
+          .token(token)
+          .userId(createdUser.getId())
+          .role(createdUser.getRole())
+          .build();
+    } catch (DataAccessException e) {
+      throw new AuthServiceException("Database error during registration", e);
+    }
+  }
+
+  public AuthResponseDTO registerStaff(
+      String firstName, String lastName, String email, String password, String role) {
+    try {
+      if (userDAO.getByEmail(email).isPresent()) {
+        throw new UserAlreadyExistsException("User with given email already exists");
+      }
+
+      User user =
+          User.builder()
+              .firstName(firstName)
+              .lastName(lastName)
+              .email(email)
+              .password(passwordEncoder.encode(password))
+              .accountStatus(AccountStatus.ACTIVE)
+              .role(UserRole.valueOf(role))
               .build();
 
       User createdUser = userDAO.createAndReturn(user);

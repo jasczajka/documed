@@ -48,7 +48,83 @@ export interface Prescription {
   status: PrescriptionStatus;
 }
 
-export interface RegisterRequestDTO {
+/**
+ * @minLength 1
+ */
+export type StaffRegisterRequestDTORole =
+  (typeof StaffRegisterRequestDTORole)[keyof typeof StaffRegisterRequestDTORole];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const StaffRegisterRequestDTORole = {
+  PATIENT: 'PATIENT',
+  DOCTOR: 'DOCTOR',
+  NURSE: 'NURSE',
+  WARD_CLERK: 'WARD_CLERK',
+  ADMINISTRATOR: 'ADMINISTRATOR',
+} as const;
+
+export interface StaffRegisterRequestDTO {
+  /** @minLength 1 */
+  role?: StaffRegisterRequestDTORole;
+  /** @minLength 1 */
+  firstName?: string;
+  /** @minLength 1 */
+  lastName?: string;
+  /** @minLength 1 */
+  email?: string;
+  /**
+   * @minLength 6
+   * @maxLength 2147483647
+   */
+  password?: string;
+  /** @minLength 1 */
+  confirmPassword?: string;
+}
+
+export type AuthResponseDTORole = (typeof AuthResponseDTORole)[keyof typeof AuthResponseDTORole];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AuthResponseDTORole = {
+  PATIENT: 'PATIENT',
+  DOCTOR: 'DOCTOR',
+  NURSE: 'NURSE',
+  WARD_CLERK: 'WARD_CLERK',
+  ADMINISTRATOR: 'ADMINISTRATOR',
+} as const;
+
+export interface AuthResponseDTO {
+  token?: string;
+  userId?: number;
+  role?: AuthResponseDTORole;
+}
+
+export interface DoctorRegisterRequestDTO {
+  /** @minLength 1 */
+  firstName?: string;
+  /** @minLength 1 */
+  lastName?: string;
+  /**
+   * @minLength 1
+   * @pattern ^\d{7}$
+   */
+  pwz?: string;
+  /**
+   * @minLength 1
+   * @pattern ^\d{9}$
+   */
+  phoneNumber?: string;
+  /** @minLength 1 */
+  email?: string;
+  /**
+   * @minLength 6
+   * @maxLength 2147483647
+   */
+  password?: string;
+  /** @minItems 1 */
+  specializationIds?: number[];
+}
+
+export interface PatientRegisterRequestDTO {
   /** @minLength 1 */
   firstName?: string;
   /** @minLength 1 */
@@ -75,23 +151,6 @@ export interface RegisterRequestDTO {
   /** @minLength 1 */
   confirmPassword?: string;
   birthdate: string;
-}
-
-export type AuthResponseDTORole = (typeof AuthResponseDTORole)[keyof typeof AuthResponseDTORole];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const AuthResponseDTORole = {
-  PATIENT: 'PATIENT',
-  DOCTOR: 'DOCTOR',
-  NURSE: 'NURSE',
-  WARD_CLERK: 'WARD_CLERK',
-  ADMINISTRATOR: 'ADMINISTRATOR',
-} as const;
-
-export interface AuthResponseDTO {
-  token?: string;
-  userId?: number;
-  role?: AuthResponseDTORole;
 }
 
 export interface LoginRequestDTO {
@@ -240,7 +299,7 @@ export interface User {
   pesel?: string;
   passportNumber?: string;
   email: string;
-  address: string;
+  address?: string;
   password?: string;
   phoneNumber?: string;
   accountStatus: UserAccountStatus;

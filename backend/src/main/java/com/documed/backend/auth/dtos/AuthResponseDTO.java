@@ -1,6 +1,6 @@
 package com.documed.backend.auth.dtos;
 
-import com.documed.backend.users.UserRole;
+import com.documed.backend.users.model.UserRole;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;

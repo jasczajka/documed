@@ -1,7 +1,9 @@
 package com.documed.backend.users;
 
 import com.documed.backend.FullDAO;
+import com.documed.backend.users.model.AccountStatus;
 import com.documed.backend.users.model.User;
+import com.documed.backend.users.model.UserRole;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -161,5 +163,21 @@ public class UserDAO implements FullDAO<User, User> {
 
     return getById(generatedId)
         .orElseThrow(() -> new IllegalStateException("Failed to retrieve created user"));
+  }
+
+  public Optional<User> addSpecializationsToUser(int userId, List<Integer> specializationIds) {
+    String sql =
+        "INSERT INTO doctor_specialization (doctor_id, specialization_id) VALUES (?, ?) ON CONFLICT DO NOTHING";
+
+    jdbcTemplate.batchUpdate(
+        sql,
+        specializationIds,
+        specializationIds.size(),
+        (ps, specializationId) -> {
+          ps.setInt(1, userId);
+          ps.setInt(2, specializationId);
+        });
+
+    return getById(userId);
   }
 }

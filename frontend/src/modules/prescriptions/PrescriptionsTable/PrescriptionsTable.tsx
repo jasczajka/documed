@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, FormControlLabel, Paper, Switch } from '@mui/material';
+import { Box, Button, FormControlLabel, Paper, Switch } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 import { format, subDays } from 'date-fns';
@@ -16,7 +16,10 @@ interface PrescriptionsTableProps {
   prescriptions: Prescription[];
 }
 
-const columns = (onShowPrescription: (id: number) => void): GridColDef<Prescription>[] => [
+const columns = (
+  onShowPrescription: (id: number) => void,
+  loading?: boolean,
+): GridColDef<Prescription>[] => [
   {
     field: 'doctorName',
     headerName: 'Wystawione przez',
@@ -45,7 +48,13 @@ const columns = (onShowPrescription: (id: number) => void): GridColDef<Prescript
     minWidth: 160,
     flex: 0.7,
     renderCell: ({ row }) => (
-      <Button variant="text" size="small" onClick={() => onShowPrescription(row.id)}>
+      <Button
+        variant="text"
+        size="small"
+        onClick={() => onShowPrescription(row.id)}
+        loading={loading}
+        disabled={loading}
+      >
         Wyświetl receptę
       </Button>
     ),
@@ -95,7 +104,6 @@ export const PrescriptionsTable: FC<PrescriptionsTableProps> = ({ prescriptions 
 
   return (
     <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', p: 2 }}>
-      {isLoading && <CircularProgress />}
       <Box sx={{ pb: 2 }}>
         <FormControlLabel
           control={<Switch checked={filters.showOnlyNotExpired} onChange={handleToggleFilter} />}
@@ -106,7 +114,7 @@ export const PrescriptionsTable: FC<PrescriptionsTableProps> = ({ prescriptions 
       <Paper sx={{ flexGrow: 1 }}>
         <DataGrid
           rows={filteredPrescriptions}
-          columns={columns(handleShowPrescriptionClick)}
+          columns={columns(handleShowPrescriptionClick, isLoading)}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },

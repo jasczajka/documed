@@ -20,11 +20,7 @@ public class SpecializationController {
   @GetMapping
   public ResponseEntity<List<Specialization>> getAllSpecializations() {
     List<Specialization> specializations = specializationService.getAll();
-    if (specializations.isEmpty()) {
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    } else {
-      return new ResponseEntity<>(specializations, HttpStatus.OK);
-    }
+    return new ResponseEntity<>(specializations, HttpStatus.OK);
   }
 
   @GetMapping("/{id}")

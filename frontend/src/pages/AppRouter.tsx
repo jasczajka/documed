@@ -15,9 +15,8 @@ const ReferralsPage = lazy(() => import('./ReferralsPage'));
 const PrescriptionsPage = lazy(() => import('./PrescriptionsPage'));
 const AdministrationPage = lazy(() => import('./AdministrationPage'));
 
-// @TODO replace these with a useRoles hook that will determine whether user is backoffice / admin / patient
-const isAdmin = true;
-const isPatient = true;
+const { isAdmin } = useAuth();
+const { isPatient } = useAuth();
 
 const defaultRoutes: RouteObject[] = [
   {
