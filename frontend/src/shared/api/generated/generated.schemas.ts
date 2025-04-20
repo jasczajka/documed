@@ -65,9 +65,6 @@ export interface Prescription {
   status: PrescriptionStatus;
 }
 
-/**
- * @minLength 1
- */
 export type StaffRegisterRequestDTORole =
   (typeof StaffRegisterRequestDTORole)[keyof typeof StaffRegisterRequestDTORole];
 
@@ -81,8 +78,7 @@ export const StaffRegisterRequestDTORole = {
 } as const;
 
 export interface StaffRegisterRequestDTO {
-  /** @minLength 1 */
-  role?: StaffRegisterRequestDTORole;
+  role: StaffRegisterRequestDTORole;
   /** @minLength 1 */
   firstName?: string;
   /** @minLength 1 */
@@ -94,8 +90,6 @@ export interface StaffRegisterRequestDTO {
    * @maxLength 2147483647
    */
   password?: string;
-  /** @minLength 1 */
-  confirmPassword?: string;
 }
 
 export type AuthResponseDTORole = (typeof AuthResponseDTORole)[keyof typeof AuthResponseDTORole];
