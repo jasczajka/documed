@@ -24,7 +24,7 @@ CREATE TABLE Attachment (
 CREATE TABLE Doctor_Specialization (
     doctor_id int  NOT NULL,
     specialization_id int  NOT NULL,
-    CONSTRAINT Doctor PRIMARY KEY (doctor_id,specialization_id)
+    CONSTRAINT Doctor_Specialization_pk PRIMARY KEY (doctor_id,specialization_id)
 );
 
 -- Table: Facility
@@ -223,15 +223,15 @@ ALTER TABLE Attachment ADD CONSTRAINT Attachment_Visit
     INITIALLY IMMEDIATE
 ;
 
--- Reference: Doctor_specialization_Specialization (table: Doctor)
-ALTER TABLE Doctor ADD CONSTRAINT Doctor_specialization_Specialization
+-- Reference: Doctor_specialization_Specialization (table: Doctor_Specialization)
+ALTER TABLE Doctor_Specialization ADD CONSTRAINT Doctor_specialization_Specialization
     FOREIGN KEY (specialization_id)
     REFERENCES Specialization (id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
 
--- Reference: Doctor_specialization_User (table: Doctor)
+-- Reference: Doctor_specialization_User (table: Doctor_Specialization)
 ALTER TABLE Doctor_Specialization ADD CONSTRAINT Doctor_specialization_User
     FOREIGN KEY (doctor_id)
     REFERENCES "User" (id)  
