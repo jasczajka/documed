@@ -6,7 +6,7 @@ import {
   useRegister,
 } from 'shared/api/generated/auth-controller/auth-controller';
 import { UserRole } from 'shared/api/generated/generated.schemas';
-import { mapLoginError } from 'shared/utils/mapAuthError';
+import { mapAuthError } from 'shared/utils/mapAuthError';
 import { useAuthStore } from './stores/useAuthStore';
 
 export const useAuth = () => {
@@ -117,9 +117,9 @@ export const useAuth = () => {
     isDoctor,
     hasRole,
     hasAnyRole,
-    loginError: mapLoginError(loginError),
-    logoutError: mapLoginError(logoutError),
-    registerError: mapLoginError(registerError),
+    loginError: mapAuthError(loginError),
+    logoutError: mapAuthError(logoutError),
+    registerError: mapAuthError(registerError),
     deleteAccountError,
   };
 };

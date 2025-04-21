@@ -10,7 +10,14 @@ export const AdminTabs: FC = () => {
   const [index, setIndex] = useState(0);
 
   return (
-    <Box className="h-full pt-10">
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        flex: 1,
+      }}
+    >
       <Tabs
         sx={{
           '& .MuiTab-root': {
@@ -33,7 +40,7 @@ export const AdminTabs: FC = () => {
         <Tab icon={<Medication />} iconPosition="start" label="Dodaj lekarza" />
       </Tabs>
 
-      <Paper elevation={1} className="h-full min-h-[532px] w-full p-8">
+      <Paper sx={{ height: '100%', width: '100%', padding: 8, minHeight: '532px' }} elevation={1}>
         {index === 0 && <AddServiceTab />}
         {index === 1 && <EditServiceTab />}
         {index === 2 && <RegisterStaffTab />}

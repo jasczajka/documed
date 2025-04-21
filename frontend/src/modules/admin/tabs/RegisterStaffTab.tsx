@@ -13,6 +13,7 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useRegisterStaff } from 'shared/api/generated/auth-controller/auth-controller';
 import { UserRole } from 'shared/api/generated/generated.schemas';
 import { useNotification } from 'shared/hooks/useNotification';
+import { mapAuthError } from 'shared/utils/mapAuthError';
 import * as Yup from 'yup';
 
 type FormData = {
@@ -62,7 +63,12 @@ export const RegisterStaffTab: FC = () => {
         reset();
       },
       onError: (error) => {
-        showNotification('Wystąpił błąd podczas dodawania konta pracownika', 'error');
+        const errorResult = mapAuthError(error);
+        if (errorResult) {
+          showNotification(`Błąd: ${errorResult.message}`, 'error');
+        } else {
+          showNotification('Wystąpił nieznany błąd', 'error');
+        }
         console.error('Error registering doctor:', error);
       },
     },

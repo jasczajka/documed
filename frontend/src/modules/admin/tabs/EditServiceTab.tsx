@@ -10,6 +10,7 @@ import {
 } from 'shared/api/generated/service-controller/service-controller';
 import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
 import { useNotification } from 'shared/hooks/useNotification';
+import { mapApiError } from 'shared/utils/mapApiError';
 import * as Yup from 'yup';
 
 type FormData = {
@@ -58,7 +59,12 @@ export const EditServiceTab = () => {
       await refetch();
       showNotification('Usługa została zaktualizowana pomyślnie!', 'success');
     } catch (error) {
-      showNotification('Wystąpił błąd podczas aktualizowania usługi', 'error');
+      const errorResult = mapApiError(error);
+      if (errorResult) {
+        showNotification(`Błąd: ${errorResult.message}`, 'error');
+      } else {
+        showNotification('Wystąpił nieznany błąd', 'error');
+      }
       console.error('Service update error:', error);
     }
   };

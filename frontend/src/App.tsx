@@ -5,9 +5,7 @@ import { AppRouter } from './pages/AppRouter';
 export const App = () => {
   return (
     <Suspense fallback={<FullPageLoadingSpinner />}>
-      <AppRouter />;
+      <AppRouter />
     </Suspense>
   );
 };
-
-export default App;

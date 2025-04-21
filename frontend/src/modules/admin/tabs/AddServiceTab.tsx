@@ -7,6 +7,7 @@ import { useCreateService } from 'shared/api/generated/service-controller/servic
 import { useGetAllSpecializations } from 'shared/api/generated/specialization-controller/specialization-controller';
 import { SpecializationSelect } from 'shared/components/SpecializationSelect';
 import { useNotification } from 'shared/hooks/useNotification';
+import { mapApiError } from 'shared/utils/mapApiError';
 import * as Yup from 'yup';
 
 type FormData = {
@@ -62,7 +63,12 @@ export const AddServiceTab: FC = () => {
         reset();
       },
       onError: (error) => {
-        showNotification('Wystąpił błąd podczas dodawania usługi', 'error');
+        const errorResult = mapApiError(error);
+        if (errorResult) {
+          showNotification(`Błąd: ${errorResult.message}`, 'error');
+        } else {
+          showNotification('Wystąpił nieznany błąd', 'error');
+        }
         console.error('Error creating service:', error);
       },
     },
@@ -82,9 +88,23 @@ export const AddServiceTab: FC = () => {
       <Box
         component="form"
         onSubmit={handleSubmit(onSubmit)}
-        sx={{ height: '100%', width: '100%', display: 'flex', gap: 10 }}
+        sx={{
+          height: '100%',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          gap: 10,
+        }}
       >
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <Box
+          sx={{
+            height: '100%',
+            width: '100%',
+            display: 'flex',
+            gap: 10,
+          }}
+        >
           <Controller
             name="type"
             control={control}
@@ -110,12 +130,20 @@ export const AddServiceTab: FC = () => {
               />
             )}
           />
+        </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 6,
+            height: '100%',
+            width: '70%',
+          }}
+        >
           <SpecializationSelect
             label="Specjalizacje mogące wykonywać usługę"
             specializations={specializations ?? []}
           />
-        </Box>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 6, width: '100%' }}>
           <Controller
             name="name"
             control={control}
@@ -169,20 +197,21 @@ export const AddServiceTab: FC = () => {
               />
             )}
           />
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-            <Button
-              loading={isLoading}
-              disabled={isLoading}
-              type="submit"
-              variant="contained"
-              size="large"
-            >
-              Dodaj usługę
-            </Button>
-          </Box>
         </Box>
-        <NotificationComponent />
+
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+          <Button
+            loading={isLoading}
+            disabled={isLoading}
+            type="submit"
+            variant="contained"
+            size="large"
+          >
+            Dodaj usługę
+          </Button>
+        </Box>
       </Box>
+      <NotificationComponent />
     </FormProvider>
   );
 };

@@ -7,6 +7,7 @@ import { useGetAllSpecializations } from 'shared/api/generated/specialization-co
 import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
 import { SpecializationSelect } from 'shared/components/SpecializationSelect';
 import { useNotification } from 'shared/hooks/useNotification';
+import { mapAuthError } from 'shared/utils/mapAuthError';
 import * as Yup from 'yup';
 
 type FormData = {
@@ -68,7 +69,12 @@ export const RegisterDoctorTab: FC = () => {
         reset();
       },
       onError: (error) => {
-        showNotification('Wystąpił błąd podczas dodawania konta lekarza', 'error');
+        const errorResult = mapAuthError(error);
+        if (errorResult) {
+          showNotification(`Błąd: ${errorResult.message}`, 'error');
+        } else {
+          showNotification('Wystąpił nieznany błąd', 'error');
+        }
         console.error('Error registering doctor:', error);
       },
     },

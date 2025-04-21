@@ -43,7 +43,7 @@ const PrescriptionsPage: FC = () => {
   }
   if (prescriptions) {
     return (
-      <div className="flex flex-col pb-10">
+      <div className="flex flex-col">
         <CardHeader title={'Recepty'} />
         <PrescriptionsTable prescriptions={prescriptions} />
       </div>
