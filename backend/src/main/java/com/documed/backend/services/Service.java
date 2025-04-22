@@ -7,18 +7,18 @@ import lombok.*;
 @Data
 @Builder
 public class Service {
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private int id;
 
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull private String name;
 
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull private BigDecimal price;
 
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull private ServiceType type;
 
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private int estimatedTime;
 }

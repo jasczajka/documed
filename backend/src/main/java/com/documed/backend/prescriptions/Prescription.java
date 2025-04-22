@@ -11,18 +11,18 @@ import lombok.Data;
 @Data
 @Builder
 public class Prescription {
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private int id;
 
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private int accessCode;
 
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private final Date date;
 
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private Date expirationDate;
 
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private PrescriptionStatus status;
 }

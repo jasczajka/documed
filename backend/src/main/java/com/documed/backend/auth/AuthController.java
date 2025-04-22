@@ -54,7 +54,7 @@ public class AuthController {
 
   @AdminOnly
   @PostMapping("/register_doctor")
-  public ResponseEntity<AuthResponseDTO> register_doctor(
+  public ResponseEntity<AuthResponseDTO> registerDoctor(
       @Valid @RequestBody DoctorRegisterRequestDTO request) {
     logger.info("Registration attempt for email: {}", request.getEmail());
     AuthResponseDTO response =
@@ -73,7 +73,7 @@ public class AuthController {
 
   @AdminOnly
   @PostMapping("/register_staff")
-  public ResponseEntity<AuthResponseDTO> register_staff(
+  public ResponseEntity<AuthResponseDTO> registerStaff(
       @Valid @RequestBody StaffRegisterRequestDTO request) {
     logger.info("Registration attempt for email: {}", request.getEmail());
     AuthResponseDTO response =

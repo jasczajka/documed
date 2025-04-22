@@ -8,9 +8,9 @@ import lombok.NonNull;
 @Data
 @Builder
 public class Specialization {
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private int id;
 
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull private String name;
 }

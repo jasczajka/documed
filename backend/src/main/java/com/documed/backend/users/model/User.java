@@ -14,21 +14,21 @@ import lombok.*;
 @Builder
 public class User {
 
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @Setter(AccessLevel.NONE)
   private int id;
 
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull private String firstName;
 
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull private String lastName;
 
   @Schema private String pesel;
 
   @Schema private String passportNumber;
 
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull private String email;
 
   @Schema private String address;
@@ -37,14 +37,14 @@ public class User {
 
   @Schema private String phoneNumber;
 
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull private AccountStatus accountStatus;
 
   @Schema private Date birthDate;
 
   @Schema private String pwzNumber;
 
-  @Schema(required = true)
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull private UserRole role;
 
   @Schema private Subscription subscription;

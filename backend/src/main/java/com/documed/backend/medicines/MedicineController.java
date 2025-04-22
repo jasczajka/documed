@@ -36,7 +36,9 @@ public class MedicineController {
   @GetMapping("/{id}")
   @Operation(summary = "Get medicine by ID")
   public Optional<Medicine> getMedicine(
-      @Parameter(description = "Medicine ID", required = true) @PathVariable String id) {
+      @Parameter(description = "Medicine ID", requiredMode = Schema.RequiredMode.REQUIRED)
+          @PathVariable
+          String id) {
     return medicineService.getById(id);
   }
 }
