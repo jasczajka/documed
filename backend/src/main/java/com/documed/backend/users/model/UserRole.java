@@ -1,4 +1,4 @@
-package com.documed.backend.users;
+package com.documed.backend.users.model;
 
 public enum UserRole {
   PATIENT,

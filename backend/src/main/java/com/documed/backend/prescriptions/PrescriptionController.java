@@ -1,6 +1,9 @@
 package com.documed.backend.prescriptions;
 
+import com.documed.backend.auth.annotations.StaffOnly;
+import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
 import com.documed.backend.medicines.model.Medicine;
+import com.documed.backend.medicines.model.MedicineWithAmount;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -15,12 +18,14 @@ public class PrescriptionController {
 
   private final PrescriptionService prescriptionService;
 
+  @StaffOnly
   @PostMapping("/visit/{visit_id}")
   @Operation(summary = "Create Prescription")
   public ResponseEntity<Prescription> createPrescription(@PathVariable("visit_id") int visitId) {
     return new ResponseEntity<>(prescriptionService.createPrescription(visitId), HttpStatus.OK);
   }
 
+  @StaffOnly
   @GetMapping("/visit/{visit_id}")
   @Operation(summary = "Get Prescription For Visit")
   public ResponseEntity<Prescription> getPrescriptionForVisit(
@@ -29,6 +34,7 @@ public class PrescriptionController {
     return ResponseEntity.ok(prescription);
   }
 
+  @StaffOnlyOrSelf
   @GetMapping("/user/{user_id}")
   public ResponseEntity<List<Prescription>> getPrescriptionsForUser(
       @PathVariable("user_id") int userId) {
@@ -36,6 +42,22 @@ public class PrescriptionController {
     return ResponseEntity.ok(prescriptions);
   }
 
+  @StaffOnlyOrSelf
+  @GetMapping("/{prescription_id}/medicines")
+  public ResponseEntity<List<MedicineWithAmount>> getMedicinesForPrescription(
+      @PathVariable("prescription_id") int prescriptionId) {
+    List<MedicineWithAmount> medicines =
+        prescriptionService.getMedicinesForPrescription(prescriptionId);
+    return ResponseEntity.ok(medicines);
+  }
+
+  @StaffOnly
+  @GetMapping
+  public List<Prescription> getAllPrescriptions() {
+    return prescriptionService.getAll();
+  }
+
+  @StaffOnly
   @DeleteMapping("/{prescription_id}")
   @Operation(summary = "Remove prescription")
   public ResponseEntity<Integer> removePrescription(
@@ -44,6 +66,7 @@ public class PrescriptionController {
     return ResponseEntity.ok(result);
   }
 
+  @StaffOnly
   @PostMapping("/{prescription_id}/medicine/{medicine_id}")
   @Operation(summary = "Add Medicine To Prescription")
   public ResponseEntity<Medicine> addMedicineToPrescription(
@@ -56,6 +79,7 @@ public class PrescriptionController {
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
+  @StaffOnly
   @DeleteMapping("/{prescription_id}/medicine/{medicine_id}")
   @Operation(summary = "Remove Medicine From Prescription")
   public ResponseEntity<Integer> removeMedicineFromPrescription(
@@ -65,6 +89,7 @@ public class PrescriptionController {
     return ResponseEntity.ok(result);
   }
 
+  @StaffOnly
   @PatchMapping("/{prescription_id}")
   @Operation(summary = "Issue prescription")
   public ResponseEntity<Prescription> issuePrescription(

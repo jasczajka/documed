@@ -20,11 +20,11 @@ CREATE TABLE Attachment (
     CONSTRAINT Attachment_pk PRIMARY KEY (id)
 );
 
--- Table: Docotr_Specialization
-CREATE TABLE Docotr_Specialization (
+-- Table: Doctor_Specialization
+CREATE TABLE Doctor_Specialization (
     doctor_id int  NOT NULL,
     specialization_id int  NOT NULL,
-    CONSTRAINT Docotr_Specialization_pk PRIMARY KEY (doctor_id,specialization_id)
+    CONSTRAINT Doctor_Specialization_pk PRIMARY KEY (doctor_id,specialization_id)
 );
 
 -- Table: Facility
@@ -166,7 +166,7 @@ CREATE TABLE "User" (
     password varchar(255)  NOT NULL,
     phone_number varchar(255)  NULL,
     account_status varchar(255)  NOT NULL,
-    birthdate date  NOT NULL,
+    birthdate date  NULL,
     pwz varchar(255)  NULL,
     role varchar(255)  NOT NULL,
     subscription_id int  NULL,
@@ -223,16 +223,16 @@ ALTER TABLE Attachment ADD CONSTRAINT Attachment_Visit
     INITIALLY IMMEDIATE
 ;
 
--- Reference: Doctor_specialization_Specialization (table: Docotr_Specialization)
-ALTER TABLE Docotr_Specialization ADD CONSTRAINT Doctor_specialization_Specialization
+-- Reference: Doctor_specialization_Specialization (table: Doctor_Specialization)
+ALTER TABLE Doctor_Specialization ADD CONSTRAINT Doctor_specialization_Specialization
     FOREIGN KEY (specialization_id)
     REFERENCES Specialization (id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
 
--- Reference: Doctor_specialization_User (table: Docotr_Specialization)
-ALTER TABLE Docotr_Specialization ADD CONSTRAINT Doctor_specialization_User
+-- Reference: Doctor_specialization_User (table: Doctor_Specialization)
+ALTER TABLE Doctor_Specialization ADD CONSTRAINT Doctor_specialization_User
     FOREIGN KEY (doctor_id)
     REFERENCES "User" (id)  
     NOT DEFERRABLE 

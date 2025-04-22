@@ -6,7 +6,7 @@ import {
   useRegister,
 } from 'shared/api/generated/auth-controller/auth-controller';
 import { UserRole } from 'shared/api/generated/generated.schemas';
-import { mapLoginError } from 'shared/utils.ts/mapAuthError';
+import { mapAuthError } from 'shared/utils/mapAuthError';
 import { useAuthStore } from './stores/useAuthStore';
 
 export const useAuth = () => {
@@ -91,10 +91,10 @@ export const useAuth = () => {
     }
   };
 
-  const isAdmin = () => user?.role === UserRole.ADMINISTRATOR;
-  const isPatient = () => user?.role === UserRole.PATIENT;
-  const isDoctor = () => user?.role === UserRole.DOCTOR;
-  const isWardClerk = () => user?.role === UserRole.WARD_CLERK;
+  const isAdmin = user?.role === UserRole.ADMINISTRATOR;
+  const isPatient = user?.role === UserRole.PATIENT;
+  const isDoctor = user?.role === UserRole.DOCTOR;
+  const isWardClerk = user?.role === UserRole.WARD_CLERK;
   const hasRole = (role: UserRole) => user?.role === role;
   const hasAnyRole = (roles: UserRole[]) => !!user?.role && roles.includes(user.role);
 
@@ -117,9 +117,9 @@ export const useAuth = () => {
     isDoctor,
     hasRole,
     hasAnyRole,
-    loginError: mapLoginError(loginError),
-    logoutError: mapLoginError(logoutError),
-    registerError: mapLoginError(registerError),
+    loginError: mapAuthError(loginError),
+    logoutError: mapAuthError(logoutError),
+    registerError: mapAuthError(registerError),
     deleteAccountError,
   };
 };

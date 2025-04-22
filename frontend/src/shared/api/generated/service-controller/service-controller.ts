@@ -20,7 +20,7 @@ import type {
 } from '@tanstack/react-query';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import type { Service, Specialization } from '../generated.schemas';
+import type { CreateServiceDTO, Service, Specialization } from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
@@ -120,12 +120,12 @@ export function useGetAllServices<
   return query;
 }
 
-export const createService = (service: Service, signal?: AbortSignal) => {
+export const createService = (createServiceDTO: CreateServiceDTO, signal?: AbortSignal) => {
   return customInstance<Service>({
     url: `/api/services`,
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    data: service,
+    data: createServiceDTO,
     signal,
   });
 };
@@ -137,13 +137,13 @@ export const getCreateServiceMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createService>>,
     TError,
-    { data: Service },
+    { data: CreateServiceDTO },
     TContext
   >;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof createService>>,
   TError,
-  { data: Service },
+  { data: CreateServiceDTO },
   TContext
 > => {
   const mutationKey = ['createService'];
@@ -155,7 +155,7 @@ export const getCreateServiceMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof createService>>,
-    { data: Service }
+    { data: CreateServiceDTO }
   > = (props) => {
     const { data } = props ?? {};
 
@@ -166,7 +166,7 @@ export const getCreateServiceMutationOptions = <
 };
 
 export type CreateServiceMutationResult = NonNullable<Awaited<ReturnType<typeof createService>>>;
-export type CreateServiceMutationBody = Service;
+export type CreateServiceMutationBody = CreateServiceDTO;
 export type CreateServiceMutationError = ErrorType<unknown>;
 
 export const useCreateService = <TError = ErrorType<unknown>, TContext = unknown>(
@@ -174,7 +174,7 @@ export const useCreateService = <TError = ErrorType<unknown>, TContext = unknown
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof createService>>,
       TError,
-      { data: Service },
+      { data: CreateServiceDTO },
       TContext
     >;
   },
@@ -182,7 +182,7 @@ export const useCreateService = <TError = ErrorType<unknown>, TContext = unknown
 ): UseMutationResult<
   Awaited<ReturnType<typeof createService>>,
   TError,
-  { data: Service },
+  { data: CreateServiceDTO },
   TContext
 > => {
   const mutationOptions = getCreateServiceMutationOptions(options);

@@ -4,6 +4,23 @@
  * OpenAPI definition
  * OpenAPI spec version: v0
  */
+export type CreateServiceDTOType = (typeof CreateServiceDTOType)[keyof typeof CreateServiceDTOType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateServiceDTOType = {
+  REGULAR_SERVICE: 'REGULAR_SERVICE',
+  ADDITIONAL_SERVICE: 'ADDITIONAL_SERVICE',
+} as const;
+
+export interface CreateServiceDTO {
+  name: string;
+  price: number;
+  type: CreateServiceDTOType;
+  estimatedTime: number;
+  /** @minItems 1 */
+  specializationIds: number[];
+}
+
 export type ServiceType = (typeof ServiceType)[keyof typeof ServiceType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -13,19 +30,112 @@ export const ServiceType = {
 } as const;
 
 export interface Service {
-  id?: number;
-  name?: string;
-  price?: number;
-  type?: ServiceType;
-  estimatedTime?: number;
+  id: number;
+  name: string;
+  price: number;
+  type: ServiceType;
+  estimatedTime: number;
 }
 
 export interface Specialization {
-  id?: number;
-  name?: string;
+  id: number;
+  name: string;
 }
 
-export interface RegisterRequestDTO {
+export interface Medicine {
+  id: string;
+  name: string;
+  commonName: string;
+  dosage: string;
+}
+
+export type PrescriptionStatus = (typeof PrescriptionStatus)[keyof typeof PrescriptionStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PrescriptionStatus = {
+  NEW: 'NEW',
+  ISSUED: 'ISSUED',
+} as const;
+
+export interface Prescription {
+  id: number;
+  accessCode: number;
+  date: string;
+  expirationDate: string;
+  status: PrescriptionStatus;
+}
+
+export type StaffRegisterRequestDTORole =
+  (typeof StaffRegisterRequestDTORole)[keyof typeof StaffRegisterRequestDTORole];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const StaffRegisterRequestDTORole = {
+  PATIENT: 'PATIENT',
+  DOCTOR: 'DOCTOR',
+  NURSE: 'NURSE',
+  WARD_CLERK: 'WARD_CLERK',
+  ADMINISTRATOR: 'ADMINISTRATOR',
+} as const;
+
+export interface StaffRegisterRequestDTO {
+  role: StaffRegisterRequestDTORole;
+  /** @minLength 1 */
+  firstName?: string;
+  /** @minLength 1 */
+  lastName?: string;
+  /** @minLength 1 */
+  email?: string;
+  /**
+   * @minLength 6
+   * @maxLength 2147483647
+   */
+  password?: string;
+}
+
+export type AuthResponseDTORole = (typeof AuthResponseDTORole)[keyof typeof AuthResponseDTORole];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AuthResponseDTORole = {
+  PATIENT: 'PATIENT',
+  DOCTOR: 'DOCTOR',
+  NURSE: 'NURSE',
+  WARD_CLERK: 'WARD_CLERK',
+  ADMINISTRATOR: 'ADMINISTRATOR',
+} as const;
+
+export interface AuthResponseDTO {
+  token?: string;
+  userId?: number;
+  role?: AuthResponseDTORole;
+}
+
+export interface DoctorRegisterRequestDTO {
+  /** @minLength 1 */
+  firstName?: string;
+  /** @minLength 1 */
+  lastName?: string;
+  /**
+   * @minLength 1
+   * @pattern ^\d{7}$
+   */
+  pwz?: string;
+  /**
+   * @minLength 1
+   * @pattern ^\d{9}$
+   */
+  phoneNumber?: string;
+  /** @minLength 1 */
+  email?: string;
+  /**
+   * @minLength 6
+   * @maxLength 2147483647
+   */
+  password?: string;
+  /** @minItems 1 */
+  specializationIds?: number[];
+}
+
+export interface PatientRegisterRequestDTO {
   /** @minLength 1 */
   firstName?: string;
   /** @minLength 1 */
@@ -54,23 +164,6 @@ export interface RegisterRequestDTO {
   birthdate: string;
 }
 
-export type AuthResponseDTORole = (typeof AuthResponseDTORole)[keyof typeof AuthResponseDTORole];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const AuthResponseDTORole = {
-  PATIENT: 'PATIENT',
-  DOCTOR: 'DOCTOR',
-  NURSE: 'NURSE',
-  WARD_CLERK: 'WARD_CLERK',
-  ADMINISTRATOR: 'ADMINISTRATOR',
-} as const;
-
-export interface AuthResponseDTO {
-  token?: string;
-  userId?: number;
-  role?: AuthResponseDTORole;
-}
-
 export interface LoginRequestDTO {
   /** @minLength 1 */
   login?: string;
@@ -78,11 +171,12 @@ export interface LoginRequestDTO {
   password?: string;
 }
 
-export interface Medicine {
+export interface MedicineWithAmount {
   id: string;
   name: string;
   commonName: string;
   dosage: string;
+  amount: number;
 }
 
 export type AdditionalServiceStatus =
@@ -159,17 +253,6 @@ export interface Notification {
   type?: NotificationType;
 }
 
-export interface Prescription {
-  id?: number;
-  accessCode?: number;
-  description?: string;
-  date?: string;
-  expirationDate?: string;
-  pesel?: number;
-  passportNumber?: string;
-  visit?: Visit;
-}
-
 export type ReferralType = (typeof ReferralType)[keyof typeof ReferralType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -227,7 +310,7 @@ export interface User {
   pesel?: string;
   passportNumber?: string;
   email: string;
-  address: string;
+  address?: string;
   password?: string;
   phoneNumber?: string;
   accountStatus: UserAccountStatus;
@@ -275,6 +358,10 @@ export interface Visit {
 export interface WorkTime {
   [key: string]: unknown;
 }
+
+export type AddMedicineToPrescriptionParams = {
+  amount?: number;
+};
 
 export type GetAllMedicinesParams = {
   /**

@@ -1,5 +1,6 @@
 package com.documed.backend.services;
 
+import com.documed.backend.services.dtos.CreateServiceDTO;
 import com.documed.backend.users.model.Specialization;
 import java.math.BigDecimal;
 import java.net.URI;
@@ -9,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
@@ -21,11 +23,7 @@ public class ServiceController {
   @GetMapping
   public ResponseEntity<List<Service>> getAllServices() {
     List<Service> services = serviceService.getAll();
-    if (services.isEmpty()) {
-      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    } else {
-      return new ResponseEntity<>(services, HttpStatus.OK);
-    }
+    return new ResponseEntity<>(services, HttpStatus.OK);
   }
 
   @GetMapping("/{id}")
@@ -38,11 +36,16 @@ public class ServiceController {
     }
   }
 
+  @Transactional
   @PostMapping()
-  public ResponseEntity<Service> createService(@RequestBody Service service) {
+  public ResponseEntity<Service> createService(@RequestBody CreateServiceDTO createServiceDTO) {
     Service createdService =
         serviceService.createService(
-            service.getName(), service.getPrice(), service.getType(), service.getEstimatedTime());
+            createServiceDTO.getName(),
+            createServiceDTO.getPrice(),
+            createServiceDTO.getType(),
+            createServiceDTO.getEstimatedTime(),
+            createServiceDTO.getSpecializationIds());
 
     HttpHeaders headers = new HttpHeaders();
     headers.setLocation(URI.create("/api/services/" + createdService.getId()));

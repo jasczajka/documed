@@ -1,8 +1,14 @@
-import { Typography } from '@mui/material';
+import { CardHeader } from '@mui/material';
+import { AdminTabs } from 'modules/admin/AdminTabs';
 import { FC } from 'react';
 
 const AdministrationPage: FC = () => {
-  return <Typography>Administracja</Typography>;
+  return (
+    <div className="flex flex-col">
+      <CardHeader title={'Administracja'} />
+      <AdminTabs />
+    </div>
+  );
 };
 
 export default AdministrationPage;

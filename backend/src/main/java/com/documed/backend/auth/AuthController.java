@@ -1,10 +1,10 @@
 package com.documed.backend.auth;
 
-import com.documed.backend.auth.dtos.AuthResponseDTO;
-import com.documed.backend.auth.dtos.LoginRequestDTO;
-import com.documed.backend.auth.dtos.RegisterRequestDTO;
+import com.documed.backend.auth.annotations.AdminOnly;
+import com.documed.backend.auth.dtos.*;
 import com.documed.backend.users.UserService;
 import com.documed.backend.users.model.User;
+import com.documed.backend.users.model.UserRole;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -33,20 +33,58 @@ public class AuthController {
   }
 
   @PostMapping("/register")
-  public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request) {
+  public ResponseEntity<AuthResponseDTO> register(
+      @Valid @RequestBody PatientRegisterRequestDTO request) {
     logger.info("Registration attempt for email: {}", request.getEmail());
     AuthResponseDTO response =
-        authService.registerUser(
+        authService.registerPatient(
             request.getFirstName(),
             request.getLastName(),
             request.getEmail(),
             request.getPesel(),
             request.getPassword(),
+            String.valueOf(UserRole.PATIENT),
             request.getPhoneNumber(),
             request.getAddress(),
             request.getBirthdate());
 
     logger.debug("User registered successfully with ID: {}", response.getUserId());
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  }
+
+  @AdminOnly
+  @PostMapping("/register_doctor")
+  public ResponseEntity<AuthResponseDTO> registerDoctor(
+      @Valid @RequestBody DoctorRegisterRequestDTO request) {
+    logger.info("Registration attempt for email: {}", request.getEmail());
+    AuthResponseDTO response =
+        authService.registerDoctor(
+            request.getFirstName(),
+            request.getLastName(),
+            request.getEmail(),
+            request.getPwz(),
+            request.getPassword(),
+            request.getPhoneNumber(),
+            request.getSpecializationIds());
+
+    logger.info("Doctor registered successfully with ID: {}", response.getUserId());
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  }
+
+  @AdminOnly
+  @PostMapping("/register_staff")
+  public ResponseEntity<AuthResponseDTO> registerStaff(
+      @Valid @RequestBody StaffRegisterRequestDTO request) {
+    logger.info("Registration attempt for email: {}", request.getEmail());
+    AuthResponseDTO response =
+        authService.registerStaff(
+            request.getFirstName(),
+            request.getLastName(),
+            request.getEmail(),
+            request.getPassword(),
+            String.valueOf(request.getRole()));
+
+    logger.info("Staff user registered successfully with ID: {}", response.getUserId());
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 

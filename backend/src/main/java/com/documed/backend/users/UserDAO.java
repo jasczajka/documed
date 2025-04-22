@@ -1,18 +1,26 @@
 package com.documed.backend.users;
 
 import com.documed.backend.FullDAO;
+import com.documed.backend.users.model.AccountStatus;
 import com.documed.backend.users.model.User;
+import com.documed.backend.users.model.UserRole;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class UserDAO implements FullDAO<User, User> {
 
   private final JdbcTemplate jdbcTemplate;
+
+  private static final Logger logger = LoggerFactory.getLogger(UserDAO.class);
 
   public UserDAO(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
@@ -161,5 +169,33 @@ public class UserDAO implements FullDAO<User, User> {
 
     return getById(generatedId)
         .orElseThrow(() -> new IllegalStateException("Failed to retrieve created user"));
+  }
+
+  @Transactional
+  public User addSpecializationsToUser(int doctorId, List<Integer> specIds) {
+    String sql =
+        """
+      INSERT INTO doctor_specialization (doctor_id, specialization_id)
+      VALUES (?, ?)
+      ON CONFLICT DO NOTHING
+      """;
+
+    int[][] results =
+        jdbcTemplate.batchUpdate(
+            sql,
+            specIds,
+            specIds.size(),
+            (ps, specId) -> {
+              ps.setInt(1, doctorId);
+              ps.setInt(2, specId);
+            });
+
+    int total = Arrays.stream(results).flatMapToInt(Arrays::stream).sum();
+    if (total == 0) {
+      logger.debug("No new specializations were added for doctor {}", doctorId);
+    }
+
+    return getById(doctorId)
+        .orElseThrow(() -> new RuntimeException("Doctor not found: " + doctorId));
   }
 }

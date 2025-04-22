@@ -18,16 +18,12 @@ import { DocuMedLogo } from 'shared/icons/DocuMedLogo';
 
 export const AppHeader = memo(() => {
   const sitemap = useSitemap();
-  const { logout, loading } = useAuth();
+  const { logout, loading, isAdmin, isPatient } = useAuth();
   const handleLogout = useCallback(async () => {
     await logout();
   }, []);
 
   const paths = useMemo(() => {
-    // @TODO replace these with a useRoles hook that will determine whether user is backoffice / admin / patient
-    const isAdmin = true;
-    const isPatient = true;
-
     return [
       { path: sitemap.visits, label: 'Wizyty i Usługi Dodatkowe' },
       ...(!isPatient ? [{ path: sitemap.patients, label: 'Pacjenci' }] : []),

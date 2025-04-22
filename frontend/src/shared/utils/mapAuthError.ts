@@ -1,10 +1,6 @@
-type AuthError = {
-  status: number;
-  message: string;
-  code?: string;
-} | null;
+import { ApiError } from 'shared/utils/mapApiError';
 
-export const mapLoginError = (error: any): AuthError => {
+export const mapAuthError = (error: any): ApiError => {
   if (!error) {
     return null;
   }

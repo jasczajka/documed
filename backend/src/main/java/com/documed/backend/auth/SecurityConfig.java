@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,6 +20,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 @EnableWebSecurity
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
   private final JwtAuthenticationFilter jwtAuthFilter;
@@ -50,7 +52,9 @@ public class SecurityConfig {
             auth -> {
               auth.requestMatchers(HttpMethod.OPTIONS, "/**")
                   .permitAll()
-                  .requestMatchers("/api/auth/**")
+                  .requestMatchers("/api/auth/login")
+                  .permitAll()
+                  .requestMatchers("/api/auth/register")
                   .permitAll()
                   .requestMatchers("/actuator/health")
                   .permitAll();

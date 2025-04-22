@@ -133,11 +133,11 @@ export function useGetAllMedicines<
 /**
  * @summary Get medicine by ID
  */
-export const getMedicine = (id: number, signal?: AbortSignal) => {
+export const getMedicine = (id: string, signal?: AbortSignal) => {
   return customInstance<Medicine>({ url: `/api/medicines/${id}`, method: 'GET', signal });
 };
 
-export const getGetMedicineQueryKey = (id: number) => {
+export const getGetMedicineQueryKey = (id: string) => {
   return [`/api/medicines/${id}`] as const;
 };
 
@@ -145,7 +145,7 @@ export const getGetMedicineQueryOptions = <
   TData = Awaited<ReturnType<typeof getMedicine>>,
   TError = ErrorType<unknown>,
 >(
-  id: number,
+  id: string,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMedicine>>, TError, TData>>;
   },
@@ -171,7 +171,7 @@ export function useGetMedicine<
   TData = Awaited<ReturnType<typeof getMedicine>>,
   TError = ErrorType<unknown>,
 >(
-  id: number,
+  id: string,
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMedicine>>, TError, TData>> &
       Pick<
@@ -189,7 +189,7 @@ export function useGetMedicine<
   TData = Awaited<ReturnType<typeof getMedicine>>,
   TError = ErrorType<unknown>,
 >(
-  id: number,
+  id: string,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMedicine>>, TError, TData>> &
       Pick<
@@ -207,7 +207,7 @@ export function useGetMedicine<
   TData = Awaited<ReturnType<typeof getMedicine>>,
   TError = ErrorType<unknown>,
 >(
-  id: number,
+  id: string,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMedicine>>, TError, TData>>;
   },
@@ -221,7 +221,7 @@ export function useGetMedicine<
   TData = Awaited<ReturnType<typeof getMedicine>>,
   TError = ErrorType<unknown>,
 >(
-  id: number,
+  id: string,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getMedicine>>, TError, TData>>;
   },

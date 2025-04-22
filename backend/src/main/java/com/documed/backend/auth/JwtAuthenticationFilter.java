@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     final String requestUri = request.getRequestURI();
     logger.info("Incoming request for URI: {}", requestUri);
 
-    if (requestUri.startsWith("/api/auth")) {
+    if (("/api/auth/login".equals(requestUri) || "/api/auth/register".equals(requestUri))) {
       logger.debug("Skipping authentication for auth endpoint: {}", requestUri);
       filterChain.doFilter(request, response);
       return;
@@ -74,6 +74,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       var authentication =
           new UsernamePasswordAuthenticationToken(
               userId, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role)));
+
+      logger.info("Granted authorities: {}", authentication.getAuthorities());
 
       authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
       SecurityContextHolder.getContext().setAuthentication(authentication);
