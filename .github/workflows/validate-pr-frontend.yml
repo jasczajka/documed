@@ -1,9 +1,7 @@
 name: "Validate PR frontend"
 
 on:
-  pull_request:
-    paths:
-      - "frontend/**"
+  pull_request
 
 env:
   NODE_VERSION: '20.x'

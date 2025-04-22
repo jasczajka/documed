@@ -3,6 +3,7 @@ package com.documed.backend.medicines;
 import com.documed.backend.medicines.model.Medicine;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -36,7 +37,10 @@ public class MedicineController {
   @GetMapping("/{id}")
   @Operation(summary = "Get medicine by ID")
   public Optional<Medicine> getMedicine(
-      @Parameter(description = "Medicine ID", requiredMode = Schema.RequiredMode.REQUIRED)
+      @Parameter(
+              description = "Medicine ID",
+              required = true,
+              schema = @Schema(requiredMode = Schema.RequiredMode.REQUIRED))
           @PathVariable
           String id) {
     return medicineService.getById(id);
