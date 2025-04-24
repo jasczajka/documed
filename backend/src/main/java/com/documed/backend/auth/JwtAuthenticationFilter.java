@@ -44,7 +44,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     final String requestUri = request.getRequestURI();
     logger.info("Incoming request for URI: {}", requestUri);
 
-    if (("/api/auth/login".equals(requestUri) || "/api/auth/register".equals(requestUri))) {
+    if (("/api/auth/login".equals(requestUri)
+        || "/api/auth/request_registration".equals(requestUri)
+        || "/api/auth/confirm_registration".equals(requestUri))) {
       logger.debug("Skipping authentication for auth endpoint: {}", requestUri);
       filterChain.doFilter(request, response);
       return;
