@@ -1,10 +1,8 @@
 package com.documed.backend.auth;
 
 import com.documed.backend.auth.dtos.AuthResponseDTO;
-import com.documed.backend.auth.exceptions.AuthServiceException;
-import com.documed.backend.auth.exceptions.InvalidCredentialsException;
-import com.documed.backend.auth.exceptions.UserAlreadyExistsException;
-import com.documed.backend.auth.exceptions.UserNotFoundException;
+import com.documed.backend.auth.exceptions.*;
+import com.documed.backend.auth.model.OtpPurpose;
 import com.documed.backend.users.*;
 import com.documed.backend.users.model.AccountStatus;
 import com.documed.backend.users.model.User;
@@ -26,18 +24,25 @@ public class AuthService {
   private final JwtUtil jwtUtil;
 
   private final UserService userService;
+  private final OtpService otpService;
 
   private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
   public AuthService(
-      UserDAO userDAO, PasswordEncoder passwordEncoder, JwtUtil jwtUtil, UserService userService) {
+      UserDAO userDAO,
+      PasswordEncoder passwordEncoder,
+      JwtUtil jwtUtil,
+      UserService userService,
+      OtpService otpService) {
     this.userDAO = userDAO;
     this.passwordEncoder = passwordEncoder;
     this.jwtUtil = jwtUtil;
     this.userService = userService;
+    this.otpService = otpService;
   }
 
-  public AuthResponseDTO registerPatient(
+  @Transactional
+  public User registerPatient(
       String firstName,
       String lastName,
       String email,
@@ -48,8 +53,8 @@ public class AuthService {
       String address,
       LocalDate birthDate) {
     try {
-      if (userDAO.getByEmail(email).isPresent()
-          || (pesel != null && userDAO.getByPesel(pesel).isPresent())) {
+      if (userService.getByEmail(email).isPresent()
+          || (pesel != null && userService.getByPesel(pesel).isPresent())) {
         throw new UserAlreadyExistsException("User with given email or PESEL already exists");
       }
 
@@ -62,23 +67,36 @@ public class AuthService {
               .phoneNumber(phoneNumber)
               .address(address)
               .password(passwordEncoder.encode(password))
-              .accountStatus(AccountStatus.ACTIVE)
+              .accountStatus(AccountStatus.PENDING_CONFIRMATION)
               .role(UserRole.valueOf(role))
               .birthDate(Date.valueOf(birthDate))
               .build();
 
-      User createdUser = userDAO.createAndReturn(user);
-      String token = jwtUtil.generateToken(createdUser.getId(), createdUser.getRole().name());
+      User createdUser = userService.createPendingUser(user);
 
-      return AuthResponseDTO.builder()
-          .token(token)
-          .userId(createdUser.getId())
-          .role(createdUser.getRole())
-          .build();
+      otpService.generateOtp(email, OtpPurpose.REGISTRATION);
+
+      return createdUser;
+
     } catch (DataAccessException e) {
       logger.error("Error in registerPatient()", e);
       throw new AuthServiceException("Database error during registration", e);
     }
+  }
+
+  @Transactional
+  public AuthResponseDTO confirmRegistration(String email, String otp) {
+    otpService.validateOtp(email, otp, OtpPurpose.REGISTRATION);
+
+    User activatedUser = userService.activateUser(email);
+
+    String token = jwtUtil.generateToken(activatedUser.getId(), activatedUser.getRole().name());
+
+    return AuthResponseDTO.builder()
+        .token(token)
+        .userId(activatedUser.getId())
+        .role(activatedUser.getRole())
+        .build();
   }
 
   @Transactional
@@ -123,6 +141,7 @@ public class AuthService {
     }
   }
 
+  @Transactional
   public AuthResponseDTO registerStaff(
       String firstName, String lastName, String email, String password, String role) {
     try {
@@ -164,6 +183,10 @@ public class AuthService {
 
       if (!passwordEncoder.matches(password, user.getPassword())) {
         throw new InvalidCredentialsException("Invalid credentials");
+      }
+
+      if (user.getAccountStatus() != AccountStatus.ACTIVE) {
+        throw new AccountNotActiveException("Account is not active");
       }
 
       String token = jwtUtil.generateToken(user.getId(), user.getRole().name());

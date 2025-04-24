@@ -23,20 +23,24 @@ public class AuthController {
 
   private final AuthService authService;
   private final UserService userService;
+  private final OtpService otpService;
 
   private final JwtUtil jwtUtil;
 
-  public AuthController(AuthService authService, UserService userService, JwtUtil jwtUtil) {
+  public AuthController(
+      AuthService authService, UserService userService, OtpService otpService, JwtUtil jwtUtil) {
     this.authService = authService;
     this.userService = userService;
+    this.otpService = otpService;
     this.jwtUtil = jwtUtil;
   }
 
-  @PostMapping("/register")
-  public ResponseEntity<AuthResponseDTO> register(
+  @PostMapping("/request-registration")
+  public ResponseEntity<PendingUserDTO> requestRegistration(
       @Valid @RequestBody PatientRegisterRequestDTO request) {
-    logger.info("Registration attempt for email: {}", request.getEmail());
-    AuthResponseDTO response =
+    logger.info("Registration request for email: {}", request.getEmail());
+
+    User createdUser =
         authService.registerPatient(
             request.getFirstName(),
             request.getLastName(),
@@ -48,8 +52,43 @@ public class AuthController {
             request.getAddress(),
             request.getBirthdate());
 
-    logger.debug("User registered successfully with ID: {}", response.getUserId());
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    PendingUserDTO responseDto =
+        PendingUserDTO.builder()
+            .id(createdUser.getId())
+            .firstName(createdUser.getFirstName())
+            .lastName(createdUser.getLastName())
+            .email(createdUser.getEmail())
+            .pesel(createdUser.getPesel())
+            .phoneNumber(createdUser.getPhoneNumber())
+            .address(createdUser.getAddress())
+            .birthDate(createdUser.getBirthDate())
+            .role(createdUser.getRole())
+            .accountStatus(createdUser.getAccountStatus())
+            .build();
+
+    logger.debug("Pending user created with ID: {}", createdUser.getId());
+    return ResponseEntity.status(HttpStatus.ACCEPTED).body(responseDto);
+  }
+
+  @PostMapping("/confirm-registration")
+  public ResponseEntity<Void> confirmRegistration(
+      @Valid @RequestBody ConfirmRegistrationRequestDTO request,
+      HttpServletResponse servletResponse) {
+    logger.info("Registration confirmation for email: {}", request.getEmail());
+
+    AuthResponseDTO authResponse =
+        authService.confirmRegistration(request.getEmail(), request.getOtp());
+
+    Cookie jwtCookie = new Cookie(JWT_COOKIE_NAME, authResponse.getToken());
+    jwtCookie.setHttpOnly(true);
+    jwtCookie.setPath("/");
+    jwtCookie.setMaxAge(60 * 60 * 24 * 7); // 1 week
+    jwtCookie.setAttribute("SameSite", "None");
+    jwtCookie.setSecure(true);
+    servletResponse.addCookie(jwtCookie);
+
+    logger.info("User registration confirmed for ID: {}", authResponse.getUserId());
+    return ResponseEntity.ok().build();
   }
 
   @AdminOnly
