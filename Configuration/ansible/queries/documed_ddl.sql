@@ -412,7 +412,6 @@ ALTER TABLE Worktime ADD CONSTRAINT Worktime_User
     INITIALLY IMMEDIATE
 ;
 
--- Create or replace function to clean up expired or used OTPs
 CREATE OR REPLACE FUNCTION cleanup_otps()
 RETURNS INTEGER AS $$
 DECLARE
@@ -422,7 +421,6 @@ BEGIN
      WHERE expires_at < NOW() - INTERVAL '1 day'
         OR used = TRUE;
 
-    -- capture how many rows were deleted
     GET DIAGNOSTICS deleted_count = ROW_COUNT;
 
     RETURN deleted_count;
@@ -430,7 +428,6 @@ END;
 $$ LANGUAGE plpgsql;
 
 
--- Create or replace function to clean up all pending users
 CREATE OR REPLACE FUNCTION cleanup_pending_users()
 RETURNS INTEGER AS $$
 DECLARE
@@ -439,7 +436,6 @@ BEGIN
     DELETE FROM "User"
      WHERE account_status = 'PENDING';
 
-    -- capture how many rows were deleted
     GET DIAGNOSTICS deleted_count = ROW_COUNT;
 
     RETURN deleted_count;

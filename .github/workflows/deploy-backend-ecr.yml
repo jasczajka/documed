@@ -76,5 +76,6 @@ jobs:
               -e SPRING_MAIL_HOST=${{ secrets.SPRING_MAIL_HOST }} \
               -e SPRING_MAIL_USERNAME=${{ secrets.SPRING_MAIL_USERNAME }} \
               -e SPRING_MAIL_PASSWORD=${{ secrets.SPRING_MAIL_PASSWORD }} \
+              -e SPRING_MEDICINE_LIST_FILE_URL=${{ secrets.SPRING_MEDICINE_LIST_FILE_URL }} \
               ${{ secrets.ECR_REGISTRY }}:latest
             echo "Deployment completed successfully."
