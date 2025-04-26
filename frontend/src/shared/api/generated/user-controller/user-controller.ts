@@ -5,20 +5,127 @@
  * OpenAPI spec version: v0
  */
 import type {
+  DataTag,
+  DefinedInitialDataOptions,
+  DefinedUseQueryResult,
   MutationFunction,
   QueryClient,
+  QueryFunction,
+  QueryKey,
+  UndefinedInitialDataOptions,
   UseMutationOptions,
   UseMutationResult,
+  UseQueryOptions,
+  UseQueryResult,
 } from '@tanstack/react-query';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import type { Specialization } from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
 
+export const areNotificationsOn = (signal?: AbortSignal) => {
+  return customInstance<boolean>({ url: `/api/user/notifications`, method: 'GET', signal });
+};
+
+export const getAreNotificationsOnQueryKey = () => {
+  return [`/api/user/notifications`] as const;
+};
+
+export const getAreNotificationsOnQueryOptions = <
+  TData = Awaited<ReturnType<typeof areNotificationsOn>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof areNotificationsOn>>, TError, TData>>;
+}) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getAreNotificationsOnQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof areNotificationsOn>>> = ({ signal }) =>
+    areNotificationsOn(signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof areNotificationsOn>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type AreNotificationsOnQueryResult = NonNullable<
+  Awaited<ReturnType<typeof areNotificationsOn>>
+>;
+export type AreNotificationsOnQueryError = ErrorType<unknown>;
+
+export function useAreNotificationsOn<
+  TData = Awaited<ReturnType<typeof areNotificationsOn>>,
+  TError = ErrorType<unknown>,
+>(
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof areNotificationsOn>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof areNotificationsOn>>,
+          TError,
+          Awaited<ReturnType<typeof areNotificationsOn>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAreNotificationsOn<
+  TData = Awaited<ReturnType<typeof areNotificationsOn>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof areNotificationsOn>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof areNotificationsOn>>,
+          TError,
+          Awaited<ReturnType<typeof areNotificationsOn>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useAreNotificationsOn<
+  TData = Awaited<ReturnType<typeof areNotificationsOn>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof areNotificationsOn>>, TError, TData>>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useAreNotificationsOn<
+  TData = Awaited<ReturnType<typeof areNotificationsOn>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof areNotificationsOn>>, TError, TData>>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getAreNotificationsOnQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
 export const toggleEmailNotifications = () => {
-  return customInstance<Specialization[]>({ url: `/api/user`, method: 'PATCH' });
+  return customInstance<Specialization[]>({ url: `/api/user/notifications`, method: 'PATCH' });
 };
 
 export const getToggleEmailNotificationsMutationOptions = <

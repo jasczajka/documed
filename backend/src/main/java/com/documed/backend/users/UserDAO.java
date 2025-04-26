@@ -28,24 +28,23 @@ public class UserDAO implements FullDAO<User, User> {
   }
 
   private RowMapper<User> userRowMapper =
-      (rs, rowNum) -> {
-        return User.builder()
-            .id(rs.getInt("id"))
-            .firstName(rs.getString("first_name"))
-            .lastName(rs.getString("last_name"))
-            .email(rs.getString("email"))
-            .address(rs.getString("address"))
-            .password(rs.getString("password"))
-            .accountStatus(AccountStatus.valueOf(rs.getString("account_status")))
-            .role(UserRole.valueOf(rs.getString("role")))
-            .birthDate(rs.getDate("birthdate"))
-            .emailNotifications(rs.getBoolean("email_notifications"))
-            // Optional fields
-            .pesel(rs.getString("pesel"))
-            .phoneNumber(rs.getString("phone_number"))
-            .pwzNumber(rs.getString("pwz"))
-            .build();
-      };
+      (rs, rowNum) ->
+          User.builder()
+              .id(rs.getInt("id"))
+              .firstName(rs.getString("first_name"))
+              .lastName(rs.getString("last_name"))
+              .email(rs.getString("email"))
+              .address(rs.getString("address"))
+              .password(rs.getString("password"))
+              .accountStatus(AccountStatus.valueOf(rs.getString("account_status")))
+              .role(UserRole.valueOf(rs.getString("role")))
+              .birthDate(rs.getDate("birthdate"))
+              .emailNotifications(rs.getBoolean("email_notifications"))
+              // Optional fields
+              .pesel(rs.getString("pesel"))
+              .phoneNumber(rs.getString("phone_number"))
+              .pwzNumber(rs.getString("pwz"))
+              .build();
 
   @Override
   public Optional<User> getById(int id) {

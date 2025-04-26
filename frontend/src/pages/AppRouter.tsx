@@ -1,4 +1,5 @@
 import { LoggedLayout } from 'modules/layouts/LoggedLayout';
+import { SettingsTabs } from 'modules/settings/SettingsTabs';
 import { lazy, useLayoutEffect, useMemo, useState } from 'react';
 import { createBrowserRouter, Navigate, RouteObject, RouterProvider } from 'react-router';
 import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
@@ -55,6 +56,7 @@ const getAuthRoutes = (isAdmin: boolean, isPatient: boolean): RouteObject[] => [
       { path: '/specialists', element: <SpecialistsPage /> },
       { path: '/referrals', element: <ReferralsPage /> },
       { path: '/prescriptions', element: <PrescriptionsPage /> },
+      { path: '/settings', element: <SettingsTabs /> },
       {
         path: '/admin',
         element: (

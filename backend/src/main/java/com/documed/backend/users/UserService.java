@@ -69,4 +69,12 @@ public class UserService {
   public void toggleEmailNotificationsById(int userId) {
     userDAO.toggleEmailNotificationsById(userId);
   }
+
+  public boolean areNotificationsOn(int userId) {
+    Optional<User> user = userDAO.getById(userId);
+    if (user.isEmpty()) {
+      throw new UserNotFoundException("User not found");
+    }
+    return user.get().isEmailNotifications();
+  }
 }

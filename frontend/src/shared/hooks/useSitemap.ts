@@ -33,6 +33,7 @@ const authSitemap = Object.freeze({
   login: '/',
   register: '/',
   forgotPassword: '/',
+  settings: '/settings',
 });
 
 const defaultSitemap = Object.freeze({
@@ -46,6 +47,7 @@ const defaultSitemap = Object.freeze({
   login: '/login',
   register: '/register',
   forgotPassword: '/forgot-password',
+  settings: '/',
 });
 
 export const useSitemap = () => {

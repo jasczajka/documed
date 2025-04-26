@@ -1,7 +1,6 @@
 package com.documed.backend.auth;
 
 import com.documed.backend.auth.annotations.AdminOnly;
-import com.documed.backend.auth.annotations.SelfDataOnly;
 import com.documed.backend.auth.dtos.*;
 import com.documed.backend.auth.model.OtpPurpose;
 import com.documed.backend.users.UserService;
@@ -15,8 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -116,11 +113,10 @@ public class AuthController {
     return ResponseEntity.ok().build();
   }
 
-  @SelfDataOnly
   @PostMapping("/change-password")
   public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequestDTO request) {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    Integer userId = (Integer) authentication.getPrincipal();
+
+    Integer userId = authService.getCurrentUserId();
     logger.info("Password change request for user ID: {}", userId);
 
     authService.changePassword(userId, request.getOldPassword(), request.getNewPassword());

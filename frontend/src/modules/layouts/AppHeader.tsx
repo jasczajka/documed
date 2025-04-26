@@ -1,4 +1,4 @@
-import { Logout, Person, Settings } from '@mui/icons-material';
+import { Logout, Settings } from '@mui/icons-material';
 import {
   CircularProgress,
   ClickAwayListener,
@@ -11,13 +11,14 @@ import {
 } from '@mui/material';
 import PopupState, { bindPopper, bindToggle } from 'material-ui-popup-state';
 import { memo, useCallback, useMemo } from 'react';
-import { Link, NavLink } from 'react-router';
+import { Link, NavLink, useNavigate } from 'react-router';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useSitemap } from 'shared/hooks/useSitemap';
 import { DocuMedLogo } from 'shared/icons/DocuMedLogo';
 
 export const AppHeader = memo(() => {
   const sitemap = useSitemap();
+  const navigate = useNavigate();
   const { logout, loading, isAdmin, isPatient } = useAuth();
   const handleLogout = useCallback(async () => {
     await logout();
@@ -89,12 +90,13 @@ export const AppHeader = memo(() => {
                     <Fade {...TransitionProps} timeout={350}>
                       <Paper className="shadow-lg">
                         <MenuList>
-                          <MenuItem className="flex gap-2">
+                          <MenuItem
+                            className="flex gap-2"
+                            onClick={() => navigate(sitemap.settings)}
+                          >
                             <Settings /> Ustawienia
                           </MenuItem>
-                          <MenuItem className="flex gap-2">
-                            <Person /> Konto
-                          </MenuItem>
+
                           <MenuItem className="flex gap-2" onClick={handleLogout}>
                             {loading ? <CircularProgress size={24} /> : <Logout />}Wyloguj się
                           </MenuItem>

@@ -2,6 +2,7 @@ package com.documed.backend.auth;
 
 import com.documed.backend.auth.dtos.AuthResponseDTO;
 import com.documed.backend.auth.exceptions.*;
+import com.documed.backend.auth.model.CurrentUser;
 import com.documed.backend.auth.model.OtpPurpose;
 import com.documed.backend.users.*;
 import com.documed.backend.users.model.AccountStatus;
@@ -270,6 +271,22 @@ public class AuthService {
     if (authentication == null || !authentication.isAuthenticated()) {
       return null;
     }
-    return (Integer) authentication.getPrincipal();
+    Object principal = authentication.getPrincipal();
+    if (principal instanceof CurrentUser currentUser) {
+      return currentUser.getUserId();
+    }
+    return null;
+  }
+
+  public UserRole getCurrentUserRole() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null || !authentication.isAuthenticated()) {
+      return null;
+    }
+    Object principal = authentication.getPrincipal();
+    if (principal instanceof CurrentUser currentUser) {
+      return currentUser.getRole();
+    }
+    return null;
   }
 }

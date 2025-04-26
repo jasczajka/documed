@@ -1,9 +1,11 @@
 package com.documed.backend.prescriptions;
 
+import com.documed.backend.auth.AuthService;
 import com.documed.backend.auth.annotations.StaffOnly;
-import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
+import com.documed.backend.auth.exceptions.UnauthorizedException;
 import com.documed.backend.medicines.model.Medicine;
 import com.documed.backend.medicines.model.MedicineWithAmount;
+import com.documed.backend.users.model.UserRole;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class PrescriptionController {
 
   private final PrescriptionService prescriptionService;
+  private final AuthService authService;
 
   @StaffOnly
   @PostMapping("/visit/{visit_id}")
@@ -34,7 +37,6 @@ public class PrescriptionController {
     return ResponseEntity.ok(prescription);
   }
 
-  @StaffOnlyOrSelf
   @GetMapping("/user/{user_id}")
   public ResponseEntity<List<Prescription>> getPrescriptionsForUser(
       @PathVariable("user_id") int userId) {
@@ -42,10 +44,18 @@ public class PrescriptionController {
     return ResponseEntity.ok(prescriptions);
   }
 
-  @StaffOnlyOrSelf
   @GetMapping("/{prescription_id}/medicines")
   public ResponseEntity<List<MedicineWithAmount>> getMedicinesForPrescription(
       @PathVariable("prescription_id") int prescriptionId) {
+
+    int userId = authService.getCurrentUserId();
+    int prescriptionUserId = prescriptionService.getUserIdForPrescriptionById(prescriptionId);
+    UserRole userRole = authService.getCurrentUserRole();
+
+    if (userRole.equals(UserRole.PATIENT) && userId != prescriptionUserId) {
+      throw new UnauthorizedException("Requesting patient id and prescription id do not match");
+    }
+
     List<MedicineWithAmount> medicines =
         prescriptionService.getMedicinesForPrescription(prescriptionId);
     return ResponseEntity.ok(medicines);

@@ -19,6 +19,10 @@ public class PrescriptionService {
     return prescriptionDAO.getAll();
   }
 
+  public Optional<Prescription> getById(int prescriptionId) {
+    return prescriptionDAO.getById(prescriptionId);
+  }
+
   Prescription createPrescription(int visitId) {
     return prescriptionDAO.create(visitId);
   }
@@ -49,5 +53,9 @@ public class PrescriptionService {
 
   Prescription issuePrescription(int prescriptionId) {
     return prescriptionDAO.issuePrescription(prescriptionId);
+  }
+
+  public Integer getUserIdForPrescriptionById(int prescriptionId) {
+    return prescriptionDAO.getUserIdForPrescriptionById(prescriptionId);
   }
 }

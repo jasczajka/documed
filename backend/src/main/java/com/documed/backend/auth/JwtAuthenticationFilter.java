@@ -1,5 +1,7 @@
 package com.documed.backend.auth;
 
+import com.documed.backend.auth.model.CurrentUser;
+import com.documed.backend.users.model.UserRole;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -74,10 +76,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       Integer userId = jwtUtil.extractUserId(jwt);
       String role = jwtUtil.extractRole(jwt);
       logger.info("Authenticated user - ID: {}, Role: {}", userId, role);
+      UserRole userRoleAsEnum = UserRole.valueOf(jwtUtil.extractRole(jwt));
+      var currentUser = new CurrentUser(userId, userRoleAsEnum);
 
       var authentication =
           new UsernamePasswordAuthenticationToken(
-              userId, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role)));
+              currentUser,
+              null,
+              Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role)));
 
       logger.info("Granted authorities: {}", authentication.getAuthorities());
 
