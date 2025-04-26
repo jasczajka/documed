@@ -8,9 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize(
-    "hasAnyRole('DOCTOR', 'NURSE', 'WARD_CLERK', 'ADMINISTRATOR') or "
-        + "(hasRole('PATIENT') and #userId == @authService.getCurrentUserId())")
-public @interface StaffOnlyOrSelf {
+@PreAuthorize("#userId == @authService.getCurrentUserId()")
+public @interface SelfDataOnly {
   String userId() default "#userId";
 }

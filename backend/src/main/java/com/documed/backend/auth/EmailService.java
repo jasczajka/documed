@@ -28,15 +28,29 @@ public class EmailService {
     this.fromAddress = fromAddress;
   }
 
+  public void sendEmail(String to, String subject, String body) {
+    if (!isValidEmail(to)) {
+      logger.warn("Attempt to send email to invalid address: {}", to);
+      return;
+    }
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setTo(to.trim());
+    message.setFrom(buildFromAddress());
+    message.setSubject(subject);
+    message.setText(body);
+    mailSender.send(message);
+    logger.info("Email sent to {} with subject '{}'", to, subject);
+  }
+
   public boolean sendOtpEmail(String toEmail, String otpCode, OtpPurpose purpose) {
     if (!isValidEmail(toEmail)) {
-      logger.warn("Próba wysłania kodu OTP na nieprawidłowy adres email: {}", toEmail);
+      logger.warn("Trying to send OTP to: {}", toEmail);
       return false;
     }
 
     SimpleMailMessage message = buildOtpMessage(toEmail, otpCode, purpose);
     mailSender.send(message);
-    logger.debug("Email z kodem OTP wysłany na adres {}", toEmail);
+    logger.debug("OTP code sent to {}", toEmail);
     return true;
   }
 
@@ -44,19 +58,13 @@ public class EmailService {
     SimpleMailMessage message = new SimpleMailMessage();
     message.setTo(toEmail.trim());
     message.setFrom(buildFromAddress());
-    message.setSubject(buildSubject(purpose));
+    message.setSubject(purpose.getSubject());
     message.setText(buildEmailBody(otpCode, purpose));
     return message;
   }
 
   private String buildFromAddress() {
     return String.format("%s <%s>", senderName, fromAddress);
-  }
-
-  private String buildSubject(OtpPurpose purpose) {
-    return purpose == OtpPurpose.REGISTRATION
-        ? "Twój kod weryfikacyjny DocuMed"
-        : "DocuMed - kod do resetu hasła";
   }
 
   private String buildEmailBody(String otpCode, OtpPurpose purpose) {

@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class ConfirmRegistrationRequestDTO {
+public class ResetPasswordConfirmDTO {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @Email(message = "Nieprawidłowy adres email") @NotBlank(message = "Adres email jest wymagany") private String email;
 

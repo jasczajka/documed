@@ -1,9 +1,10 @@
 import {
+  useConfirmRegistration,
   useDeactivateAccount,
   useGetCurrentUser,
   useLogin,
   useLogout,
-  useRegister,
+  useRequestRegistration,
 } from 'shared/api/generated/auth-controller/auth-controller';
 import { UserRole } from 'shared/api/generated/generated.schemas';
 import { mapAuthError } from 'shared/utils/mapAuthError';
@@ -14,10 +15,16 @@ export const useAuth = () => {
 
   const { mutateAsync: loginMutation, isPending: isLoginPending, error: loginError } = useLogin();
   const {
-    mutateAsync: registerMutation,
-    isPending: isRegisterPending,
-    error: registerError,
-  } = useRegister();
+    mutateAsync: requestRegisterMutation,
+    isPending: isRequestRegisterPending,
+    error: requestRegisterError,
+  } = useRequestRegistration();
+
+  const {
+    mutateAsync: confirmRegisterMutation,
+    isPending: isConfirmRegisterPending,
+    error: confirmRegisterError,
+  } = useConfirmRegistration();
   const {
     mutateAsync: logoutMutation,
     isPending: isLogoutPending,
@@ -62,18 +69,23 @@ export const useAuth = () => {
     }
   };
 
-  const register = async (userData: {
+  const requestRegister = async (userData: {
     firstName: string;
     lastName: string;
     email: string;
     password: string;
     confirmPassword: string;
     address: string;
-    phoneNumber?: string;
+    phoneNumber: string;
     pesel?: string;
     birthdate: string;
   }) => {
-    const response = await registerMutation({ data: userData });
+    const response = await requestRegisterMutation({ data: userData });
+    return response;
+  };
+
+  const confirmRegistration = async (userData: { email: string; otp: string }) => {
+    const response = await confirmRegisterMutation({ data: userData });
     return response;
   };
 
@@ -101,14 +113,16 @@ export const useAuth = () => {
   return {
     loading:
       isLoginPending ||
-      isRegisterPending ||
+      isRequestRegisterPending ||
+      isConfirmRegisterPending ||
       isLogoutPending ||
       isDeleteAccountPending ||
       isGetCurrentUserLoading,
     user,
     login,
     logout,
-    register,
+    requestRegister,
+    confirmRegistration,
     deleteAccount,
     verifyAuthentication,
     isAdmin,
@@ -119,7 +133,8 @@ export const useAuth = () => {
     hasAnyRole,
     loginError: mapAuthError(loginError),
     logoutError: mapAuthError(logoutError),
-    registerError: mapAuthError(registerError),
+    requestRegisterError: mapAuthError(requestRegisterError),
+    confirmRegisterError: mapAuthError(confirmRegisterError),
     deleteAccountError,
   };
 };

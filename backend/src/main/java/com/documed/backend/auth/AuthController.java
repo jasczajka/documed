@@ -1,7 +1,9 @@
 package com.documed.backend.auth;
 
 import com.documed.backend.auth.annotations.AdminOnly;
+import com.documed.backend.auth.annotations.SelfDataOnly;
 import com.documed.backend.auth.dtos.*;
+import com.documed.backend.auth.model.OtpPurpose;
 import com.documed.backend.users.UserService;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
@@ -13,6 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -88,6 +92,41 @@ public class AuthController {
     servletResponse.addCookie(jwtCookie);
 
     logger.info("User registration confirmed for ID: {}", authResponse.getUserId());
+    return ResponseEntity.ok().build();
+  }
+
+  @PostMapping("/request-password-reset")
+  public ResponseEntity<Void> requestPasswordReset(
+      @Valid @RequestBody ResetPasswordRequestDTO request) {
+    logger.info("Password reset request for email: {}", request.getEmail());
+
+    otpService.generateOtp(request.getEmail(), OtpPurpose.PASSWORD_RESET);
+    logger.info("OTP generated for password reset request for email: {}", request.getEmail());
+    return ResponseEntity.ok().build();
+  }
+
+  @PostMapping("/reset-password")
+  public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordConfirmDTO request) {
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    Integer userId = (Integer) authentication.getPrincipal();
+    logger.info("Password reset request for user id: {}", userId);
+
+    authService.resetPassword(request.getEmail(), request.getOtp());
+
+    logger.info("Password reset successful for email: {}", request.getEmail());
+    return ResponseEntity.ok().build();
+  }
+
+  @SelfDataOnly
+  @PostMapping("/change-password")
+  public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequestDTO request) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    Integer userId = (Integer) authentication.getPrincipal();
+    logger.info("Password change request for user ID: {}", userId);
+
+    authService.changePassword(userId, request.getOldPassword(), request.getNewPassword());
+    logger.info("Password changed successfully for user ID: {}", userId);
     return ResponseEntity.ok().build();
   }
 

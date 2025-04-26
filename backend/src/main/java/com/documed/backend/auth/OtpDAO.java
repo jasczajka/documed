@@ -84,9 +84,11 @@ public class OtpDAO {
         """
                 SELECT *
                 FROM otp
-                WHERE email = ? AND otp = ? AND purpose = ?
+                WHERE email = ? AND otp = ? AND purpose = ? AND used = false AND expires_at > ?
                 """;
-    List<Otp> results = jdbcTemplate.query(sql, rowMapper, email, otp, purpose.name());
+    List<Otp> results =
+        jdbcTemplate.query(
+            sql, rowMapper, email, otp, purpose.name(), Timestamp.valueOf(LocalDateTime.now()));
     return results.stream().findFirst();
   }
 
@@ -95,29 +97,13 @@ public class OtpDAO {
         """
                 SELECT *
                 FROM otp
-                WHERE email = ? AND purpose = ?
+                WHERE email = ? AND purpose = ? AND used = false AND expires_at > ?
                 ORDER BY generated_at DESC
                 LIMIT 1
                 """;
-    List<Otp> results = jdbcTemplate.query(sql, rowMapper, email, purpose.name());
+    List<Otp> results =
+        jdbcTemplate.query(
+            sql, rowMapper, email, purpose.name(), Timestamp.valueOf(LocalDateTime.now()));
     return results.stream().findFirst();
-  }
-
-  public int deleteExpiredBefore(LocalDateTime cutoff) {
-    String sql =
-        """
-                DELETE FROM otp
-                WHERE expires_at < ?
-                """;
-    return jdbcTemplate.update(sql, Timestamp.valueOf(cutoff));
-  }
-
-  public int deleteAllForEmail(String email) {
-    String sql =
-        """
-                DELETE FROM otp
-                WHERE email = ?
-                """;
-    return jdbcTemplate.update(sql, email);
   }
 }

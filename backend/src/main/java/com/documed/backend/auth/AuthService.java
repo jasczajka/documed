@@ -10,9 +10,12 @@ import com.documed.backend.users.model.UserRole;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +28,7 @@ public class AuthService {
 
   private final UserService userService;
   private final OtpService otpService;
+  private final EmailService emailService;
 
   private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
@@ -33,12 +37,30 @@ public class AuthService {
       PasswordEncoder passwordEncoder,
       JwtUtil jwtUtil,
       UserService userService,
-      OtpService otpService) {
+      OtpService otpService,
+      EmailService emailService) {
     this.userDAO = userDAO;
     this.passwordEncoder = passwordEncoder;
     this.jwtUtil = jwtUtil;
     this.userService = userService;
     this.otpService = otpService;
+    this.emailService = emailService;
+  }
+
+  @Transactional
+  public void resetPassword(String email, String otp) {
+    otpService.validateOtp(email, otp, OtpPurpose.PASSWORD_RESET);
+
+    userService.getByEmail(email).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+    String newPassword = generateRandomPassword();
+
+    String encodedPassword = passwordEncoder.encode(newPassword);
+    updatePasswordByEmail(email, encodedPassword);
+
+    sendNewPasswordEmail(email, newPassword);
+
+    logger.info("Password reset successfully for user with email: {}", email);
   }
 
   @Transactional
@@ -53,9 +75,15 @@ public class AuthService {
       String address,
       LocalDate birthDate) {
     try {
-      if (userService.getByEmail(email).isPresent()
-          || (pesel != null && userService.getByPesel(pesel).isPresent())) {
-        throw new UserAlreadyExistsException("User with given email or PESEL already exists");
+      Optional<User> existingUserOpt = userService.getByEmail(email);
+      if (existingUserOpt.isPresent()) {
+        User existingUser = existingUserOpt.get();
+        if (existingUser.getAccountStatus() == AccountStatus.PENDING_CONFIRMATION) {
+          otpService.generateOtp(email, OtpPurpose.REGISTRATION);
+          return existingUser;
+        } else {
+          throw new UserAlreadyExistsException("User with given email already exists");
+        }
       }
 
       User user =
@@ -200,5 +228,48 @@ public class AuthService {
       logger.error("Error in login()", e);
       throw new AuthServiceException("Database error during login", e);
     }
+  }
+
+  @Transactional
+  public void changePassword(int userId, String oldPassword, String newPassword) {
+    User user =
+        userService.getById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+    if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+      throw new InvalidCredentialsException("Old password is incorrect");
+    }
+
+    String encodedPassword = passwordEncoder.encode(newPassword);
+    userDAO.updatePasswordById(userId, encodedPassword);
+  }
+
+  private String generateRandomPassword() {
+    String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+    StringBuilder password = new StringBuilder();
+    for (int i = 0; i < 12; i++) {
+      int index = (int) (Math.random() * characters.length());
+      password.append(characters.charAt(index));
+    }
+    return password.toString();
+  }
+
+  private void sendNewPasswordEmail(String email, String newPassword) {
+    String subject = "Twoje nowe hasło";
+    String text = "Twoje nowe hasło to: " + newPassword;
+
+    emailService.sendEmail(email, subject, text);
+  }
+
+  @Transactional
+  public void updatePasswordByEmail(String email, String encodedPassword) {
+    userDAO.updatePasswordByEmail(email, encodedPassword);
+  }
+
+  public Integer getCurrentUserId() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null || !authentication.isAuthenticated()) {
+      return null;
+    }
+    return (Integer) authentication.getPrincipal();
   }
 }

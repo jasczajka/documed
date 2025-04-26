@@ -65,6 +65,80 @@ export interface Prescription {
   status: PrescriptionStatus;
 }
 
+export interface ResetPasswordConfirmDTO {
+  /** @minLength 1 */
+  email: string;
+  /**
+   * @minLength 6
+   * @maxLength 6
+   */
+  otp: string;
+}
+
+export interface PatientRegisterRequestDTO {
+  /** @minLength 1 */
+  firstName: string;
+  /** @minLength 1 */
+  lastName: string;
+  /** @pattern ^\d{11}$ */
+  pesel?: string;
+  /**
+   * @minLength 1
+   * @pattern ^\d{9}$
+   */
+  phoneNumber: string;
+  /** @minLength 1 */
+  email: string;
+  /** @minLength 1 */
+  address: string;
+  /**
+   * @minLength 6
+   * @maxLength 2147483647
+   */
+  password: string;
+  /** @minLength 1 */
+  confirmPassword: string;
+  birthdate: string;
+}
+
+export type PendingUserDTORole = (typeof PendingUserDTORole)[keyof typeof PendingUserDTORole];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PendingUserDTORole = {
+  PATIENT: 'PATIENT',
+  DOCTOR: 'DOCTOR',
+  NURSE: 'NURSE',
+  WARD_CLERK: 'WARD_CLERK',
+  ADMINISTRATOR: 'ADMINISTRATOR',
+} as const;
+
+export type PendingUserDTOAccountStatus =
+  (typeof PendingUserDTOAccountStatus)[keyof typeof PendingUserDTOAccountStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PendingUserDTOAccountStatus = {
+  ACTIVE: 'ACTIVE',
+  PENDING_CONFIRMATION: 'PENDING_CONFIRMATION',
+  DEACTIVATED: 'DEACTIVATED',
+} as const;
+
+export interface PendingUserDTO {
+  id?: number;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  pesel?: string;
+  phoneNumber?: string;
+  address?: string;
+  birthDate?: string;
+  role?: PendingUserDTORole;
+  accountStatus?: PendingUserDTOAccountStatus;
+}
+
+export interface ResetPasswordRequestDTO {
+  email: string;
+}
+
 export type StaffRegisterRequestDTORole =
   (typeof StaffRegisterRequestDTORole)[keyof typeof StaffRegisterRequestDTORole];
 
@@ -80,16 +154,16 @@ export const StaffRegisterRequestDTORole = {
 export interface StaffRegisterRequestDTO {
   role: StaffRegisterRequestDTORole;
   /** @minLength 1 */
-  firstName?: string;
+  firstName: string;
   /** @minLength 1 */
-  lastName?: string;
+  lastName: string;
   /** @minLength 1 */
-  email?: string;
+  email: string;
   /**
    * @minLength 6
    * @maxLength 2147483647
    */
-  password?: string;
+  password: string;
 }
 
 export type AuthResponseDTORole = (typeof AuthResponseDTORole)[keyof typeof AuthResponseDTORole];
@@ -111,64 +185,52 @@ export interface AuthResponseDTO {
 
 export interface DoctorRegisterRequestDTO {
   /** @minLength 1 */
-  firstName?: string;
+  firstName: string;
   /** @minLength 1 */
-  lastName?: string;
+  lastName: string;
   /**
    * @minLength 1
    * @pattern ^\d{7}$
    */
-  pwz?: string;
+  pwz: string;
   /**
    * @minLength 1
    * @pattern ^\d{9}$
    */
-  phoneNumber?: string;
+  phoneNumber: string;
   /** @minLength 1 */
-  email?: string;
+  email: string;
   /**
    * @minLength 6
    * @maxLength 2147483647
    */
-  password?: string;
+  password: string;
   /** @minItems 1 */
-  specializationIds?: number[];
-}
-
-export interface PatientRegisterRequestDTO {
-  /** @minLength 1 */
-  firstName?: string;
-  /** @minLength 1 */
-  lastName?: string;
-  /**
-   * @minLength 1
-   * @pattern ^\d{11}$
-   */
-  pesel?: string;
-  /**
-   * @minLength 1
-   * @pattern ^\d{9}$
-   */
-  phoneNumber?: string;
-  /** @minLength 1 */
-  email?: string;
-  /** @minLength 1 */
-  address?: string;
-  /**
-   * @minLength 6
-   * @maxLength 2147483647
-   */
-  password?: string;
-  /** @minLength 1 */
-  confirmPassword?: string;
-  birthdate: string;
+  specializationIds: number[];
 }
 
 export interface LoginRequestDTO {
   /** @minLength 1 */
-  login?: string;
+  login: string;
   /** @minLength 1 */
-  password?: string;
+  password: string;
+}
+
+export interface ConfirmRegistrationRequestDTO {
+  /** @minLength 1 */
+  email: string;
+  /**
+   * @minLength 6
+   * @maxLength 6
+   */
+  otp: string;
+}
+
+export interface ChangePasswordRequestDTO {
+  /** @minLength 1 */
+  oldPassword: string;
+  /** @minLength 1 */
+  newPassword: string;
 }
 
 export interface MedicineWithAmount {
@@ -289,6 +351,7 @@ export type UserAccountStatus = (typeof UserAccountStatus)[keyof typeof UserAcco
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UserAccountStatus = {
   ACTIVE: 'ACTIVE',
+  PENDING_CONFIRMATION: 'PENDING_CONFIRMATION',
   DEACTIVATED: 'DEACTIVATED',
 } as const;
 
@@ -316,6 +379,7 @@ export interface User {
   accountStatus: UserAccountStatus;
   birthDate?: string;
   pwzNumber?: string;
+  emailNotifications: boolean;
   role: UserRole;
   subscription?: Subscription;
   specializations?: Specialization[];

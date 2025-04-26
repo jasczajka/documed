@@ -65,4 +65,8 @@ public class UserService {
 
     return userDAO.addSpecializationsToUser(userId, specializationIds);
   }
+
+  public void toggleEmailNotificationsById(int userId) {
+    userDAO.toggleEmailNotificationsById(userId);
+  }
 }

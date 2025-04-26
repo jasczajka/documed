@@ -170,6 +170,7 @@ CREATE TABLE "User" (
     pwz varchar(255)  NULL,
     role varchar(255)  NOT NULL,
     subscription_id int  NULL,
+    email_notifications BOOLEAN DEFAULT true,
     CONSTRAINT User_pk PRIMARY KEY (id)
 );
 
