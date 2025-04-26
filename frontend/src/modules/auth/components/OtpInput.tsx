@@ -15,7 +15,6 @@ const otpSchema = Yup.object({
 });
 
 interface OTPInputProps {
-  email: string;
   onSubmit: (otp: string) => Promise<void>;
   error?: string;
   loading?: boolean;

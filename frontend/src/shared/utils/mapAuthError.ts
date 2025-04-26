@@ -23,13 +23,13 @@ export const mapAuthError = (error: any): ApiError => {
     case 401:
       return {
         status,
-        message: data.message || 'Nieprawidłowy email lub hasło',
+        message: data.message || 'Nieprawidłowe dane logowania',
         code: 'UNAUTHORIZED',
       };
     case 403:
       return {
         status,
-        message: data.message || 'Nieprawidłowy email lub hasło',
+        message: data.message || 'Brak uprawnień do wykonania tej operacji',
         code: 'FORBIDDEN',
       };
     case 404:
@@ -38,10 +38,16 @@ export const mapAuthError = (error: any): ApiError => {
         message: data.message || 'Użytkownik nie istnieje',
         code: 'NOT_FOUND',
       };
+    case 410:
+      return {
+        status,
+        message: data.message || 'Kod OTP jest nieaktywny',
+        code: 'GONE',
+      };
     case 429:
       return {
         status,
-        message: 'Zbyt wiele prób logowania. Spróbuj później.',
+        message: 'Zbyt wiele prób.',
         code: 'RATE_LIMITED',
       };
     case 409:

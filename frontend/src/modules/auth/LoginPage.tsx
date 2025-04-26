@@ -4,6 +4,7 @@ import { FC } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Link } from 'react-router';
 import { useAuth } from 'shared/hooks/useAuth';
+import { useSitemap } from 'shared/hooks/useSitemap';
 import { DocuMedLogo } from 'shared/icons/DocuMedLogo';
 import * as Yup from 'yup';
 
@@ -36,6 +37,8 @@ export const LoginPage: FC = () => {
       password: '',
     },
   });
+  const sitemap = useSitemap();
+  console.log('sitemap: ', sitemap);
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -106,13 +109,14 @@ export const LoginPage: FC = () => {
           </Typography>
         )}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', paddingTop: 3 }}>
-          {/* @TODO when Email Module is ready, implement forgot password functionality with sending a new password
-          <Button variant="outlined" sx={{ width: '50%' }}>
-            Zapomniałem hasła
-          </Button> */}
+          <Link to={sitemap.forgotPassword}>
+            <Typography color="primary" variant="body1">
+              Zapomniałem hasła!
+            </Typography>
+          </Link>
           <Box sx={{ display: 'flex', paddingTop: 1 }}>
             <Typography variant="body1">Nie masz konta?&nbsp;</Typography>
-            <Link to="/register">
+            <Link to={sitemap.register}>
               <Typography color="primary" variant="body1">
                 Zarejestruj się!
               </Typography>

@@ -8,6 +8,7 @@ import { useAuth } from 'shared/hooks/useAuth';
 
 const LoginPage = lazy(() => import('../modules/auth/LoginPage'));
 const RegisterPage = lazy(() => import('../modules/auth/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('../modules/auth/ForgotPasswordPage'));
 const VisitsPage = lazy(() => import('./VisitsPage'));
 const PatientsPage = lazy(() => import('./PatientsPage'));
 const SpecialistsPage = lazy(() => import('./SpecialistsPage'));
@@ -27,6 +28,10 @@ const getDefaultRoutes = () => [
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/forgot-password',
+    element: <ForgotPasswordPage />,
   },
   {
     path: '*',

@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import PopupState, { bindPopper, bindToggle } from 'material-ui-popup-state';
 import { memo, useCallback, useMemo } from 'react';
-import { NavLink } from 'react-router';
+import { Link, NavLink } from 'react-router';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useSitemap } from 'shared/hooks/useSitemap';
 import { DocuMedLogo } from 'shared/icons/DocuMedLogo';
@@ -36,7 +36,9 @@ export const AppHeader = memo(() => {
 
   return (
     <header className="bg-gray relative flex h-17 items-center pl-28">
-      <DocuMedLogo className="text-primary absolute left-28 h-6 w-[110px]" />
+      <Link className="text-primary absolute left-28 h-6 w-[110px]" to={sitemap.main}>
+        <DocuMedLogo />
+      </Link>
       <nav className="w-full px-60">
         <ul className="text-secondary [&>*]:hover:text-primary flex min-w-96 justify-center gap-14 [&>*]:transition-colors [&>*]:duration-500 [&>*]:ease-in-out">
           {paths.map(({ path, label }) => (

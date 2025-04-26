@@ -47,7 +47,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     if (("/api/auth/login".equals(requestUri)
             || "/api/auth/request_registration".equals(requestUri)
             || "/api/auth/confirm_registration".equals(requestUri))
-        || "/api/auth/request-password-reset".equals(requestUri)) {
+        || "/api/auth/request-password-reset".equals(requestUri)
+        || "/api/auth/reset-password".equals(requestUri)) {
       logger.debug("Skipping authentication for auth endpoint: {}", requestUri);
       filterChain.doFilter(request, response);
       return;

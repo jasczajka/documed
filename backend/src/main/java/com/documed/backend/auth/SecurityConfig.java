@@ -60,6 +60,8 @@ public class SecurityConfig {
                   .permitAll()
                   .requestMatchers("/api/auth/request-password-reset")
                   .permitAll()
+                  .requestMatchers("/api/auth/reset-password")
+                  .permitAll()
                   .requestMatchers("/actuator/health")
                   .permitAll();
 

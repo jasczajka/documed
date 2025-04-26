@@ -108,9 +108,7 @@ public class AuthController {
   @PostMapping("/reset-password")
   public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordConfirmDTO request) {
 
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    Integer userId = (Integer) authentication.getPrincipal();
-    logger.info("Password reset request for user id: {}", userId);
+    logger.info("Password reset request for user with email: {}", request.getEmail());
 
     authService.resetPassword(request.getEmail(), request.getOtp());
 

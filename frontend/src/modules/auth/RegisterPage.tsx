@@ -12,7 +12,7 @@ enum RegisterFormStep {
 }
 
 export const RegisterPage: FC = () => {
-  const [currentStep, setCurrentStep] = useState<RegisterFormStep>(RegisterFormStep.OTP);
+  const [currentStep, setCurrentStep] = useState<RegisterFormStep>(RegisterFormStep.REGISTER);
   const [registeredEmail, setRegisteredEmail] = useState('');
   const {
     requestRegister,
@@ -65,7 +65,6 @@ export const RegisterPage: FC = () => {
         />
       ) : (
         <OTPInput
-          email={registeredEmail}
           onSubmit={handleOTPSubmit}
           error={confirmRegisterError?.message}
           loading={loading}
