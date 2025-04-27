@@ -1,25 +1,35 @@
 import { Logout, Settings } from '@mui/icons-material';
 import {
+  Avatar,
+  Box,
   CircularProgress,
   ClickAwayListener,
   Fade,
   IconButton,
+  ListItem,
   MenuItem,
   MenuList,
   Paper,
   Popper,
+  Typography,
 } from '@mui/material';
 import PopupState, { bindPopper, bindToggle } from 'material-ui-popup-state';
 import { memo, useCallback, useMemo } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router';
+import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useSitemap } from 'shared/hooks/useSitemap';
 import { DocuMedLogo } from 'shared/icons/DocuMedLogo';
+import { useShallow } from 'zustand/react/shallow';
 
 export const AppHeader = memo(() => {
   const sitemap = useSitemap();
   const navigate = useNavigate();
   const { logout, loading, isAdmin, isPatient } = useAuth();
+  const { firstName, lastName, email } = useAuthStore(
+    useShallow((state) => state.user ?? { firstName: '', lastName: '', email: '' }),
+  );
+  const userName = `${firstName} ${lastName}`;
   const handleLogout = useCallback(async () => {
     await logout();
   }, []);
@@ -84,11 +94,20 @@ export const AppHeader = memo(() => {
                 <Popper
                   {...bindPopper(popupState)}
                   transition
-                  modifiers={[{ name: 'offset', options: { offset: [-44, 10] } }]}
+                  modifiers={[{ name: 'offset', options: { offset: [-100, 10] } }]}
                 >
                   {({ TransitionProps }) => (
                     <Fade {...TransitionProps} timeout={350}>
                       <Paper className="shadow-lg">
+                        <ListItem sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Avatar />
+                          <Box>
+                            <Typography variant="body1">{userName}</Typography>
+                            <Typography variant="body2" color="secondary">
+                              {email}
+                            </Typography>
+                          </Box>
+                        </ListItem>
                         <MenuList>
                           <MenuItem
                             className="flex gap-2"

@@ -2,6 +2,9 @@ import { UserRole } from 'shared/api/generated/generated.schemas';
 import { create } from 'zustand';
 
 export type AuthUser = {
+  firstName: string;
+  lastName: string;
+  email: string;
   id: number;
   role: UserRole;
 } | null;

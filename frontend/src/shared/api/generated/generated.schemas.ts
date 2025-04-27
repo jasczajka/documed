@@ -423,6 +423,25 @@ export interface WorkTime {
   [key: string]: unknown;
 }
 
+export type MeDTORole = (typeof MeDTORole)[keyof typeof MeDTORole];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const MeDTORole = {
+  PATIENT: 'PATIENT',
+  DOCTOR: 'DOCTOR',
+  NURSE: 'NURSE',
+  WARD_CLERK: 'WARD_CLERK',
+  ADMINISTRATOR: 'ADMINISTRATOR',
+} as const;
+
+export interface MeDTO {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: MeDTORole;
+}
+
 export type AddMedicineToPrescriptionParams = {
   amount?: number;
 };

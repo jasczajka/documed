@@ -1,7 +1,7 @@
 import { NotificationsActive, Person } from '@mui/icons-material';
 import { Box, Paper, Tab, Tabs } from '@mui/material';
-import { AddServiceTab } from 'modules/admin/tabs/AddServiceTab';
 import { FC, useState } from 'react';
+import { AccountTab } from './tabs/AccountTab';
 import { NotificationsTab } from './tabs/NotificationsTab';
 
 export const SettingsTabs: FC = () => {
@@ -37,7 +37,7 @@ export const SettingsTabs: FC = () => {
       </Tabs>
 
       <Paper sx={{ height: '100%', width: '100%', padding: 8, minHeight: '532px' }} elevation={1}>
-        {index === 0 && <AddServiceTab />}
+        {index === 0 && <AccountTab />}
         {index === 1 && <NotificationsTab />}
       </Paper>
     </Box>

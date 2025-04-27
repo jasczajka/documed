@@ -46,8 +46,8 @@ export const useAuth = () => {
     try {
       const { data } = await fetchCurrentUser();
       console.log('data from verify authentication');
-      if (data && data.id && data.role) {
-        authenticateUser({ id: data.id, role: data.role });
+      if (data) {
+        authenticateUser(data);
       } else {
         clearUser();
       }
@@ -61,7 +61,7 @@ export const useAuth = () => {
       await loginMutation({ data: credentials });
       const { data } = await fetchCurrentUser();
       if (data) {
-        authenticateUser({ id: data.id, role: data.role });
+        authenticateUser(data);
       }
     } catch (error) {
       console.error('Error logging in: ', error);

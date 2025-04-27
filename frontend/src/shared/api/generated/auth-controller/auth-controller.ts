@@ -26,12 +26,12 @@ import type {
   ConfirmRegistrationRequestDTO,
   DoctorRegisterRequestDTO,
   LoginRequestDTO,
+  MeDTO,
   PatientRegisterRequestDTO,
   PendingUserDTO,
   ResetPasswordConfirmDTO,
   ResetPasswordRequestDTO,
   StaffRegisterRequestDTO,
-  User,
 } from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
@@ -721,7 +721,7 @@ export const useChangePassword = <TError = ErrorType<unknown>, TContext = unknow
   return useMutation(mutationOptions, queryClient);
 };
 export const getCurrentUser = (signal?: AbortSignal) => {
-  return customInstance<User>({ url: `/api/auth/me`, method: 'GET', signal });
+  return customInstance<MeDTO>({ url: `/api/auth/me`, method: 'GET', signal });
 };
 
 export const getGetCurrentUserQueryKey = () => {

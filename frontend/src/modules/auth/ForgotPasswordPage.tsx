@@ -93,7 +93,7 @@ export const ForgotPasswordPage: FC = () => {
                 placeholder="Wprowadź e-mail swojego konta"
                 error={!!fieldState.error || !!requestPasswordResetError}
                 helperText={
-                  mapAuthError(requestPasswordResetError)?.message || fieldState.error?.message
+                  fieldState.error?.message || mapAuthError(requestPasswordResetError)?.message
                 }
                 fullWidth
               />

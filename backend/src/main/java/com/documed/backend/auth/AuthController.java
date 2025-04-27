@@ -182,7 +182,7 @@ public class AuthController {
   }
 
   @GetMapping("/me")
-  public ResponseEntity<User> getCurrentUser(
+  public ResponseEntity<MeDTO> getCurrentUser(
       @CookieValue(name = JWT_COOKIE_NAME, required = false) String token,
       HttpServletResponse response) {
 
@@ -201,16 +201,26 @@ public class AuthController {
       }
 
       Integer userId = jwtUtil.extractUserId(token);
-      Optional<User> user = userService.getById(userId);
+      Optional<User> userOpt = userService.getById(userId);
 
-      if (user.isEmpty()) {
+      if (userOpt.isEmpty()) {
         logger.warn("User not found for ID: {}", userId);
         clearJwtCookie(response);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
       }
 
       logger.debug("Returning current user info for ID: {}", userId);
-      return ResponseEntity.ok(user.get());
+      User user = userOpt.get();
+      MeDTO returnDto =
+          MeDTO.builder()
+              .id(user.getId())
+              .firstName(user.getFirstName())
+              .lastName(user.getLastName())
+              .email(user.getEmail())
+              .role(user.getRole())
+              .build();
+
+      return ResponseEntity.ok(returnDto);
 
     } catch (Exception e) {
       logger.warn("JWT processing error: {}", e.getMessage());
