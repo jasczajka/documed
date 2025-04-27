@@ -59,7 +59,7 @@ public class EmailService {
     message.setTo(toEmail.trim());
     message.setFrom(buildFromAddress());
     message.setSubject(purpose.getSubject());
-    message.setText(buildEmailBody(otpCode, purpose));
+    message.setText(buildOtpEmailBody(otpCode, purpose));
     return message;
   }
 
@@ -67,7 +67,7 @@ public class EmailService {
     return String.format("%s <%s>", senderName, fromAddress);
   }
 
-  private String buildEmailBody(String otpCode, OtpPurpose purpose) {
+  private String buildOtpEmailBody(String otpCode, OtpPurpose purpose) {
     return String.format(
         """
             Szanowny Użytkowniku,
