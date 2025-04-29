@@ -1,3 +1,6 @@
+
+-- Note: remember to adjust the database name!
+
 CREATE EXTENSION IF NOT EXISTS pg_cron;
 -- Schedule OTP cleanup to run daily at midnight (00:00)
 SELECT cron.schedule_in_database(
