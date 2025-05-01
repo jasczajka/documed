@@ -45,12 +45,12 @@
         name: postgresql
         state: restarted
         
-    - name: Create database
+    - name: Create prod database
       postgresql_db:
         name: prod_db
       become_user: postgres
 
-    - name: Create database
+    - name: Create test database
       postgresql_db:
         name: test_db
       become_user: postgres
