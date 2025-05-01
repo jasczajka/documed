@@ -2,6 +2,7 @@ package com.documed.backend.auth;
 
 import com.documed.backend.auth.annotations.AdminOnly;
 import com.documed.backend.auth.dtos.*;
+import com.documed.backend.auth.model.OtpPurpose;
 import com.documed.backend.users.UserService;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
@@ -23,20 +24,24 @@ public class AuthController {
 
   private final AuthService authService;
   private final UserService userService;
+  private final OtpService otpService;
 
   private final JwtUtil jwtUtil;
 
-  public AuthController(AuthService authService, UserService userService, JwtUtil jwtUtil) {
+  public AuthController(
+      AuthService authService, UserService userService, OtpService otpService, JwtUtil jwtUtil) {
     this.authService = authService;
     this.userService = userService;
+    this.otpService = otpService;
     this.jwtUtil = jwtUtil;
   }
 
-  @PostMapping("/register")
-  public ResponseEntity<AuthResponseDTO> register(
+  @PostMapping("/request-registration")
+  public ResponseEntity<PendingUserDTO> requestRegistration(
       @Valid @RequestBody PatientRegisterRequestDTO request) {
-    logger.info("Registration attempt for email: {}", request.getEmail());
-    AuthResponseDTO response =
+    logger.info("Registration request for email: {}", request.getEmail());
+
+    User createdUser =
         authService.registerPatient(
             request.getFirstName(),
             request.getLastName(),
@@ -48,8 +53,75 @@ public class AuthController {
             request.getAddress(),
             request.getBirthdate());
 
-    logger.debug("User registered successfully with ID: {}", response.getUserId());
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    PendingUserDTO responseDto =
+        PendingUserDTO.builder()
+            .id(createdUser.getId())
+            .firstName(createdUser.getFirstName())
+            .lastName(createdUser.getLastName())
+            .email(createdUser.getEmail())
+            .pesel(createdUser.getPesel())
+            .phoneNumber(createdUser.getPhoneNumber())
+            .address(createdUser.getAddress())
+            .birthDate(createdUser.getBirthDate())
+            .role(createdUser.getRole())
+            .accountStatus(createdUser.getAccountStatus())
+            .build();
+
+    logger.debug("Pending user created with ID: {}", createdUser.getId());
+    return ResponseEntity.status(HttpStatus.ACCEPTED).body(responseDto);
+  }
+
+  @PostMapping("/confirm-registration")
+  public ResponseEntity<Void> confirmRegistration(
+      @Valid @RequestBody ConfirmRegistrationRequestDTO request,
+      HttpServletResponse servletResponse) {
+    logger.info("Registration confirmation for email: {}", request.getEmail());
+
+    AuthResponseDTO authResponse =
+        authService.confirmRegistration(request.getEmail(), request.getOtp());
+
+    Cookie jwtCookie = new Cookie(JWT_COOKIE_NAME, authResponse.getToken());
+    jwtCookie.setHttpOnly(true);
+    jwtCookie.setPath("/");
+    jwtCookie.setMaxAge(60 * 60 * 24 * 7); // 1 week
+    jwtCookie.setAttribute("SameSite", "None");
+    jwtCookie.setSecure(true);
+    servletResponse.addCookie(jwtCookie);
+
+    logger.info("User registration confirmed for ID: {}", authResponse.getUserId());
+    return ResponseEntity.ok().build();
+  }
+
+  @PostMapping("/request-password-reset")
+  public ResponseEntity<Void> requestPasswordReset(
+      @Valid @RequestBody ResetPasswordRequestDTO request) {
+    logger.info("Password reset request for email: {}", request.getEmail());
+
+    otpService.generateOtp(request.getEmail(), OtpPurpose.PASSWORD_RESET);
+    logger.info("OTP generated for password reset request for email: {}", request.getEmail());
+    return ResponseEntity.ok().build();
+  }
+
+  @PostMapping("/reset-password")
+  public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordConfirmDTO request) {
+
+    logger.info("Password reset request for user with email: {}", request.getEmail());
+
+    authService.resetPassword(request.getEmail(), request.getOtp());
+
+    logger.info("Password reset successful for email: {}", request.getEmail());
+    return ResponseEntity.ok().build();
+  }
+
+  @PostMapping("/change-password")
+  public ResponseEntity<Void> changePassword(@Valid @RequestBody ChangePasswordRequestDTO request) {
+
+    Integer userId = authService.getCurrentUserId();
+    logger.info("Password change request for user ID: {}", userId);
+
+    authService.changePassword(userId, request.getOldPassword(), request.getNewPassword());
+    logger.info("Password changed successfully for user ID: {}", userId);
+    return ResponseEntity.ok().build();
   }
 
   @AdminOnly
@@ -110,7 +182,7 @@ public class AuthController {
   }
 
   @GetMapping("/me")
-  public ResponseEntity<User> getCurrentUser(
+  public ResponseEntity<MeDTO> getCurrentUser(
       @CookieValue(name = JWT_COOKIE_NAME, required = false) String token,
       HttpServletResponse response) {
 
@@ -129,16 +201,26 @@ public class AuthController {
       }
 
       Integer userId = jwtUtil.extractUserId(token);
-      Optional<User> user = userService.getById(userId);
+      Optional<User> userOpt = userService.getById(userId);
 
-      if (user.isEmpty()) {
+      if (userOpt.isEmpty()) {
         logger.warn("User not found for ID: {}", userId);
         clearJwtCookie(response);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
       }
 
       logger.debug("Returning current user info for ID: {}", userId);
-      return ResponseEntity.ok(user.get());
+      User user = userOpt.get();
+      MeDTO returnDto =
+          MeDTO.builder()
+              .id(user.getId())
+              .firstName(user.getFirstName())
+              .lastName(user.getLastName())
+              .email(user.getEmail())
+              .role(user.getRole())
+              .build();
+
+      return ResponseEntity.ok(returnDto);
 
     } catch (Exception e) {
       logger.warn("JWT processing error: {}", e.getMessage());

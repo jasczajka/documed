@@ -1,6 +1,7 @@
 package com.documed.backend.users;
 
 import com.documed.backend.FullDAO;
+import com.documed.backend.auth.exceptions.UserNotFoundException;
 import com.documed.backend.users.model.AccountStatus;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
@@ -27,23 +28,23 @@ public class UserDAO implements FullDAO<User, User> {
   }
 
   private RowMapper<User> userRowMapper =
-      (rs, rowNum) -> {
-        return User.builder()
-            .id(rs.getInt("id"))
-            .firstName(rs.getString("first_name"))
-            .lastName(rs.getString("last_name"))
-            .email(rs.getString("email"))
-            .address(rs.getString("address"))
-            .password(rs.getString("password"))
-            .accountStatus(AccountStatus.valueOf(rs.getString("account_status")))
-            .role(UserRole.valueOf(rs.getString("role")))
-            .birthDate(rs.getDate("birthdate"))
-            // Optional fields
-            .pesel(rs.getString("pesel"))
-            .phoneNumber(rs.getString("phone_number"))
-            .pwzNumber(rs.getString("pwz"))
-            .build();
-      };
+      (rs, rowNum) ->
+          User.builder()
+              .id(rs.getInt("id"))
+              .firstName(rs.getString("first_name"))
+              .lastName(rs.getString("last_name"))
+              .email(rs.getString("email"))
+              .address(rs.getString("address"))
+              .password(rs.getString("password"))
+              .accountStatus(AccountStatus.valueOf(rs.getString("account_status")))
+              .role(UserRole.valueOf(rs.getString("role")))
+              .birthDate(rs.getDate("birthdate"))
+              .emailNotifications(rs.getBoolean("email_notifications"))
+              // Optional fields
+              .pesel(rs.getString("pesel"))
+              .phoneNumber(rs.getString("phone_number"))
+              .pwzNumber(rs.getString("pwz"))
+              .build();
 
   @Override
   public Optional<User> getById(int id) {
@@ -197,5 +198,32 @@ public class UserDAO implements FullDAO<User, User> {
 
     return getById(doctorId)
         .orElseThrow(() -> new RuntimeException("Doctor not found: " + doctorId));
+  }
+
+  public void updatePasswordByEmail(String email, String encodedPassword) {
+    String sql = "UPDATE \"User\" SET password = ? WHERE email = ?";
+    int rowsAffected = jdbcTemplate.update(sql, encodedPassword, email);
+
+    if (rowsAffected == 0) {
+      throw new IllegalStateException("No user found with email: " + email);
+    }
+  }
+
+  public void updatePasswordById(int userId, String encodedPassword) {
+    String sql = "UPDATE \"User\" SET password = ? WHERE id = ?";
+    int rowsAffected = jdbcTemplate.update(sql, encodedPassword, userId);
+
+    if (rowsAffected == 0) {
+      throw new UserNotFoundException("User not found with ID: " + userId);
+    }
+  }
+
+  public void toggleEmailNotificationsById(int userId) {
+    String sql = "UPDATE \"User\" SET email_notifications = NOT email_notifications WHERE id = ?";
+    int rowsAffected = jdbcTemplate.update(sql, userId);
+
+    if (rowsAffected == 0) {
+      throw new UserNotFoundException("User not found with ID: " + userId);
+    }
   }
 }

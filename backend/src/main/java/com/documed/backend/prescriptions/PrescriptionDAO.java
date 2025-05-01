@@ -72,6 +72,20 @@ public class PrescriptionDAO implements FullDAO<Prescription, Integer> {
     return prescriptions.stream().findFirst();
   }
 
+  public Integer getUserIdForPrescriptionById(int id) {
+    String sql =
+        "SELECT \"User\".id "
+            + "FROM \"User\" "
+            + "JOIN visit ON \"User\".id = visit.patient_id "
+            + "JOIN prescription ON visit.id = prescription.visit_id "
+            + "WHERE prescription.id = ?";
+
+    List<Integer> userIds = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("id"), id);
+
+    // Return the first result if available, or null if no result
+    return userIds.stream().findFirst().orElse(null);
+  }
+
   public List<Prescription> getAll() {
     String sql =
         """

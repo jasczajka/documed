@@ -1,4 +1,5 @@
 import { LoggedLayout } from 'modules/layouts/LoggedLayout';
+import { SettingsTabs } from 'modules/settings/SettingsTabs';
 import { lazy, useLayoutEffect, useMemo, useState } from 'react';
 import { createBrowserRouter, Navigate, RouteObject, RouterProvider } from 'react-router';
 import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
@@ -8,6 +9,7 @@ import { useAuth } from 'shared/hooks/useAuth';
 
 const LoginPage = lazy(() => import('../modules/auth/LoginPage'));
 const RegisterPage = lazy(() => import('../modules/auth/RegisterPage'));
+const ForgotPasswordPage = lazy(() => import('../modules/auth/ForgotPasswordPage'));
 const VisitsPage = lazy(() => import('./VisitsPage'));
 const PatientsPage = lazy(() => import('./PatientsPage'));
 const SpecialistsPage = lazy(() => import('./SpecialistsPage'));
@@ -27,6 +29,10 @@ const getDefaultRoutes = () => [
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/forgot-password',
+    element: <ForgotPasswordPage />,
   },
   {
     path: '*',
@@ -50,6 +56,7 @@ const getAuthRoutes = (isAdmin: boolean, isPatient: boolean): RouteObject[] => [
       { path: '/specialists', element: <SpecialistsPage /> },
       { path: '/referrals', element: <ReferralsPage /> },
       { path: '/prescriptions', element: <PrescriptionsPage /> },
+      { path: '/settings', element: <SettingsTabs /> },
       {
         path: '/admin',
         element: (
