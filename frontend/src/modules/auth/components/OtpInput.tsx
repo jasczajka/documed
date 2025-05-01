@@ -1,7 +1,8 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Button, TextField } from '@mui/material';
+import { Box, Button, TextField, Typography } from '@mui/material';
 import { FC } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { Link } from 'react-router';
 import * as Yup from 'yup';
 
 type OTPData = {
@@ -10,17 +11,25 @@ type OTPData = {
 
 const otpSchema = Yup.object({
   otp: Yup.string()
-    .required('Kod OTP jest wymagany')
-    .matches(/^\d{6}$/, 'Kod OTP musi składać się z 6 cyfr'),
+    .required('Kod weryfikacjny jest wymagany')
+    .matches(/^\d{6}$/, 'Kod weryfikacyjny musi składać się z 6 cyfr'),
 });
 
 interface OTPInputProps {
   onSubmit: (otp: string) => Promise<void>;
+  pathBack?: string;
+  pathBackTitle?: string;
   error?: string;
   loading?: boolean;
 }
 
-export const OTPInput: FC<OTPInputProps> = ({ onSubmit, error, loading }) => {
+export const OTPInput: FC<OTPInputProps> = ({
+  onSubmit,
+  pathBack,
+  pathBackTitle,
+  error,
+  loading,
+}) => {
   const { control, handleSubmit } = useForm<OTPData>({
     resolver: yupResolver(otpSchema),
   });
@@ -44,7 +53,7 @@ export const OTPInput: FC<OTPInputProps> = ({ onSubmit, error, loading }) => {
         render={({ field, fieldState }) => (
           <TextField
             {...field}
-            label="Kod OTP"
+            label="Kod weryfikacyjny"
             placeholder="Wprowadź 6-cyfrowy kod"
             error={!!fieldState.error || !!error}
             helperText={error || fieldState.error?.message}
@@ -55,8 +64,17 @@ export const OTPInput: FC<OTPInputProps> = ({ onSubmit, error, loading }) => {
       />
 
       <Button variant="contained" type="submit" loading={loading} disabled={loading}>
-        Zweryfikuj kod
+        Zweryfikuj kod weryfikacyjny
       </Button>
+      {pathBack && pathBackTitle && (
+        <Box sx={{ display: 'flex', justifyContent: 'start', paddingTop: 3 }}>
+          <Link to={pathBack}>
+            <Typography color="primary" variant="body1">
+              {pathBackTitle}
+            </Typography>
+          </Link>
+        </Box>
+      )}
     </Box>
   );
 };

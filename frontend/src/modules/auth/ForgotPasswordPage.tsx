@@ -1,12 +1,14 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Button, TextField } from '@mui/material';
+import { Box, Button, TextField, Typography } from '@mui/material';
 import { FC, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { Link } from 'react-router';
 import {
   useRequestPasswordReset,
   useResetPassword,
 } from 'shared/api/generated/auth-controller/auth-controller';
 import { useNotification } from 'shared/hooks/useNotification';
+import { useSitemap } from 'shared/hooks/useSitemap';
 import { DocuMedLogo } from 'shared/icons/DocuMedLogo';
 import { mapAuthError } from 'shared/utils/mapAuthError';
 import * as Yup from 'yup';
@@ -25,6 +27,7 @@ export const ForgotPasswordPage: FC = () => {
     resolver: yupResolver(otpSchema),
   });
   const { showNotification, NotificationComponent } = useNotification();
+  const sitemap = useSitemap();
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
 
@@ -109,6 +112,13 @@ export const ForgotPasswordPage: FC = () => {
           </Button>
         </Box>
       )}
+      <Box sx={{ display: 'flex', justifyContent: 'center', paddingTop: 5, width: '100%' }}>
+        <Link to={sitemap.login}>
+          <Typography color="primary" variant="body1">
+            Wróć do logowania
+          </Typography>
+        </Link>
+      </Box>
     </main>
   );
 };

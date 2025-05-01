@@ -41,7 +41,7 @@ export const mapAuthError = (error: any): ApiError => {
     case 410:
       return {
         status,
-        message: data.message || 'Kod OTP jest nieaktywny',
+        message: data.message || 'Kod weryfikacyjny jest nieaktywny',
         code: 'GONE',
       };
     case 429:
