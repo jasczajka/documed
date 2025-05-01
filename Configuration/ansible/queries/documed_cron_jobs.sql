@@ -1,19 +1,14 @@
 
--- Note: remember to adjust the database name!
-
-CREATE EXTENSION IF NOT EXISTS pg_cron;
 -- Schedule OTP cleanup to run daily at midnight (00:00)
-SELECT cron.schedule_in_database(
-    'cleanup-otps-daily',
-    '0 0 * * *',  
-    'SELECT cleanup_otps()',
-    'prod_db'
+SELECT cron.schedule(
+  'cleanup_pending_users_daily',
+  '0 0 * * *',
+  $$SELECT cleanup_pending_users();$$
 );
 
 -- Schedule pending users cleanup to run daily at midnight (00:00)
-SELECT cron.schedule_in_database(
-    'cleanup-pending-users-daily',
-    '0 0 * * *',  
-    'SELECT cleanup_pending_users()',
-    'prod_db'
+SELECT cron.schedule(
+  'cleanup_opts_daily',
+  '0 0 * * *',
+  $$SELECT cleanup_otps();$$
 );

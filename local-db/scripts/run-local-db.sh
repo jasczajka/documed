@@ -4,7 +4,7 @@ CONTAINER_NAME="local-postgres"
 IMAGE="custom-postgres"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SQL_INIT_PATH="$SCRIPT_DIR/../../Configuration/ansible/queries/documed_ddl.sql"
-SQL_CRON_PATH="$SCRIPT_DIR/../../Configuration/ansible/queries/documed_cron_jobs.sql"
+SQL_CRON_PATH="$SCRIPT_DIR/../../Configuration/ansible/queries/documed_cron_jobs_local_db.sql"
 
 INIT_SQL_ABS="$(realpath "$SQL_INIT_PATH")"
 CRON_SQL_ABS="$(realpath "$SQL_CRON_PATH")"
