@@ -1,24 +1,35 @@
-import { Logout, Person, Settings } from '@mui/icons-material';
+import { Logout, Settings } from '@mui/icons-material';
 import {
+  Avatar,
+  Box,
   CircularProgress,
   ClickAwayListener,
   Fade,
   IconButton,
+  ListItem,
   MenuItem,
   MenuList,
   Paper,
   Popper,
+  Typography,
 } from '@mui/material';
 import PopupState, { bindPopper, bindToggle } from 'material-ui-popup-state';
 import { memo, useCallback, useMemo } from 'react';
-import { NavLink } from 'react-router';
+import { Link, NavLink, useNavigate } from 'react-router';
+import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useSitemap } from 'shared/hooks/useSitemap';
 import { DocuMedLogo } from 'shared/icons/DocuMedLogo';
+import { useShallow } from 'zustand/react/shallow';
 
 export const AppHeader = memo(() => {
   const sitemap = useSitemap();
+  const navigate = useNavigate();
   const { logout, loading, isAdmin, isPatient } = useAuth();
+  const { firstName, lastName, email } = useAuthStore(
+    useShallow((state) => state.user ?? { firstName: '', lastName: '', email: '' }),
+  );
+  const userName = `${firstName} ${lastName}`;
   const handleLogout = useCallback(async () => {
     await logout();
   }, []);
@@ -36,7 +47,9 @@ export const AppHeader = memo(() => {
 
   return (
     <header className="bg-gray relative flex h-17 items-center pl-28">
-      <DocuMedLogo className="text-primary absolute left-28 h-6 w-[110px]" />
+      <Link className="text-primary absolute left-28 h-6 w-[110px]" to={sitemap.main}>
+        <DocuMedLogo />
+      </Link>
       <nav className="w-full px-60">
         <ul className="text-secondary [&>*]:hover:text-primary flex min-w-96 justify-center gap-14 [&>*]:transition-colors [&>*]:duration-500 [&>*]:ease-in-out">
           {paths.map(({ path, label }) => (
@@ -81,18 +94,28 @@ export const AppHeader = memo(() => {
                 <Popper
                   {...bindPopper(popupState)}
                   transition
-                  modifiers={[{ name: 'offset', options: { offset: [-44, 10] } }]}
+                  modifiers={[{ name: 'offset', options: { offset: [-100, 10] } }]}
                 >
                   {({ TransitionProps }) => (
                     <Fade {...TransitionProps} timeout={350}>
                       <Paper className="shadow-lg">
+                        <ListItem sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Avatar />
+                          <Box>
+                            <Typography variant="body1">{userName}</Typography>
+                            <Typography variant="body2" color="secondary">
+                              {email}
+                            </Typography>
+                          </Box>
+                        </ListItem>
                         <MenuList>
-                          <MenuItem className="flex gap-2">
+                          <MenuItem
+                            className="flex gap-2"
+                            onClick={() => navigate(sitemap.settings)}
+                          >
                             <Settings /> Ustawienia
                           </MenuItem>
-                          <MenuItem className="flex gap-2">
-                            <Person /> Konto
-                          </MenuItem>
+
                           <MenuItem className="flex gap-2" onClick={handleLogout}>
                             {loading ? <CircularProgress size={24} /> : <Logout />}Wyloguj się
                           </MenuItem>

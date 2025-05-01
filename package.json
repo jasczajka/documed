@@ -8,9 +8,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "prepare": "husky install",
-    "db:up": "./scripts/run-local-db.sh",
-    "db:stop": "./scripts/stop-local-db.sh",
-    "db:clean": "./scripts/clean-local-db.sh"
+    "db:up": "./local-db/scripts/run-local-db.sh",
+    "db:stop": "./local-db/scripts/stop-local-db.sh",
+    "db:clean": "./local-db/scripts/clean-local-db.sh"
   },
   "lint-staged": {
       "frontend/**/*.{js,tsx,ts,jsx}": [

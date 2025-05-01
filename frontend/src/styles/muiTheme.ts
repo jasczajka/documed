@@ -12,6 +12,9 @@ export const theme = createTheme(
         dark: '#033E3B',
         contrastText: '#ffffff',
       },
+      secondary: {
+        main: 'rgba(0, 0, 0, 0.6)',
+      },
     },
     typography: {
       fontFamily: 'Roboto, sans-serif',

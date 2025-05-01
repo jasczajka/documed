@@ -1,5 +1,7 @@
 package com.documed.backend.auth;
 
+import com.documed.backend.auth.model.CurrentUser;
+import com.documed.backend.users.model.UserRole;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -44,7 +46,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     final String requestUri = request.getRequestURI();
     logger.info("Incoming request for URI: {}", requestUri);
 
-    if (("/api/auth/login".equals(requestUri) || "/api/auth/register".equals(requestUri))) {
+    if (("/api/auth/login".equals(requestUri)
+            || "/api/auth/request_registration".equals(requestUri)
+            || "/api/auth/confirm_registration".equals(requestUri))
+        || "/api/auth/request-password-reset".equals(requestUri)
+        || "/api/auth/reset-password".equals(requestUri)) {
       logger.debug("Skipping authentication for auth endpoint: {}", requestUri);
       filterChain.doFilter(request, response);
       return;
@@ -70,10 +76,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       Integer userId = jwtUtil.extractUserId(jwt);
       String role = jwtUtil.extractRole(jwt);
       logger.info("Authenticated user - ID: {}, Role: {}", userId, role);
+      UserRole userRoleAsEnum = UserRole.valueOf(jwtUtil.extractRole(jwt));
+      var currentUser = new CurrentUser(userId, userRoleAsEnum);
 
       var authentication =
           new UsernamePasswordAuthenticationToken(
-              userId, null, Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role)));
+              currentUser,
+              null,
+              Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role)));
 
       logger.info("Granted authorities: {}", authentication.getAuthorities());
 

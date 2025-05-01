@@ -22,16 +22,241 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import type {
   AuthResponseDTO,
+  ChangePasswordRequestDTO,
+  ConfirmRegistrationRequestDTO,
   DoctorRegisterRequestDTO,
   LoginRequestDTO,
+  MeDTO,
   PatientRegisterRequestDTO,
+  PendingUserDTO,
+  ResetPasswordConfirmDTO,
+  ResetPasswordRequestDTO,
   StaffRegisterRequestDTO,
-  User,
 } from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
 
+export const resetPassword = (
+  resetPasswordConfirmDTO: ResetPasswordConfirmDTO,
+  signal?: AbortSignal,
+) => {
+  return customInstance<void>({
+    url: `/api/auth/reset-password`,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: resetPasswordConfirmDTO,
+    signal,
+  });
+};
+
+export const getResetPasswordMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof resetPassword>>,
+    TError,
+    { data: ResetPasswordConfirmDTO },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof resetPassword>>,
+  TError,
+  { data: ResetPasswordConfirmDTO },
+  TContext
+> => {
+  const mutationKey = ['resetPassword'];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof resetPassword>>,
+    { data: ResetPasswordConfirmDTO }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return resetPassword(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ResetPasswordMutationResult = NonNullable<Awaited<ReturnType<typeof resetPassword>>>;
+export type ResetPasswordMutationBody = ResetPasswordConfirmDTO;
+export type ResetPasswordMutationError = ErrorType<unknown>;
+
+export const useResetPassword = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof resetPassword>>,
+      TError,
+      { data: ResetPasswordConfirmDTO },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof resetPassword>>,
+  TError,
+  { data: ResetPasswordConfirmDTO },
+  TContext
+> => {
+  const mutationOptions = getResetPasswordMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+export const requestRegistration = (
+  patientRegisterRequestDTO: PatientRegisterRequestDTO,
+  signal?: AbortSignal,
+) => {
+  return customInstance<PendingUserDTO>({
+    url: `/api/auth/request-registration`,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: patientRegisterRequestDTO,
+    signal,
+  });
+};
+
+export const getRequestRegistrationMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof requestRegistration>>,
+    TError,
+    { data: PatientRegisterRequestDTO },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof requestRegistration>>,
+  TError,
+  { data: PatientRegisterRequestDTO },
+  TContext
+> => {
+  const mutationKey = ['requestRegistration'];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof requestRegistration>>,
+    { data: PatientRegisterRequestDTO }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return requestRegistration(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RequestRegistrationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof requestRegistration>>
+>;
+export type RequestRegistrationMutationBody = PatientRegisterRequestDTO;
+export type RequestRegistrationMutationError = ErrorType<unknown>;
+
+export const useRequestRegistration = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof requestRegistration>>,
+      TError,
+      { data: PatientRegisterRequestDTO },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof requestRegistration>>,
+  TError,
+  { data: PatientRegisterRequestDTO },
+  TContext
+> => {
+  const mutationOptions = getRequestRegistrationMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+export const requestPasswordReset = (
+  resetPasswordRequestDTO: ResetPasswordRequestDTO,
+  signal?: AbortSignal,
+) => {
+  return customInstance<void>({
+    url: `/api/auth/request-password-reset`,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: resetPasswordRequestDTO,
+    signal,
+  });
+};
+
+export const getRequestPasswordResetMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof requestPasswordReset>>,
+    TError,
+    { data: ResetPasswordRequestDTO },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof requestPasswordReset>>,
+  TError,
+  { data: ResetPasswordRequestDTO },
+  TContext
+> => {
+  const mutationKey = ['requestPasswordReset'];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof requestPasswordReset>>,
+    { data: ResetPasswordRequestDTO }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return requestPasswordReset(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RequestPasswordResetMutationResult = NonNullable<
+  Awaited<ReturnType<typeof requestPasswordReset>>
+>;
+export type RequestPasswordResetMutationBody = ResetPasswordRequestDTO;
+export type RequestPasswordResetMutationError = ErrorType<unknown>;
+
+export const useRequestPasswordReset = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof requestPasswordReset>>,
+      TError,
+      { data: ResetPasswordRequestDTO },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof requestPasswordReset>>,
+  TError,
+  { data: ResetPasswordRequestDTO },
+  TContext
+> => {
+  const mutationOptions = getRequestPasswordResetMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
 export const registerStaff = (
   staffRegisterRequestDTO: StaffRegisterRequestDTO,
   signal?: AbortSignal,
@@ -173,78 +398,6 @@ export const useRegisterDoctor = <TError = ErrorType<unknown>, TContext = unknow
   TContext
 > => {
   const mutationOptions = getRegisterDoctorMutationOptions(options);
-
-  return useMutation(mutationOptions, queryClient);
-};
-export const register = (
-  patientRegisterRequestDTO: PatientRegisterRequestDTO,
-  signal?: AbortSignal,
-) => {
-  return customInstance<AuthResponseDTO>({
-    url: `/api/auth/register`,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    data: patientRegisterRequestDTO,
-    signal,
-  });
-};
-
-export const getRegisterMutationOptions = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof register>>,
-    TError,
-    { data: PatientRegisterRequestDTO },
-    TContext
-  >;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof register>>,
-  TError,
-  { data: PatientRegisterRequestDTO },
-  TContext
-> => {
-  const mutationKey = ['register'];
-  const { mutation: mutationOptions } = options
-    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey } };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof register>>,
-    { data: PatientRegisterRequestDTO }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return register(data);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type RegisterMutationResult = NonNullable<Awaited<ReturnType<typeof register>>>;
-export type RegisterMutationBody = PatientRegisterRequestDTO;
-export type RegisterMutationError = ErrorType<unknown>;
-
-export const useRegister = <TError = ErrorType<unknown>, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof register>>,
-      TError,
-      { data: PatientRegisterRequestDTO },
-      TContext
-    >;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof register>>,
-  TError,
-  { data: PatientRegisterRequestDTO },
-  TContext
-> => {
-  const mutationOptions = getRegisterMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
@@ -421,8 +574,154 @@ export const useDeactivateAccount = <TError = ErrorType<unknown>, TContext = unk
 
   return useMutation(mutationOptions, queryClient);
 };
+export const confirmRegistration = (
+  confirmRegistrationRequestDTO: ConfirmRegistrationRequestDTO,
+  signal?: AbortSignal,
+) => {
+  return customInstance<void>({
+    url: `/api/auth/confirm-registration`,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: confirmRegistrationRequestDTO,
+    signal,
+  });
+};
+
+export const getConfirmRegistrationMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof confirmRegistration>>,
+    TError,
+    { data: ConfirmRegistrationRequestDTO },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof confirmRegistration>>,
+  TError,
+  { data: ConfirmRegistrationRequestDTO },
+  TContext
+> => {
+  const mutationKey = ['confirmRegistration'];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof confirmRegistration>>,
+    { data: ConfirmRegistrationRequestDTO }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return confirmRegistration(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ConfirmRegistrationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof confirmRegistration>>
+>;
+export type ConfirmRegistrationMutationBody = ConfirmRegistrationRequestDTO;
+export type ConfirmRegistrationMutationError = ErrorType<unknown>;
+
+export const useConfirmRegistration = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof confirmRegistration>>,
+      TError,
+      { data: ConfirmRegistrationRequestDTO },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof confirmRegistration>>,
+  TError,
+  { data: ConfirmRegistrationRequestDTO },
+  TContext
+> => {
+  const mutationOptions = getConfirmRegistrationMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+export const changePassword = (
+  changePasswordRequestDTO: ChangePasswordRequestDTO,
+  signal?: AbortSignal,
+) => {
+  return customInstance<void>({
+    url: `/api/auth/change-password`,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: changePasswordRequestDTO,
+    signal,
+  });
+};
+
+export const getChangePasswordMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof changePassword>>,
+    TError,
+    { data: ChangePasswordRequestDTO },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof changePassword>>,
+  TError,
+  { data: ChangePasswordRequestDTO },
+  TContext
+> => {
+  const mutationKey = ['changePassword'];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof changePassword>>,
+    { data: ChangePasswordRequestDTO }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return changePassword(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ChangePasswordMutationResult = NonNullable<Awaited<ReturnType<typeof changePassword>>>;
+export type ChangePasswordMutationBody = ChangePasswordRequestDTO;
+export type ChangePasswordMutationError = ErrorType<unknown>;
+
+export const useChangePassword = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof changePassword>>,
+      TError,
+      { data: ChangePasswordRequestDTO },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof changePassword>>,
+  TError,
+  { data: ChangePasswordRequestDTO },
+  TContext
+> => {
+  const mutationOptions = getChangePasswordMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
 export const getCurrentUser = (signal?: AbortSignal) => {
-  return customInstance<User>({ url: `/api/auth/me`, method: 'GET', signal });
+  return customInstance<MeDTO>({ url: `/api/auth/me`, method: 'GET', signal });
 };
 
 export const getGetCurrentUserQueryKey = () => {
