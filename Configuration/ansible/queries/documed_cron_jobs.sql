@@ -11,3 +11,4 @@ SELECT cron.schedule(
   'cleanup_opts_daily',
   '0 0 * * *',
   $$SELECT cleanup_otps();$$
+);
