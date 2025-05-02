@@ -1,9 +1,9 @@
 package com.documed.backend.users.model;
 
 import com.documed.backend.additionalservices.AdditionalService;
-import com.documed.backend.schedules.FreeDay;
-import com.documed.backend.schedules.TimeSlot;
-import com.documed.backend.schedules.WorkTime;
+import com.documed.backend.schedules.model.FreeDay;
+import com.documed.backend.schedules.model.TimeSlot;
+import com.documed.backend.schedules.model.WorkTime;
 import com.documed.backend.visits.Visit;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.Date;
