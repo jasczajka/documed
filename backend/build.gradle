@@ -36,6 +36,12 @@ spotless {
 		importOrder()
 		trimTrailingWhitespace()
 	}
+	groovy {
+		greclipse()
+		endWithNewline()
+		importOrder()
+		trimTrailingWhitespace()
+	}
 }
 
 repositories {
@@ -69,4 +75,8 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.spotlessCheck {
+	dependsOn test
 }

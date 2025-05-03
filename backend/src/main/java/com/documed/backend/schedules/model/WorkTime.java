@@ -11,7 +11,7 @@ import lombok.Setter;
 @Setter
 public class WorkTime {
   private int id;
-//  private final User user;
+  //  private final User user;
   private final int userId;
   private final DayOfWeek dayOfWeek;
   private LocalTime startTime;

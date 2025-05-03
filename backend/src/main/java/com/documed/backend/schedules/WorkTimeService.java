@@ -8,10 +8,9 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class WorkTimeService {
 
-    private final WorkTimeDAO workTimeDAO;
+  private final WorkTimeDAO workTimeDAO;
 
-    WorkTime createWorkTime(WorkTime workTime) {
-        return workTimeDAO.create(workTime);
-    }
-
+  WorkTime createWorkTime(WorkTime workTime) {
+    return workTimeDAO.create(workTime);
+  }
 }
