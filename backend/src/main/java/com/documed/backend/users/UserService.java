@@ -3,6 +3,7 @@ package com.documed.backend.users;
 import com.documed.backend.auth.exceptions.UserNotFoundException;
 import com.documed.backend.users.exceptions.SpecializationToNonDoctorException;
 import com.documed.backend.users.model.AccountStatus;
+import com.documed.backend.users.model.Specialization;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
 import java.util.List;
@@ -63,6 +64,30 @@ public class UserService {
     }
 
     return userDAO.addSpecializationsToUser(userId, specializationIds);
+  }
+
+  public User updateUserSpecializations(int userId, List<Integer> updatedSpecializationIds) {
+    Optional<User> optionalUser = getById(userId);
+    if (optionalUser.isEmpty()) {
+      throw new UserNotFoundException("User not found.");
+    }
+
+    User user = optionalUser.get();
+    if (user.getRole() != UserRole.DOCTOR) {
+      throw new SpecializationToNonDoctorException(
+          "Only users with role DOCTOR can have specializations.");
+    }
+
+    return userDAO.updateUserSpecializations(userId, updatedSpecializationIds);
+  }
+
+  public List<Specialization> getUserSpecializationsById(int userId) {
+    Optional<User> optionalUser = getById(userId);
+    if (optionalUser.isEmpty()) {
+      throw new UserNotFoundException("User not found.");
+    }
+
+    return userDAO.getUserSpecializationsById(userId);
   }
 
   public void toggleEmailNotificationsById(int userId) {

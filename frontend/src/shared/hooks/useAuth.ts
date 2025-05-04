@@ -107,6 +107,7 @@ export const useAuth = () => {
   const isPatient = user?.role === UserRole.PATIENT;
   const isDoctor = user?.role === UserRole.DOCTOR;
   const isWardClerk = user?.role === UserRole.WARD_CLERK;
+  const canEditDoctorData = isAdmin || isWardClerk;
   const hasRole = (role: UserRole) => user?.role === role;
   const hasAnyRole = (roles: UserRole[]) => !!user?.role && roles.includes(user.role);
 
@@ -129,6 +130,7 @@ export const useAuth = () => {
     isPatient,
     isWardClerk,
     isDoctor,
+    canEditDoctorData,
     hasRole,
     hasAnyRole,
     loginError: mapAuthError(loginError),

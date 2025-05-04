@@ -20,11 +20,88 @@ import type {
 } from '@tanstack/react-query';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import type { Specialization } from '../generated.schemas';
+import type {
+  DoctorDetailsDTO,
+  Specialization,
+  UpdateDoctorSpecializationsDTO,
+} from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
 
+export const updateDoctorSpecializations = (
+  id: number,
+  updateDoctorSpecializationsDTO: UpdateDoctorSpecializationsDTO,
+) => {
+  return customInstance<number[]>({
+    url: `/api/user/${id}`,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    data: updateDoctorSpecializationsDTO,
+  });
+};
+
+export const getUpdateDoctorSpecializationsMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateDoctorSpecializations>>,
+    TError,
+    { id: number; data: UpdateDoctorSpecializationsDTO },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateDoctorSpecializations>>,
+  TError,
+  { id: number; data: UpdateDoctorSpecializationsDTO },
+  TContext
+> => {
+  const mutationKey = ['updateDoctorSpecializations'];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateDoctorSpecializations>>,
+    { id: number; data: UpdateDoctorSpecializationsDTO }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return updateDoctorSpecializations(id, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateDoctorSpecializationsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateDoctorSpecializations>>
+>;
+export type UpdateDoctorSpecializationsMutationBody = UpdateDoctorSpecializationsDTO;
+export type UpdateDoctorSpecializationsMutationError = ErrorType<unknown>;
+
+export const useUpdateDoctorSpecializations = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateDoctorSpecializations>>,
+      TError,
+      { id: number; data: UpdateDoctorSpecializationsDTO },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateDoctorSpecializations>>,
+  TError,
+  { id: number; data: UpdateDoctorSpecializationsDTO },
+  TContext
+> => {
+  const mutationOptions = getUpdateDoctorSpecializationsMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
 export const areNotificationsOn = (signal?: AbortSignal) => {
   return customInstance<boolean>({ url: `/api/user/notifications`, method: 'GET', signal });
 };
@@ -187,3 +264,227 @@ export const useToggleEmailNotifications = <TError = ErrorType<unknown>, TContex
 
   return useMutation(mutationOptions, queryClient);
 };
+export const updateDoctorSpecializations1 = (id: number, signal?: AbortSignal) => {
+  return customInstance<Specialization[]>({
+    url: `/api/user/${id}/specializations`,
+    method: 'GET',
+    signal,
+  });
+};
+
+export const getUpdateDoctorSpecializations1QueryKey = (id: number) => {
+  return [`/api/user/${id}/specializations`] as const;
+};
+
+export const getUpdateDoctorSpecializations1QueryOptions = <
+  TData = Awaited<ReturnType<typeof updateDoctorSpecializations1>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof updateDoctorSpecializations1>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getUpdateDoctorSpecializations1QueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof updateDoctorSpecializations1>>> = ({
+    signal,
+  }) => updateDoctorSpecializations1(id, signal);
+
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof updateDoctorSpecializations1>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type UpdateDoctorSpecializations1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof updateDoctorSpecializations1>>
+>;
+export type UpdateDoctorSpecializations1QueryError = ErrorType<unknown>;
+
+export function useUpdateDoctorSpecializations1<
+  TData = Awaited<ReturnType<typeof updateDoctorSpecializations1>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof updateDoctorSpecializations1>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof updateDoctorSpecializations1>>,
+          TError,
+          Awaited<ReturnType<typeof updateDoctorSpecializations1>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useUpdateDoctorSpecializations1<
+  TData = Awaited<ReturnType<typeof updateDoctorSpecializations1>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof updateDoctorSpecializations1>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof updateDoctorSpecializations1>>,
+          TError,
+          Awaited<ReturnType<typeof updateDoctorSpecializations1>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useUpdateDoctorSpecializations1<
+  TData = Awaited<ReturnType<typeof updateDoctorSpecializations1>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof updateDoctorSpecializations1>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useUpdateDoctorSpecializations1<
+  TData = Awaited<ReturnType<typeof updateDoctorSpecializations1>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof updateDoctorSpecializations1>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getUpdateDoctorSpecializations1QueryOptions(id, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const getDoctorDetails = (id: number, signal?: AbortSignal) => {
+  return customInstance<DoctorDetailsDTO>({
+    url: `/api/user/${id}/basic_info`,
+    method: 'GET',
+    signal,
+  });
+};
+
+export const getGetDoctorDetailsQueryKey = (id: number) => {
+  return [`/api/user/${id}/basic_info`] as const;
+};
+
+export const getGetDoctorDetailsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getDoctorDetails>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getDoctorDetails>>, TError, TData>>;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetDoctorDetailsQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getDoctorDetails>>> = ({ signal }) =>
+    getDoctorDetails(id, signal);
+
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getDoctorDetails>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetDoctorDetailsQueryResult = NonNullable<Awaited<ReturnType<typeof getDoctorDetails>>>;
+export type GetDoctorDetailsQueryError = ErrorType<unknown>;
+
+export function useGetDoctorDetails<
+  TData = Awaited<ReturnType<typeof getDoctorDetails>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getDoctorDetails>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDoctorDetails>>,
+          TError,
+          Awaited<ReturnType<typeof getDoctorDetails>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetDoctorDetails<
+  TData = Awaited<ReturnType<typeof getDoctorDetails>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getDoctorDetails>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDoctorDetails>>,
+          TError,
+          Awaited<ReturnType<typeof getDoctorDetails>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetDoctorDetails<
+  TData = Awaited<ReturnType<typeof getDoctorDetails>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getDoctorDetails>>, TError, TData>>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useGetDoctorDetails<
+  TData = Awaited<ReturnType<typeof getDoctorDetails>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getDoctorDetails>>, TError, TData>>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetDoctorDetailsQueryOptions(id, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
