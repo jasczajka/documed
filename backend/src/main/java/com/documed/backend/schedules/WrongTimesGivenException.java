@@ -1,0 +1,11 @@
+package com.documed.backend.schedules;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+public class WrongTimesGivenException extends RuntimeException {
+  public WrongTimesGivenException(String message) {
+    super(message);
+  }
+}

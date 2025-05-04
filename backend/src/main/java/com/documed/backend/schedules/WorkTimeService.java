@@ -3,22 +3,37 @@ package com.documed.backend.schedules;
 import com.documed.backend.schedules.model.WorkTime;
 import com.documed.backend.users.model.UserRole;
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class WorkTimeService {
+
+  @Value("${time-slot.duration-in-minutes}")
+  private int slotDurationInMinutes;
 
   private final WorkTimeDAO workTimeDAO;
 
   WorkTime createWorkTime(WorkTime workTime) {
-    return workTimeDAO.create(workTime);
+    long duration = Duration.between(workTime.getStartTime(), workTime.getEndTime()).toMinutes();
+    if (duration < slotDurationInMinutes) {
+      throw new WrongTimesGivenException(
+          "Różnica pomiędzy godzinami nie może być krótsza niż slot czasowy.");
+    } else if (!workTime.getStartTime().isBefore(workTime.getEndTime())) {
+      throw new WrongTimesGivenException(
+          "Czas rozpoczęcia musi być wcześniejszy niż czas zakończenia.");
+    } else {
+      return workTimeDAO.create(workTime);
+    }
   }
 
-  // TODO will be invoked when creating new employeeTim
+  // TODO will be invoked when creating new employee
   List<WorkTime> createWorkTimeForNewUser(int userId, UserRole role) {
 
     if (role == UserRole.DOCTOR) {
@@ -37,17 +52,28 @@ public class WorkTimeService {
     return workTimeDAO.getWorkTimesForUser(userId);
   }
 
-  List<WorkTime> updateWorkTimes(List<WorkTimeDTO> updatedWorkTimes, int userId) {
+  @Transactional
+  public List<WorkTime> updateWorkTimes(List<WorkTimeDTO> updatedWorkTimes, int userId) {
     List<WorkTime> workTimes = new ArrayList<>();
     for (WorkTimeDTO workTime : updatedWorkTimes) {
-      workTimes.add(
-          WorkTime.builder()
-              .userId(userId)
-              .dayOfWeek(workTime.getDayOfWeek())
-              .startTime(workTime.getStartTime())
-              .endTime(workTime.getEndTime())
-              .build());
-      workTimeDAO.updateWorkTime(workTimes.getLast());
+
+      long duration = Duration.between(workTime.getStartTime(), workTime.getEndTime()).toMinutes();
+      if (duration < slotDurationInMinutes) {
+        throw new WrongTimesGivenException(
+            "Różnica pomiędzy godzinami nie może być krótsza niż slot czasowy.");
+      } else if (!workTime.getStartTime().isBefore(workTime.getEndTime())) {
+        throw new WrongTimesGivenException(
+            "Czas rozpoczęcia musi być wcześniejszy niż czas zakończenia.");
+      } else {
+        workTimes.add(
+            WorkTime.builder()
+                .userId(userId)
+                .dayOfWeek(workTime.getDayOfWeek())
+                .startTime(workTime.getStartTime())
+                .endTime(workTime.getEndTime())
+                .build());
+        workTimeDAO.updateWorkTime(workTimes.getLast());
+      }
     }
     return workTimes;
   }

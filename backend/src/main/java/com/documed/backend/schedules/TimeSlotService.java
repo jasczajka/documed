@@ -9,10 +9,15 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TimeSlotService {
+
+  @Value("${time-slot.duration-in-minutes}")
+  private int slotDurationInMinutes;
 
   private final TimeSlotDAO timeSlotDAO;
 
@@ -20,19 +25,8 @@ public class TimeSlotService {
     this.timeSlotDAO = timeSlotDAO;
   }
 
-  TimeSlot createTimeSlot(CreateTimeSlotDTO timeSlotDTO) {
-    TimeSlot timeSlot =
-        TimeSlot.builder()
-            .doctorId(timeSlotDTO.getDoctorId())
-            .startTime(timeSlotDTO.getStartTime())
-            .endTime(timeSlotDTO.getEndTime())
-            .isBusy(false)
-            .date(timeSlotDTO.getDate())
-            .build();
-    return timeSlotDAO.create(timeSlot);
-  }
-
-  void createTimeSlotsForWorkTimes(List<WorkTime> workTimes) {
+  @Transactional
+  public void createTimeSlotsForWorkTimes(List<WorkTime> workTimes) {
     for (WorkTime workTime : workTimes) {
       createTimeSlotForWorkTime(workTime);
     }
@@ -41,7 +35,7 @@ public class TimeSlotService {
   void createTimeSlotForWorkTime(WorkTime workTime) {
     long durationInMinutes =
         Duration.between(workTime.getStartTime(), workTime.getEndTime()).toMinutes();
-    int requiredSlots = (int) durationInMinutes / 15;
+    int requiredSlots = (int) durationInMinutes / slotDurationInMinutes;
     DayOfWeek dayOfWeek = workTime.getDayOfWeek();
     LocalDate date = LocalDate.now();
     LocalDate nextWeekDate = date.with(TemporalAdjusters.next(dayOfWeek));
@@ -50,8 +44,8 @@ public class TimeSlotService {
       TimeSlot timeSlot =
           TimeSlot.builder()
               .doctorId(workTime.getUserId())
-              .startTime(workTime.getStartTime().plusMinutes(i * 15))
-              .endTime(workTime.getStartTime().plusMinutes((i + 1) * 15))
+              .startTime(workTime.getStartTime().plusMinutes(i * slotDurationInMinutes))
+              .endTime(workTime.getStartTime().plusMinutes((i + 1) * slotDurationInMinutes))
               .date(nextWeekDate)
               .build();
       timeSlotDAO.create(timeSlot);
@@ -62,8 +56,9 @@ public class TimeSlotService {
     return timeSlotDAO.getById(id);
   }
 
-  void reserveTimeSlotsForVisit(Visit visit, TimeSlot firstTimeSlot) {
-    int neededTimeSlots = visit.getService().getEstimatedTime() / 15;
+  @Transactional
+  public void reserveTimeSlotsForVisit(Visit visit, TimeSlot firstTimeSlot) {
+    int neededTimeSlots = visit.getService().getEstimatedTime() / slotDurationInMinutes;
 
     List<TimeSlot> availableSlots =
         timeSlotDAO.getAvailableTimeSlotsByDoctorAndDate(
@@ -72,7 +67,7 @@ public class TimeSlotService {
     int startIndex = availableSlots.indexOf(firstTimeSlot);
 
     if (startIndex == -1 || startIndex + neededTimeSlots > availableSlots.size()) {
-      throw new RuntimeException("Not enough continuous time slots available");
+      throw new NotEnoughTimeInTimeSlotException("Not enough continuous time slots available");
     }
 
     for (int i = 0; i < neededTimeSlots; i++) {
