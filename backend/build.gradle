@@ -3,6 +3,7 @@ plugins {
 	id 'org.springframework.boot' version '3.4.1'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'com.diffplug.spotless' version '7.0.2'
+	id 'groovy'
 }
 
 group = 'com.documed'
@@ -35,6 +36,12 @@ spotless {
 		importOrder()
 		trimTrailingWhitespace()
 	}
+	groovy {
+		greclipse()
+		endWithNewline()
+		importOrder()
+		trimTrailingWhitespace()
+	}
 }
 
 repositories {
@@ -60,9 +67,16 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.spockframework:spock-core:2.4-M4-groovy-4.0'
+	testImplementation 'org.spockframework:spock-spring:2.4-M4-groovy-4.0'
+	testImplementation 'org.apache.groovy:groovy:4.0.20'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.spotlessCheck {
+	dependsOn test
 }

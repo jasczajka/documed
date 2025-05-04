@@ -4,7 +4,7 @@ import com.documed.backend.attachments.Attachment;
 import com.documed.backend.notifications.Notification;
 import com.documed.backend.prescriptions.Prescription;
 import com.documed.backend.referrals.Referral;
-import com.documed.backend.schedules.TimeSlot;
+import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.services.Service;
 import com.documed.backend.users.model.User;
 import java.math.BigDecimal;

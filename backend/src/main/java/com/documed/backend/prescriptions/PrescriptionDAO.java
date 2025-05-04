@@ -82,7 +82,6 @@ public class PrescriptionDAO implements FullDAO<Prescription, Integer> {
 
     List<Integer> userIds = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("id"), id);
 
-    // Return the first result if available, or null if no result
     return userIds.stream().findFirst().orElse(null);
   }
 
@@ -124,21 +123,13 @@ public class PrescriptionDAO implements FullDAO<Prescription, Integer> {
     return jdbcTemplate.query(sql, rowMapper, userId);
   }
 
-  public Prescription issuePrescription(int prescriptionId) {
+  public int updatePrescriptionStatus(int prescriptionId, PrescriptionStatus status) {
     String sql =
         """
-                UPDATE prescription
-                SET date = current_date, status = 'ISSUED', expiration_date = current_date
-                WHERE id = ?
-                """;
-
-    int rowsAffected = jdbcTemplate.update(sql, prescriptionId);
-
-    if (rowsAffected > 0) {
-      return getById(prescriptionId)
-          .orElseThrow(() -> new IllegalStateException("Could not found prescription"));
-    } else {
-      throw new IllegalStateException("Failed update prescription");
-    }
+        UPDATE prescription
+        SET status = ?, date = current_date, expiration_date = current_date
+        WHERE id = ?;
+    """;
+    return jdbcTemplate.update(sql, status, prescriptionId);
   }
 }

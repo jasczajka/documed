@@ -3,6 +3,8 @@ package com.documed.backend.prescriptions;
 import com.documed.backend.medicines.MedicineDAO;
 import com.documed.backend.medicines.model.Medicine;
 import com.documed.backend.medicines.model.MedicineWithAmount;
+import com.documed.backend.prescriptions.exceptions.AlreadyIssuedException;
+import com.documed.backend.prescriptions.exceptions.WrongAmountException;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -40,6 +42,9 @@ public class PrescriptionService {
   }
 
   Optional<Medicine> addMedicineToPrescription(int prescriptionId, String medicineId, int amount) {
+    if (amount < 1) {
+      throw new WrongAmountException("Amount can't be smaller than 1");
+    }
     return prescriptionDAO.addMedicineToPrescription(prescriptionId, medicineId, amount);
   }
 
@@ -51,8 +56,24 @@ public class PrescriptionService {
     return prescriptionDAO.delete(prescriptionId);
   }
 
-  Prescription issuePrescription(int prescriptionId) {
-    return prescriptionDAO.issuePrescription(prescriptionId);
+  public Prescription issuePrescription(int prescriptionId) {
+    Optional<Prescription> existingPrescription = prescriptionDAO.getById(prescriptionId);
+
+    if (existingPrescription.isPresent()
+        && existingPrescription.get().getStatus() == PrescriptionStatus.ISSUED) {
+      throw new AlreadyIssuedException("Prescription is already issued");
+    }
+
+    int rowsAffected =
+        prescriptionDAO.updatePrescriptionStatus(prescriptionId, PrescriptionStatus.ISSUED);
+
+    if (rowsAffected > 0) {
+      return prescriptionDAO
+          .getById(prescriptionId)
+          .orElseThrow(() -> new IllegalStateException("Prescription not found after update"));
+    } else {
+      throw new IllegalStateException("Failed to update prescription");
+    }
   }
 
   public Integer getUserIdForPrescriptionById(int prescriptionId) {

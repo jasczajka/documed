@@ -1,14 +1,18 @@
-package com.documed.backend.schedules;
+package com.documed.backend.schedules.model;
 
-import com.documed.backend.users.model.User;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-@AllArgsConstructor
+@Builder
+@Getter
+@Setter
 public class WorkTime {
   private int id;
-  private final User user;
+  //  private final User user;
+  private final int userId;
   private final DayOfWeek dayOfWeek;
   private LocalTime startTime;
   private LocalTime endTime;

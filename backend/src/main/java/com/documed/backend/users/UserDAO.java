@@ -197,7 +197,7 @@ public class UserDAO implements FullDAO<User, User> {
     }
 
     return getById(doctorId)
-        .orElseThrow(() -> new RuntimeException("Doctor not found: " + doctorId));
+        .orElseThrow(() -> new UserNotFoundException("Doctor not found: " + doctorId));
   }
 
   public void updatePasswordByEmail(String email, String encodedPassword) {
@@ -205,7 +205,7 @@ public class UserDAO implements FullDAO<User, User> {
     int rowsAffected = jdbcTemplate.update(sql, encodedPassword, email);
 
     if (rowsAffected == 0) {
-      throw new IllegalStateException("No user found with email: " + email);
+      throw new UserNotFoundException("No user found with email: " + email);
     }
   }
 

@@ -1,4 +1,4 @@
-package com.documed.backend.schedules;
+package com.documed.backend.schedules.model;
 
 import com.documed.backend.users.model.User;
 import java.util.Date;
