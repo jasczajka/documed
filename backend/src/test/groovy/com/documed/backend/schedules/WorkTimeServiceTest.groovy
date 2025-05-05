@@ -1,85 +1,84 @@
 package com.documed.backend.schedules
 
 import com.documed.backend.schedules.model.WorkTime
+import java.time.DayOfWeek
+import java.time.LocalTime
 import spock.lang.Specification
 import spock.lang.Subject
 
-import java.time.DayOfWeek
-import java.time.LocalTime
-
 class WorkTimeServiceTest extends Specification{
-  
-    def workTimeDAO = Mock(WorkTimeDAO)
 
-    @Subject
-    def workTimeService = new WorkTimeService(workTimeDAO)
+	def workTimeDAO = Mock(WorkTimeDAO)
 
-    def setup() {
-        workTimeService.slotDurationInMinutes = 15
-    }
+	@Subject
+	def workTimeService = new WorkTimeService(workTimeDAO)
 
-    def "should create work time"() {
-        given:
-        def workTime = WorkTime.builder()
-            .userId(997)
-            .dayOfWeek(DayOfWeek.FRIDAY)
-            .startTime(LocalTime.of(10, 00))
-            .endTime(LocalTime.of(15, 00))
-            .build()
+	def setup() {
+		workTimeService.slotDurationInMinutes = 15
+	}
 
-        when:
-        def result = workTimeService.createWorkTime(workTime)
+	def "should create work time"() {
+		given:
+		def workTime = WorkTime.builder()
+				.userId(997)
+				.dayOfWeek(DayOfWeek.FRIDAY)
+				.startTime(LocalTime.of(10, 00))
+				.endTime(LocalTime.of(15, 00))
+				.build()
 
-        then:
-        1 * workTimeDAO.create(workTime) >> workTime
-        result == workTime
-    }
+		when:
+		def result = workTimeService.createWorkTime(workTime)
 
-    def "should update work times"() {
-        given:
-        def dto = new WorkTimeDTO(
-                dayOfWeek: DayOfWeek.MONDAY,
-                startTime: LocalTime.of(9, 0),
-                endTime: LocalTime.of(10, 0)
-        )
+		then:
+		1 * workTimeDAO.create(workTime) >> workTime
+		result == workTime
+	}
 
-        when:
-        def result = workTimeService.updateWorkTimes([dto], 997)
+	def "should update work times"() {
+		given:
+		def dto = new WorkTimeDTO(
+				dayOfWeek: DayOfWeek.MONDAY,
+				startTime: LocalTime.of(9, 0),
+				endTime: LocalTime.of(10, 0)
+				)
 
-        then:
-        1 * workTimeDAO.updateWorkTime(_ as WorkTime)
-        result.size() == 1
-        result[0].dayOfWeek == DayOfWeek.MONDAY
-        result[0].userId == 997
-    }
+		when:
+		def result = workTimeService.updateWorkTimes([dto], 997)
 
-    def "should throw exception when duration is too short"() {
-        given:
-        def dto = new WorkTimeDTO(
-                dayOfWeek: DayOfWeek.MONDAY,
-                startTime: LocalTime.of(9, 0),
-                endTime: LocalTime.of(9, 5)
-        )
+		then:
+		1 * workTimeDAO.updateWorkTime(_ as WorkTime)
+		result.size() == 1
+		result[0].dayOfWeek == DayOfWeek.MONDAY
+		result[0].userId == 997
+	}
 
-        when:
-        workTimeService.updateWorkTimes([dto], 997)
+	def "should throw exception when duration is too short"() {
+		given:
+		def dto = new WorkTimeDTO(
+				dayOfWeek: DayOfWeek.MONDAY,
+				startTime: LocalTime.of(9, 0),
+				endTime: LocalTime.of(9, 5)
+				)
 
-        then:
-        thrown(WrongTimesGivenException)
-    }
+		when:
+		workTimeService.updateWorkTimes([dto], 997)
 
-    def "should throw exception when startTime is not before endTime"() {
-        given:
-        def dto = new WorkTimeDTO(
-                dayOfWeek: DayOfWeek.MONDAY,
-                startTime: LocalTime.of(10, 0),
-                endTime: LocalTime.of(9, 0)
-        )
+		then:
+		thrown(WrongTimesGivenException)
+	}
 
-        when:
-        workTimeService.updateWorkTimes([dto], 997)
+	def "should throw exception when startTime is not before endTime"() {
+		given:
+		def dto = new WorkTimeDTO(
+				dayOfWeek: DayOfWeek.MONDAY,
+				startTime: LocalTime.of(10, 0),
+				endTime: LocalTime.of(9, 0)
+				)
 
-        then:
-        thrown(WrongTimesGivenException)
-    }
+		when:
+		workTimeService.updateWorkTimes([dto], 997)
+
+		then:
+		thrown(WrongTimesGivenException)
+	}
 }
