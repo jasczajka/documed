@@ -8,7 +8,7 @@ import java.time.DayOfWeek
 import java.time.LocalTime
 
 class WorkTimeServiceTest extends Specification{
-
+  
     def workTimeDAO = Mock(WorkTimeDAO)
 
     @Subject

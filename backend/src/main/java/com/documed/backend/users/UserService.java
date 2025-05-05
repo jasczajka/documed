@@ -1,12 +1,12 @@
 package com.documed.backend.users;
 
 import com.documed.backend.auth.exceptions.UserNotFoundException;
+import com.documed.backend.users.exceptions.SpecializationToNonDoctorException;
 import com.documed.backend.users.model.AccountStatus;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,11 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
   private final UserDAO userDAO;
-  private final PasswordEncoder passwordEncoder;
 
-  public UserService(UserDAO userDAO, PasswordEncoder passwordEncoder) {
+  public UserService(UserDAO userDAO) {
     this.userDAO = userDAO;
-    this.passwordEncoder = passwordEncoder;
   }
 
   public Optional<User> getById(int id) {
@@ -60,7 +58,8 @@ public class UserService {
 
     User user = optionalUser.get();
     if (user.getRole() != UserRole.DOCTOR) {
-      throw new IllegalArgumentException("Only users with role DOCTOR can have specializations.");
+      throw new SpecializationToNonDoctorException(
+          "Only users with role DOCTOR can have specializations.");
     }
 
     return userDAO.addSpecializationsToUser(userId, specializationIds);

@@ -50,12 +50,12 @@ public class MedicineDAO implements FullDAO<Medicine, Medicine> {
   public Medicine createOrUpdate(Medicine medicine) {
     String sql =
         """
-            INSERT INTO medicine (id, name, dosage, common_name, packaging)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO medicine (id, name, dosage, common_name)
+            VALUES (?, ?, ?, ?)
             ON CONFLICT (id) DO UPDATE SET
               name = EXCLUDED.name,
               common_name = EXCLUDED.common_name,
-              dosage = EXCLUDED.dosage,
+              dosage = EXCLUDED.dosage
         """;
 
     jdbcTemplate.update(
