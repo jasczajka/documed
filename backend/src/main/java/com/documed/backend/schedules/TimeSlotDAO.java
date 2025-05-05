@@ -95,7 +95,7 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
     String sql =
         """
                 UPDATE time_slot
-                SET doctor_id = ?, start_time = ?, end_time = ?, date = ?, is_busy = ?
+                SET doctor_id = ?, start_time = ?, end_time = ?, date = ?, is_busy = ?, visit_id = ?
                 WHERE id = ?
                 """;
 
@@ -107,6 +107,7 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
             Time.valueOf(timeSlot.getEndTime()),
             Date.valueOf(timeSlot.getDate()),
             timeSlot.isBusy(),
+            timeSlot.getVisitId(),
             timeSlot.getId());
 
     if (affectedRows == 1) {

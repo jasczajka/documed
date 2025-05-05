@@ -58,7 +58,8 @@ public class TimeSlotService {
 
   @Transactional
   public void reserveTimeSlotsForVisit(Visit visit, TimeSlot firstTimeSlot) {
-    int neededTimeSlots = visit.getService().getEstimatedTime() / slotDurationInMinutes;
+    int neededTimeSlots =
+        (int) Math.ceil((double) visit.getService().getEstimatedTime() / slotDurationInMinutes);
 
     List<TimeSlot> availableSlots =
         timeSlotDAO.getAvailableTimeSlotsByDoctorAndDate(
