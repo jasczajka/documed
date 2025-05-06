@@ -9,6 +9,7 @@ import lombok.Data;
 @Data
 @Builder
 public class StaffRegisterRequestDTO {
+
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NotNull(message = "Rola użytkownika jest wymagana") private UserRole role;
 

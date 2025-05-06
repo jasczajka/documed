@@ -1,7 +1,7 @@
 package com.documed.backend.prescriptions;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.Date;
+import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Data;
 
@@ -18,10 +18,10 @@ public class Prescription {
   private int accessCode;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private final Date date;
+  private final LocalDate date;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private Date expirationDate;
+  private LocalDate expirationDate;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private PrescriptionStatus status;

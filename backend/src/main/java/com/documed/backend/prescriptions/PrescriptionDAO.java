@@ -26,8 +26,8 @@ public class PrescriptionDAO implements FullDAO<Prescription, Integer> {
           Prescription.builder()
               .id(rs.getInt("id"))
               .accessCode(rs.getInt("access_code"))
-              .date(rs.getDate("date"))
-              .expirationDate(rs.getDate("expiration_date"))
+              .date(rs.getDate("date").toLocalDate())
+              .expirationDate(rs.getDate("expiration_date").toLocalDate())
               .status(PrescriptionStatus.valueOf(rs.getString("status")))
               .build();
 
