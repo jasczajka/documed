@@ -5,9 +5,11 @@ import com.documed.backend.schedules.model.WorkTime;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Time;
+import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -20,6 +22,16 @@ public class WorkTimeDAO implements FullDAO<WorkTime, WorkTime> {
   public WorkTimeDAO(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
   }
+
+  private final RowMapper<WorkTime> rowMapper =
+      (rs, rowNum) ->
+          WorkTime.builder()
+              .id(rs.getInt("id"))
+              .userId(rs.getInt("user_id"))
+              .dayOfWeek(DayOfWeek.of(rs.getInt("day_of_week")))
+              .startTime(rs.getTime("start_time").toLocalTime())
+              .endTime(rs.getTime("end_time").toLocalTime())
+              .build();
 
   @Override
   public WorkTime create(WorkTime creationObject) {
@@ -39,13 +51,47 @@ public class WorkTimeDAO implements FullDAO<WorkTime, WorkTime> {
         },
         keyHolder);
 
-    if (keyHolder.getKey() != null) {
-      creationObject.setId(keyHolder.getKey().intValue());
-    } else {
-      throw new RuntimeException("Failed retrieve id value");
-    }
+    Number key = keyHolder.getKey();
 
-    return null;
+    if (key != null) {
+      creationObject.setId(key.intValue());
+      return creationObject;
+    } else {
+      throw new IllegalStateException("Failed retrieve id value");
+    }
+  }
+
+  public List<WorkTime> getWorkTimesForUser(int userId) {
+    String sql =
+        "SELECT id, user_id, day_of_week, start_time, end_time FROM worktime WHERE user_id = ?";
+
+    return jdbcTemplate.query(sql, rowMapper, userId);
+  }
+
+  public WorkTime updateWorkTime(WorkTime workTime) {
+    String sql =
+        "UPDATE worktime SET start_time = ?, end_time = ? WHERE user_id = ? AND day_of_week = ?";
+
+    int affectedRows =
+        jdbcTemplate.update(
+            sql,
+            Time.valueOf(workTime.getStartTime()),
+            Time.valueOf(workTime.getEndTime()),
+            workTime.getUserId(),
+            workTime.getDayOfWeek().getValue());
+
+    if (affectedRows == 1) {
+      return getByUserIdAndDayOfWeek(workTime.getUserId(), workTime.getDayOfWeek().getValue())
+          .orElseThrow(RuntimeException::new);
+    } else {
+      throw new RuntimeException("Failed to update worktime");
+    }
+  }
+
+  public Optional<WorkTime> getByUserIdAndDayOfWeek(int userId, int dayOfWeek) {
+    String sql =
+        "SELECT id, user_id, day_of_week, start_time, end_time FROM worktime WHERE user_id = ? AND day_of_week = ?";
+    return jdbcTemplate.query(sql, rowMapper, userId, dayOfWeek).stream().findFirst();
   }
 
   @Override
@@ -60,6 +106,7 @@ public class WorkTimeDAO implements FullDAO<WorkTime, WorkTime> {
 
   @Override
   public List<WorkTime> getAll() {
-    return List.of();
+    String sql = "SELECT id, user_id, day_of_week, start_time, end_time FROM worktime";
+    return jdbcTemplate.query(sql, rowMapper);
   }
 }

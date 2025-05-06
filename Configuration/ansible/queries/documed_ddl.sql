@@ -481,6 +481,11 @@ ALTER TABLE Visit ADD CONSTRAINT Visit_Service
 ALTER TABLE Worktime
 DROP CONSTRAINT IF EXISTS Worktime_User;
 
+ALTER TABLE Worktime
+DROP CONSTRAINT IF EXISTS worktime_User;
+
+ALTER TABLE worktime ADD CONSTRAINT worktime_User UNIQUE (user_id, day_of_week);
+
 ALTER TABLE Worktime ADD CONSTRAINT Worktime_User
     FOREIGN KEY (user_id)
     REFERENCES "User" (id)  

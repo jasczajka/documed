@@ -1,16 +1,20 @@
 package com.documed.backend.schedules.model;
 
-import com.documed.backend.users.model.User;
+import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Date;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
-@AllArgsConstructor
+@Builder
+@Getter
+@Setter
 public class TimeSlot {
   private int id;
-  private final User doctor;
+  private int visitId;
+  private final int doctorId;
   private final LocalTime startTime;
   private final LocalTime endTime;
-  private final Date date;
+  private final LocalDate date;
   private boolean isBusy;
 }
