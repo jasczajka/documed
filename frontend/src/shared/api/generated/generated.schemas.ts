@@ -4,6 +4,46 @@
  * OpenAPI definition
  * OpenAPI spec version: v0
  */
+export type WorkTimeDTODayOfWeek = (typeof WorkTimeDTODayOfWeek)[keyof typeof WorkTimeDTODayOfWeek];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const WorkTimeDTODayOfWeek = {
+  MONDAY: 'MONDAY',
+  TUESDAY: 'TUESDAY',
+  WEDNESDAY: 'WEDNESDAY',
+  THURSDAY: 'THURSDAY',
+  FRIDAY: 'FRIDAY',
+  SATURDAY: 'SATURDAY',
+  SUNDAY: 'SUNDAY',
+} as const;
+
+export interface WorkTimeDTO {
+  dayOfWeek: WorkTimeDTODayOfWeek;
+  startTime: string;
+  endTime: string;
+}
+
+export type WorkTimeDayOfWeek = (typeof WorkTimeDayOfWeek)[keyof typeof WorkTimeDayOfWeek];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const WorkTimeDayOfWeek = {
+  MONDAY: 'MONDAY',
+  TUESDAY: 'TUESDAY',
+  WEDNESDAY: 'WEDNESDAY',
+  THURSDAY: 'THURSDAY',
+  FRIDAY: 'FRIDAY',
+  SATURDAY: 'SATURDAY',
+  SUNDAY: 'SUNDAY',
+} as const;
+
+export interface WorkTime {
+  id: number;
+  userId: number;
+  dayOfWeek: WorkTimeDayOfWeek;
+  startTime: string;
+  endTime: string;
+}
+
 export type CreateServiceDTOType = (typeof CreateServiceDTOType)[keyof typeof CreateServiceDTOType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -233,6 +273,29 @@ export interface ChangePasswordRequestDTO {
   newPassword: string;
 }
 
+export interface UpdateDoctorSpecializationsDTO {
+  /** @minItems 1 */
+  specializationIds: number[];
+}
+
+export interface TimeSlot {
+  id?: number;
+  visitId?: number;
+  doctorId?: number;
+  startTime?: string;
+  endTime?: string;
+  date?: string;
+  busy?: boolean;
+}
+
+export interface DoctorDetailsDTO {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  specializations: Specialization[];
+}
+
 export interface MedicineWithAmount {
   id: string;
   name: string;
@@ -260,7 +323,6 @@ export interface AdditionalService {
   service?: Service;
   status?: AdditionalServiceStatus;
   notifications?: Notification[];
-  attachments?: Attachment[];
 }
 
 export interface Attachment {
@@ -342,10 +404,6 @@ export interface SubscriptionService {
   [key: string]: unknown;
 }
 
-export interface TimeSlot {
-  [key: string]: unknown;
-}
-
 export type UserAccountStatus = (typeof UserAccountStatus)[keyof typeof UserAccountStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -406,21 +464,16 @@ export interface Visit {
   diagnosis?: string;
   recommendations?: string;
   totalCost?: number;
-  facility?: Facility;
+  facilityId?: number;
   service?: Service;
   patientInformation?: string;
-  patient?: User;
-  doctor?: User;
+  patientId?: number;
+  doctorId?: number;
   feedback?: Feedback;
   attachments?: Attachment[];
   prescriptions?: Prescription[];
   referrals?: Referral[];
   notifications?: Notification[];
-  timeSlots?: TimeSlot[];
-}
-
-export interface WorkTime {
-  [key: string]: unknown;
 }
 
 export type MeDTORole = (typeof MeDTORole)[keyof typeof MeDTORole];

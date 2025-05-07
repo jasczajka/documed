@@ -3,6 +3,7 @@ package com.documed.backend.users;
 import com.documed.backend.auth.exceptions.UserNotFoundException;
 import com.documed.backend.users.exceptions.SpecializationToNonDoctorException;
 import com.documed.backend.users.model.AccountStatus;
+import com.documed.backend.users.model.Specialization;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
 import java.util.List;
@@ -51,18 +52,33 @@ public class UserService {
   }
 
   public User addSpecializationsToUser(int userId, List<Integer> specializationIds) {
-    Optional<User> optionalUser = getById(userId);
-    if (optionalUser.isEmpty()) {
-      throw new UserNotFoundException("User not found.");
-    }
-
-    User user = optionalUser.get();
-    if (user.getRole() != UserRole.DOCTOR) {
+    boolean isUserDoctor = isUserAssignedToRole(userId, UserRole.DOCTOR);
+    if (!isUserDoctor) {
       throw new SpecializationToNonDoctorException(
           "Only users with role DOCTOR can have specializations.");
     }
 
     return userDAO.addSpecializationsToUser(userId, specializationIds);
+  }
+
+  public User updateUserSpecializations(int userId, List<Integer> updatedSpecializationIds) {
+
+    boolean isUserDoctor = isUserAssignedToRole(userId, UserRole.DOCTOR);
+    if (!isUserDoctor) {
+      throw new SpecializationToNonDoctorException(
+          "Only users with role DOCTOR can have specializations.");
+    }
+
+    return userDAO.updateUserSpecializations(userId, updatedSpecializationIds);
+  }
+
+  public List<Specialization> getUserSpecializationsById(int userId) {
+    Optional<User> optionalUser = getById(userId);
+    if (optionalUser.isEmpty()) {
+      throw new UserNotFoundException("User not found.");
+    }
+
+    return userDAO.getUserSpecializationsById(userId);
   }
 
   public void toggleEmailNotificationsById(int userId) {
@@ -75,5 +91,15 @@ public class UserService {
       throw new UserNotFoundException("User not found");
     }
     return user.get().isEmailNotifications();
+  }
+
+  private boolean isUserAssignedToRole(int userId, UserRole role) {
+    Optional<User> optionalUser = getById(userId);
+    if (optionalUser.isEmpty()) {
+      throw new UserNotFoundException("User not found.");
+    }
+
+    User user = optionalUser.get();
+    return user.getRole() == role;
   }
 }

@@ -3,11 +3,10 @@ package com.documed.backend.users;
 import com.documed.backend.FullDAO;
 import com.documed.backend.auth.exceptions.UserNotFoundException;
 import com.documed.backend.users.model.AccountStatus;
+import com.documed.backend.users.model.Specialization;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -170,6 +169,67 @@ public class UserDAO implements FullDAO<User, User> {
 
     return getById(generatedId)
         .orElseThrow(() -> new IllegalStateException("Failed to retrieve created user"));
+  }
+
+  @Transactional
+  public User updateUserSpecializations(int doctorId, List<Integer> newSpecIds) {
+    String selectSql = "SELECT specialization_id FROM doctor_specialization WHERE doctor_id = ?";
+    List<Integer> currentSpecIds = jdbcTemplate.queryForList(selectSql, Integer.class, doctorId);
+
+    Set<Integer> toAdd = new HashSet<>(newSpecIds);
+    Set<Integer> toRemove = new HashSet<>(currentSpecIds);
+
+    toAdd.removeAll(currentSpecIds);
+    toRemove.removeAll(newSpecIds);
+
+    if (!toRemove.isEmpty()) {
+      String deleteSql =
+          "DELETE FROM doctor_specialization WHERE doctor_id = ? AND specialization_id = ?";
+      jdbcTemplate.batchUpdate(
+          deleteSql,
+          toRemove,
+          toRemove.size(),
+          (ps, specId) -> {
+            ps.setInt(1, doctorId);
+            ps.setInt(2, specId);
+          });
+    }
+
+    if (!toAdd.isEmpty()) {
+      String insertSql =
+          """
+              INSERT INTO doctor_specialization (doctor_id, specialization_id)
+              VALUES (?, ?)
+              ON CONFLICT DO NOTHING
+              """;
+      jdbcTemplate.batchUpdate(
+          insertSql,
+          toAdd,
+          toAdd.size(),
+          (ps, specId) -> {
+            ps.setInt(1, doctorId);
+            ps.setInt(2, specId);
+          });
+    }
+
+    return getById(doctorId)
+        .orElseThrow(() -> new UserNotFoundException("Doctor not found: " + doctorId));
+  }
+
+  public List<Specialization> getUserSpecializationsById(int userId) {
+    String sql =
+        """
+        SELECT s.id, s.name
+        FROM doctor_specialization ds
+        JOIN Specialization s ON ds.specialization_id = s.id
+        WHERE ds.doctor_id = ?
+    """;
+
+    return jdbcTemplate.query(
+        sql,
+        (rs, rowNum) ->
+            Specialization.builder().id(rs.getInt("id")).name(rs.getString("name")).build(),
+        userId);
   }
 
   @Transactional

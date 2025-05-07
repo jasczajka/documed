@@ -16,6 +16,7 @@ const SpecialistsPage = lazy(() => import('./SpecialistsPage'));
 const ReferralsPage = lazy(() => import('./ReferralsPage'));
 const PrescriptionsPage = lazy(() => import('./PrescriptionsPage'));
 const AdministrationPage = lazy(() => import('./AdministrationPage'));
+const SingleSpecialistPage = lazy(() => import('./SingleSpecialistPage'));
 
 const getDefaultRoutes = () => [
   {
@@ -40,7 +41,11 @@ const getDefaultRoutes = () => [
   },
 ];
 
-const getAuthRoutes = (isAdmin: boolean, isPatient: boolean): RouteObject[] => [
+const getAuthRoutes = (
+  isAdmin: boolean,
+  isPatient: boolean,
+  canEditDoctorData: boolean,
+): RouteObject[] => [
   {
     path: '/',
     element: <LoggedLayout />,
@@ -58,6 +63,16 @@ const getAuthRoutes = (isAdmin: boolean, isPatient: boolean): RouteObject[] => [
       { path: '/prescriptions', element: <PrescriptionsPage /> },
       { path: '/settings', element: <SettingsTabs /> },
       {
+        path: '/specialists/:id',
+        element: (
+          <ProtectedRoute
+            element={<SingleSpecialistPage />}
+            isAllowed={canEditDoctorData}
+            redirectTo="/visits"
+          />
+        ),
+      },
+      {
         path: '/admin',
         element: (
           <ProtectedRoute
@@ -73,11 +88,13 @@ const getAuthRoutes = (isAdmin: boolean, isPatient: boolean): RouteObject[] => [
 ];
 
 export const AppRouter = () => {
-  const { verifyAuthentication, loading, isAdmin, isPatient } = useAuth();
+  const { verifyAuthentication, loading, isAdmin, isPatient, canEditDoctorData } = useAuth();
   const authenticated = useAuthStore((state) => state.authenticated);
   const [authChecked, setAuthChecked] = useState(false);
   const router = useMemo(() => {
-    const routes = authenticated ? getAuthRoutes(isAdmin, isPatient) : getDefaultRoutes();
+    const routes = authenticated
+      ? getAuthRoutes(isAdmin, isPatient, canEditDoctorData)
+      : getDefaultRoutes();
     return createBrowserRouter(routes);
   }, [authenticated, isPatient, isAdmin]);
 
