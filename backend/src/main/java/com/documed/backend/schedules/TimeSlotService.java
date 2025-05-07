@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,19 +66,33 @@ public class TimeSlotService {
         timeSlotDAO.getAvailableTimeSlotsByDoctorAndDate(
             firstTimeSlot.getDoctorId(), firstTimeSlot.getDate());
 
-    int startIndex = availableSlots.indexOf(firstTimeSlot);
+    int startIndex =
+        IntStream.range(0, availableSlots.size())
+            .filter(i -> availableSlots.get(i).getId() == firstTimeSlot.getId())
+            .findFirst()
+            .orElse(-1);
 
     if (startIndex == -1 || startIndex + neededTimeSlots > availableSlots.size()) {
       throw new NotEnoughTimeInTimeSlotException("Not enough continuous time slots available");
     }
 
     for (int i = 0; i < neededTimeSlots; i++) {
+
       TimeSlot slotToReserve = availableSlots.get(startIndex + i);
+
+      if (i > 0
+          && !checkTimeSlotContinuity(availableSlots.get(startIndex + i - 1), slotToReserve)) {
+        throw new NotEnoughTimeInTimeSlotException("Not enough continuous time slots available");
+      }
 
       slotToReserve.setBusy(true);
       slotToReserve.setVisitId(visit.getId());
 
       timeSlotDAO.update(slotToReserve);
     }
+  }
+
+  boolean checkTimeSlotContinuity(TimeSlot previousTimeSlot, TimeSlot currentTimeSlot) {
+    return previousTimeSlot.getEndTime().equals(currentTimeSlot.getStartTime());
   }
 }

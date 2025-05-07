@@ -5,13 +5,14 @@ import com.documed.backend.notifications.Notification;
 import com.documed.backend.prescriptions.Prescription;
 import com.documed.backend.referrals.Referral;
 import com.documed.backend.services.Service;
-import com.documed.backend.users.model.User;
 import java.math.BigDecimal;
 import java.util.List;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
 
 @Data
+@Builder
 public class Visit {
   private int id;
   @NonNull private VisitStatus status;
@@ -19,11 +20,11 @@ public class Visit {
   private String diagnosis;
   private String recommendations;
   private BigDecimal totalCost;
-  @NonNull private Facility facility;
+  @NonNull private int facilityId;
   @NonNull private Service service;
   private String patientInformation;
-  @NonNull private User patient;
-  @NonNull private User doctor;
+  @NonNull private int patientId;
+  @NonNull private int doctorId;
   private Feedback feedback;
   private List<Attachment> attachments;
   private List<Prescription> prescriptions;
