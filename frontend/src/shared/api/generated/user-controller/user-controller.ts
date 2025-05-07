@@ -264,7 +264,7 @@ export const useToggleEmailNotifications = <TError = ErrorType<unknown>, TContex
 
   return useMutation(mutationOptions, queryClient);
 };
-export const updateDoctorSpecializations1 = (id: number, signal?: AbortSignal) => {
+export const getUserSpecializations = (id: number, signal?: AbortSignal) => {
   return customInstance<Specialization[]>({
     url: `/api/user/${id}/specializations`,
     method: 'GET',
@@ -272,107 +272,106 @@ export const updateDoctorSpecializations1 = (id: number, signal?: AbortSignal) =
   });
 };
 
-export const getUpdateDoctorSpecializations1QueryKey = (id: number) => {
+export const getGetUserSpecializationsQueryKey = (id: number) => {
   return [`/api/user/${id}/specializations`] as const;
 };
 
-export const getUpdateDoctorSpecializations1QueryOptions = <
-  TData = Awaited<ReturnType<typeof updateDoctorSpecializations1>>,
+export const getGetUserSpecializationsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getUserSpecializations>>,
   TError = ErrorType<unknown>,
 >(
   id: number,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof updateDoctorSpecializations1>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof getUserSpecializations>>, TError, TData>
     >;
   },
 ) => {
   const { query: queryOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getUpdateDoctorSpecializations1QueryKey(id);
+  const queryKey = queryOptions?.queryKey ?? getGetUserSpecializationsQueryKey(id);
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof updateDoctorSpecializations1>>> = ({
-    signal,
-  }) => updateDoctorSpecializations1(id, signal);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserSpecializations>>> = ({ signal }) =>
+    getUserSpecializations(id, signal);
 
   return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof updateDoctorSpecializations1>>,
+    Awaited<ReturnType<typeof getUserSpecializations>>,
     TError,
     TData
   > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type UpdateDoctorSpecializations1QueryResult = NonNullable<
-  Awaited<ReturnType<typeof updateDoctorSpecializations1>>
+export type GetUserSpecializationsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getUserSpecializations>>
 >;
-export type UpdateDoctorSpecializations1QueryError = ErrorType<unknown>;
+export type GetUserSpecializationsQueryError = ErrorType<unknown>;
 
-export function useUpdateDoctorSpecializations1<
-  TData = Awaited<ReturnType<typeof updateDoctorSpecializations1>>,
+export function useGetUserSpecializations<
+  TData = Awaited<ReturnType<typeof getUserSpecializations>>,
   TError = ErrorType<unknown>,
 >(
   id: number,
   options: {
     query: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof updateDoctorSpecializations1>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof getUserSpecializations>>, TError, TData>
     > &
       Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof updateDoctorSpecializations1>>,
+          Awaited<ReturnType<typeof getUserSpecializations>>,
           TError,
-          Awaited<ReturnType<typeof updateDoctorSpecializations1>>
+          Awaited<ReturnType<typeof getUserSpecializations>>
         >,
         'initialData'
       >;
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useUpdateDoctorSpecializations1<
-  TData = Awaited<ReturnType<typeof updateDoctorSpecializations1>>,
+export function useGetUserSpecializations<
+  TData = Awaited<ReturnType<typeof getUserSpecializations>>,
   TError = ErrorType<unknown>,
 >(
   id: number,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof updateDoctorSpecializations1>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof getUserSpecializations>>, TError, TData>
     > &
       Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof updateDoctorSpecializations1>>,
+          Awaited<ReturnType<typeof getUserSpecializations>>,
           TError,
-          Awaited<ReturnType<typeof updateDoctorSpecializations1>>
+          Awaited<ReturnType<typeof getUserSpecializations>>
         >,
         'initialData'
       >;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useUpdateDoctorSpecializations1<
-  TData = Awaited<ReturnType<typeof updateDoctorSpecializations1>>,
+export function useGetUserSpecializations<
+  TData = Awaited<ReturnType<typeof getUserSpecializations>>,
   TError = ErrorType<unknown>,
 >(
   id: number,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof updateDoctorSpecializations1>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof getUserSpecializations>>, TError, TData>
     >;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-export function useUpdateDoctorSpecializations1<
-  TData = Awaited<ReturnType<typeof updateDoctorSpecializations1>>,
+export function useGetUserSpecializations<
+  TData = Awaited<ReturnType<typeof getUserSpecializations>>,
   TError = ErrorType<unknown>,
 >(
   id: number,
   options?: {
     query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof updateDoctorSpecializations1>>, TError, TData>
+      UseQueryOptions<Awaited<ReturnType<typeof getUserSpecializations>>, TError, TData>
     >;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getUpdateDoctorSpecializations1QueryOptions(id, options);
+  const queryOptions = getGetUserSpecializationsQueryOptions(id, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;

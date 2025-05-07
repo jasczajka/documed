@@ -24,6 +24,6 @@ public class DoctorDetailsDTO {
   @NonNull private String email;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private List<@NotNull(message = "Lekarz nie moze nie miec zadnych specjalizacji") Specialization>
+  private List<@NotNull(message = "Lekarz nie może nie mieć żadnych specjalizacji") Specialization>
       specializations;
 }

@@ -52,13 +52,8 @@ public class UserService {
   }
 
   public User addSpecializationsToUser(int userId, List<Integer> specializationIds) {
-    Optional<User> optionalUser = getById(userId);
-    if (optionalUser.isEmpty()) {
-      throw new UserNotFoundException("User not found.");
-    }
-
-    User user = optionalUser.get();
-    if (user.getRole() != UserRole.DOCTOR) {
+    boolean isUserDoctor = isUserAssignedToRole(userId, UserRole.DOCTOR);
+    if (!isUserDoctor) {
       throw new SpecializationToNonDoctorException(
           "Only users with role DOCTOR can have specializations.");
     }
@@ -67,13 +62,9 @@ public class UserService {
   }
 
   public User updateUserSpecializations(int userId, List<Integer> updatedSpecializationIds) {
-    Optional<User> optionalUser = getById(userId);
-    if (optionalUser.isEmpty()) {
-      throw new UserNotFoundException("User not found.");
-    }
 
-    User user = optionalUser.get();
-    if (user.getRole() != UserRole.DOCTOR) {
+    boolean isUserDoctor = isUserAssignedToRole(userId, UserRole.DOCTOR);
+    if (!isUserDoctor) {
       throw new SpecializationToNonDoctorException(
           "Only users with role DOCTOR can have specializations.");
     }
@@ -100,5 +91,15 @@ public class UserService {
       throw new UserNotFoundException("User not found");
     }
     return user.get().isEmailNotifications();
+  }
+
+  private boolean isUserAssignedToRole(int userId, UserRole role) {
+    Optional<User> optionalUser = getById(userId);
+    if (optionalUser.isEmpty()) {
+      throw new UserNotFoundException("User not found.");
+    }
+
+    User user = optionalUser.get();
+    return user.getRole() == role;
   }
 }

@@ -72,7 +72,7 @@ public class UserController {
   }
 
   @GetMapping("/{id}/specializations")
-  public ResponseEntity<List<Specialization>> updateDoctorSpecializations(
+  public ResponseEntity<List<Specialization>> getUserSpecializations(
       @PathVariable("id") int userId) {
     List<Specialization> specs = this.userService.getUserSpecializationsById(userId);
     return new ResponseEntity<>(specs, HttpStatus.OK);
