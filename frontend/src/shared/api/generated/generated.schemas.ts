@@ -18,9 +18,9 @@ export const WorkTimeDTODayOfWeek = {
 } as const;
 
 export interface WorkTimeDTO {
-  dayOfWeek?: WorkTimeDTODayOfWeek;
-  startTime?: string;
-  endTime?: string;
+  dayOfWeek: WorkTimeDTODayOfWeek;
+  startTime: string;
+  endTime: string;
 }
 
 export type WorkTimeDayOfWeek = (typeof WorkTimeDayOfWeek)[keyof typeof WorkTimeDayOfWeek];
@@ -37,11 +37,11 @@ export const WorkTimeDayOfWeek = {
 } as const;
 
 export interface WorkTime {
-  id?: number;
-  userId?: number;
-  dayOfWeek?: WorkTimeDayOfWeek;
-  startTime?: string;
-  endTime?: string;
+  id: number;
+  userId: number;
+  dayOfWeek: WorkTimeDayOfWeek;
+  startTime: string;
+  endTime: string;
 }
 
 export type CreateServiceDTOType = (typeof CreateServiceDTOType)[keyof typeof CreateServiceDTOType];
@@ -278,6 +278,16 @@ export interface UpdateDoctorSpecializationsDTO {
   specializationIds: number[];
 }
 
+export interface TimeSlot {
+  id?: number;
+  visitId?: number;
+  doctorId?: number;
+  startTime?: string;
+  endTime?: string;
+  date?: string;
+  busy?: boolean;
+}
+
 export interface DoctorDetailsDTO {
   id: number;
   firstName: string;
@@ -313,7 +323,6 @@ export interface AdditionalService {
   service?: Service;
   status?: AdditionalServiceStatus;
   notifications?: Notification[];
-  attachments?: Attachment[];
 }
 
 export interface Attachment {
@@ -395,10 +404,6 @@ export interface SubscriptionService {
   [key: string]: unknown;
 }
 
-export interface TimeSlot {
-  [key: string]: unknown;
-}
-
 export type UserAccountStatus = (typeof UserAccountStatus)[keyof typeof UserAccountStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -459,17 +464,16 @@ export interface Visit {
   diagnosis?: string;
   recommendations?: string;
   totalCost?: number;
-  facility?: Facility;
+  facilityId?: number;
   service?: Service;
   patientInformation?: string;
-  patient?: User;
-  doctor?: User;
+  patientId?: number;
+  doctorId?: number;
   feedback?: Feedback;
   attachments?: Attachment[];
   prescriptions?: Prescription[];
   referrals?: Referral[];
   notifications?: Notification[];
-  timeSlots?: TimeSlot[];
 }
 
 export type MeDTORole = (typeof MeDTORole)[keyof typeof MeDTORole];

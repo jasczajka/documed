@@ -1,24 +1,32 @@
 import { BeachAccess, CalendarMonth, Person2, QueryBuilder } from '@mui/icons-material';
 import { Box, Paper, Tab, Tabs } from '@mui/material';
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import { Specialization } from 'shared/api/generated/generated.schemas';
+import { WorkTimeWithoutIdAndUser } from 'src/pages/SingleSpecialistPage';
 import { EditSpecializationsTab } from './tabs/EditSpecializationsTab';
+import { EditWorkTimeTab } from './tabs/EditWorkTimeTab';
 
 interface SpecialistTabsProps {
   doctorId: number;
   currentSpecializations: Specialization[];
+  currentWorkTimes: WorkTimeWithoutIdAndUser[];
   allSpecializations: Specialization[];
   handleUpdateSpecialistSpecializations: (selected: Specialization[]) => void;
-  updateSpecialistSpecializationsLoading?: boolean;
+  handleUpdateSpecialistWorkTimes: (selected: WorkTimeWithoutIdAndUser[]) => void;
+  tabIndex: number;
+  onTabChange: (index: number) => void;
+  loading?: boolean;
 }
 export const SpecialistTabs: FC<SpecialistTabsProps> = ({
   currentSpecializations,
+  currentWorkTimes,
   allSpecializations,
   handleUpdateSpecialistSpecializations,
-  updateSpecialistSpecializationsLoading,
+  handleUpdateSpecialistWorkTimes,
+  tabIndex,
+  onTabChange,
+  loading,
 }) => {
-  const [index, setIndex] = useState(0);
-
   return (
     <Box
       sx={{
@@ -40,8 +48,8 @@ export const SpecialistTabs: FC<SpecialistTabsProps> = ({
             },
           },
         }}
-        value={index}
-        onChange={(_, value) => setIndex(value)}
+        value={tabIndex}
+        onChange={(_, value) => onTabChange(value)}
         aria-label="single-specialist-tabs"
       >
         <Tab icon={<BeachAccess />} iconPosition="start" label="Urlopy" />
@@ -51,17 +59,23 @@ export const SpecialistTabs: FC<SpecialistTabsProps> = ({
       </Tabs>
 
       <Paper sx={{ height: '100%', width: '100%', padding: 8, minHeight: '532px' }} elevation={1}>
-        {index === 0 && <div>Urlopy</div>}
-        {index === 1 && <div>wizyty</div>}
-        {index === 2 && (
+        {tabIndex === 0 && <div>Urlopy</div>}
+        {tabIndex === 1 && <div>wizyty</div>}
+        {tabIndex === 2 && (
           <EditSpecializationsTab
             currentSpecializations={currentSpecializations}
             allSpecializations={allSpecializations}
             onSave={handleUpdateSpecialistSpecializations}
-            loading={updateSpecialistSpecializationsLoading}
+            loading={loading}
           />
         )}
-        {index === 3 && <div>Godziny</div>}
+        {tabIndex === 3 && (
+          <EditWorkTimeTab
+            currentWorkTimes={currentWorkTimes}
+            onSave={handleUpdateSpecialistWorkTimes}
+            loading={loading}
+          />
+        )}
       </Paper>
     </Box>
   );

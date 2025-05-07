@@ -70,21 +70,23 @@ public class WorkTimeDAO implements FullDAO<WorkTime, WorkTime> {
 
   public WorkTime updateWorkTime(WorkTime workTime) {
     String sql =
-        "UPDATE worktime SET start_time = ?, end_time = ? WHERE user_id = ? AND day_of_week = ?";
-
+        "INSERT INTO worktime (user_id, day_of_week, start_time, end_time) "
+            + "VALUES (?, ?, ?, ?) "
+            + "ON CONFLICT (user_id, day_of_week) DO UPDATE "
+            + "SET start_time = EXCLUDED.start_time, end_time = EXCLUDED.end_time";
     int affectedRows =
         jdbcTemplate.update(
             sql,
-            Time.valueOf(workTime.getStartTime()),
-            Time.valueOf(workTime.getEndTime()),
             workTime.getUserId(),
-            workTime.getDayOfWeek().getValue());
+            workTime.getDayOfWeek().getValue(),
+            Time.valueOf(workTime.getStartTime()),
+            Time.valueOf(workTime.getEndTime()));
 
     if (affectedRows == 1) {
       return getByUserIdAndDayOfWeek(workTime.getUserId(), workTime.getDayOfWeek().getValue())
           .orElseThrow(RuntimeException::new);
     } else {
-      throw new RuntimeException("Failed to update worktime");
+      throw new RuntimeException("Failed to upsert worktime");
     }
   }
 
