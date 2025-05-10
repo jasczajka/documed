@@ -1,0 +1,71 @@
+package com.documed.backend.attachments;
+
+import com.documed.backend.attachments.dtos.CompleteUploadRequestDTO;
+import com.documed.backend.attachments.dtos.GenerateUploadUrlRequestDTO;
+import com.documed.backend.attachments.dtos.UploadUrlResponseDTO;
+import com.documed.backend.attachments.model.Attachment;
+import com.documed.backend.attachments.model.AttachmentStatus;
+import jakarta.validation.Valid;
+import java.util.UUID;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/attachments")
+@AllArgsConstructor
+public class AttachmentController {
+  private final S3Service s3Service;
+
+  @PostMapping("/get-upload-url")
+  public ResponseEntity<UploadUrlResponseDTO> generateUploadUrl(
+      @Valid @RequestBody GenerateUploadUrlRequestDTO request) {
+
+    String objectKey = UUID.randomUUID() + "-" + request.getFileName();
+
+    Attachment attachment =
+        Attachment.builder()
+            .s3Key(objectKey)
+            .fileName(request.getFileName())
+            .visitId(request.getVisitId())
+            .additionalServiceId(request.getAdditionalServiceId())
+            .status(AttachmentStatus.PENDING)
+            .build();
+
+    Attachment createdAttachment = s3Service.createAttachment(attachment);
+
+    String uploadUrl = s3Service.generatePreSignedPutUrl(objectKey, request.getFileSizeBytes());
+
+    UploadUrlResponseDTO response =
+        UploadUrlResponseDTO.builder()
+            .uploadUrl(uploadUrl)
+            .s3Key(objectKey)
+            .attachmentId(createdAttachment.getId())
+            .build();
+    return ResponseEntity.status(HttpStatus.OK).body(response);
+  }
+
+  @PostMapping("/complete-upload")
+  public ResponseEntity<String> completeUpload(
+      @Valid @RequestBody CompleteUploadRequestDTO request) {
+    s3Service.completeFileUpload(request.getAttachmentId());
+
+    String downloadUrl = s3Service.generatePresignedGetUrl(request.getS3Key());
+
+    return ResponseEntity.status(HttpStatus.OK).body(downloadUrl);
+  }
+
+  @GetMapping("/{id}/download-url")
+  public ResponseEntity<String> getDownloadUrl(@PathVariable int id) {
+    Attachment attachment = s3Service.getUploadedById(id);
+
+    if (attachment.getStatus() != AttachmentStatus.UPLOADED) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body("Attachment not found or not uploaded.");
+    }
+
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(s3Service.generatePresignedGetUrl(attachment.getS3Key()));
+  }
+}

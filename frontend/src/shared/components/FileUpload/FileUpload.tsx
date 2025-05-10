@@ -6,7 +6,7 @@ import FileCard from './FileCard';
 import { formatFileName, formatFileSize, readFileAsUrl } from './utils';
 
 const ACCEPT_FILE_TYPES = {}; // extend if needed
-const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
+const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
 const MAX_FILE_COUNT = 5;
 
 const getAcceptedExtensions = (fileTypes: Record<string, any>) => {
@@ -30,7 +30,7 @@ const getPlErrorMessage = (error: FileError) => {
   }
 };
 
-const getPllFileRejections = (fileRejections: FileRejection[]) => {
+const getPlFileRejections = (fileRejections: FileRejection[]) => {
   return fileRejections.map((reject) => ({
     file: reject.file,
     errors: reject.errors.map((error) => ({
@@ -83,7 +83,7 @@ export const FileUpload: FC = () => {
         }
       }
 
-      const formattedRejections = getPllFileRejections(rejected);
+      const formattedRejections = getPlFileRejections(rejected);
       setRejectedFiles((prev) => [
         ...prev,
         ...formattedRejections.map(({ file, errors }) => ({

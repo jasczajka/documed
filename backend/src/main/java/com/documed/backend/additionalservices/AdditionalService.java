@@ -1,6 +1,6 @@
 package com.documed.backend.additionalservices;
 
-import com.documed.backend.attachments.Attachment;
+import com.documed.backend.attachments.model.Attachment;
 import com.documed.backend.notifications.Notification;
 import com.documed.backend.services.Service;
 import com.documed.backend.users.model.User;

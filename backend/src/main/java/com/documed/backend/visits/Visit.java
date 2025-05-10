@@ -1,6 +1,6 @@
 package com.documed.backend.visits;
 
-import com.documed.backend.attachments.Attachment;
+import com.documed.backend.attachments.model.Attachment;
 import com.documed.backend.notifications.Notification;
 import com.documed.backend.prescriptions.Prescription;
 import com.documed.backend.referrals.Referral;
