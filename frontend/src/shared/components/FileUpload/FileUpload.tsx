@@ -42,14 +42,26 @@ const getPlFileRejections = (fileRejections: FileRejection[]) => {
 
 interface TrackedFile {
   file: File;
-  status: 'loading' | 'error' | 'loaded';
+  status: 'loading' | 'error' | 'loaded' | 'uploaded';
+  downloadUrl?: string;
   errors?: string[];
 }
 
-export const FileUpload: FC = () => {
+interface FileUploadProps {
+  onConfirmUpload: (file: File) => Promise<string>;
+  className?: string;
+  uploadFileLoading?: boolean;
+}
+
+export const FileUpload: FC<FileUploadProps> = ({
+  onConfirmUpload,
+  className,
+  uploadFileLoading,
+}) => {
   const [acceptedFiles, setAcceptedFiles] = useState<TrackedFile[]>([]);
   const [rejectedFiles, setRejectedFiles] = useState<TrackedFile[]>([]);
   const isDisabled = useMemo(() => acceptedFiles.length >= MAX_FILE_COUNT, [acceptedFiles]);
+  const isEmpty = !acceptedFiles.length && !rejectedFiles.length;
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: ACCEPT_FILE_TYPES,
@@ -109,8 +121,30 @@ export const FileUpload: FC = () => {
     [rejectedFiles],
   );
 
+  const handleConfirmUpload = async (fileToUpload: File) => {
+    try {
+      setAcceptedFiles((prev) =>
+        prev.map((f) => (f.file === fileToUpload ? { ...f, status: 'loading' } : f)),
+      );
+      console.log('onconfirm upload fn: ', onConfirmUpload);
+      const downloadUrl = await onConfirmUpload(fileToUpload);
+      setAcceptedFiles((prev) =>
+        prev.map((f) => (f.file === fileToUpload ? { ...f, status: 'uploaded', downloadUrl } : f)),
+      );
+    } catch (e) {
+      console.error('error uploading files: ', e);
+      setAcceptedFiles((prev) =>
+        prev.map((f) =>
+          f.file === fileToUpload
+            ? { ...f, status: 'error', errors: ['Błąd podczas przesyłania do systemu'] }
+            : f,
+        ),
+      );
+    }
+  };
+
   return (
-    <Card sx={{ width: '100%', maxWidth: 600, mx: 'auto' }}>
+    <Card className={className} sx={{ width: '100%', maxWidth: 600 }}>
       <CardHeader title={<Typography variant="body2">Załączniki</Typography>} />
       <Box
         {...getRootProps()}
@@ -121,6 +155,7 @@ export const FileUpload: FC = () => {
           gap: 2,
           border: '1px dashed #D3D3D3',
           padding: 4,
+          mb: isEmpty ? 2 : 0,
           textAlign: 'center',
           cursor: isDisabled ? 'not-allowed' : 'pointer',
           '&:hover': {
@@ -142,7 +177,10 @@ export const FileUpload: FC = () => {
             fileName={formatFileName(file.file.name)}
             fileSize={formatFileSize(file.file.size)}
             status={file.status}
+            downloadUrl={file.downloadUrl}
             onDelete={() => handleDeleteAcceptedFile(file.file)}
+            onConfirmUpload={() => handleConfirmUpload(file.file)}
+            loading={uploadFileLoading}
           />
         ))}
       </Box>
@@ -155,6 +193,7 @@ export const FileUpload: FC = () => {
             status="error"
             errorMessage={errors?.join(', ')}
             onDelete={() => handleDeleteRejectedFile(file)}
+            loading={uploadFileLoading}
           />
         ))}
       </Box>
