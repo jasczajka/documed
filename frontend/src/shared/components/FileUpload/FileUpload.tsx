@@ -42,19 +42,22 @@ const getPlFileRejections = (fileRejections: FileRejection[]) => {
 
 interface TrackedFile {
   file: File;
+  id?: number;
   status: 'loading' | 'error' | 'loaded' | 'uploaded';
   downloadUrl?: string;
   errors?: string[];
 }
 
 interface FileUploadProps {
-  onConfirmUpload: (file: File) => Promise<string>;
+  onConfirmUpload: (file: File) => Promise<{ downloadUrl: string; fileId: number }>;
+  onDeleteUploaded: (fileId: number) => Promise<string>;
   className?: string;
   uploadFileLoading?: boolean;
 }
 
 export const FileUpload: FC<FileUploadProps> = ({
   onConfirmUpload,
+  onDeleteUploaded,
   className,
   uploadFileLoading,
 }) => {
@@ -108,8 +111,14 @@ export const FileUpload: FC<FileUploadProps> = ({
   });
 
   const handleDeleteAcceptedFile = useCallback(
-    (fileToDelete: File) => {
-      setAcceptedFiles((prev) => prev.filter((f) => f.file !== fileToDelete));
+    async (fileToDelete: TrackedFile) => {
+      setAcceptedFiles((prev) =>
+        prev.map((f) => (f === fileToDelete ? { ...f, status: 'loading' } : f)),
+      );
+      if (fileToDelete.id) {
+        await onDeleteUploaded(fileToDelete.id);
+      }
+      setAcceptedFiles((prev) => prev.filter((f) => f.file !== fileToDelete.file));
     },
     [setAcceptedFiles],
   );
@@ -126,10 +135,13 @@ export const FileUpload: FC<FileUploadProps> = ({
       setAcceptedFiles((prev) =>
         prev.map((f) => (f.file === fileToUpload ? { ...f, status: 'loading' } : f)),
       );
-      console.log('onconfirm upload fn: ', onConfirmUpload);
-      const downloadUrl = await onConfirmUpload(fileToUpload);
+      const data = await onConfirmUpload(fileToUpload);
       setAcceptedFiles((prev) =>
-        prev.map((f) => (f.file === fileToUpload ? { ...f, status: 'uploaded', downloadUrl } : f)),
+        prev.map((f) =>
+          f.file === fileToUpload
+            ? { ...f, status: 'uploaded', downloadUrl: data.downloadUrl, id: data.fileId }
+            : f,
+        ),
       );
     } catch (e) {
       console.error('error uploading files: ', e);
@@ -178,7 +190,7 @@ export const FileUpload: FC<FileUploadProps> = ({
             fileSize={formatFileSize(file.file.size)}
             status={file.status}
             downloadUrl={file.downloadUrl}
-            onDelete={() => handleDeleteAcceptedFile(file.file)}
+            onDelete={() => handleDeleteAcceptedFile(file)}
             onConfirmUpload={() => handleConfirmUpload(file.file)}
             loading={uploadFileLoading}
           />

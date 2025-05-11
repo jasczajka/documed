@@ -109,7 +109,7 @@ export const FileCard: FC<FileCardProps> = ({
         </Box>
       </Box>
       <Box>
-        {!isSuccessfullyUploaded && (
+        {!isLoading && (
           <IconButton onClick={onDelete} disabled={loading}>
             <Delete color="action" />
           </IconButton>

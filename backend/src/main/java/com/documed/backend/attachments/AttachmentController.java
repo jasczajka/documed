@@ -68,4 +68,15 @@ public class AttachmentController {
     return ResponseEntity.status(HttpStatus.OK)
         .body(s3Service.generatePresignedGetUrl(attachment.getS3Key()));
   }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<String> deleteFile(@PathVariable int id) {
+    Attachment attachment = s3Service.getUploadedById(id);
+
+    if (attachment == null) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Attachment not found.");
+    }
+    s3Service.deleteFile(id);
+    return ResponseEntity.status(HttpStatus.OK).body("Attachment deleted.");
+  }
 }

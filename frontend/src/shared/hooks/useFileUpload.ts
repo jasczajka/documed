@@ -1,5 +1,6 @@
 import {
   useCompleteUpload,
+  useDeleteFile,
   useGenerateUploadUrl,
 } from 'shared/api/generated/attachment-controller/attachment-controller';
 
@@ -9,13 +10,24 @@ export const useFileUpload = () => {
     isPending: isGenerateUploadUrlLoading,
     error: uploadUrlError,
   } = useGenerateUploadUrl();
+
   const {
     mutateAsync: completeUpload,
     isPending: isCompleteUploadLoading,
     error: completeUploadError,
   } = useCompleteUpload();
 
-  const uploadFile = async (file: File, visitId?: number, additionalServiceId?: number) => {
+  const {
+    mutateAsync: deleteFile,
+    isPending: isDeleteFileLoading,
+    error: deleteFileError,
+  } = useDeleteFile();
+
+  const uploadFile = async (
+    file: File,
+    visitId?: number,
+    additionalServiceId?: number,
+  ): Promise<{ downloadUrl: string; fileId: number }> => {
     const { name: fileName, size: fileSizeBytes } = file;
 
     const uploadUrlResponse = await generateUploadUrl({
@@ -39,12 +51,13 @@ export const useFileUpload = () => {
         s3Key: uploadUrlResponse.s3Key,
       },
     });
-    return downloadUrl;
+    return { downloadUrl, fileId: uploadUrlResponse.attachmentId };
   };
 
   return {
     uploadFile,
-    isLoading: isGenerateUploadUrlLoading || isCompleteUploadLoading,
-    uploadError: uploadUrlError || completeUploadError,
+    deleteFile,
+    isLoading: isGenerateUploadUrlLoading || isCompleteUploadLoading || isDeleteFileLoading,
+    uploadError: uploadUrlError || completeUploadError || deleteFileError,
   };
 };
