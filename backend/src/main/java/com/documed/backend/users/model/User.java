@@ -45,7 +45,7 @@ public class User {
   @Schema private String pwzNumber;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  @NonNull private boolean emailNotifications;
+  private boolean emailNotifications;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull private UserRole role;

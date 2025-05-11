@@ -19,11 +19,11 @@ public class Visit {
   private String diagnosis;
   private String recommendations;
   private BigDecimal totalCost;
-  @NonNull private int facilityId;
-  @NonNull private int serviceId;
+  private int facilityId;
+  private int serviceId;
   private String patientInformation;
-  @NonNull private int patientId;
-  @NonNull private int doctorId;
+  private int patientId;
+  private int doctorId;
   private int prescriptionId;
   private Feedback feedback;
   private List<Attachment> attachments;
