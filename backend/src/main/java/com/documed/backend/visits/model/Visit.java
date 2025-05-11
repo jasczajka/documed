@@ -2,9 +2,7 @@ package com.documed.backend.visits.model;
 
 import com.documed.backend.attachments.model.Attachment;
 import com.documed.backend.notifications.Notification;
-import com.documed.backend.prescriptions.Prescription;
 import com.documed.backend.referrals.Referral;
-import com.documed.backend.services.Service;
 import java.math.BigDecimal;
 import java.util.List;
 
