@@ -1,13 +1,16 @@
-import { Delete, UploadFile } from '@mui/icons-material';
-import { Box, IconButton, LinearProgress, Typography } from '@mui/material';
+import { Delete, Upload, UploadFile } from '@mui/icons-material';
+import { Box, IconButton, LinearProgress, Link, Typography } from '@mui/material';
 import { FC } from 'react';
 
 interface FileCardProps {
   fileSize: string;
   fileName: string;
-  status: 'loading' | 'error' | 'loaded';
+  status: 'loading' | 'error' | 'loaded' | 'uploaded';
   onDelete: () => void;
+  onConfirmUpload?: () => Promise<void>;
+  downloadUrl?: string;
   errorMessage?: string;
+  loading?: boolean;
 }
 
 export const FileCard: FC<FileCardProps> = ({
@@ -15,9 +18,40 @@ export const FileCard: FC<FileCardProps> = ({
   fileName,
   status,
   onDelete,
+  onConfirmUpload,
+  downloadUrl,
   errorMessage,
+  loading,
 }) => {
   const isError = status === 'error';
+  const isSuccessfullyUploaded = status === 'uploaded';
+  const isSuccessfullyLoaded = status === 'loaded';
+  const isLoading = status === 'loading';
+
+  const getIconColor = () => {
+    if (isSuccessfullyUploaded) {
+      return 'success';
+    }
+    if (isError) {
+      return 'error';
+    }
+    return 'primary';
+  };
+
+  const getStatusLabel = () => {
+    if (isSuccessfullyLoaded) {
+      return 'Plik gotowy do załadowania';
+    }
+    if (isSuccessfullyUploaded) {
+      return 'Udało się załadować plik';
+    }
+    if (isLoading) {
+      return 'Ładowanie';
+    }
+    if (isError) {
+      return errorMessage ?? 'Wystąpił błąd';
+    }
+  };
 
   return (
     <Box
@@ -33,11 +67,17 @@ export const FileCard: FC<FileCardProps> = ({
       <Box sx={{ display: 'flex', flexDirection: 'row' }}>
         <UploadFile
           sx={{ display: 'flex', paddingRight: 4, height: 40, width: 40, alignSelf: 'center' }}
-          color={isError ? 'error' : 'primary'}
+          color={getIconColor()}
         />
         <Box>
           <Typography variant="subtitle1" color={isError ? 'error' : 'text.primary'}>
-            {fileName}
+            {downloadUrl ? (
+              <Link href={downloadUrl} target="_blank" rel="noopener noreferrer" underline="hover">
+                {fileName}
+              </Link>
+            ) : (
+              fileName
+            )}
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'row' }}>
             {!isError && (
@@ -51,27 +91,35 @@ export const FileCard: FC<FileCardProps> = ({
               </Typography>
             )}
             <Typography variant="body2" color={isError ? 'error' : 'text.secondary'}>
-              {status === 'loading'
-                ? 'Ładowanie'
-                : isError
-                  ? errorMessage || 'Nie udało się'
-                  : 'Załadowano'}
+              {getStatusLabel()}
             </Typography>
           </Box>
           <LinearProgress
             sx={{
               mt: 1,
             }}
-            color={isError ? 'error' : 'primary'}
-            variant={status === 'loaded' || isError ? 'determinate' : 'indeterminate'}
-            value={status === 'loaded' ? 100 : isError ? 0 : undefined}
+            color={getIconColor()}
+            variant={
+              isSuccessfullyLoaded || isSuccessfullyUploaded || isError
+                ? 'determinate'
+                : 'indeterminate'
+            }
+            value={isSuccessfullyLoaded || isSuccessfullyUploaded ? 100 : isError ? 0 : undefined}
           />
         </Box>
       </Box>
-
-      <IconButton onClick={onDelete}>
-        <Delete color="action" />
-      </IconButton>
+      <Box>
+        {!isLoading && (
+          <IconButton onClick={onDelete} disabled={loading}>
+            <Delete color="action" />
+          </IconButton>
+        )}
+        {isSuccessfullyLoaded && (
+          <IconButton onClick={onConfirmUpload} loading={loading} disabled={loading}>
+            <Upload color="action" />
+          </IconButton>
+        )}
+      </Box>
     </Box>
   );
 };

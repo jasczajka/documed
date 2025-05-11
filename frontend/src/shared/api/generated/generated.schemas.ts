@@ -273,6 +273,24 @@ export interface ChangePasswordRequestDTO {
   newPassword: string;
 }
 
+export interface GenerateUploadUrlRequestDTO {
+  fileSizeBytes: number;
+  fileName: string;
+  visitId?: number;
+  additionalServiceId?: number;
+}
+
+export interface UploadUrlResponseDTO {
+  uploadUrl: string;
+  s3Key: string;
+  attachmentId: number;
+}
+
+export interface CompleteUploadRequestDTO {
+  attachmentId: number;
+  s3Key: string;
+}
+
 export interface UpdateDoctorSpecializationsDTO {
   /** @minItems 1 */
   specializationIds: number[];
@@ -322,14 +340,24 @@ export interface AdditionalService {
   fulfiller?: User;
   service?: Service;
   status?: AdditionalServiceStatus;
-  notifications?: Notification[];
+  attachments?: Attachment[];
 }
+
+export type AttachmentStatus = (typeof AttachmentStatus)[keyof typeof AttachmentStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const AttachmentStatus = {
+  PENDING: 'PENDING',
+  UPLOADED: 'UPLOADED',
+} as const;
 
 export interface Attachment {
   id?: number;
-  url?: string;
-  visit?: Visit;
-  additionalService?: AdditionalService;
+  fileName?: string;
+  s3Key?: string;
+  status?: AttachmentStatus;
+  visitId?: number;
+  additionalServiceId?: number;
 }
 
 export interface Facility {

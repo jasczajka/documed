@@ -17,6 +17,7 @@ const ReferralsPage = lazy(() => import('./ReferralsPage'));
 const PrescriptionsPage = lazy(() => import('./PrescriptionsPage'));
 const AdministrationPage = lazy(() => import('./AdministrationPage'));
 const SingleSpecialistPage = lazy(() => import('./SingleSpecialistPage'));
+const FileUploadTestPage = lazy(() => import('./FileUploadTestPage'));
 
 const getDefaultRoutes = () => [
   {
@@ -50,6 +51,7 @@ const getAuthRoutes = (
     path: '/',
     element: <LoggedLayout />,
     children: [
+      { path: '/file-upload-test', element: <FileUploadTestPage /> },
       { path: '/', element: <Navigate to="/visits" replace /> },
       { path: '/visits', element: <VisitsPage /> },
       {
