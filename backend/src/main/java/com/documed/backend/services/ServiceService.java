@@ -17,7 +17,7 @@ public class ServiceService {
     return serviceDAO.getAll();
   }
 
-  Optional<com.documed.backend.services.Service> getById(int id) {
+  public Optional<com.documed.backend.services.Service> getById(int id) {
     return serviceDAO.getById(id);
   }
 

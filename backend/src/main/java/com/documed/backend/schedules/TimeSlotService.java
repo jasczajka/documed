@@ -2,7 +2,9 @@ package com.documed.backend.schedules;
 
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.schedules.model.WorkTime;
-import com.documed.backend.visits.Visit;
+import com.documed.backend.services.ServiceService;
+import com.documed.backend.visits.VisitService;
+import com.documed.backend.visits.model.Visit;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
@@ -10,10 +12,13 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@RequiredArgsConstructor
 @Service
 public class TimeSlotService {
 
@@ -21,10 +26,8 @@ public class TimeSlotService {
   private int slotDurationInMinutes;
 
   private final TimeSlotDAO timeSlotDAO;
-
-  public TimeSlotService(TimeSlotDAO timeSlotDAO) {
-    this.timeSlotDAO = timeSlotDAO;
-  }
+  private final VisitService visitService;
+  private final ServiceService serviceService;
 
   @Transactional
   public void createTimeSlotsForWorkTimes(List<WorkTime> workTimes) {
@@ -59,8 +62,10 @@ public class TimeSlotService {
 
   @Transactional
   public void reserveTimeSlotsForVisit(Visit visit, TimeSlot firstTimeSlot) {
+    int serviceId = visit.getServiceId();
+    com.documed.backend.services.Service service = serviceService.getById(serviceId).get();
     int neededTimeSlots =
-        (int) Math.ceil((double) visit.getService().getEstimatedTime() / slotDurationInMinutes);
+        (int) Math.ceil((double) service.getEstimatedTime() / slotDurationInMinutes);
 
     List<TimeSlot> availableSlots =
         timeSlotDAO.getAvailableTimeSlotsByDoctorAndDate(

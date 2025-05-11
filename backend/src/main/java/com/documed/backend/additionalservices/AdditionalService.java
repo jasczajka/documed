@@ -4,7 +4,7 @@ import com.documed.backend.attachments.model.Attachment;
 import com.documed.backend.notifications.Notification;
 import com.documed.backend.services.Service;
 import com.documed.backend.users.model.User;
-import com.documed.backend.visits.VisitStatus;
+import com.documed.backend.visits.model.VisitStatus;
 import java.util.Date;
 import java.util.List;
 import lombok.Data;

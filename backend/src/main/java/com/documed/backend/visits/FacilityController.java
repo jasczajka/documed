@@ -1,6 +1,8 @@
 package com.documed.backend.visits;
 
 import java.util.List;
+
+import com.documed.backend.visits.model.Facility;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
