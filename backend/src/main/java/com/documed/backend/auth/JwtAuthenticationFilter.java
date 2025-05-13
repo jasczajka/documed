@@ -50,7 +50,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             || "/api/auth/request_registration".equals(requestUri)
             || "/api/auth/confirm_registration".equals(requestUri))
         || "/api/auth/request-password-reset".equals(requestUri)
-        || "/api/auth/reset-password".equals(requestUri)) {
+        || "/api/auth/reset-password".equals(requestUri)
+        || "/api/facilities".equals(requestUri)) {
+
       logger.debug("Skipping authentication for auth endpoint: {}", requestUri);
       filterChain.doFilter(request, response);
       return;
@@ -75,9 +77,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
       Integer userId = jwtUtil.extractUserId(jwt);
       String role = jwtUtil.extractRole(jwt);
+      Integer facilityId = jwtUtil.extractFacilityId(jwt);
       logger.info("Authenticated user - ID: {}, Role: {}", userId, role);
       UserRole userRoleAsEnum = UserRole.valueOf(jwtUtil.extractRole(jwt));
-      var currentUser = new CurrentUser(userId, userRoleAsEnum);
+      var currentUser = new CurrentUser(userId, userRoleAsEnum, facilityId);
 
       var authentication =
           new UsernamePasswordAuthenticationToken(
