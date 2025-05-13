@@ -4,11 +4,14 @@ import com.documed.backend.auth.dtos.AuthResponseDTO
 import com.documed.backend.auth.exceptions.*
 import com.documed.backend.auth.model.CurrentUser
 import com.documed.backend.auth.model.OtpPurpose
+import com.documed.backend.exceptions.NotFoundException
 import com.documed.backend.users.UserDAO
 import com.documed.backend.users.UserService
 import com.documed.backend.users.model.AccountStatus
 import com.documed.backend.users.model.User
 import com.documed.backend.users.model.UserRole
+import com.documed.backend.visits.Facility
+import com.documed.backend.visits.FacilityService
 import java.sql.Date
 import java.time.LocalDate
 import java.util.Optional
@@ -25,10 +28,11 @@ class AuthServiceTest extends Specification {
 	def userService = Mock(UserService)
 	def otpService = Mock(OtpService)
 	def emailService = Mock(EmailService)
+	def facilityService = Mock(FacilityService)
 
 	@Subject
 	AuthService authService = new AuthService(
-	userDAO, passwordEncoder, jwtUtil, userService, otpService, emailService
+	userDAO, passwordEncoder, jwtUtil, userService, otpService, emailService, facilityService
 	)
 
 	private User buildPatient(Map overrides = [:]) {
@@ -60,6 +64,16 @@ class AuthServiceTest extends Specification {
 				.password(overrides.password ?: 'pass')
 				.accountStatus(overrides.accountStatus ?: AccountStatus.ACTIVE)
 				.role(UserRole.DOCTOR)
+		return builder.build()
+	}
+
+	private Facility buildFacility(Map overrides = [:]) {
+		def builder = Facility.builder()
+		if (overrides.id != null) builder.id(overrides.id)
+		builder
+				.address(overrides.address ?: '123 Mockingbird Lane')
+				.city(overrides.city ?: 'Testville')
+				.visits(overrides.visits ?: [])
 		return builder.build()
 	}
 
@@ -135,11 +149,9 @@ class AuthServiceTest extends Specification {
 		otpService.validateOtp('e','o', OtpPurpose.REGISTRATION) >> true
 		def activated = buildPatient(id: 42, email: 'e', accountStatus: AccountStatus.ACTIVE)
 		userService.activateUser('e') >> activated
-		jwtUtil.generateToken(42, 'PATIENT') >> 'tok'
 		when:
 		def dto = authService.confirmRegistration('e','o')
 		then:
-		dto.token == 'tok'
 		dto.userId == 42
 		dto.role == UserRole.PATIENT
 	}
@@ -157,11 +169,9 @@ class AuthServiceTest extends Specification {
 		def doc = buildDoctor(id:1, email:'e', password:'enc', pwzNumber:'pwz')
 		userDAO.createAndReturn(_ as User) >> doc
 		userService.addSpecializationsToUser(1, [1, 2]) >> null
-		jwtUtil.generateToken(1, 'DOCTOR') >> 't'
 		when:
 		def dto = authService.registerDoctor('fn','ln','e','pwz','pw','ph',[1, 2])
 		then:
-		dto.token == 't'
 		dto.userId == 1
 		dto.role == UserRole.DOCTOR
 	}
@@ -172,11 +182,9 @@ class AuthServiceTest extends Specification {
 		passwordEncoder.encode('pw') >> 'enc'
 		def staff = buildStaff(id:2, email:'e', password:'enc', role:'ADMINISTRATOR')
 		userDAO.createAndReturn(_ as User) >> staff
-		jwtUtil.generateToken(2, 'ADMINISTRATOR') >> 'x'
 		when:
 		def dto = authService.registerStaff('fn','ln','e','pw','ADMINISTRATOR')
 		then:
-		dto.token == 'x'
 		dto.userId == 2
 		dto.role == UserRole.ADMINISTRATOR
 	}
@@ -186,20 +194,22 @@ class AuthServiceTest extends Specification {
 		def user = buildPatient(id:3, email:'l', password:'enc', accountStatus:AccountStatus.ACTIVE)
 		userDAO.getByEmail('l') >> Optional.of(user)
 		userDAO.getByPesel('l') >> Optional.empty()
+		facilityService.getById(1) >> Optional.of(buildFacility())
 		passwordEncoder.matches('pw','enc') >> true
-		jwtUtil.generateToken(3,'PATIENT') >> 'tok'
+		jwtUtil.generateToken(3,'PATIENT', 1) >> 'tok'
 		when:
-		def dto = authService.loginUser('l','pw')
+		def dto = authService.loginUser('l','pw', 1)
 		then: dto.token == 'tok'
 	}
 
 	def "loginUser throws UserNotFoundException when no user"() {
 		given:
+		facilityService.getById(1) >> Optional.of(buildFacility())
 		userDAO.getByEmail('l') >> Optional.empty()
 		userDAO.getByPesel('l') >> Optional.empty()
 
 		when:
-		authService.loginUser('l','pw')
+		authService.loginUser('l','pw', 1)
 
 		then:
 		thrown(UserNotFoundException)
@@ -208,24 +218,42 @@ class AuthServiceTest extends Specification {
 	def "loginUser throws InvalidCredentialsException for wrong password"() {
 		given:
 		def u = buildPatient(id:4, email:'l', password:'enc', accountStatus:AccountStatus.ACTIVE)
+		facilityService.getById(1) >> Optional.of(buildFacility())
 		userDAO.getByEmail('l') >> Optional.of(u)
 		passwordEncoder.matches('pw','enc') >> false
 
 		when:
-		authService.loginUser('l','pw')
+		authService.loginUser('l','pw', 1)
 
 		then:
 		thrown(InvalidCredentialsException)
+	}
+
+	def "loginUser throws NotFoundException when facility not found"() {
+		given:
+		def user = buildPatient(id: 3, email: 'l', password: 'enc', accountStatus: AccountStatus.ACTIVE)
+		userDAO.getByEmail('l') >> Optional.of(user)
+		userDAO.getByPesel('l') >> Optional.empty()
+		passwordEncoder.matches('pw', 'enc') >> true
+
+		facilityService.getById(1) >> Optional.empty()
+
+		when:
+		authService.loginUser('l', 'pw', 1)
+
+		then:
+		thrown(NotFoundException)
 	}
 
 	def "loginUser throws AccountNotActiveException when account not active"() {
 		given:
 		def u = buildPatient(id:5, email:'l', password:'enc', accountStatus:AccountStatus.PENDING_CONFIRMATION)
 		userDAO.getByEmail('l') >> Optional.of(u)
+		facilityService.getById(1) >> Optional.of(buildFacility())
 		passwordEncoder.matches('pw','enc') >> true
 
 		when:
-		authService.loginUser('l','pw')
+		authService.loginUser('l','pw',1)
 
 		then:
 		thrown(AccountNotActiveException)

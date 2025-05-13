@@ -254,6 +254,7 @@ export interface LoginRequestDTO {
   login: string;
   /** @minLength 1 */
   password: string;
+  facilityId: number;
 }
 
 export interface ConfirmRegistrationRequestDTO {
@@ -320,6 +321,12 @@ export interface MedicineWithAmount {
   commonName: string;
   dosage: string;
   amount: number;
+}
+
+export interface FacilityLoginReturnDTO {
+  id: number;
+  address: string;
+  city: string;
 }
 
 export type AdditionalServiceStatus =

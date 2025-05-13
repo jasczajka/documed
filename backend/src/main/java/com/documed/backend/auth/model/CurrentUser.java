@@ -11,4 +11,5 @@ import lombok.ToString;
 public class CurrentUser {
   private final Integer userId;
   private final UserRole role;
+  private final Integer facilityId;
 }

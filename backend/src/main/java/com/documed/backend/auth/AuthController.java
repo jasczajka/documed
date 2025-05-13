@@ -165,7 +165,8 @@ public class AuthController {
       @Valid @RequestBody LoginRequestDTO request, HttpServletResponse servletResponse) {
     logger.info("Login attempt for: {}", request.getLogin());
 
-    AuthResponseDTO authResponse = authService.loginUser(request.getLogin(), request.getPassword());
+    AuthResponseDTO authResponse =
+        authService.loginUser(request.getLogin(), request.getPassword(), request.getFacilityId());
     logger.debug("Login successful for user ID: {}", authResponse.getUserId());
 
     Cookie jwtCookie = new Cookie(JWT_COOKIE_NAME, authResponse.getToken());
