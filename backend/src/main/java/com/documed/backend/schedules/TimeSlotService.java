@@ -26,7 +26,6 @@ public class TimeSlotService {
   private int slotDurationInMinutes;
 
   private final TimeSlotDAO timeSlotDAO;
-  private final VisitService visitService;
   private final ServiceService serviceService;
 
   @Transactional
@@ -56,7 +55,7 @@ public class TimeSlotService {
     }
   }
 
-  Optional<TimeSlot> getTimeSlotById(int id) {
+  public Optional<TimeSlot> getTimeSlotById(int id) {
     return timeSlotDAO.getById(id);
   }
 

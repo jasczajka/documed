@@ -6,8 +6,12 @@ import com.documed.backend.visits.model.VisitStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +38,30 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
 
     @Override
     public Visit create(Visit creationObject) {
-        return null;
+        String sql = "INSERT INTO visit (status, facility_id, service_id, patient_id, patient_information) VALUES (?, ?, ?, ?, ?) RETURNING id";
+
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+
+        jdbcTemplate.update(
+                connection -> {
+                    PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                    ps.setString(1, creationObject.getStatus().name());
+                    ps.setInt(2, creationObject.getFacilityId());
+                    ps.setInt(3, creationObject.getServiceId());
+                    ps.setInt(4, creationObject.getPatientId());
+                    ps.setString(5, creationObject.getPatientInformation());
+                    return ps;
+                },
+                keyHolder);
+
+        Number key = keyHolder.getKey();
+
+        if (key != null) {
+            creationObject.setId(key.intValue());
+            return creationObject;
+        } else {
+            throw new IllegalStateException("Failed retrieve id value");
+        }
     }
 
     @Override
