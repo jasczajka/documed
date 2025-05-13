@@ -17,13 +17,17 @@ import type {
 } from '@tanstack/react-query';
 import { useQuery } from '@tanstack/react-query';
 
-import type { Facility } from '../generated.schemas';
+import type { Facility, FacilityLoginReturnDTO } from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
 
 export const getAllFacilities = (signal?: AbortSignal) => {
-  return customInstance<Facility[]>({ url: `/api/facilities`, method: 'GET', signal });
+  return customInstance<FacilityLoginReturnDTO[]>({
+    url: `/api/facilities`,
+    method: 'GET',
+    signal,
+  });
 };
 
 export const getGetAllFacilitiesQueryKey = () => {

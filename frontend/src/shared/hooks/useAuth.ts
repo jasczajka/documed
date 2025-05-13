@@ -56,7 +56,7 @@ export const useAuth = () => {
     }
   };
 
-  const login = async (credentials: { login: string; password: string }) => {
+  const login = async (credentials: { login: string; password: string; facilityId: number }) => {
     try {
       await loginMutation({ data: credentials });
       const { data } = await fetchCurrentUser();
