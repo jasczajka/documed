@@ -1,8 +1,11 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Button, TextField, Typography } from '@mui/material';
-import { FC } from 'react';
+import { Autocomplete, Box, Button, TextField, Typography } from '@mui/material';
+import { FC, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Link } from 'react-router';
+import { getAllFacilities } from 'shared/api/generated/facility-controller/facility-controller';
+import { FacilityLoginReturnDTO } from 'shared/api/generated/generated.schemas';
+import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useSitemap } from 'shared/hooks/useSitemap';
 import { DocuMedLogo } from 'shared/icons/DocuMedLogo';
@@ -11,6 +14,7 @@ import * as Yup from 'yup';
 type FormData = {
   login: string;
   password: string;
+  facilityId: number;
 };
 
 const validationSchema = Yup.object({
@@ -22,10 +26,17 @@ const validationSchema = Yup.object({
       (value) => Yup.string().email().isValidSync(value) || /^[0-9]{11}$/.test(value),
     ),
   password: Yup.string().required('Hasło jest wymagane'),
+  facilityId: Yup.number().required('Proszę wybrać placówkę'),
 });
 
 export const LoginPage: FC = () => {
+  const [facilities, setFacilities] = useState<FacilityLoginReturnDTO[] | null>(null);
   const { login, loading, loginError } = useAuth();
+
+  useEffect(() => {
+    getAllFacilities().then((returnedFacilities) => setFacilities(returnedFacilities));
+  }, []);
+
   const {
     control,
     handleSubmit,
@@ -35,6 +46,7 @@ export const LoginPage: FC = () => {
     defaultValues: {
       login: '',
       password: '',
+      facilityId: undefined,
     },
   });
   const sitemap = useSitemap();
@@ -47,6 +59,10 @@ export const LoginPage: FC = () => {
       console.error('Login error:', error);
     }
   };
+
+  if (!facilities) {
+    return <FullPageLoadingSpinner />;
+  }
 
   return (
     <main className="flex h-full w-full flex-col items-center justify-center pt-40">
@@ -89,6 +105,27 @@ export const LoginPage: FC = () => {
               error={!!errors.password}
               helperText={errors.password?.message}
               type="password"
+              fullWidth
+            />
+          )}
+        />
+        <Controller
+          name="facilityId"
+          control={control}
+          render={({ field }) => (
+            <Autocomplete
+              options={facilities}
+              getOptionLabel={(option) => `${option.city} ${option.address}`}
+              onChange={(_, value) => field.onChange(value?.id)}
+              value={facilities.find((f) => f.id === field.value)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Placówka"
+                  error={!!errors.facilityId}
+                  helperText={errors.facilityId?.message}
+                />
+              )}
               fullWidth
             />
           )}

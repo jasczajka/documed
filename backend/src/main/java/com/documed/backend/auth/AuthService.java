@@ -4,10 +4,12 @@ import com.documed.backend.auth.dtos.AuthResponseDTO;
 import com.documed.backend.auth.exceptions.*;
 import com.documed.backend.auth.model.CurrentUser;
 import com.documed.backend.auth.model.OtpPurpose;
+import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.users.*;
 import com.documed.backend.users.model.AccountStatus;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
+import com.documed.backend.visits.FacilityService;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
@@ -31,6 +33,8 @@ public class AuthService {
   private final OtpService otpService;
   private final EmailService emailService;
 
+  private final FacilityService facilityService;
+
   private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
   public AuthService(
@@ -39,13 +43,15 @@ public class AuthService {
       JwtUtil jwtUtil,
       UserService userService,
       OtpService otpService,
-      EmailService emailService) {
+      EmailService emailService,
+      FacilityService facilityService) {
     this.userDAO = userDAO;
     this.passwordEncoder = passwordEncoder;
     this.jwtUtil = jwtUtil;
     this.userService = userService;
     this.otpService = otpService;
     this.emailService = emailService;
+    this.facilityService = facilityService;
   }
 
   @Transactional
@@ -119,10 +125,7 @@ public class AuthService {
 
     User activatedUser = userService.activateUser(email);
 
-    String token = jwtUtil.generateToken(activatedUser.getId(), activatedUser.getRole().name());
-
     return AuthResponseDTO.builder()
-        .token(token)
         .userId(activatedUser.getId())
         .role(activatedUser.getRole())
         .build();
@@ -157,10 +160,8 @@ public class AuthService {
       User createdUser = userDAO.createAndReturn(user);
 
       userService.addSpecializationsToUser(createdUser.getId(), specializationIds);
-      String token = jwtUtil.generateToken(createdUser.getId(), createdUser.getRole().name());
 
       return AuthResponseDTO.builder()
-          .token(token)
           .userId(createdUser.getId())
           .role(createdUser.getRole())
           .build();
@@ -189,10 +190,8 @@ public class AuthService {
               .build();
 
       User createdUser = userDAO.createAndReturn(user);
-      String token = jwtUtil.generateToken(createdUser.getId(), createdUser.getRole().name());
 
       return AuthResponseDTO.builder()
-          .token(token)
           .userId(createdUser.getId())
           .role(createdUser.getRole())
           .build();
@@ -202,7 +201,7 @@ public class AuthService {
     }
   }
 
-  public AuthResponseDTO loginUser(String login, String password) {
+  public AuthResponseDTO loginUser(String login, String password, Integer facilityId) {
     try {
       User user =
           userDAO
@@ -217,8 +216,11 @@ public class AuthService {
       if (user.getAccountStatus() != AccountStatus.ACTIVE) {
         throw new AccountNotActiveException("Account is not active");
       }
+      facilityService
+          .getById(facilityId)
+          .orElseThrow(() -> new NotFoundException("Facility not found"));
 
-      String token = jwtUtil.generateToken(user.getId(), user.getRole().name());
+      String token = jwtUtil.generateToken(user.getId(), user.getRole().name(), facilityId);
 
       return AuthResponseDTO.builder()
           .token(token)
@@ -286,6 +288,18 @@ public class AuthService {
     Object principal = authentication.getPrincipal();
     if (principal instanceof CurrentUser currentUser) {
       return currentUser.getRole();
+    }
+    return null;
+  }
+
+  public Integer getCurrentFacilityId() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    if (authentication == null || !authentication.isAuthenticated()) {
+      return null;
+    }
+    Object principal = authentication.getPrincipal();
+    if (principal instanceof CurrentUser currentUser) {
+      return currentUser.getFacilityId();
     }
     return null;
   }

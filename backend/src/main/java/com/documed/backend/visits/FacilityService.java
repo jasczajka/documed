@@ -17,7 +17,7 @@ public class FacilityService {
     return facilityDAO.getAll();
   }
 
-  Optional<Facility> getById(int id) {
+  public Optional<Facility> getById(int id) {
     return facilityDAO.getById(id);
   }
 }

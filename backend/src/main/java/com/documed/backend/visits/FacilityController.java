@@ -1,5 +1,6 @@
 package com.documed.backend.visits;
 
+import com.documed.backend.visits.dtos.FacilityLoginReturnDTO;
 import java.util.List;
 
 import com.documed.backend.visits.model.Facility;
@@ -18,12 +19,23 @@ public class FacilityController {
   FacilityService facilityService;
 
   @GetMapping
-  public ResponseEntity<List<Facility>> getAllFacilities() {
+  public ResponseEntity<List<FacilityLoginReturnDTO>> getAllFacilities() {
     List<Facility> facilities = facilityService.getAll();
     if (facilities.isEmpty()) {
       return ResponseEntity.notFound().build();
     } else {
-      return ResponseEntity.ok(facilities);
+      List<FacilityLoginReturnDTO> dtos =
+          facilities.stream()
+              .map(
+                  facility ->
+                      FacilityLoginReturnDTO.builder()
+                          .id(facility.getId())
+                          .address(facility.getAddress())
+                          .city(facility.getCity())
+                          .build())
+              .toList();
+
+      return ResponseEntity.ok(dtos);
     }
   }
 
