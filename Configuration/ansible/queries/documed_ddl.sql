@@ -183,7 +183,7 @@ CREATE TABLE IF NOT EXISTS Visit (
     interview text  NULL,
     diagnosis text  NULL,
     recommendations text  NULL,
-    total_cost decimal(6,2)  NOT NULL,
+    total_cost decimal(6,2)  NULL,
     facility_id int  NOT NULL,
     service_id int  NOT NULL,
     patient_information varchar(255)  NULL,

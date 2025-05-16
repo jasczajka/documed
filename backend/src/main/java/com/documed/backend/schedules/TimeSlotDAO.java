@@ -85,7 +85,6 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
         SELECT id, doctor_id, start_time, end_time, date, is_busy, visit_id
         FROM time_slot
         WHERE doctor_id = ? AND date = ? AND is_busy = false
-        ORDER BY start_time
 """;
 
     return jdbcTemplate.query(sql, rowMapper, doctorId, Date.valueOf(date));

@@ -6,15 +6,14 @@ import lombok.Data;
 
 @Data
 public class ScheduleVisitDTO {
-    private final String patientInformation;
+  private final String patientInformation;
 
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "ID pacjenta jest wymagane") private final int patientId;
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "ID slotu jest wymagane") private final int firstTimeSlotId;
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "ID usługi jest wymagane") private final int serviceId;
-    @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-    @NotNull(message = "ID placówki jest wymagane") private final int facilityId;
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  @NotNull(message = "ID pacjenta jest wymagane") private final int patientId;
 
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  @NotNull(message = "ID slotu jest wymagane") private final int firstTimeSlotId;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  @NotNull(message = "ID usługi jest wymagane") private final int serviceId;
 }

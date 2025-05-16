@@ -3,16 +3,15 @@ package com.documed.backend.schedules;
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.schedules.model.WorkTime;
 import com.documed.backend.services.ServiceService;
-import com.documed.backend.visits.VisitService;
 import com.documed.backend.visits.model.Visit;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -69,6 +68,8 @@ public class TimeSlotService {
     List<TimeSlot> availableSlots =
         timeSlotDAO.getAvailableTimeSlotsByDoctorAndDate(
             firstTimeSlot.getDoctorId(), firstTimeSlot.getDate());
+
+    availableSlots.sort(Comparator.comparing(TimeSlot::getId));
 
     int startIndex =
         IntStream.range(0, availableSlots.size())

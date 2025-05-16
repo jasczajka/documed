@@ -1,11 +1,10 @@
 package com.documed.backend.visits;
 
 import com.documed.backend.ReadDAO;
+import com.documed.backend.visits.model.Facility;
 import java.util.List;
 import java.util.Optional;
 import javax.sql.DataSource;
-
-import com.documed.backend.visits.model.Facility;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 

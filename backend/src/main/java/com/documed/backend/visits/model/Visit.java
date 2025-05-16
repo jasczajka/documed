@@ -5,7 +5,6 @@ import com.documed.backend.notifications.Notification;
 import com.documed.backend.referrals.Referral;
 import java.math.BigDecimal;
 import java.util.List;
-
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -23,8 +22,6 @@ public class Visit {
   private int serviceId;
   private String patientInformation;
   private int patientId;
-  private int doctorId;
-  private int prescriptionId;
   private Feedback feedback;
   private List<Attachment> attachments;
   private List<Referral> referrals;
