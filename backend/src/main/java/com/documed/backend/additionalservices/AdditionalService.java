@@ -2,7 +2,7 @@ package com.documed.backend.additionalservices;
 
 import com.documed.backend.attachments.model.Attachment;
 import com.documed.backend.notifications.Notification;
-import com.documed.backend.services.Service;
+import com.documed.backend.services.model.Service;
 import com.documed.backend.users.model.User;
 import com.documed.backend.visits.VisitStatus;
 import java.util.Date;
