@@ -20,7 +20,7 @@ public class AdditionalServiceController {
 
   @StaffOnly
   @PostMapping
-  public ResponseEntity<AdditionalService> createAdditionalService(
+  public ResponseEntity<AdditionalServiceReturnDTO> createAdditionalService(
       @RequestBody @Valid CreateAdditionalServiceDTO createDto) {
     AdditionalService additionalService =
         additionalServiceService.createAdditionalService(
@@ -39,7 +39,8 @@ public class AdditionalServiceController {
         additionalServiceService.updateAttachmentsForAdditionalService(
             additionalService.getId(), attachmentIds);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(additionalServiceWithAttachments);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(AdditionalServiceMapper.toDto(additionalServiceWithAttachments));
   }
 
   @StaffOnly
