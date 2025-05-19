@@ -1,7 +1,7 @@
 package com.documed.backend.services
 
+import com.documed.backend.services.model.Service
 import com.documed.backend.users.model.Specialization
-import java.math.BigDecimal
 import spock.lang.Specification
 
 class ServiceServiceTest extends Specification {

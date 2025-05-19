@@ -4,7 +4,7 @@ import com.documed.backend.attachments.model.Attachment;
 import com.documed.backend.notifications.Notification;
 import com.documed.backend.prescriptions.Prescription;
 import com.documed.backend.referrals.Referral;
-import com.documed.backend.services.Service;
+import com.documed.backend.services.model.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.Builder;

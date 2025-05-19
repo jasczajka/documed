@@ -1,14 +1,13 @@
 package com.documed.backend.services;
 
 import com.documed.backend.FullDAO;
+import com.documed.backend.services.model.Service;
 import com.documed.backend.users.SpecializationDAO;
 import com.documed.backend.users.model.Specialization;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -60,19 +59,52 @@ public class ServiceDAO implements FullDAO<Service, Service> {
 
   @Override
   public Optional<Service> getById(int id) {
-    String sql = "SELECT * FROM service WHERE id = ?";
+    String sql =
+        """
+      SELECT
+        s.id AS service_id,
+        s.name,
+        s.price,
+        s.type,
+        s.estimated_time,
+        ss.specialization_id
+      FROM service s
+      LEFT JOIN specialization_service ss ON s.id = ss.service_id
+      WHERE s.id = ?
+      """;
 
     List<Service> services =
         jdbcTemplate.query(
             sql,
-            (rs, rowNum) ->
-                Service.builder()
-                    .id(id)
-                    .name(rs.getString("name"))
-                    .price(rs.getBigDecimal("price"))
-                    .type(ServiceType.valueOf(rs.getString("type")))
-                    .estimatedTime(rs.getInt("estimated_time"))
-                    .build(),
+            rs -> {
+              if (!rs.next()) return List.of();
+
+              int serviceId = rs.getInt("service_id");
+              String name = rs.getString("name");
+              BigDecimal price = rs.getBigDecimal("price");
+              ServiceType type = ServiceType.valueOf(rs.getString("type"));
+              int estimatedTime = rs.getInt("estimated_time");
+
+              List<Integer> specializationIds = new ArrayList<>();
+              do {
+                int specId = rs.getInt("specialization_id");
+                if (!rs.wasNull()) {
+                  specializationIds.add(specId);
+                }
+              } while (rs.next());
+
+              Service service =
+                  Service.builder()
+                      .id(serviceId)
+                      .name(name)
+                      .price(price)
+                      .type(type)
+                      .estimatedTime(estimatedTime)
+                      .specializationIds(specializationIds)
+                      .build();
+
+              return List.of(service);
+            },
             id);
 
     return services.stream().findFirst();
@@ -80,23 +112,49 @@ public class ServiceDAO implements FullDAO<Service, Service> {
 
   @Override
   public List<Service> getAll() {
-    String sql = "SELECT * FROM service";
+    String sql =
+        """
+        SELECT
+            s.id AS service_id,
+            s.name,
+            s.price,
+            s.type,
+            s.estimated_time,
+            ss.specialization_id
+        FROM service s
+        LEFT JOIN specialization_service ss ON s.id = ss.service_id
+        ORDER BY s.id
+        """;
 
     return jdbcTemplate.query(
         sql,
-        (rs, rowNum) -> {
-          int id = rs.getInt("id");
-          String name = rs.getString("name");
-          BigDecimal price = rs.getBigDecimal("price");
-          ServiceType type = ServiceType.valueOf(rs.getString("type"));
-          int estimatedTime = rs.getInt("estimated_time");
-          return Service.builder()
-              .id(id)
-              .name(name)
-              .price(price)
-              .type(type)
-              .estimatedTime(estimatedTime)
-              .build();
+        rs -> {
+          Map<Integer, Service> services = new LinkedHashMap<>();
+
+          while (rs.next()) {
+            int serviceId = rs.getInt("service_id");
+            Service service = services.get(serviceId);
+
+            if (service == null) {
+              service =
+                  Service.builder()
+                      .id(serviceId)
+                      .name(rs.getString("name"))
+                      .price(rs.getBigDecimal("price"))
+                      .type(ServiceType.valueOf(rs.getString("type")))
+                      .estimatedTime(rs.getInt("estimated_time"))
+                      .specializationIds(new ArrayList<>())
+                      .build();
+              services.put(serviceId, service);
+            }
+
+            int specId = rs.getInt("specialization_id");
+            if (!rs.wasNull()) {
+              service.getSpecializationIds().add(specId);
+            }
+          }
+
+          return new ArrayList<>(services.values());
         });
   }
 
