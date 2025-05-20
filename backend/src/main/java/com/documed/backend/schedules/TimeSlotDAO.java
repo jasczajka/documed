@@ -1,6 +1,7 @@
 package com.documed.backend.schedules;
 
 import com.documed.backend.FullDAO;
+import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.schedules.model.TimeSlot;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -60,7 +61,7 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
       timeSlot.setId(key.intValue());
       return timeSlot;
     } else {
-      throw new RuntimeException("Failed retrieve id value");
+      throw new NotFoundException("Failed retrieve id value");
     }
   }
 
@@ -114,5 +115,11 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
     } else {
       throw new RuntimeException("Failed to update time slot");
     }
+  }
+
+  public boolean releaseTimeSlotsForVisit(int visitId) {
+    String sql = "UPDATE time_slot SET is_busy = false, visit_id = null WHERE visit_id = ?";
+
+    return jdbcTemplate.update(sql, visitId) > 0;
   }
 }

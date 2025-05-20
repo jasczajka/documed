@@ -1,5 +1,6 @@
 package com.documed.backend.schedules;
 
+import com.documed.backend.schedules.exceptions.NotEnoughTimeInTimeSlotException;
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.schedules.model.WorkTime;
 import com.documed.backend.services.ServiceService;
@@ -99,5 +100,9 @@ public class TimeSlotService {
 
   boolean checkTimeSlotContinuity(TimeSlot previousTimeSlot, TimeSlot currentTimeSlot) {
     return previousTimeSlot.getEndTime().equals(currentTimeSlot.getStartTime());
+  }
+
+  public boolean releaseTimeSlotsForVisit(int visitId) {
+    return timeSlotDAO.releaseTimeSlotsForVisit(visitId);
   }
 }

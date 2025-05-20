@@ -2,6 +2,8 @@ package com.documed.backend.visits;
 
 import com.documed.backend.auth.annotations.SelfDataOnly;
 import com.documed.backend.auth.annotations.StaffOnly;
+import com.documed.backend.visits.dtos.UpdateVisitDTO;
+import com.documed.backend.visits.exceptions.CancelVisitException;
 import com.documed.backend.visits.model.ScheduleVisitDTO;
 import com.documed.backend.visits.model.Visit;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,7 +43,7 @@ public class VisitController {
   @StaffOnly
   @PatchMapping("/{id}/start")
   @Operation(summary = "start visit")
-  public ResponseEntity<Boolean> startVisit(@PathVariable("id") int id) {
+  public ResponseEntity<Visit> startVisit(@PathVariable("id") int id) {
     visitService.startVisit(id);
 
     return new ResponseEntity<>(HttpStatus.OK);
@@ -50,10 +52,13 @@ public class VisitController {
   @StaffOnly
   @PatchMapping("/{id}/cancel")
   @Operation(summary = "cancel visit")
-  public ResponseEntity<Boolean> cancelPlannedVisit(@PathVariable("id") int id) {
-    // visitService.cancelVisit(id);
-    // TODO: implement cancel visit
-    return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+  public ResponseEntity<String> cancelPlannedVisit(@PathVariable("id") int id) {
+
+    if (visitService.cancelVisit(id)) {
+      return new ResponseEntity<>("Visit cancelled successfully", HttpStatus.OK);
+    } else {
+      throw new CancelVisitException("Failed to cancel visit " + id);
+    }
   }
 
   @SelfDataOnly
@@ -90,5 +95,26 @@ public class VisitController {
     List<Visit> visits = visitService.getVisitsForCurrentDoctor();
 
     return new ResponseEntity<>(visits, HttpStatus.OK);
+  }
+
+  @StaffOnly
+  @PatchMapping("/{id}")
+  @Operation(summary = "update visit data")
+  public ResponseEntity<Visit> updateVisit(
+      @PathVariable("id") int visitId, @RequestBody UpdateVisitDTO updateVisitDTO) {
+    Visit updatedVisit = visitService.updateVisit(visitId, updateVisitDTO);
+    return new ResponseEntity<>(updatedVisit, HttpStatus.OK);
+  }
+
+  @StaffOnly
+  @PatchMapping("/{id}/close")
+  @Operation(summary = "finish visit")
+  public ResponseEntity<String> finishVisit(
+      @PathVariable("id") int visitId, @RequestBody UpdateVisitDTO updateVisitDTO) {
+    if (visitService.closeVisit(visitId, updateVisitDTO)) {
+      return new ResponseEntity<>("Visit closed successfully", HttpStatus.OK);
+    } else {
+      return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
   }
 }

@@ -1,10 +1,6 @@
 package com.documed.backend.visits.model;
 
-import com.documed.backend.attachments.model.Attachment;
-import com.documed.backend.notifications.Notification;
-import com.documed.backend.referrals.Referral;
 import java.math.BigDecimal;
-import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -22,8 +18,4 @@ public class Visit {
   private int serviceId;
   private String patientInformation;
   private int patientId;
-  private Feedback feedback;
-  private List<Attachment> attachments;
-  private List<Referral> referrals;
-  private List<Notification> notifications;
 }

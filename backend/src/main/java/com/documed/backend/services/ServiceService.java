@@ -72,4 +72,11 @@ public class ServiceService {
   int removeSpecializationFromService(int serviceId, int specializationId) {
     return serviceDAO.removeSpecializationFromService(serviceId, specializationId);
   }
+
+  public BigDecimal getPriceForService(int serviceId) {
+    return serviceDAO
+        .getById(serviceId)
+        .map(com.documed.backend.services.Service::getPrice)
+        .orElseThrow(RuntimeException::new);
+  }
 }

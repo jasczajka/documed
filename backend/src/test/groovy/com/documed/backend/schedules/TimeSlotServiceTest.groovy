@@ -1,5 +1,6 @@
 package com.documed.backend.schedules
 
+import com.documed.backend.schedules.exceptions.NotEnoughTimeInTimeSlotException
 import com.documed.backend.schedules.model.TimeSlot
 import com.documed.backend.schedules.model.WorkTime
 import com.documed.backend.services.Service

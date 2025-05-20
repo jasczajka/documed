@@ -65,13 +65,13 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
 
   @Override
   public int delete(int id) {
-    return 0;
+    throw new UnsupportedOperationException("Operation nor supported.");
   }
 
   @Override
   public Optional<Visit> getById(int id) {
     String sql =
-        "SELECT id, status, interview, diagnosis, recommendations, total_cost, facility_id, service_id, patient_information, patient_id, prescription_id FROM visit WHERE id = ?";
+        "SELECT id, status, interview, diagnosis, recommendations, total_cost, facility_id, service_id, patient_information, patient_id FROM visit WHERE id = ?";
 
     List<Visit> visits = jdbcTemplate.query(sql, rowMapper, id);
 
@@ -105,5 +105,29 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
             + "WHERE time_slot.doctor_id = ?";
 
     return jdbcTemplate.query(sql, rowMapper, doctorId);
+  }
+
+  public Visit update(Visit visit) {
+    String sql =
+        """
+        UPDATE visit
+        SET interview = ?,
+        diagnosis = ?,
+        recommendations = ?
+        WHERE id = ?;
+  """;
+
+    jdbcTemplate.update(
+        sql, visit.getInterview(), visit.getDiagnosis(), visit.getRecommendations(), visit.getId());
+    return visit;
+  }
+
+  public VisitStatus getVisitStatus(int visitId) {
+    String sql = "SELECT status FROM visit WHERE id = ?";
+    return jdbcTemplate
+        .query(sql, (rs, rowNum) -> VisitStatus.valueOf(rs.getString("status")), visitId)
+        .stream()
+        .findFirst()
+        .orElseThrow();
   }
 }
