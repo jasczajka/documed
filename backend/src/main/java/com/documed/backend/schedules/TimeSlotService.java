@@ -4,6 +4,7 @@ import com.documed.backend.schedules.exceptions.NotEnoughTimeInTimeSlotException
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.schedules.model.WorkTime;
 import com.documed.backend.services.ServiceService;
+import com.documed.backend.visits.exceptions.CancelVisitException;
 import com.documed.backend.visits.model.Visit;
 import java.time.DayOfWeek;
 import java.time.Duration;
@@ -102,7 +103,9 @@ public class TimeSlotService {
     return previousTimeSlot.getEndTime().equals(currentTimeSlot.getStartTime());
   }
 
-  public boolean releaseTimeSlotsForVisit(int visitId) {
-    return timeSlotDAO.releaseTimeSlotsForVisit(visitId);
+  public void releaseTimeSlotsForVisit(int visitId) {
+    if(!timeSlotDAO.releaseTimeSlotsForVisit(visitId)){
+      throw new CancelVisitException("Failed to release time slots for visit");
+    }
   }
 }

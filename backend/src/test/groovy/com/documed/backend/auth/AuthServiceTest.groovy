@@ -1,6 +1,5 @@
 package com.documed.backend.auth
 
-import com.documed.backend.auth.dtos.AuthResponseDTO
 import com.documed.backend.auth.exceptions.*
 import com.documed.backend.auth.model.CurrentUser
 import com.documed.backend.auth.model.OtpPurpose
@@ -10,11 +9,10 @@ import com.documed.backend.users.UserService
 import com.documed.backend.users.model.AccountStatus
 import com.documed.backend.users.model.User
 import com.documed.backend.users.model.UserRole
-import com.documed.backend.visits.Facility
+import com.documed.backend.visits.model.Facility
 import com.documed.backend.visits.FacilityService
 import java.sql.Date
 import java.time.LocalDate
-import java.util.Optional
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
