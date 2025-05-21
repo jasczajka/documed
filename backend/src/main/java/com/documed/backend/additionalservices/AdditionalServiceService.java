@@ -91,30 +91,24 @@ public class AdditionalServiceService {
   }
 
   public List<AdditionalService> getByFulfiller(int fulfillerId) {
+    userDAO.getById(fulfillerId).orElseThrow(() -> new NotFoundException("Fulfiller not found"));
     List<AdditionalService> services = additionalServiceDAO.getByFulfillerId(fulfillerId);
     enrichWithAttachmentUrls(services);
     return services;
   }
 
   public List<AdditionalService> getByService(int serviceId) {
+    serviceDAO.getById(serviceId).orElseThrow(() -> new NotFoundException("Service not found"));
     List<AdditionalService> services = additionalServiceDAO.getByServiceId(serviceId);
     enrichWithAttachmentUrls(services);
     return services;
   }
 
   public List<AdditionalService> getByPatient(int patientId) {
+    userDAO.getById(patientId).orElseThrow(() -> new NotFoundException("Patient not found"));
     List<AdditionalService> services = additionalServiceDAO.getByPatientId(patientId);
     enrichWithAttachmentUrls(services);
     return services;
-  }
-
-  public void removeAttachment(int additionalServiceId, int attachmentId) {
-    Attachment attachment = s3Service.getUploadedById(attachmentId);
-    if (attachment.getAdditionalServiceId() != additionalServiceId) {
-      throw new NotFoundException("Attachment not found for this service");
-    }
-
-    s3Service.deleteFile(attachmentId);
   }
 
   @Transactional
