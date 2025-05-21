@@ -3,6 +3,8 @@ package com.documed.backend.attachments;
 import com.documed.backend.FullDAO;
 import com.documed.backend.attachments.model.Attachment;
 import com.documed.backend.attachments.model.AttachmentStatus;
+import com.documed.backend.exceptions.InvalidAssignmentException;
+import com.documed.backend.exceptions.NotFoundException;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.Types;
@@ -96,8 +98,56 @@ public class AttachmentDAO implements FullDAO<Attachment, Attachment> {
     return jdbcTemplate.query(sql, rowMapper);
   }
 
-  public List<Attachment> getUploadedByVisit(int visitId) {
+  public List<Attachment> getUploadedByVisitId(int visitId) {
     String sql = "SELECT * FROM attachment WHERE visit_id = ? AND status = 'UPLOADED'";
     return jdbcTemplate.query(sql, rowMapper, visitId);
+  }
+
+  public List<Attachment> getUploadedByAdditionalServiceId(int additionalServiceId) {
+    String sql = "SELECT * FROM attachment WHERE additional_service_id = ? AND status = 'UPLOADED'";
+    return jdbcTemplate.query(sql, rowMapper, additionalServiceId);
+  }
+
+  public Attachment assignToVisit(int attachmentId, int visitId) {
+    Attachment attachment =
+        getById(attachmentId)
+            .orElseThrow(() -> new IllegalArgumentException("Attachment not found"));
+
+    validateAttachmentAssignment(attachment);
+
+    String sql = "UPDATE attachment SET visit_id = ? WHERE id = ?";
+    int updated = jdbcTemplate.update(sql, visitId, attachmentId);
+
+    if (updated == 0) {
+      throw new IllegalStateException("Failed to assign attachment to visit");
+    }
+
+    return getById(attachmentId)
+        .orElseThrow(() -> new IllegalStateException("Attachment not found after update"));
+  }
+
+  public Attachment assignToAdditionalService(int attachmentId, int additionalServiceId) {
+    Attachment attachment =
+        getById(attachmentId)
+            .orElseThrow(() -> new IllegalArgumentException("Attachment not found"));
+
+    validateAttachmentAssignment(attachment);
+
+    String sql = "UPDATE attachment SET additional_service_id = ? WHERE id = ?";
+    int updated = jdbcTemplate.update(sql, additionalServiceId, attachmentId);
+
+    if (updated == 0) {
+      throw new IllegalStateException("Failed to assign attachment to additional service");
+    }
+
+    return getById(attachmentId)
+        .orElseThrow(() -> new NotFoundException("Attachment not found after update"));
+  }
+
+  private void validateAttachmentAssignment(Attachment attachment) {
+    if (attachment.getVisitId() != null && attachment.getAdditionalServiceId() != null) {
+      throw new InvalidAssignmentException(
+          "Attachment cannot be assigned to both a visit and additional service simultaneously");
+    }
   }
 }

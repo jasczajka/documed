@@ -4,6 +4,8 @@ import com.documed.backend.attachments.exceptions.FileUploadFailedException;
 import com.documed.backend.attachments.model.Attachment;
 import com.documed.backend.exceptions.NotFoundException;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -101,6 +103,37 @@ public class S3Service {
             .build();
 
     return s3Presigner.presignGetObject(presignRequest).url().toString();
+  }
+
+  public List<String> generatePresignedGetUrlsForVisit(int visitId) {
+    ArrayList<String> urls = new ArrayList<>();
+    List<Attachment> attachments = this.attachmentDAO.getUploadedByVisitId(visitId);
+    attachments.forEach(
+        attachment -> {
+          String url = this.generatePresignedGetUrl(attachment.getS3Key());
+          urls.add(url);
+        });
+    return urls;
+  }
+
+  public List<String> generatePresignedGetUrlsForAdditionalService(int additionalServiceId) {
+    ArrayList<String> urls = new ArrayList<>();
+    List<Attachment> attachments =
+        this.attachmentDAO.getUploadedByAdditionalServiceId(additionalServiceId);
+    attachments.forEach(
+        attachment -> {
+          String url = this.generatePresignedGetUrl(attachment.getS3Key());
+          urls.add(url);
+        });
+    return urls;
+  }
+
+  public List<Attachment> getAttachmentsForAdditionalService(int additionalServiceId) {
+    return this.attachmentDAO.getUploadedByAdditionalServiceId(additionalServiceId);
+  }
+
+  public List<Attachment> getAttachmentsForVisit(int visitId) {
+    return this.attachmentDAO.getUploadedByVisitId(visitId);
   }
 
   public void deleteFile(int fileId) {
