@@ -3,7 +3,7 @@ package com.documed.backend.schedules
 import com.documed.backend.schedules.exceptions.NotEnoughTimeInTimeSlotException
 import com.documed.backend.schedules.model.TimeSlot
 import com.documed.backend.schedules.model.WorkTime
-import com.documed.backend.services.Service
+import com.documed.backend.services.model.Service
 import com.documed.backend.visits.model.Visit
 import java.time.DayOfWeek
 import java.time.LocalDate
