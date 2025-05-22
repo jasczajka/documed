@@ -1,6 +1,7 @@
 package com.documed.backend.services;
 
 import com.documed.backend.services.dtos.CreateServiceDTO;
+import com.documed.backend.services.model.Service;
 import com.documed.backend.users.model.Specialization;
 import java.math.BigDecimal;
 import java.net.URI;

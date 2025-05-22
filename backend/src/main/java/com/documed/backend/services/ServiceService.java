@@ -13,30 +13,30 @@ public class ServiceService {
 
   private final ServiceDAO serviceDAO;
 
-  List<com.documed.backend.services.Service> getAll() {
+  List<com.documed.backend.services.model.Service> getAll() {
     return serviceDAO.getAll();
   }
 
-  public Optional<com.documed.backend.services.Service> getById(int id) {
+  public Optional<com.documed.backend.services.model.Service> getById(int id) {
     return serviceDAO.getById(id);
   }
 
-  com.documed.backend.services.Service createService(
+  com.documed.backend.services.model.Service createService(
       String name,
       BigDecimal price,
       ServiceType type,
       int estimatedTime,
       List<Integer> specializationIds) {
 
-    com.documed.backend.services.Service service =
-        com.documed.backend.services.Service.builder()
+    com.documed.backend.services.model.Service service =
+        com.documed.backend.services.model.Service.builder()
             .name(name)
             .price(price)
             .type(type)
             .estimatedTime(estimatedTime)
             .build();
 
-    com.documed.backend.services.Service createdService = serviceDAO.create(service);
+    com.documed.backend.services.model.Service createdService = serviceDAO.create(service);
     addSpecializationsToService(createdService.getId(), specializationIds);
 
     return createdService;
@@ -46,14 +46,14 @@ public class ServiceService {
     return serviceDAO.delete(id);
   }
 
-  com.documed.backend.services.Service updatePrice(int serviceId, BigDecimal price) {
+  com.documed.backend.services.model.Service updatePrice(int serviceId, BigDecimal price) {
     if (price.compareTo(BigDecimal.ZERO) <= 0) {
       throw new IllegalArgumentException("Price must be greater than zero");
     }
     return serviceDAO.updatePrice(serviceId, price);
   }
 
-  com.documed.backend.services.Service updateEstimatedTime(int serviceId, int time) {
+  com.documed.backend.services.model.Service updateEstimatedTime(int serviceId, int time) {
     if (time <= 0) {
       throw new IllegalArgumentException("Time must be greater than zero");
     }
@@ -64,7 +64,7 @@ public class ServiceService {
     return serviceDAO.addSpecializationToService(serviceId, specializationId);
   }
 
-  com.documed.backend.services.Service addSpecializationsToService(
+  com.documed.backend.services.model.Service addSpecializationsToService(
       int serviceId, List<Integer> specializationIds) {
     return serviceDAO.addSpecializationsToService(serviceId, specializationIds);
   }
@@ -76,7 +76,7 @@ public class ServiceService {
   public BigDecimal getPriceForService(int serviceId) {
     return serviceDAO
         .getById(serviceId)
-        .map(com.documed.backend.services.Service::getPrice)
+        .map(com.documed.backend.services.model.Service::getPrice)
         .orElseThrow(RuntimeException::new);
   }
 }

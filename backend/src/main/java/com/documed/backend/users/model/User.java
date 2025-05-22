@@ -1,6 +1,6 @@
 package com.documed.backend.users.model;
 
-import com.documed.backend.additionalservices.AdditionalService;
+import com.documed.backend.additionalservices.model.AdditionalService;
 import com.documed.backend.schedules.model.FreeDay;
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.schedules.model.WorkTime;
