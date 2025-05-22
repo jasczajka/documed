@@ -1,6 +1,7 @@
 package com.documed.backend.visits;
 
 import com.documed.backend.auth.AuthService;
+import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.schedules.TimeSlotService;
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.services.ServiceService;
@@ -35,8 +36,7 @@ public class VisitService {
     TimeSlot timeSlot =
         timeSlotService
             .getTimeSlotById(scheduleVisitDTO.getFirstTimeSlotId())
-            .orElseThrow(
-                () -> new IllegalArgumentException("Could not retrieve slot with given ID"));
+            .orElseThrow(() -> new NotFoundException("Could not retrieve slot with given ID"));
 
     Visit visit = createVisit(scheduleVisitDTO);
 

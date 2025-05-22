@@ -9,8 +9,8 @@ import com.documed.backend.users.UserService
 import com.documed.backend.users.model.AccountStatus
 import com.documed.backend.users.model.User
 import com.documed.backend.users.model.UserRole
-import com.documed.backend.visits.model.Facility
 import com.documed.backend.visits.FacilityService
+import com.documed.backend.visits.model.Facility
 import java.sql.Date
 import java.time.LocalDate
 import org.springframework.security.core.Authentication

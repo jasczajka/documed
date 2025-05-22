@@ -104,7 +104,7 @@ public class TimeSlotService {
   }
 
   public void releaseTimeSlotsForVisit(int visitId) {
-    if(!timeSlotDAO.releaseTimeSlotsForVisit(visitId)){
+    if (!timeSlotDAO.releaseTimeSlotsForVisit(visitId)) {
       throw new CancelVisitException("Failed to release time slots for visit");
     }
   }
