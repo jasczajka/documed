@@ -1,6 +1,5 @@
 package com.documed.backend.visits;
 
-import com.documed.backend.auth.annotations.SelfDataOnly;
 import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.visits.dtos.UpdateVisitDTO;
 import com.documed.backend.visits.exceptions.CancelVisitException;
@@ -23,13 +22,9 @@ public class VisitController {
 
   @GetMapping("/{id}")
   @Operation(summary = "Get visit by id")
-  public ResponseEntity<Optional<Visit>> getVisitById(@PathVariable("id") int id) {
-    Optional<Visit> visit = visitService.getById(id);
-    if (visit.isEmpty()) {
-      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-    } else {
+  public ResponseEntity<Visit> getVisitById(@PathVariable("id") int id) {
+    Visit visit = visitService.getById(id);
       return new ResponseEntity<>(visit, HttpStatus.OK);
-    }
   }
 
   @PostMapping
@@ -61,7 +56,6 @@ public class VisitController {
     }
   }
 
-  @SelfDataOnly
   @Operation(summary = "get all visits for logged in patient")
   @GetMapping("/patient")
   public ResponseEntity<List<Visit>> getVisitsForCurrentPatient() {
@@ -88,7 +82,6 @@ public class VisitController {
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
-  @SelfDataOnly
   @Operation(summary = "get all visits assigned for logged in doctor")
   @GetMapping("/doctor")
   public ResponseEntity<List<Visit>> getVisitsForCurrentDoctor() {
