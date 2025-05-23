@@ -7,7 +7,6 @@ import com.documed.backend.visits.model.ScheduleVisitDTO;
 import com.documed.backend.visits.model.Visit;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +23,7 @@ public class VisitController {
   @Operation(summary = "Get visit by id")
   public ResponseEntity<Visit> getVisitById(@PathVariable("id") int id) {
     Visit visit = visitService.getById(id);
-      return new ResponseEntity<>(visit, HttpStatus.OK);
+    return new ResponseEntity<>(visit, HttpStatus.OK);
   }
 
   @PostMapping

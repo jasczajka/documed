@@ -63,7 +63,8 @@ public class TimeSlotService {
   @Transactional
   public void reserveTimeSlotsForVisit(Visit visit, TimeSlot firstTimeSlot) {
     int serviceId = visit.getServiceId();
-    com.documed.backend.services.model.Service service = serviceService.getById(serviceId).orElseThrow();
+    com.documed.backend.services.model.Service service =
+        serviceService.getById(serviceId).orElseThrow();
     int neededTimeSlots =
         (int) Math.ceil((double) service.getEstimatedTime() / slotDurationInMinutes);
 

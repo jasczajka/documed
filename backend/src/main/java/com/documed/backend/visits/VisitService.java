@@ -28,8 +28,9 @@ public class VisitService {
   private final ServiceService serviceService;
 
   public Visit getById(int id) {
-    Visit visit =  visitDAO.getById(id).orElseThrow(() -> new NotFoundException("Visit not found"));
-    if (authService.getCurrentUserRole() == UserRole.PATIENT && visit.getPatientId() != authService.getCurrentUserId()) {
+    Visit visit = visitDAO.getById(id).orElseThrow(() -> new NotFoundException("Visit not found"));
+    if (authService.getCurrentUserRole() == UserRole.PATIENT
+        && visit.getPatientId() != authService.getCurrentUserId()) {
       throw new UnauthorizedException("You are not authorized to access this resource");
     }
 
