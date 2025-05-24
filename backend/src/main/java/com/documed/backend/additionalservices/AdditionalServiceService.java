@@ -7,7 +7,7 @@ import com.documed.backend.attachments.model.Attachment;
 import com.documed.backend.exceptions.InvalidAssignmentException;
 import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.services.ServiceDAO;
-import com.documed.backend.services.ServiceType;
+import com.documed.backend.services.model.ServiceType;
 import com.documed.backend.users.UserDAO;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;

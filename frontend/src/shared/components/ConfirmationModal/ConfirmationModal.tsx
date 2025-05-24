@@ -26,16 +26,26 @@ export const ConfirmationModal: FC<ConfirmationModalProps> = ({
   onCancel,
 }) => {
   return (
-    <Dialog open onClose={onCancel}>
+    <Dialog
+      open
+      onClose={onCancel}
+      PaperProps={{
+        sx: {
+          p: 3,
+          borderRadius: 3,
+          minWidth: 360,
+        },
+      }}
+    >
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
-        <DialogContentText>{message}</DialogContentText>
+        <DialogContentText sx={{ mt: 1.5 }}>{message}</DialogContentText>
       </DialogContent>
-      <DialogActions>
-        <Button onClick={onCancel} color="error" variant="contained">
+      <DialogActions sx={{ mt: 2, justifyContent: 'flex-end', gap: 1 }}>
+        <Button onClick={onCancel} color="error" variant="outlined" sx={{ minWidth: 100 }}>
           {cancelText}
         </Button>
-        <Button onClick={onConfirm} color="success" variant="contained">
+        <Button onClick={onConfirm} color="success" variant="contained" sx={{ minWidth: 100 }}>
           {confirmText}
         </Button>
       </DialogActions>

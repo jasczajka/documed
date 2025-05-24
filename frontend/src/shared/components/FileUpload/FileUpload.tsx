@@ -1,6 +1,6 @@
 import { UploadFile } from '@mui/icons-material';
 import { Box, Card, CardHeader, Typography } from '@mui/material';
-import { FC, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { ErrorCode, FileError, FileRejection, useDropzone } from 'react-dropzone';
 import FileCard from './FileCard';
 import { formatFileName, formatFileSize, readFileAsUrl } from './utils';
@@ -51,6 +51,7 @@ interface TrackedFile {
 interface FileUploadProps {
   onConfirmUpload: (file: File) => Promise<{ downloadUrl: string; fileId: number }>;
   onDeleteUploaded: (fileId: number) => Promise<string>;
+  onAttachmentsChange?: (fileIds: number[]) => void;
   className?: string;
   uploadFileLoading?: boolean;
 }
@@ -58,6 +59,7 @@ interface FileUploadProps {
 export const FileUpload: FC<FileUploadProps> = ({
   onConfirmUpload,
   onDeleteUploaded,
+  onAttachmentsChange,
   className,
   uploadFileLoading,
 }) => {
@@ -154,6 +156,18 @@ export const FileUpload: FC<FileUploadProps> = ({
       );
     }
   };
+  const notifyAttachmentsChange = useCallback(() => {
+    if (onAttachmentsChange) {
+      const uploadedIds = acceptedFiles
+        .filter((f) => f.status === 'uploaded' && f.id !== undefined)
+        .map((f) => f.id!);
+      onAttachmentsChange(uploadedIds);
+    }
+  }, [acceptedFiles, onAttachmentsChange]);
+
+  useEffect(() => {
+    notifyAttachmentsChange();
+  }, [acceptedFiles]);
 
   return (
     <Card className={className} sx={{ width: '100%', maxWidth: 600 }}>

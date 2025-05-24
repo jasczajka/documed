@@ -39,11 +39,11 @@ public class AttachmentDAO implements FullDAO<Attachment, Attachment> {
   public Attachment create(Attachment attachment) {
     String sql =
         """
-            INSERT INTO attachment
-              (file_name, s3_key,status, visit_id, additional_service_id )
-            VALUES (?, ?, ?, ?, ?)
-            RETURNING id
-            """;
+                  INSERT INTO attachment
+                    (file_name, s3_key,status, visit_id, additional_service_id )
+                  VALUES (?, ?, ?, ?, ?)
+                  RETURNING id
+                  """;
     KeyHolder kh = new GeneratedKeyHolder();
     jdbcTemplate.update(
         conn -> {
@@ -68,12 +68,21 @@ public class AttachmentDAO implements FullDAO<Attachment, Attachment> {
 
   @Override
   public Optional<Attachment> getById(int id) {
-    String sql = "SELECT * FROM attachment WHERE id = ?";
+    String sql =
+        """
+                 SELECT id, file_name, s3_key, status, visit_id, additional_service_id FROM
+                 attachment WHERE id = ?
+                 """;
     return jdbcTemplate.query(sql, rowMapper, id).stream().findFirst();
   }
 
   public Optional<Attachment> getUploadedById(int id) {
-    String sql = "SELECT * FROM attachment WHERE id = ? AND status = 'UPLOADED'";
+    String sql =
+        """
+                SELECT id, file_name, s3_key, status, visit_id, additional_service_id FROM attachment
+                WHERE id = ?
+                AND status = 'UPLOADED'
+                 """;
     return jdbcTemplate.query(sql, rowMapper, id).stream().findFirst();
   }
 
@@ -94,18 +103,44 @@ public class AttachmentDAO implements FullDAO<Attachment, Attachment> {
 
   @Override
   public List<Attachment> getAll() {
-    String sql = "SELECT * FROM attachment";
+    String sql =
+        """
+                SELECT id, file_name, s3_key, status, visit_id, additional_service_id
+                FROM attachment
+                """;
     return jdbcTemplate.query(sql, rowMapper);
   }
 
   public List<Attachment> getUploadedByVisitId(int visitId) {
-    String sql = "SELECT * FROM attachment WHERE visit_id = ? AND status = 'UPLOADED'";
+    String sql =
+        """
+           SELECT id, file_name, s3_key, status, visit_id, additional_service_id
+           FROM attachment WHERE visit_id = ? AND status = 'UPLOADED'
+           """;
     return jdbcTemplate.query(sql, rowMapper, visitId);
   }
 
   public List<Attachment> getUploadedByAdditionalServiceId(int additionalServiceId) {
-    String sql = "SELECT * FROM attachment WHERE additional_service_id = ? AND status = 'UPLOADED'";
+    String sql =
+        """
+                SELECT id, file_name, s3_key, status, visit_id, additional_service_id
+                FROM attachment WHERE additional_service_id = ?
+                 AND status = 'UPLOADED'
+                 """;
     return jdbcTemplate.query(sql, rowMapper, additionalServiceId);
+  }
+
+  public List<Attachment> getUploadedByPatientId(int patientId) {
+    String sql =
+        """
+                SELECT a.id, a.file_name, a.s3_key, a.status, a.visit_id, a.additional_service_id
+                FROM attachment a
+                LEFT JOIN visit v ON a.visit_id = v.id
+                LEFT JOIN additional_service ads ON a.additional_service_id = ads.id
+                WHERE a.status = 'UPLOADED'
+                  AND (v.patient_id = ? OR ads.patient_id = ?)
+                """;
+    return jdbcTemplate.query(sql, rowMapper, patientId, patientId);
   }
 
   public Attachment assignToVisit(int attachmentId, int visitId) {

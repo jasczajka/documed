@@ -1,5 +1,6 @@
 package com.documed.backend.attachments;
 
+import com.documed.backend.attachments.dtos.FileInfoDTO;
 import com.documed.backend.attachments.exceptions.FileUploadFailedException;
 import com.documed.backend.attachments.model.Attachment;
 import com.documed.backend.exceptions.NotFoundException;
@@ -105,35 +106,29 @@ public class S3Service {
     return s3Presigner.presignGetObject(presignRequest).url().toString();
   }
 
-  public List<String> generatePresignedGetUrlsForVisit(int visitId) {
-    ArrayList<String> urls = new ArrayList<>();
-    List<Attachment> attachments = this.attachmentDAO.getUploadedByVisitId(visitId);
-    attachments.forEach(
-        attachment -> {
-          String url = this.generatePresignedGetUrl(attachment.getS3Key());
-          urls.add(url);
-        });
-    return urls;
-  }
-
-  public List<String> generatePresignedGetUrlsForAdditionalService(int additionalServiceId) {
-    ArrayList<String> urls = new ArrayList<>();
-    List<Attachment> attachments =
-        this.attachmentDAO.getUploadedByAdditionalServiceId(additionalServiceId);
-    attachments.forEach(
-        attachment -> {
-          String url = this.generatePresignedGetUrl(attachment.getS3Key());
-          urls.add(url);
-        });
-    return urls;
-  }
-
   public List<Attachment> getAttachmentsForAdditionalService(int additionalServiceId) {
     return this.attachmentDAO.getUploadedByAdditionalServiceId(additionalServiceId);
   }
 
   public List<Attachment> getAttachmentsForVisit(int visitId) {
     return this.attachmentDAO.getUploadedByVisitId(visitId);
+  }
+
+  public List<Attachment> getAttachmentsForPatient(int patientId) {
+    return this.attachmentDAO.getUploadedByPatientId(patientId);
+  }
+
+  public List<String> generatePresignedGetUrlsForVisit(int visitId) {
+    List<Attachment> attachments = this.attachmentDAO.getUploadedByVisitId(visitId);
+
+    return this.generatePresignedGetUrlsForAttachments(attachments);
+  }
+
+  public List<String> generatePresignedGetUrlsForAdditionalService(int additionalServiceId) {
+    List<Attachment> attachments =
+        this.attachmentDAO.getUploadedByAdditionalServiceId(additionalServiceId);
+
+    return this.generatePresignedGetUrlsForAttachments(attachments);
   }
 
   public void deleteFile(int fileId) {
@@ -149,5 +144,26 @@ public class S3Service {
                 .bucket(s3Config.getBucketName())
                 .key(attachmentToDelete.getS3Key())
                 .build());
+  }
+
+  public List<String> generatePresignedGetUrlsForAttachments(List<Attachment> attachments) {
+    List<String> urls = new ArrayList<>();
+    for (Attachment attachment : attachments) {
+      urls.add(generatePresignedGetUrl(attachment.getS3Key()));
+    }
+    return urls;
+  }
+
+  public List<FileInfoDTO> generateFileInfoDtosForAttachments(List<Attachment> attachments) {
+    List<FileInfoDTO> dtos = new ArrayList<>();
+    for (Attachment attachment : attachments) {
+      dtos.add(
+          FileInfoDTO.builder()
+              .id(attachment.getId())
+              .fileName(attachment.getFileName())
+              .downloadUrl(generatePresignedGetUrl(attachment.getS3Key()))
+              .build());
+    }
+    return dtos;
   }
 }
