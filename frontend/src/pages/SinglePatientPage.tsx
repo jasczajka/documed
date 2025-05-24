@@ -3,6 +3,7 @@ import { PatientTabs } from 'modules/patient/PatientTabs';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import { useCreateAdditionalService } from 'shared/api/generated/additional-service-controller/additional-service-controller';
+import { useGetFilesForPatient } from 'shared/api/generated/attachment-controller/attachment-controller';
 import {
   CreateAdditionalServiceDTO,
   Service,
@@ -42,7 +43,15 @@ const SinglePatientPage: FC = () => {
     data: patientInfo,
     isLoading: isPatientInfoLoading,
     isError: isPatientInfoError,
+    refetch: refetchPatientInfo,
   } = useGetPatientDetails(patientId);
+
+  const {
+    data: patientAttachments,
+    isLoading: isPatientAttachmentsLoading,
+    isError: isPatientAttachmentsError,
+    refetch: refetchPatientAttachments,
+  } = useGetFilesForPatient(patientId);
 
   const {
     mutateAsync: createAdditionalService,
@@ -50,8 +59,8 @@ const SinglePatientPage: FC = () => {
     isPending: isCreateAdditionalServiceLoading,
   } = useCreateAdditionalService();
 
-  const isInitialLoading = isServicesLoading || isPatientInfoLoading;
-  const isInitialError = isServicesError || isPatientInfoError;
+  const isInitialLoading = isServicesLoading || isPatientInfoLoading || isPatientAttachmentsLoading;
+  const isInitialError = isServicesError || isPatientInfoError || isPatientAttachmentsError;
 
   const handleCreateAdditionalService = async (data: CreateAdditionalServiceDTO) => {
     await createAdditionalService({ data });
@@ -68,8 +77,13 @@ const SinglePatientPage: FC = () => {
           fulfillerId={fulfillerId}
           patientFullName={`${patientInfo?.firstName} ${patientInfo?.lastName}`}
           patientAge={patientInfo?.birthdate ? getAge(new Date(patientInfo?.birthdate)) : null}
-          onConfirm={(data) => {
-            handleCreateAdditionalService({ ...data, date: new Date().toISOString(), patientId });
+          onConfirm={async (data) => {
+            await handleCreateAdditionalService({
+              ...data,
+              date: new Date().toISOString(),
+              patientId,
+            });
+            await refetchPatientAttachments();
             closeModal('additionalServiceModal');
           }}
           onCancel={() => closeModal('additionalServiceModal')}
@@ -112,7 +126,17 @@ const SinglePatientPage: FC = () => {
           </Button>
         </div>
       </div>
-      <PatientTabs patientId={patientId} tabIndex={tabIndex} onTabChange={onTabChange} />
+      <PatientTabs
+        patientInfo={{
+          patientId: patientInfo.id,
+          patientFullName: `${patientInfo.firstName} ${patientInfo.lastName}`,
+          patientAge: getAge(new Date(patientInfo.birthdate)),
+        }}
+        tabIndex={tabIndex}
+        onTabChange={onTabChange}
+        patientAttachments={patientAttachments ?? []}
+        refetch={() => refetchPatientInfo()}
+      />
       <NotificationComponent />
     </div>
   );

@@ -1,6 +1,7 @@
 package com.documed.backend.attachments;
 
 import com.documed.backend.attachments.dtos.CompleteUploadRequestDTO;
+import com.documed.backend.attachments.dtos.FileInfoDTO;
 import com.documed.backend.attachments.dtos.GenerateUploadUrlRequestDTO;
 import com.documed.backend.attachments.dtos.UploadUrlResponseDTO;
 import com.documed.backend.attachments.model.Attachment;
@@ -72,12 +73,12 @@ public class AttachmentController {
   }
 
   @StaffOnlyOrSelf
-  @GetMapping("/{userId}")
-  public ResponseEntity<List<String>> getDownloadUrlsForPatient(@PathVariable int userId) {
+  @GetMapping("patients/{userId}")
+  public ResponseEntity<List<FileInfoDTO>> getFilesForPatient(@PathVariable int userId) {
     List<Attachment> attachmentList = this.s3Service.getAttachmentsForPatient(userId);
 
     return ResponseEntity.status(HttpStatus.OK)
-        .body(s3Service.generatePresignedGetUrlsForAttachments(attachmentList));
+        .body(s3Service.generateFileInfoDtosForAttachments(attachmentList));
   }
 
   @DeleteMapping("/{id}")

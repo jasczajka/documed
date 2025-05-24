@@ -94,4 +94,11 @@ public class UserController {
     List<Specialization> specs = this.userService.getUserSpecializationsById(userId);
     return new ResponseEntity<>(specs, HttpStatus.OK);
   }
+
+  @StaffOnly
+  @DeleteMapping("/{id}")
+  public ResponseEntity<Void> deletePatientPersonalData(@PathVariable("id") int userId) {
+    this.userService.deactivateUser(userId);
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
 }

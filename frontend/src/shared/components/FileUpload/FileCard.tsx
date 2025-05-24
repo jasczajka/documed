@@ -3,7 +3,7 @@ import { Box, IconButton, LinearProgress, Link, Typography } from '@mui/material
 import { FC } from 'react';
 
 interface FileCardProps {
-  fileSize: string;
+  fileSize?: string;
   fileName: string;
   status: 'loading' | 'error' | 'loaded' | 'uploaded';
   onDelete: () => void;
@@ -31,6 +31,9 @@ export const FileCard: FC<FileCardProps> = ({
   const getIconColor = () => {
     if (isSuccessfullyUploaded) {
       return 'success';
+    }
+    if (isSuccessfullyLoaded || isLoading) {
+      return 'warning';
     }
     if (isError) {
       return 'error';
@@ -80,7 +83,7 @@ export const FileCard: FC<FileCardProps> = ({
             )}
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-            {!isError && (
+            {!isError && fileSize && (
               <Typography variant="body2" color={isError ? 'error' : 'text.secondary'}>
                 {fileSize}
               </Typography>

@@ -63,6 +63,36 @@ export interface AdditionalServiceReturnDTO {
   attachmentUrls: string[];
 }
 
+export interface ScheduleVisitDTO {
+  patientInformation?: string;
+  patientId: number;
+  firstTimeSlotId: number;
+  serviceId: number;
+}
+
+export type VisitStatus = (typeof VisitStatus)[keyof typeof VisitStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const VisitStatus = {
+  PLANNED: 'PLANNED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  CLOSED: 'CLOSED',
+  CANCELLED: 'CANCELLED',
+} as const;
+
+export interface Visit {
+  id?: number;
+  status?: VisitStatus;
+  interview?: string;
+  diagnosis?: string;
+  recommendations?: string;
+  totalCost?: number;
+  facilityId?: number;
+  serviceId?: number;
+  patientInformation?: string;
+  patientId?: number;
+}
+
 export type CreateServiceDTOType = (typeof CreateServiceDTOType)[keyof typeof CreateServiceDTOType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -323,6 +353,12 @@ export interface CreateAdditionalServiceDTO {
   attachmentIds?: number[];
 }
 
+export interface UpdateVisitDTO {
+  interview?: string;
+  diagnosis?: string;
+  recommendations?: string;
+}
+
 export interface UpdateDoctorSpecializationsDTO {
   /** @minItems 1 */
   specializationIds: number[];
@@ -368,175 +404,11 @@ export interface FacilityLoginReturnDTO {
   city: string;
 }
 
-export interface AdditionalService {
-  id: number;
-  description?: string;
-  date?: string;
-  fulfiller?: User;
-  patient?: User;
-  service?: Service;
-  attachmentUrls?: string[];
-}
-
-export type AttachmentStatus = (typeof AttachmentStatus)[keyof typeof AttachmentStatus];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const AttachmentStatus = {
-  PENDING: 'PENDING',
-  UPLOADED: 'UPLOADED',
-} as const;
-
-export interface Attachment {
-  id?: number;
-  fileName?: string;
-  s3Key?: string;
-  status?: AttachmentStatus;
-  visitId?: number;
-  additionalServiceId?: number;
-}
-
 export interface Facility {
   id?: number;
   address?: string;
   city?: string;
   visits?: Visit[];
-}
-
-export interface Feedback {
-  id?: number;
-  rating?: number;
-  text?: string;
-  visit?: Visit;
-}
-
-export interface FreeDay {
-  id?: number;
-  date?: string;
-  user?: User;
-}
-
-export type NotificationStatus = (typeof NotificationStatus)[keyof typeof NotificationStatus];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const NotificationStatus = {
-  QUEUED: 'QUEUED',
-  SENT: 'SENT',
-  ERROR: 'ERROR',
-} as const;
-
-export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const NotificationType = {
-  VISIT_TOMORROW: 'VISIT_TOMORROW',
-  NEW_VISIT_INFO: 'NEW_VISIT_INFO',
-} as const;
-
-export interface Notification {
-  id?: number;
-  status?: NotificationStatus;
-  visit?: Visit;
-  additionalService?: AdditionalService;
-  type?: NotificationType;
-}
-
-export type ReferralType = (typeof ReferralType)[keyof typeof ReferralType];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const ReferralType = {
-  RTG: 'RTG',
-} as const;
-
-export interface Referral {
-  id?: number;
-  diagnosis?: string;
-  type?: ReferralType;
-  visit?: Visit;
-  expirationDate?: string;
-}
-
-export interface Subscription {
-  id?: number;
-  name?: string;
-  price?: number;
-  users?: User[];
-  subscriptionServices?: SubscriptionService[];
-}
-
-export interface SubscriptionService {
-  [key: string]: unknown;
-}
-
-export type UserAccountStatus = (typeof UserAccountStatus)[keyof typeof UserAccountStatus];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const UserAccountStatus = {
-  ACTIVE: 'ACTIVE',
-  PENDING_CONFIRMATION: 'PENDING_CONFIRMATION',
-  DEACTIVATED: 'DEACTIVATED',
-} as const;
-
-export type UserRole = (typeof UserRole)[keyof typeof UserRole];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const UserRole = {
-  PATIENT: 'PATIENT',
-  DOCTOR: 'DOCTOR',
-  NURSE: 'NURSE',
-  WARD_CLERK: 'WARD_CLERK',
-  ADMINISTRATOR: 'ADMINISTRATOR',
-} as const;
-
-export interface User {
-  id: number;
-  firstName: string;
-  lastName: string;
-  pesel?: string;
-  passportNumber?: string;
-  email: string;
-  address?: string;
-  password?: string;
-  phoneNumber?: string;
-  accountStatus: UserAccountStatus;
-  birthDate?: string;
-  pwzNumber?: string;
-  emailNotifications: boolean;
-  role: UserRole;
-  subscription?: Subscription;
-  specializations?: Specialization[];
-  timeSlots?: TimeSlot[];
-  workTimes?: WorkTime[];
-  freeDays?: FreeDay[];
-  additionalServices?: AdditionalService[];
-}
-
-export type VisitStatus = (typeof VisitStatus)[keyof typeof VisitStatus];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const VisitStatus = {
-  PLANNED: 'PLANNED',
-  IN_PROGRESS: 'IN_PROGRESS',
-  CLOSED: 'CLOSED',
-  CANCELLED: 'CANCELLED',
-} as const;
-
-export interface Visit {
-  id?: number;
-  status?: VisitStatus;
-  interview?: string;
-  diagnosis?: string;
-  recommendations?: string;
-  totalCost?: number;
-  facilityId?: number;
-  service?: Service;
-  patientInformation?: string;
-  patientId?: number;
-  doctorId?: number;
-  feedback?: Feedback;
-  attachments?: Attachment[];
-  prescriptions?: Prescription[];
-  referrals?: Referral[];
-  notifications?: Notification[];
 }
 
 export type MeDTORole = (typeof MeDTORole)[keyof typeof MeDTORole];
@@ -556,6 +428,12 @@ export interface MeDTO {
   lastName: string;
   email: string;
   role: MeDTORole;
+}
+
+export interface FileInfoDTO {
+  id: number;
+  downloadUrl: string;
+  fileName: string;
 }
 
 export type UpdateDescription200 = { [key: string]: unknown };

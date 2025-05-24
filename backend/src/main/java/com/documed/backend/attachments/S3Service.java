@@ -1,5 +1,6 @@
 package com.documed.backend.attachments;
 
+import com.documed.backend.attachments.dtos.FileInfoDTO;
 import com.documed.backend.attachments.exceptions.FileUploadFailedException;
 import com.documed.backend.attachments.model.Attachment;
 import com.documed.backend.exceptions.NotFoundException;
@@ -151,5 +152,18 @@ public class S3Service {
       urls.add(generatePresignedGetUrl(attachment.getS3Key()));
     }
     return urls;
+  }
+
+  public List<FileInfoDTO> generateFileInfoDtosForAttachments(List<Attachment> attachments) {
+    List<FileInfoDTO> dtos = new ArrayList<>();
+    for (Attachment attachment : attachments) {
+      dtos.add(
+          FileInfoDTO.builder()
+              .id(attachment.getId())
+              .fileName(attachment.getFileName())
+              .downloadUrl(generatePresignedGetUrl(attachment.getS3Key()))
+              .build());
+    }
+    return dtos;
   }
 }

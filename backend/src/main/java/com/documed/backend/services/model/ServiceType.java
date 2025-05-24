@@ -1,4 +1,4 @@
-package com.documed.backend.services;
+package com.documed.backend.services.model;
 
 public enum ServiceType {
   REGULAR_SERVICE,

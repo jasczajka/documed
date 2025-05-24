@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import { FC } from 'react';
 
-interface PatientInfoPanelProps {
+export interface PatientInfoPanelProps {
   patientId: number;
   patientFullName: string;
   patientAge: number | null;

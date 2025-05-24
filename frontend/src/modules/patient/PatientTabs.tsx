@@ -1,21 +1,27 @@
 import { CalendarMonth, Cloud, CreditCard, Person2 } from '@mui/icons-material';
 import { Box, Paper, Tab, Tabs } from '@mui/material';
 import { FC } from 'react';
+import { FileInfoDTO } from 'shared/api/generated/generated.schemas';
+import { PatientInfoPanelProps } from 'shared/components/PatientInfoPanel';
+import { AttachmentsTab } from './tabs/AttachmentsTab';
+import { PersonalDataTab } from './tabs/PersonalDataTab';
 
 interface PatientTabsProps {
-  patientId: number;
-
+  patientInfo: PatientInfoPanelProps;
   tabIndex: number;
   onTabChange: (index: number) => void;
+  patientAttachments: FileInfoDTO[];
+  refetch: () => void;
   // loading?: boolean;
 }
 export const PatientTabs: FC<PatientTabsProps> = ({
-  patientId,
+  patientInfo,
   tabIndex,
   onTabChange,
+  patientAttachments,
+  refetch,
   // loading,
 }) => {
-  console.log('patient ID: ', patientId);
   return (
     <Box
       sx={{
@@ -48,9 +54,11 @@ export const PatientTabs: FC<PatientTabsProps> = ({
       </Tabs>
 
       <Paper sx={{ height: '100%', width: '100%', padding: 8, minHeight: '532px' }} elevation={1}>
-        {tabIndex === 0 && <div>Urlopy</div>}
-        {tabIndex === 1 && <div>wizyty</div>}
-        {tabIndex === 2 && <div>Dane osobowe</div>}
+        {tabIndex === 0 && <AttachmentsTab attachments={patientAttachments} />}
+        {tabIndex === 1 && <div>Wizyty</div>}
+        {tabIndex === 2 && (
+          <PersonalDataTab patientInfo={patientInfo} onSuccessfulDeactivate={refetch} />
+        )}
         {tabIndex === 3 && <div>Abonament</div>}
       </Paper>
     </Box>
