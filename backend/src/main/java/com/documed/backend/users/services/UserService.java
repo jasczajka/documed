@@ -1,6 +1,7 @@
-package com.documed.backend.users;
+package com.documed.backend.users.services;
 
 import com.documed.backend.auth.exceptions.UserNotFoundException;
+import com.documed.backend.users.UserDAO;
 import com.documed.backend.users.exceptions.SpecializationToNonDoctorException;
 import com.documed.backend.users.model.AccountStatus;
 import com.documed.backend.users.model.Specialization;
@@ -102,4 +103,9 @@ public class UserService {
     User user = optionalUser.get();
     return user.getRole() == role;
   }
+
+  public void updateUserSubscription(int userId, int subscriptionId) {
+    userDAO.updateUserSubscription(userId, subscriptionId);
+  }
+
 }

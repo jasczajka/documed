@@ -10,6 +10,8 @@ import com.documed.backend.users.exceptions.UserNotDoctorException;
 import com.documed.backend.users.model.Specialization;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
+import com.documed.backend.users.services.UserService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
@@ -77,4 +79,16 @@ public class UserController {
     List<Specialization> specs = this.userService.getUserSpecializationsById(userId);
     return new ResponseEntity<>(specs, HttpStatus.OK);
   }
+
+  @Operation(
+          summary = "Set patient subscription",
+          description = "To cancel subscription set subscriptionId to null or 0"
+  )
+  @PatchMapping("/{id}/subscription")
+  public ResponseEntity<String> updateUserSubscription(
+          @PathVariable("id") int userId, @RequestBody int subscriptionId) {
+    userService.updateUserSubscription(userId, subscriptionId);
+    return new ResponseEntity<>("Subscription updated", HttpStatus.OK);
+  }
+
 }

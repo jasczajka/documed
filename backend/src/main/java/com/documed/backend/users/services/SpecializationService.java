@@ -1,5 +1,6 @@
-package com.documed.backend.users;
+package com.documed.backend.users.services;
 
+import com.documed.backend.users.SpecializationDAO;
 import com.documed.backend.users.model.Specialization;
 import java.util.List;
 import java.util.Optional;
@@ -12,11 +13,11 @@ public class SpecializationService {
 
   private final SpecializationDAO specializationDAO;
 
-  List<Specialization> getAll() {
+  public List<Specialization> getAll() {
     return specializationDAO.getAll();
   }
 
-  Optional<Specialization> getById(int id) {
+  public Optional<Specialization> getById(int id) {
     return specializationDAO.getById(id);
   }
 }

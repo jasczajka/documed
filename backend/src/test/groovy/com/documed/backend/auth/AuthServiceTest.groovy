@@ -5,10 +5,10 @@ import com.documed.backend.auth.model.CurrentUser
 import com.documed.backend.auth.model.OtpPurpose
 import com.documed.backend.exceptions.NotFoundException
 import com.documed.backend.users.UserDAO
-import com.documed.backend.users.UserService
 import com.documed.backend.users.model.AccountStatus
 import com.documed.backend.users.model.User
 import com.documed.backend.users.model.UserRole
+import com.documed.backend.users.services.UserService
 import com.documed.backend.visits.FacilityService
 import com.documed.backend.visits.model.Facility
 import java.sql.Date

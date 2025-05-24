@@ -4,7 +4,7 @@ import com.documed.backend.services.model.Service;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class SubscriptionService {
+public class SubscriptionToService {
   private Subscription subscription;
   private Service service;
   private int discount;
