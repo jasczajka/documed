@@ -1,6 +1,7 @@
 package com.documed.backend.visits;
 
 import com.documed.backend.visits.dtos.FacilityLoginReturnDTO;
+import com.documed.backend.visits.model.Facility;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,7 +1,7 @@
 package com.documed.backend.notifications;
 
 import com.documed.backend.additionalservices.model.AdditionalService;
-import com.documed.backend.visits.Visit;
+import com.documed.backend.visits.model.Visit;
 import lombok.Data;
 import lombok.NonNull;
 

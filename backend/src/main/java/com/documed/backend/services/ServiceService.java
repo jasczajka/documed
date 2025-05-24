@@ -17,7 +17,7 @@ public class ServiceService {
     return serviceDAO.getAll();
   }
 
-  Optional<com.documed.backend.services.model.Service> getById(int id) {
+  public Optional<com.documed.backend.services.model.Service> getById(int id) {
     return serviceDAO.getById(id);
   }
 
@@ -71,5 +71,12 @@ public class ServiceService {
 
   int removeSpecializationFromService(int serviceId, int specializationId) {
     return serviceDAO.removeSpecializationFromService(serviceId, specializationId);
+  }
+
+  public BigDecimal getPriceForService(int serviceId) {
+    return serviceDAO
+        .getById(serviceId)
+        .map(com.documed.backend.services.model.Service::getPrice)
+        .orElseThrow(RuntimeException::new);
   }
 }
