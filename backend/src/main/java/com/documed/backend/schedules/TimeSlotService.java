@@ -1,5 +1,6 @@
 package com.documed.backend.schedules;
 
+import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.schedules.exceptions.NotEnoughTimeInTimeSlotException;
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.schedules.model.WorkTime;
@@ -64,7 +65,7 @@ public class TimeSlotService {
   public void reserveTimeSlotsForVisit(Visit visit, TimeSlot firstTimeSlot) {
     int serviceId = visit.getServiceId();
     com.documed.backend.services.model.Service service =
-        serviceService.getById(serviceId).orElseThrow();
+        serviceService.getById(serviceId).orElseThrow(() -> new NotFoundException("Service not found"));
     int neededTimeSlots =
         (int) Math.ceil((double) service.getEstimatedTime() / slotDurationInMinutes);
 
