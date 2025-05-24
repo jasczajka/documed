@@ -1,9 +1,11 @@
 package com.documed.backend.schedules
 
+import com.documed.backend.schedules.exceptions.NotEnoughTimeInTimeSlotException
 import com.documed.backend.schedules.model.TimeSlot
 import com.documed.backend.schedules.model.WorkTime
+import com.documed.backend.services.ServiceService
 import com.documed.backend.services.model.Service
-import com.documed.backend.visits.Visit
+import com.documed.backend.visits.model.Visit
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.LocalTime
@@ -11,13 +13,17 @@ import spock.lang.Specification
 
 class TimeSlotServiceTest extends Specification {
 
-	def timeSlotDAO = Mock(TimeSlotDAO)
-
-	def timeSlotService = new TimeSlotService(timeSlotDAO)
+	TimeSlotDAO timeSlotDAO
+	ServiceService serviceService
+	TimeSlotService timeSlotService
 
 	def setup() {
+		timeSlotDAO = Mock(TimeSlotDAO)
+		serviceService = Mock(ServiceService)
+		timeSlotService = new TimeSlotService(timeSlotDAO, serviceService)
 		timeSlotService.slotDurationInMinutes = 15
 	}
+
 
 	def "should create timeslots for a worktime"() {
 		given:
@@ -45,8 +51,11 @@ class TimeSlotServiceTest extends Specification {
 			getEstimatedTime() >> 120
 		}
 		def visit = Mock(Visit) {
-			getService() >> service
+			getServiceId() >> 55
+			getId() >> 10
 		}
+
+		serviceService.getById(55) >> Optional.of(service)
 
 		def date = LocalDate.now()
 		def timeSlot = TimeSlot.builder()
@@ -68,13 +77,15 @@ class TimeSlotServiceTest extends Specification {
 
 	def "should reserve timeSlots for visit"() {
 		given:
-		def service = Mock(Service) {
+		def service = Mock(com.documed.backend.services.model.Service) {
 			getEstimatedTime() >> 25
 		}
 		def visit = Mock(Visit) {
-			getService() >> service
+			getServiceId() >> 55
 			getId() >> 112
 		}
+
+		serviceService.getById(55) >> Optional.of(service)
 
 		def date = LocalDate.now()
 		def timeSlot1 = TimeSlot.builder()
@@ -83,7 +94,6 @@ class TimeSlotServiceTest extends Specification {
 				.startTime(LocalTime.of(9, 0))
 				.endTime(LocalTime.of(9, 15))
 				.build()
-
 		def timeSlot2 = TimeSlot.builder()
 				.doctorId(997)
 				.date(date)

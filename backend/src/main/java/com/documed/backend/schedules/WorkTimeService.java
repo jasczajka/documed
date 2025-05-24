@@ -1,6 +1,8 @@
 package com.documed.backend.schedules;
 
+import com.documed.backend.schedules.exceptions.WrongTimesGivenException;
 import com.documed.backend.schedules.model.WorkTime;
+import com.documed.backend.schedules.model.WorkTimeDTO;
 import com.documed.backend.users.model.UserRole;
 import java.time.DayOfWeek;
 import java.time.Duration;

@@ -1,4 +1,4 @@
-package com.documed.backend.visits;
+package com.documed.backend.visits.model;
 
 public enum VisitStatus {
   PLANNED,

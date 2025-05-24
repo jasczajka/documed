@@ -1,6 +1,6 @@
 package com.documed.backend.referrals;
 
-import com.documed.backend.visits.Visit;
+import com.documed.backend.visits.model.Visit;
 import java.util.Date;
 import lombok.Data;
 import lombok.NonNull;
