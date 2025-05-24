@@ -5,14 +5,15 @@ import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
 import com.documed.backend.auth.exceptions.UserNotFoundException;
 import com.documed.backend.users.dtos.DoctorDetailsDTO;
+import com.documed.backend.users.dtos.PatientDetailsDTO;
 import com.documed.backend.users.dtos.UpdateDoctorSpecializationsDTO;
 import com.documed.backend.users.exceptions.UserNotDoctorException;
+import com.documed.backend.users.exceptions.UserNotPatientException;
 import com.documed.backend.users.model.Specialization;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
 import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,16 +46,11 @@ public class UserController {
     return new ResponseEntity<>(request.getSpecializationIds(), HttpStatus.OK);
   }
 
-  @StaffOnlyOrSelf
-  @GetMapping("/{id}/basic_info")
+  @GetMapping("/doctors/{id}/basic_info")
   public ResponseEntity<DoctorDetailsDTO> getDoctorDetails(@PathVariable("id") int userId) {
-    Optional<User> optionalUser = userService.getById(userId);
-    if (optionalUser.isEmpty()) {
-      throw new UserNotFoundException("User not found");
-    }
-    User user = optionalUser.get();
+    User user =
+        userService.getById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
     if (user.getRole() != UserRole.DOCTOR) {
-      System.out.println(user);
       throw new UserNotDoctorException("User is not a doctor");
     }
     List<Specialization> doctorSpecializations =
@@ -66,6 +62,27 @@ public class UserController {
             .lastName(user.getLastName())
             .email(user.getEmail())
             .specializations(doctorSpecializations)
+            .build();
+
+    return new ResponseEntity<>(value, HttpStatus.OK);
+  }
+
+  @StaffOnlyOrSelf
+  @GetMapping("/patients/{id}/basic_info")
+  public ResponseEntity<PatientDetailsDTO> getPatientDetails(@PathVariable("id") int userId) {
+    User user =
+        userService.getById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+    if (user.getRole() != UserRole.PATIENT) {
+      throw new UserNotPatientException("User is not a patient");
+    }
+
+    PatientDetailsDTO value =
+        PatientDetailsDTO.builder()
+            .id(user.getId())
+            .firstName(user.getFirstName())
+            .lastName(user.getLastName())
+            .email(user.getEmail())
+            .birthdate(user.getBirthDate())
             .build();
 
     return new ResponseEntity<>(value, HttpStatus.OK);

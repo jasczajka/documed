@@ -44,6 +44,25 @@ export interface WorkTime {
   endTime: string;
 }
 
+export interface UpdateDescriptionDTO {
+  /** @minLength 1 */
+  description: string;
+}
+
+export interface UpdateAttachmentsDTO {
+  attachmentIds: number[];
+}
+
+export interface AdditionalServiceReturnDTO {
+  id: number;
+  description?: string;
+  date: string;
+  fulfillerId: number;
+  patientId: number;
+  serviceId: number;
+  attachmentUrls: string[];
+}
+
 export type CreateServiceDTOType = (typeof CreateServiceDTOType)[keyof typeof CreateServiceDTOType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -75,6 +94,8 @@ export interface Service {
   price: number;
   type: ServiceType;
   estimatedTime: number;
+  /** @minItems 1 */
+  specializationIds: number[];
 }
 
 export interface Specialization {
@@ -292,6 +313,16 @@ export interface CompleteUploadRequestDTO {
   s3Key: string;
 }
 
+export interface CreateAdditionalServiceDTO {
+  /** @minLength 1 */
+  description: string;
+  date: string;
+  fulfillerId: number;
+  patientId: number;
+  serviceId: number;
+  attachmentIds?: number[];
+}
+
 export interface UpdateDoctorSpecializationsDTO {
   /** @minItems 1 */
   specializationIds: number[];
@@ -305,6 +336,14 @@ export interface TimeSlot {
   endTime?: string;
   date?: string;
   busy?: boolean;
+}
+
+export interface PatientDetailsDTO {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  birthdate: string;
 }
 
 export interface DoctorDetailsDTO {
@@ -329,25 +368,14 @@ export interface FacilityLoginReturnDTO {
   city: string;
 }
 
-export type AdditionalServiceStatus =
-  (typeof AdditionalServiceStatus)[keyof typeof AdditionalServiceStatus];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const AdditionalServiceStatus = {
-  PLANNED: 'PLANNED',
-  IN_PROGRESS: 'IN_PROGRESS',
-  CLOSED: 'CLOSED',
-  CANCELLED: 'CANCELLED',
-} as const;
-
 export interface AdditionalService {
-  id?: number;
+  id: number;
   description?: string;
   date?: string;
   fulfiller?: User;
+  patient?: User;
   service?: Service;
-  status?: AdditionalServiceStatus;
-  attachments?: Attachment[];
+  attachmentUrls?: string[];
 }
 
 export type AttachmentStatus = (typeof AttachmentStatus)[keyof typeof AttachmentStatus];
@@ -529,6 +557,8 @@ export interface MeDTO {
   email: string;
   role: MeDTORole;
 }
+
+export type UpdateDescription200 = { [key: string]: unknown };
 
 export type AddMedicineToPrescriptionParams = {
   amount?: number;

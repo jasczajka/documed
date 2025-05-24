@@ -22,6 +22,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import type {
   DoctorDetailsDTO,
+  PatientDetailsDTO,
   Specialization,
   UpdateDoctorSpecializationsDTO,
 } from '../generated.schemas';
@@ -382,16 +383,124 @@ export function useGetUserSpecializations<
   return query;
 }
 
+export const getPatientDetails = (id: number, signal?: AbortSignal) => {
+  return customInstance<PatientDetailsDTO>({
+    url: `/api/user/patients/${id}/basic_info`,
+    method: 'GET',
+    signal,
+  });
+};
+
+export const getGetPatientDetailsQueryKey = (id: number) => {
+  return [`/api/user/patients/${id}/basic_info`] as const;
+};
+
+export const getGetPatientDetailsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getPatientDetails>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getPatientDetails>>, TError, TData>>;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetPatientDetailsQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getPatientDetails>>> = ({ signal }) =>
+    getPatientDetails(id, signal);
+
+  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getPatientDetails>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetPatientDetailsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getPatientDetails>>
+>;
+export type GetPatientDetailsQueryError = ErrorType<unknown>;
+
+export function useGetPatientDetails<
+  TData = Awaited<ReturnType<typeof getPatientDetails>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getPatientDetails>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPatientDetails>>,
+          TError,
+          Awaited<ReturnType<typeof getPatientDetails>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetPatientDetails<
+  TData = Awaited<ReturnType<typeof getPatientDetails>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getPatientDetails>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPatientDetails>>,
+          TError,
+          Awaited<ReturnType<typeof getPatientDetails>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetPatientDetails<
+  TData = Awaited<ReturnType<typeof getPatientDetails>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getPatientDetails>>, TError, TData>>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useGetPatientDetails<
+  TData = Awaited<ReturnType<typeof getPatientDetails>>,
+  TError = ErrorType<unknown>,
+>(
+  id: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getPatientDetails>>, TError, TData>>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetPatientDetailsQueryOptions(id, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
 export const getDoctorDetails = (id: number, signal?: AbortSignal) => {
   return customInstance<DoctorDetailsDTO>({
-    url: `/api/user/${id}/basic_info`,
+    url: `/api/user/doctors/${id}/basic_info`,
     method: 'GET',
     signal,
   });
 };
 
 export const getGetDoctorDetailsQueryKey = (id: number) => {
-  return [`/api/user/${id}/basic_info`] as const;
+  return [`/api/user/doctors/${id}/basic_info`] as const;
 };
 
 export const getGetDoctorDetailsQueryOptions = <
