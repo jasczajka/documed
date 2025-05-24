@@ -108,6 +108,19 @@ public class AttachmentDAO implements FullDAO<Attachment, Attachment> {
     return jdbcTemplate.query(sql, rowMapper, additionalServiceId);
   }
 
+  public List<Attachment> getUploadedByPatientId(int patientId) {
+    String sql =
+        """
+        SELECT a.*
+        FROM attachment a
+        LEFT JOIN visit v ON a.visit_id = v.id
+        LEFT JOIN additional_service ads ON a.additional_service_id = ads.id
+        WHERE a.status = 'UPLOADED'
+          AND (v.patient_id = ? OR ads.patient_id = ?)
+        """;
+    return jdbcTemplate.query(sql, rowMapper, patientId, patientId);
+  }
+
   public Attachment assignToVisit(int attachmentId, int visitId) {
     Attachment attachment =
         getById(attachmentId)

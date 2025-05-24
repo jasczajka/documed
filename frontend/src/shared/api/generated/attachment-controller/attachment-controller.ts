@@ -175,16 +175,127 @@ export const useCompleteUpload = <TError = ErrorType<unknown>, TContext = unknow
 
   return useMutation(mutationOptions, queryClient);
 };
-export const getDownloadUrl = (id: number, signal?: AbortSignal) => {
-  return customInstance<string>({
-    url: `/api/attachments/${id}/download-url`,
-    method: 'GET',
+export const getDownloadUrlsForPatient = (userId: number, signal?: AbortSignal) => {
+  return customInstance<string[]>({ url: `/api/attachments/${userId}`, method: 'GET', signal });
+};
+
+export const getGetDownloadUrlsForPatientQueryKey = (userId: number) => {
+  return [`/api/attachments/${userId}`] as const;
+};
+
+export const getGetDownloadUrlsForPatientQueryOptions = <
+  TData = Awaited<ReturnType<typeof getDownloadUrlsForPatient>>,
+  TError = ErrorType<unknown>,
+>(
+  userId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getDownloadUrlsForPatient>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetDownloadUrlsForPatientQueryKey(userId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getDownloadUrlsForPatient>>> = ({
     signal,
-  });
+  }) => getDownloadUrlsForPatient(userId, signal);
+
+  return { queryKey, queryFn, enabled: !!userId, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getDownloadUrlsForPatient>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetDownloadUrlsForPatientQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getDownloadUrlsForPatient>>
+>;
+export type GetDownloadUrlsForPatientQueryError = ErrorType<unknown>;
+
+export function useGetDownloadUrlsForPatient<
+  TData = Awaited<ReturnType<typeof getDownloadUrlsForPatient>>,
+  TError = ErrorType<unknown>,
+>(
+  userId: number,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getDownloadUrlsForPatient>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDownloadUrlsForPatient>>,
+          TError,
+          Awaited<ReturnType<typeof getDownloadUrlsForPatient>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetDownloadUrlsForPatient<
+  TData = Awaited<ReturnType<typeof getDownloadUrlsForPatient>>,
+  TError = ErrorType<unknown>,
+>(
+  userId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getDownloadUrlsForPatient>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getDownloadUrlsForPatient>>,
+          TError,
+          Awaited<ReturnType<typeof getDownloadUrlsForPatient>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetDownloadUrlsForPatient<
+  TData = Awaited<ReturnType<typeof getDownloadUrlsForPatient>>,
+  TError = ErrorType<unknown>,
+>(
+  userId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getDownloadUrlsForPatient>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useGetDownloadUrlsForPatient<
+  TData = Awaited<ReturnType<typeof getDownloadUrlsForPatient>>,
+  TError = ErrorType<unknown>,
+>(
+  userId: number,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getDownloadUrlsForPatient>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetDownloadUrlsForPatientQueryOptions(userId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const getDownloadUrl = (id: number, signal?: AbortSignal) => {
+  return customInstance<string>({ url: `/api/attachments/${id}`, method: 'GET', signal });
 };
 
 export const getGetDownloadUrlQueryKey = (id: number) => {
-  return [`/api/attachments/${id}/download-url`] as const;
+  return [`/api/attachments/${id}`] as const;
 };
 
 export const getGetDownloadUrlQueryOptions = <
