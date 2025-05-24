@@ -94,7 +94,7 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
   const { uploadFile, deleteFile } = useFileUpload();
 
   return (
-    <Dialog open onClose={onCancel}>
+    <Dialog maxWidth={false} open onClose={onCancel}>
       <Card
         sx={{
           px: 8,
@@ -102,7 +102,7 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
           display: 'flex',
           flexDirection: 'column',
           gap: 6,
-          minWidth: 600,
+          overflow: 'visible',
         }}
         component="form"
         onSubmit={handleSubmit(onSubmit)}
@@ -143,7 +143,6 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
             )}
           />
         </Stack>
-
         <DialogContent sx={{ p: 0, paddingTop: 2 }}>
           <Controller
             name="description"
