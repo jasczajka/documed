@@ -3,11 +3,12 @@ import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { FC, useCallback, useState } from 'react';
+import { Service, VisitDTO } from 'shared/api/generated/generated.schemas';
 import { appConfig } from 'shared/appConfig';
 import { ReviewModal } from 'shared/components/ReviewModal';
 import { TableFilters } from 'shared/components/TableFilters';
+import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
-import { VisitLite } from 'shared/types/Visit';
 import { useVisitsTable } from './useVisitsTable';
 
 export type VisitsFilters = {
@@ -20,7 +21,8 @@ export type VisitsFilters = {
 };
 
 interface VisitTableProps {
-  visits: VisitLite[];
+  visits: VisitDTO[];
+  allServices: Service[];
   onEdit?: (id: number) => void;
   onDelete?: (id: number) => void;
 }
@@ -30,7 +32,7 @@ const columns = (
   onDelete?: (id: number) => void,
   onAddReview?: (id: number, doctorFullName: string) => void,
   showReviewOption?: boolean,
-): GridColDef<VisitLite>[] => [
+): GridColDef<VisitDTO>[] => [
   {
     field: 'index',
     headerName: '#',
@@ -43,7 +45,7 @@ const columns = (
     headerName: 'Pacjent',
     minWidth: 200,
     flex: 1,
-    valueGetter: (_, row) => `${row.patient.firstName} ${row.patient.lastName}`,
+    valueGetter: (_, row) => `${row.patientFullName}`,
   },
   {
     field: 'date',
@@ -51,9 +53,7 @@ const columns = (
     minWidth: 200,
     flex: 1,
     valueGetter: (_, row) => {
-      return row.timeSlots[0]?.date
-        ? format(new Date(row.timeSlots[0].date), 'dd.MM.yyyy')
-        : 'Brak daty';
+      return row.date ? format(new Date(row.date), 'dd.MM.yyyy') : 'Brak daty';
     },
   },
   {
@@ -62,26 +62,22 @@ const columns = (
     minWidth: 200,
     flex: 1,
     valueGetter: (_, row) => {
-      return row.timeSlots[0].startTime ? `${row.timeSlots[0].startTime}` : 'Brak godziny';
+      return row.startTime ? row.startTime : 'Brak godziny';
     },
   },
-  // @TODO to be finished when we define types for services
   {
     field: 'service',
     headerName: 'Usługa',
     minWidth: 200,
     flex: 1,
-    // valueGetter: (_, row) => 'Kardiologia',
-    valueGetter: () => 'Kardiologia',
-    // || 'Brak usługi',
+    valueGetter: (_, row) => row.serviceName,
   },
   {
     field: 'specialist',
     headerName: 'Specjalista',
     minWidth: 200,
     flex: 1,
-    valueGetter: (_, row) =>
-      row.doctor ? `${row.doctor.firstName} ${row.doctor.lastName}` : 'Brak specjalisty',
+    valueGetter: (_, row) => row.doctorFullName,
   },
   {
     field: 'actions',
@@ -89,7 +85,7 @@ const columns = (
     type: 'actions',
     width: 70,
     flex: 0.5,
-    getActions: (params: { row: VisitLite }) => [
+    getActions: (params: { row: VisitDTO }) => [
       <GridActionsCellItem
         key={`begin-${params.row.id}`}
         label="Rozpocznij wizytę"
@@ -103,17 +99,14 @@ const columns = (
         showInMenu
         sx={{ color: 'error.main' }}
       />,
-      ...(showReviewOption && !params.row.feedbackRating
+      // @TODO adjust when reviews module is done
+      // ...(showReviewOption && !params.row.feedbackRating
+      ...(showReviewOption
         ? [
             <GridActionsCellItem
               key={`review-${params.row.id}`}
               label="Dodaj opinię"
-              onClick={() =>
-                onAddReview?.(
-                  params.row.id,
-                  `${params.row.doctor?.firstName && params.row.doctor?.lastName ? `${params.row.doctor?.firstName} ${params.row.doctor?.lastName}` : 'Nieznany specjalista'}`,
-                )
-              }
+              onClick={() => onAddReview?.(params.row.id, params.row.doctorFullName)}
               showInMenu
             />,
           ]
@@ -122,7 +115,7 @@ const columns = (
   },
 ];
 
-export const VisitsTable: FC<VisitTableProps> = ({ visits, onEdit, onDelete }) => {
+export const VisitsTable: FC<VisitTableProps> = ({ visits, allServices, onEdit, onDelete }) => {
   const [filters, setFilters] = useState<VisitsFilters>({
     serviceType: '',
     patientName: '',
@@ -132,9 +125,8 @@ export const VisitsTable: FC<VisitTableProps> = ({ visits, onEdit, onDelete }) =
     dateTo: '',
   });
 
-  // @TODO replace with useRoles logic when they're done
-  const isPatient = true;
-  const { visitsFilterConfig, filteredVisits } = useVisitsTable({ visits, filters });
+  const { isPatient } = useAuth();
+  const { visitsFilterConfig, filteredVisits } = useVisitsTable({ visits, filters, allServices });
 
   const handleFilterChange = useCallback((name: keyof VisitsFilters, value: string) => {
     setFilters((prev) => ({ ...prev, [name]: value }));

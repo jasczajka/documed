@@ -91,6 +91,17 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
     return jdbcTemplate.query(sql, rowMapper, doctorId, Date.valueOf(date));
   }
 
+  public List<TimeSlot> getTimeSlotsForVisit(int visitId) {
+    String sql =
+        """
+            SELECT id, doctor_id, start_time, end_time, date, is_busy, visit_id
+            FROM time_slot
+            WHERE visit_id = ?
+    """;
+
+    return jdbcTemplate.query(sql, rowMapper, visitId);
+  }
+
   public TimeSlot update(TimeSlot timeSlot) {
     String sql =
         """

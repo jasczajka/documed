@@ -1,12 +1,9 @@
-import { format } from 'date-fns';
 import { useMemo } from 'react';
-import { appConfig } from 'shared/appConfig';
+import { Service, ServiceType, VisitDTO } from 'shared/api/generated/generated.schemas';
 import { FilterConfig } from 'shared/components/TableFilters';
-import { ServiceType } from 'shared/types/enums';
-import { VisitLite } from 'shared/types/Visit';
 import { VisitsFilters } from './VisitsTable';
 
-const visitsFilterConfig: FilterConfig[] = [
+const generateVisitsFilterConfig = (allServices: Service[]): FilterConfig[] => [
   {
     name: 'serviceType',
     label: 'Rodzaj usługi',
@@ -26,10 +23,10 @@ const visitsFilterConfig: FilterConfig[] = [
     name: 'service',
     label: 'Usługa',
     type: 'select',
-    options: [
-      { value: 'Kardiologia', label: 'Kardiologia' },
-      { value: 'Stomatologia', label: 'Stomatologia' },
-    ],
+    options: allServices.map((service) => ({
+      value: service.name,
+      label: service.name,
+    })),
   },
   {
     name: 'specialist',
@@ -51,77 +48,80 @@ const visitsFilterConfig: FilterConfig[] = [
 export const useVisitsTable = ({
   visits,
   filters,
+  allServices,
 }: {
-  visits: VisitLite[];
+  visits: VisitDTO[];
   filters: VisitsFilters;
+  allServices: Service[];
 }) => {
-  const filterByServiceType = useMemo(() => {
-    if (!filters.serviceType) return null;
-    return (visit: VisitLite) => visit.service.type === filters.serviceType;
-  }, [filters.serviceType]);
+  // const filterByServiceType = useMemo(() => {
+  //   if (!filters.serviceType) return null;
+  //   return (visit: VisitDTO) => visit.service.type === filters.serviceType;
+  // }, [filters.serviceType]);
 
   const filterByPatientName = useMemo(() => {
     if (!filters.patientName) return null;
     const searchTerm = filters.patientName.toLowerCase();
-    return (visit: VisitLite) =>
-      `${visit.patient.firstName} ${visit.patient.lastName}`.toLowerCase().includes(searchTerm);
+    return (visit: VisitDTO) => visit.patientFullName.toLowerCase().includes(searchTerm);
   }, [filters.patientName]);
 
   const filterByService = useMemo(() => {
     if (!filters.service) return null;
     const searchTerm = filters.service.toLowerCase();
-    return (visit: VisitLite) => visit.service.name.toLowerCase().includes(searchTerm);
+    return (visit: VisitDTO) => visit.serviceName.toLowerCase().includes(searchTerm);
   }, [filters.service]);
 
   const filterBySpecialist = useMemo(() => {
     if (!filters.specialist) return null;
     const searchTerm = filters.specialist.toLowerCase();
-    return (visit: VisitLite) => {
-      if (!visit.doctor) return false;
-      return `${visit.doctor.firstName} ${visit.doctor.lastName}`
-        .toLowerCase()
-        .includes(searchTerm);
+    return (visit: VisitDTO) => {
+      return visit.doctorFullName.toLowerCase().includes(searchTerm);
     };
   }, [filters.specialist]);
 
   const filterByDateRange = useMemo(() => {
-    if (!filters.dateFrom && !filters.dateTo) return null;
-    return (visit: VisitLite) => {
-      if (!visit.timeSlots[0]?.date) return false;
-      const visitStartTime = format(
-        new Date(
-          `${format(visit.timeSlots[0].date, 'yyyy-MM-dd')}T${visit.timeSlots[0].startTime}`,
-        ),
-        appConfig.dateTimeFormat,
-      );
+    if (!filters.dateFrom && !filters.dateTo) {
+      return null;
+    }
 
-      return (
-        (!filters.dateFrom || visitStartTime >= filters.dateFrom) &&
-        (!filters.dateTo || visitStartTime <= filters.dateTo)
-      );
+    return (visit: VisitDTO) => {
+      if (!visit.date || !visit.startTime) {
+        return false;
+      }
+
+      const visitDateString = visit.date;
+      const visitStartTimeString = visit.startTime;
+      const visitDateTime = new Date(`${visitDateString}T${visitStartTimeString}`);
+
+      const fromDate = filters.dateFrom ? new Date(filters.dateFrom) : null;
+      const toDate = filters.dateTo ? new Date(filters.dateTo) : null;
+
+      return (!fromDate || visitDateTime >= fromDate) && (!toDate || visitDateTime <= toDate);
     };
   }, [filters.dateFrom, filters.dateTo]);
 
   const filteredVisits = useMemo(() => {
     const activeFilters = [
-      filterByServiceType,
+      // filterByServiceType,
       filterByPatientName,
       filterByService,
       filterBySpecialist,
       filterByDateRange,
-    ].filter(Boolean) as ((visit: VisitLite) => boolean)[];
+    ].filter(Boolean) as ((visit: VisitDTO) => boolean)[];
 
     if (activeFilters.length === 0) return visits;
 
     return visits.filter((visit) => activeFilters.every((filterFn) => filterFn(visit)));
   }, [
     visits,
-    filterByServiceType,
+    // filterByServiceType,
     filterByPatientName,
     filterByService,
     filterBySpecialist,
     filterByDateRange,
   ]);
+
+  const visitsFilterConfig = useMemo(() => generateVisitsFilterConfig(allServices), [allServices]);
 
   return {
     visitsFilterConfig,

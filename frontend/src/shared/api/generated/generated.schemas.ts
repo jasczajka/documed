@@ -70,27 +70,34 @@ export interface ScheduleVisitDTO {
   serviceId: number;
 }
 
-export type VisitStatus = (typeof VisitStatus)[keyof typeof VisitStatus];
+export type VisitDTOStatus = (typeof VisitDTOStatus)[keyof typeof VisitDTOStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const VisitStatus = {
+export const VisitDTOStatus = {
   PLANNED: 'PLANNED',
   IN_PROGRESS: 'IN_PROGRESS',
   CLOSED: 'CLOSED',
   CANCELLED: 'CANCELLED',
 } as const;
 
-export interface Visit {
-  id?: number;
-  status?: VisitStatus;
+export interface VisitDTO {
+  id: number;
+  status: VisitDTOStatus;
   interview?: string;
   diagnosis?: string;
   recommendations?: string;
   totalCost?: number;
-  facilityId?: number;
-  serviceId?: number;
+  facilityId: number;
+  serviceName: string;
+  serviceId: number;
   patientInformation?: string;
-  patientId?: number;
+  patientFullName: string;
+  patientId: number;
+  doctorFullName: string;
+  doctorId: number;
+  date: string;
+  startTime: string;
+  endTime: string;
 }
 
 export type CreateServiceDTOType = (typeof CreateServiceDTOType)[keyof typeof CreateServiceDTOType];
@@ -409,6 +416,30 @@ export interface Facility {
   address?: string;
   city?: string;
   visits?: Visit[];
+}
+
+export type VisitStatus = (typeof VisitStatus)[keyof typeof VisitStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const VisitStatus = {
+  PLANNED: 'PLANNED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  CLOSED: 'CLOSED',
+  CANCELLED: 'CANCELLED',
+} as const;
+
+export interface Visit {
+  id?: number;
+  status?: VisitStatus;
+  interview?: string;
+  diagnosis?: string;
+  recommendations?: string;
+  totalCost?: number;
+  facilityId?: number;
+  serviceId?: number;
+  patientInformation?: string;
+  patientId?: number;
+  reservedTimeSlots?: TimeSlot[];
 }
 
 export type MeDTORole = (typeof MeDTORole)[keyof typeof MeDTORole];

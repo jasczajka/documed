@@ -61,6 +61,10 @@ public class TimeSlotService {
     return timeSlotDAO.getById(id);
   }
 
+  public List<TimeSlot> getTimeSlotsForVisit(int visitId) {
+    return timeSlotDAO.getTimeSlotsForVisit(visitId);
+  }
+
   @Transactional
   public void reserveTimeSlotsForVisit(Visit visit, TimeSlot firstTimeSlot) {
     int serviceId = visit.getServiceId();

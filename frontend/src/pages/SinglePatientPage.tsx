@@ -1,6 +1,6 @@
 import { Button, CardHeader } from '@mui/material';
 import { PatientTabs } from 'modules/patient/PatientTabs';
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 import { useCreateAdditionalService } from 'shared/api/generated/additional-service-controller/additional-service-controller';
 import { useGetFilesForPatient } from 'shared/api/generated/attachment-controller/attachment-controller';
@@ -11,6 +11,7 @@ import {
 } from 'shared/api/generated/generated.schemas';
 import { useGetAllServices } from 'shared/api/generated/service-controller/service-controller';
 import { useGetPatientDetails } from 'shared/api/generated/user-controller/user-controller';
+import { useGetVisitsByPatientId } from 'shared/api/generated/visit-controller/visit-controller';
 import { AdditionalServiceModal } from 'shared/components/AdditionalServiceModal';
 import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
@@ -54,13 +55,25 @@ const SinglePatientPage: FC = () => {
   } = useGetFilesForPatient(patientId);
 
   const {
+    data: patientVisits,
+    isLoading: isPatientVisitsLoading,
+    isError: isPatientVisitsError,
+    // refetch: refetchPatientVisits,
+  } = useGetVisitsByPatientId(patientId);
+
+  const {
     mutateAsync: createAdditionalService,
     isError: isCreateAdditionalServiceError,
     isPending: isCreateAdditionalServiceLoading,
   } = useCreateAdditionalService();
 
-  const isInitialLoading = isServicesLoading || isPatientInfoLoading || isPatientAttachmentsLoading;
-  const isInitialError = isServicesError || isPatientInfoError || isPatientAttachmentsError;
+  const isInitialLoading =
+    isServicesLoading ||
+    isPatientInfoLoading ||
+    isPatientAttachmentsLoading ||
+    isPatientVisitsLoading;
+  const isInitialError =
+    isServicesError || isPatientInfoError || isPatientAttachmentsError || isPatientVisitsError;
 
   const handleCreateAdditionalService = async (data: CreateAdditionalServiceDTO) => {
     await createAdditionalService({ data });
@@ -93,6 +106,11 @@ const SinglePatientPage: FC = () => {
     }
   }, [openModal, closeModal, isInitialLoading, additionalServices]);
 
+  const patientFullName = useMemo(
+    () => `${patientInfo?.firstName} ${patientInfo?.lastName}`,
+    [patientInfo],
+  );
+
   useEffect(() => {
     if (isInitialError) {
       showNotification('Coś poszło nie tak', 'error');
@@ -108,7 +126,7 @@ const SinglePatientPage: FC = () => {
     }
   }, [allServices, isInitialError]);
 
-  if (!patientInfo || !fulfillerId) {
+  if (!patientInfo || !fulfillerId || patientVisits == undefined || allServices == undefined) {
     return <NotificationComponent />;
   }
 
@@ -119,7 +137,7 @@ const SinglePatientPage: FC = () => {
   return (
     <div className="flex flex-col">
       <div className="flex w-full items-center justify-between">
-        <CardHeader title={`${patientInfo?.firstName} ${patientInfo?.lastName}`} />
+        <CardHeader title={patientFullName} />
         <div className="flex-shrink-0">
           <Button onClick={() => handleScheduleVisitClick()} variant="contained">
             Rozpocznij usługę dodatkową
@@ -129,12 +147,14 @@ const SinglePatientPage: FC = () => {
       <PatientTabs
         patientInfo={{
           patientId: patientInfo.id,
-          patientFullName: `${patientInfo.firstName} ${patientInfo.lastName}`,
+          patientFullName,
           patientAge: getAge(new Date(patientInfo.birthdate)),
         }}
         tabIndex={tabIndex}
         onTabChange={onTabChange}
         patientAttachments={patientAttachments ?? []}
+        patientVisits={patientVisits}
+        allServices={allServices}
         refetch={() => refetchPatientInfo()}
       />
       <NotificationComponent />

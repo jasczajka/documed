@@ -103,6 +103,7 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
           flexDirection: 'column',
           gap: 6,
           overflow: 'visible',
+          minWidth: 600,
         }}
         component="form"
         onSubmit={handleSubmit(onSubmit)}

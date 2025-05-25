@@ -1,6 +1,14 @@
 package com.documed.backend.visits;
 
 import com.documed.backend.auth.annotations.StaffOnly;
+import com.documed.backend.exceptions.BadRequestException;
+import com.documed.backend.exceptions.NotFoundException;
+import com.documed.backend.schedules.TimeSlotService;
+import com.documed.backend.schedules.model.TimeSlot;
+import com.documed.backend.services.ServiceService;
+import com.documed.backend.services.model.Service;
+import com.documed.backend.users.UserService;
+import com.documed.backend.users.model.User;
 import com.documed.backend.visits.dtos.UpdateVisitDTO;
 import com.documed.backend.visits.dtos.VisitDTO;
 import com.documed.backend.visits.dtos.VisitMapper;
@@ -10,6 +18,8 @@ import com.documed.backend.visits.model.Visit;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +30,17 @@ import org.springframework.web.bind.annotation.*;
 public class VisitController {
 
   private final VisitService visitService;
+  private final UserService userService;
+  private final TimeSlotService timeSlotService;
+  private final ServiceService serviceService;
+
+  private static final Logger log = LoggerFactory.getLogger(VisitController.class);
 
   @GetMapping("/{id}")
   @Operation(summary = "Get visit by id")
   public ResponseEntity<VisitDTO> getVisitById(@PathVariable("id") int id) {
     Visit visit = visitService.getById(id);
-    return new ResponseEntity<>(VisitMapper.toDto(visit), HttpStatus.OK);
+    return new ResponseEntity<>(this.enrichVisitToDto(visit), HttpStatus.OK);
   }
 
   @PostMapping
@@ -33,7 +48,7 @@ public class VisitController {
   public ResponseEntity<VisitDTO> scheduleVisit(@RequestBody ScheduleVisitDTO scheduleVisitDTO) {
     Visit visit = visitService.scheduleVisit(scheduleVisitDTO);
 
-    return new ResponseEntity<>(VisitMapper.toDto(visit), HttpStatus.CREATED);
+    return new ResponseEntity<>(this.enrichVisitToDto(visit), HttpStatus.CREATED);
   }
 
   @StaffOnly
@@ -62,7 +77,8 @@ public class VisitController {
   public ResponseEntity<List<VisitDTO>> getVisitsForCurrentPatient() {
     List<Visit> visits = visitService.getVisitsForCurrentPatient();
 
-    return new ResponseEntity<>(visits.stream().map(VisitMapper::toDto).toList(), HttpStatus.OK);
+    return new ResponseEntity<>(
+        visits.stream().map(this::enrichVisitToDto).toList(), HttpStatus.OK);
   }
 
   @StaffOnly
@@ -71,7 +87,8 @@ public class VisitController {
   public ResponseEntity<List<VisitDTO>> getVisitsByPatientId(@PathVariable("id") int patientId) {
     List<Visit> visits = visitService.getVisitsByPatientId(patientId);
 
-    return new ResponseEntity<>(visits.stream().map(VisitMapper::toDto).toList(), HttpStatus.OK);
+    return new ResponseEntity<>(
+        visits.stream().map(this::enrichVisitToDto).toList(), HttpStatus.OK);
   }
 
   @StaffOnly
@@ -80,7 +97,8 @@ public class VisitController {
   public ResponseEntity<List<VisitDTO>> getVisitsByDoctorId(@PathVariable("id") int doctorId) {
     List<Visit> visits = visitService.getVisitsByDoctorId(doctorId);
 
-    return new ResponseEntity<>(visits.stream().map(VisitMapper::toDto).toList(), HttpStatus.OK);
+    return new ResponseEntity<>(
+        visits.stream().map(this::enrichVisitToDto).toList(), HttpStatus.OK);
   }
 
   @Operation(summary = "get all visits assigned for logged in doctor")
@@ -88,7 +106,8 @@ public class VisitController {
   public ResponseEntity<List<VisitDTO>> getVisitsForCurrentDoctor() {
     List<Visit> visits = visitService.getVisitsForCurrentDoctor();
 
-    return new ResponseEntity<>(visits.stream().map(VisitMapper::toDto).toList(), HttpStatus.OK);
+    return new ResponseEntity<>(
+        visits.stream().map(this::enrichVisitToDto).toList(), HttpStatus.OK);
   }
 
   @StaffOnly
@@ -97,7 +116,7 @@ public class VisitController {
   public ResponseEntity<VisitDTO> updateVisit(
       @PathVariable("id") int visitId, @RequestBody UpdateVisitDTO updateVisitDTO) {
     Visit updatedVisit = visitService.updateVisit(visitId, updateVisitDTO);
-    return new ResponseEntity<>(VisitMapper.toDto(updatedVisit), HttpStatus.OK);
+    return new ResponseEntity<>(enrichVisitToDto(updatedVisit), HttpStatus.OK);
   }
 
   @StaffOnly
@@ -110,5 +129,41 @@ public class VisitController {
     } else {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+  }
+
+  private VisitDTO enrichVisitToDto(Visit visit) {
+    User patient =
+        userService
+            .getById(visit.getPatientId())
+            .orElseThrow(
+                () -> {
+                  log.warn("Patient not found with ID: {}", visit.getPatientId());
+                  return new NotFoundException("Patient not found");
+                });
+    List<TimeSlot> visitTimeSlots = this.timeSlotService.getTimeSlotsForVisit(visit.getId());
+    if (visitTimeSlots.isEmpty()) {
+      log.warn("No timeslots found for visit ID: {}", visit.getId());
+      throw new BadRequestException("This visit doesn't have any timeslots assigned");
+    }
+    User doctor =
+        userService
+            .getById(visitTimeSlots.getFirst().getDoctorId())
+            .orElseThrow(
+                () -> {
+                  log.info("Reserved time slots: ");
+                  log.warn("Doctor not found with ID: {}", visitTimeSlots.getFirst().getDoctorId());
+                  return new NotFoundException("Doctor not found");
+                });
+
+    Service service =
+        serviceService
+            .getById(visit.getServiceId())
+            .orElseThrow(
+                () -> {
+                  log.warn("Service not found with ID: {}", visit.getServiceId());
+                  return new NotFoundException("Service not found");
+                });
+
+    return VisitMapper.toDto(visit, patient, doctor, service, visitTimeSlots);
   }
 }

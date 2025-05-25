@@ -120,7 +120,7 @@ public class VisitService {
   BigDecimal calculateTotalCost(int serviceId, int patientId) {
 
     BigDecimal basicPrice = serviceService.getPriceForService(serviceId);
-    // TODO: calculate total cost based on subscription
+    // @TODO: calculate total cost based on subscription
     return basicPrice;
   }
 
