@@ -37,9 +37,14 @@ public class SubscriptionToServiceDAO {
         }
     }
 
-//    public int create(SubscriptionToService subscriptionToService) {
-//        String sql = "INSERT INTO subscription_service (service_id, subscription_id, discount) VALUES (?, ?, ?)";
-//        return jdbcTemplate.update(sql, subscriptionToService.getServiceId(), subscriptionToService.getSubscriptionId(), subscriptionToService.getDiscount());
-//    }
+    public int create(SubscriptionToService subscriptionToService) {
+        String sql = "INSERT INTO subscription_service (service_id, subscription_id, discount) VALUES (?, ?, ?)";
+        return jdbcTemplate.update(sql, subscriptionToService.getServiceId(), subscriptionToService.getSubscriptionId(), subscriptionToService.getDiscount());
+    }
+
+    public int update(SubscriptionToService subscriptionToService) {
+        String sql = "UPDATE subscription_service SET discount = ? WHERE service_id = ? AND subscription_id = ?";
+        return jdbcTemplate.update(sql, subscriptionToService.getDiscount(), subscriptionToService.getServiceId(), subscriptionToService.getSubscriptionId());
+    }
 
 }

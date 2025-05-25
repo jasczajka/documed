@@ -4,16 +4,20 @@ import com.documed.backend.users.model.Specialization;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+
+import com.documed.backend.users.services.SubscriptionToServiceService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
 public class ServiceService {
 
   private final ServiceDAO serviceDAO;
+  private final SubscriptionToServiceService subscriptionToServiceService;
 
-  List<com.documed.backend.services.model.Service> getAll() {
+  public List<com.documed.backend.services.model.Service> getAll() {
     return serviceDAO.getAll();
   }
 
@@ -21,6 +25,7 @@ public class ServiceService {
     return serviceDAO.getById(id);
   }
 
+  @Transactional
   com.documed.backend.services.model.Service createService(
       String name,
       BigDecimal price,
@@ -38,6 +43,10 @@ public class ServiceService {
 
     com.documed.backend.services.model.Service createdService = serviceDAO.create(service);
     addSpecializationsToService(createdService.getId(), specializationIds);
+
+    if (type == ServiceType.REGULAR_SERVICE) {
+      subscriptionToServiceService.createSubscriptionToServiceForNewService(createdService.getId());
+    }
 
     return createdService;
   }

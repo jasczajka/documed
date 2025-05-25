@@ -8,6 +8,7 @@ import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.services.ServiceService;
 import com.documed.backend.users.model.UserRole;
 import com.documed.backend.users.services.SubscriptionService;
+import com.documed.backend.users.services.SubscriptionToServiceService;
 import com.documed.backend.users.services.UserService;
 import com.documed.backend.visits.dtos.UpdateVisitDTO;
 import com.documed.backend.visits.exceptions.WrongVisitStatusException;
@@ -30,7 +31,7 @@ public class VisitService {
   private final AuthService authService;
   private final ServiceService serviceService;
   private final UserService userService;
-  private final SubscriptionService subscriptionService;
+  private final SubscriptionToServiceService subscriptionToServiceService;
 
   public Visit getById(int id) {
     Visit visit = visitDAO.getById(id).orElseThrow(() -> new NotFoundException("Visit not found"));
@@ -129,7 +130,7 @@ public class VisitService {
       return basicPrice;
     } else {
       BigDecimal discount = BigDecimal.valueOf(
-              (100 - subscriptionService.getDiscountForService(serviceId, subscriptionId)))
+              (100 - subscriptionToServiceService.getDiscountForService(serviceId, subscriptionId)))
               .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP
       );
       if (discount.compareTo(BigDecimal.ZERO) > 0) {

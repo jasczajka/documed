@@ -6,14 +6,12 @@ import com.documed.backend.users.model.SubscriptionToService;
 import com.documed.backend.users.services.SubscriptionService;
 import java.util.List;
 
+import com.documed.backend.users.services.SubscriptionToServiceService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -21,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SubscriptionController {
 
   private final SubscriptionService subscriptionService;
+  private final SubscriptionToServiceService subscriptionToServiceService;
 
   @StaffOnly
   @GetMapping("/{id}")
@@ -42,12 +41,20 @@ public class SubscriptionController {
   public ResponseEntity<List<SubscriptionToService>> getAllSubscriptionToServiceForSubscription(
           @PathVariable int subscriptionId
   ) {
-    List<SubscriptionToService> subscriptionToServiceList = subscriptionService.getAllSubscriptionToServiceForSubscription(subscriptionId);
+    List<SubscriptionToService> subscriptionToServiceList = subscriptionToServiceService.getAllSubscriptionToServiceForSubscription(subscriptionId);
     if (subscriptionToServiceList.isEmpty()) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } else {
       return new ResponseEntity<>(subscriptionToServiceList, HttpStatus.OK);
     }
+  }
+
+  @PutMapping("{subscriptionId}/services/{serviceId}")
+  public ResponseEntity<String> updateServiceDiscount(
+          @PathVariable int subscriptionId, @PathVariable int serviceId, @RequestBody int discount
+  ) {
+    subscriptionToServiceService.updateSubscriptionToService(new SubscriptionToService(serviceId, subscriptionId, discount));
+    return new ResponseEntity<>("Service discount updated", HttpStatus.OK);
   }
 
 }
