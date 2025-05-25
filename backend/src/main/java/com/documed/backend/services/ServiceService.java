@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-//import com.documed.backend.users.services.SubscriptionToServiceService;
 import com.documed.backend.users.services.SubscriptionService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -89,4 +88,5 @@ public class ServiceService {
         .map(com.documed.backend.services.model.Service::getPrice)
         .orElseThrow(RuntimeException::new);
   }
+
 }

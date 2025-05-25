@@ -158,6 +158,45 @@ public class ServiceDAO implements FullDAO<Service, Service> {
         });
   }
 
+    public List<Service> getAllRegular() {
+        String sql =
+                """
+                SELECT
+                    s.id AS service_id,
+                    s.name,
+                    s.price,
+                    s.type,
+                    s.estimated_time
+                FROM service s
+                WHERE s.type = 'REGULAR_SERVICE'
+                """;
+
+        return jdbcTemplate.query(
+                sql,
+                rs -> {
+                    Map<Integer, Service> services = new LinkedHashMap<>();
+
+                    while (rs.next()) {
+                        int serviceId = rs.getInt("service_id");
+                        Service service = services.get(serviceId);
+
+                        if (service == null) {
+                            service =
+                                    Service.builder()
+                                            .id(serviceId)
+                                            .name(rs.getString("name"))
+                                            .price(rs.getBigDecimal("price"))
+                                            .type(ServiceType.valueOf(rs.getString("type")))
+                                            .estimatedTime(rs.getInt("estimated_time"))
+                                            .build();
+                            services.put(serviceId, service);
+                        }
+                    }
+
+                    return new ArrayList<>(services.values());
+                });
+    }
+
   public Service updatePrice(int id, BigDecimal price) {
     String sql = "UPDATE service SET price = ? WHERE id = ?";
     int affectedRows = jdbcTemplate.update(sql, price, id);

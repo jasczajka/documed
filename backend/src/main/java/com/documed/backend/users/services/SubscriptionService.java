@@ -1,15 +1,18 @@
 package com.documed.backend.users.services;
 
 import com.documed.backend.exceptions.NotFoundException;
-import com.documed.backend.services.ServiceService;
+import com.documed.backend.services.ServiceDAO;
 import com.documed.backend.users.SubscriptionDAO;
 import com.documed.backend.users.SubscriptionToServiceDAO;
 import com.documed.backend.users.model.Subscription;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.documed.backend.users.model.SubscriptionToService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -17,7 +20,7 @@ public class SubscriptionService {
 
   private final SubscriptionDAO subscriptionDAO;
   private final SubscriptionToServiceDAO subscriptionToServiceDAO;
-  private final ServiceService serviceService;
+  private final ServiceDAO serviceDAO;
 
   public Subscription getById(int id) {
     return subscriptionDAO
@@ -27,6 +30,15 @@ public class SubscriptionService {
 
   public List<Subscription> getAll() {
     return subscriptionDAO.getAll();
+  }
+
+  public Subscription createSubscription(String name, BigDecimal price) {
+    Subscription subscriptionToCreate = Subscription.builder().name(name).price(price).build();
+    Subscription createdSubscription = subscriptionDAO.create(subscriptionToCreate);
+
+    createSubscriptionToServiceForNewSubscription(createdSubscription.getId());
+
+    return createdSubscription;
   }
 
   public List<SubscriptionToService> getAllSubscriptionToServiceForSubscription(int subscriptionId) {
@@ -52,13 +64,9 @@ public class SubscriptionService {
   }
 
   void createSubscriptionToServiceForNewSubscription(int subscriptionId) {
-    List<com.documed.backend.services.model.Service> services = serviceService.getAll();
+    List<com.documed.backend.services.model.Service> services = serviceDAO.getAllRegular();
 
     services.forEach(service ->
-            createSubscriptionToService(new SubscriptionToService(service.getId(), subscriptionId, 0)));
-
+            createSubscriptionToService(new SubscriptionToService(subscriptionId, service.getId(), 0)));
   }
-
-
-
 }

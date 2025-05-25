@@ -4,6 +4,8 @@ import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.users.model.Subscription;
 import com.documed.backend.users.model.SubscriptionToService;
 import com.documed.backend.users.services.SubscriptionService;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -53,6 +55,12 @@ public class SubscriptionController {
   ) {
     subscriptionService.updateSubscriptionToService(new SubscriptionToService(serviceId, subscriptionId, discount));
     return new ResponseEntity<>("Service discount updated", HttpStatus.OK);
+  }
+
+  @PostMapping
+  public ResponseEntity<Subscription> createSubscription(String name, BigDecimal price) {
+    Subscription subscription = subscriptionService.createSubscription(name, price);
+    return new ResponseEntity<>(subscription, HttpStatus.CREATED);
   }
 
 }
