@@ -5,7 +5,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import com.documed.backend.users.services.SubscriptionToServiceService;
+//import com.documed.backend.users.services.SubscriptionToServiceService;
+import com.documed.backend.users.services.SubscriptionService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ServiceService {
 
   private final ServiceDAO serviceDAO;
-  private final SubscriptionToServiceService subscriptionToServiceService;
+  private final SubscriptionService subscriptionService;
 
   public List<com.documed.backend.services.model.Service> getAll() {
     return serviceDAO.getAll();
@@ -45,7 +46,7 @@ public class ServiceService {
     addSpecializationsToService(createdService.getId(), specializationIds);
 
     if (type == ServiceType.REGULAR_SERVICE) {
-      subscriptionToServiceService.createSubscriptionToServiceForNewService(createdService.getId());
+      subscriptionService.createSubscriptionToServiceForNewService(createdService.getId());
     }
 
     return createdService;

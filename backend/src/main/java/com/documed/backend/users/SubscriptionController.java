@@ -6,7 +6,6 @@ import com.documed.backend.users.model.SubscriptionToService;
 import com.documed.backend.users.services.SubscriptionService;
 import java.util.List;
 
-import com.documed.backend.users.services.SubscriptionToServiceService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 public class SubscriptionController {
 
   private final SubscriptionService subscriptionService;
-  private final SubscriptionToServiceService subscriptionToServiceService;
 
   @StaffOnly
   @GetMapping("/{id}")
@@ -41,7 +39,7 @@ public class SubscriptionController {
   public ResponseEntity<List<SubscriptionToService>> getAllSubscriptionToServiceForSubscription(
           @PathVariable int subscriptionId
   ) {
-    List<SubscriptionToService> subscriptionToServiceList = subscriptionToServiceService.getAllSubscriptionToServiceForSubscription(subscriptionId);
+    List<SubscriptionToService> subscriptionToServiceList = subscriptionService.getAllSubscriptionToServiceForSubscription(subscriptionId);
     if (subscriptionToServiceList.isEmpty()) {
       return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     } else {
@@ -53,7 +51,7 @@ public class SubscriptionController {
   public ResponseEntity<String> updateServiceDiscount(
           @PathVariable int subscriptionId, @PathVariable int serviceId, @RequestBody int discount
   ) {
-    subscriptionToServiceService.updateSubscriptionToService(new SubscriptionToService(serviceId, subscriptionId, discount));
+    subscriptionService.updateSubscriptionToService(new SubscriptionToService(serviceId, subscriptionId, discount));
     return new ResponseEntity<>("Service discount updated", HttpStatus.OK);
   }
 
