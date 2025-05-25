@@ -188,6 +188,7 @@ CREATE TABLE IF NOT EXISTS Visit (
     service_id int  NOT NULL,
     patient_information varchar(255)  NULL,
     patient_id int  NOT NULL,
+    doctor_id int  NOT NULL,
     CONSTRAINT Visit_pk PRIMARY KEY (id)
 );
 

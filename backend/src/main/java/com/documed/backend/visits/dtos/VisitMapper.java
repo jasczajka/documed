@@ -25,9 +25,9 @@ public class VisitMapper {
         .patientId(patient.getId())
         .doctorFullName(doctor.getFirstName() + " " + doctor.getLastName())
         .doctorId(doctor.getId())
-        .startTime(timeSlots.getFirst().getStartTime())
-        .endTime(timeSlots.getLast().getEndTime())
-        .date(timeSlots.getFirst().getDate())
+        .startTime(timeSlots.isEmpty() ? null : timeSlots.getFirst().getStartTime())
+        .endTime(timeSlots.isEmpty() ? null : timeSlots.getLast().getEndTime())
+        .date(timeSlots.isEmpty() ? null : timeSlots.getFirst().getDate())
         .build();
   }
 }

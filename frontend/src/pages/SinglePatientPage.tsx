@@ -139,6 +139,9 @@ const SinglePatientPage: FC = () => {
       <div className="flex w-full items-center justify-between">
         <CardHeader title={patientFullName} />
         <div className="flex-shrink-0">
+          <Button onClick={() => {}} variant="contained">
+            Umów wizytę dla pacjenta
+          </Button>
           <Button onClick={() => handleScheduleVisitClick()} variant="contained">
             Rozpocznij usługę dodatkową
           </Button>

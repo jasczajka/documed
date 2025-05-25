@@ -15,6 +15,7 @@ import com.documed.backend.visits.dtos.VisitMapper;
 import com.documed.backend.visits.exceptions.CancelVisitException;
 import com.documed.backend.visits.model.ScheduleVisitDTO;
 import com.documed.backend.visits.model.Visit;
+import com.documed.backend.visits.model.VisitStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -141,17 +142,17 @@ public class VisitController {
                   return new NotFoundException("Patient not found");
                 });
     List<TimeSlot> visitTimeSlots = this.timeSlotService.getTimeSlotsForVisit(visit.getId());
-    if (visitTimeSlots.isEmpty()) {
-      log.warn("No timeslots found for visit ID: {}", visit.getId());
-      throw new BadRequestException("This visit doesn't have any timeslots assigned");
+    if (visit.getStatus() != VisitStatus.CANCELLED && visitTimeSlots.isEmpty()) {
+      log.warn("No timeslots found for not cancelled visit ID: {}", visit.getId());
+      throw new BadRequestException(
+          "This visit is not cancelled and doesn't have any timeslots assigned");
     }
     User doctor =
         userService
-            .getById(visitTimeSlots.getFirst().getDoctorId())
+            .getById(visit.getDoctorId())
             .orElseThrow(
                 () -> {
-                  log.info("Reserved time slots: ");
-                  log.warn("Doctor not found with ID: {}", visitTimeSlots.getFirst().getDoctorId());
+                  log.warn("Doctor not found with ID: {}", visit.getDoctorId());
                   return new NotFoundException("Doctor not found");
                 });
 

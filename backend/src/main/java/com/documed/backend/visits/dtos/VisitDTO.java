@@ -46,12 +46,9 @@ public class VisitDTO {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private int doctorId;
 
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   LocalDate date;
 
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   LocalTime startTime;
 
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   LocalTime endTime;
 }

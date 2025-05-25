@@ -32,12 +32,13 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
               .facilityId(rs.getInt("facility_id"))
               .serviceId(rs.getInt("service_id"))
               .patientId(rs.getInt("patient_id"))
+              .doctorId(rs.getInt("doctor_id"))
               .build();
 
   @Override
   public Visit create(Visit creationObject) {
     String sql =
-        "INSERT INTO visit (status, facility_id, service_id, patient_id, patient_information) VALUES (?, ?, ?, ?, ?) RETURNING id";
+        "INSERT INTO visit (status, facility_id, service_id, patient_id, doctor_id, patient_information) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
 
     KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -48,7 +49,8 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
           ps.setInt(2, creationObject.getFacilityId());
           ps.setInt(3, creationObject.getServiceId());
           ps.setInt(4, creationObject.getPatientId());
-          ps.setString(5, creationObject.getPatientInformation());
+          ps.setInt(5, creationObject.getDoctorId());
+          ps.setString(6, creationObject.getPatientInformation());
           return ps;
         },
         keyHolder);
@@ -72,7 +74,7 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
   @Override
   public Optional<Visit> getById(int id) {
     String sql =
-        "SELECT id, status, interview, diagnosis, recommendations, total_cost, facility_id, service_id, patient_information, patient_id FROM visit WHERE id = ?";
+        "SELECT id, status, interview, diagnosis, recommendations, total_cost, facility_id, service_id, patient_information, patient_id, doctor_id FROM visit WHERE id = ?";
 
     List<Visit> visits = jdbcTemplate.query(sql, rowMapper, id);
 
@@ -93,7 +95,7 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
   public List<Visit> getVisitsByPatientIdAndFacilityId(int patientId, int facilityId) {
     String sql =
         """
-                  SELECT id, status, interview, diagnosis, recommendations, total_cost, facility_id, service_id, patient_information, patient_id
+                  SELECT id, status, interview, diagnosis, recommendations, total_cost, facility_id, service_id, patient_information, patient_id, doctor_id
                   FROM visit
                   WHERE patient_id = ?
                   AND facility_id = ?
@@ -105,11 +107,10 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
   public List<Visit> getVisitsByDoctorIdAndFacilityId(int doctorId, int facilityId) {
     String sql =
         """
-                  SELECT DISTINCT v.id, status, interview, diagnosis, recommendations, total_cost, facility_id, service_id, patient_information, patient_id
-                  FROM visit v
-                  JOIN time_slot ON v.id = time_slot.visit_id
-                  WHERE time_slot.doctor_id = ?
-                  AND v.facility_id = ?
+                  SELECT DISTINCT id, status, interview, diagnosis, recommendations, total_cost, facility_id, service_id, patient_information, patient_id, doctor_id
+                  FROM visit
+                  WHERE doctor_id = ?
+                  AND facility_id = ?
                  """;
 
     return jdbcTemplate.query(sql, rowMapper, doctorId, facilityId);

@@ -95,9 +95,9 @@ export interface VisitDTO {
   patientId: number;
   doctorFullName: string;
   doctorId: number;
-  date: string;
-  startTime: string;
-  endTime: string;
+  date?: string;
+  startTime?: string;
+  endTime?: string;
 }
 
 export type CreateServiceDTOType = (typeof CreateServiceDTOType)[keyof typeof CreateServiceDTOType];

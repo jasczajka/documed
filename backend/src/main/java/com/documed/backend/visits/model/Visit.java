@@ -20,6 +20,7 @@ public class Visit {
   private int serviceId;
   private String patientInformation;
   private int patientId;
+  private int doctorId;
   private List<TimeSlot> reservedTimeSlots;
   // @TODO feedback
 }
