@@ -44,6 +44,7 @@ public class UserDAO implements FullDAO<User, User> {
               .pesel(rs.getString("pesel"))
               .phoneNumber(rs.getString("phone_number"))
               .pwzNumber(rs.getString("pwz"))
+              .subscriptionId(rs.getInt("subscription_id"))
               .build();
 
   @Override

@@ -1,11 +1,12 @@
 package com.documed.backend.users.model;
 
-import com.documed.backend.services.model.Service;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 
 @AllArgsConstructor
+@Data
 public class SubscriptionToService {
-  private Subscription subscription;
-  private Service service;
+  private final int subscriptionId;
+  private final int serviceId;
   private int discount;
 }

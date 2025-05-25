@@ -32,12 +32,13 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
               .facilityId(rs.getInt("facility_id"))
               .serviceId(rs.getInt("service_id"))
               .patientId(rs.getInt("patient_id"))
+              .patientInformation(rs.getString("patient_information"))
               .build();
 
   @Override
   public Visit create(Visit creationObject) {
     String sql =
-        "INSERT INTO visit (status, facility_id, service_id, patient_id, patient_information) VALUES (?, ?, ?, ?, ?) RETURNING id";
+        "INSERT INTO visit (status, facility_id, service_id, patient_id, patient_information, total_cost) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
 
     KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -49,6 +50,7 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
           ps.setInt(3, creationObject.getServiceId());
           ps.setInt(4, creationObject.getPatientId());
           ps.setString(5, creationObject.getPatientInformation());
+          ps.setBigDecimal(6, creationObject.getTotalCost());
           return ps;
         },
         keyHolder);
