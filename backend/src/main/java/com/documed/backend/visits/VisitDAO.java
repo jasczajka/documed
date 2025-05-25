@@ -59,13 +59,14 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
       creationObject.setId(key.intValue());
       return creationObject;
     } else {
-      throw new IllegalStateException("Failed retrieve id value");
+      throw new IllegalStateException("Failed to retrieve id value");
     }
   }
 
   @Override
   public int delete(int id) {
-    throw new UnsupportedOperationException("Operation nor supported.");
+    String sql = "DELETE FROM visit WHERE id = ?";
+    return jdbcTemplate.update(sql, id);
   }
 
   @Override
@@ -89,33 +90,40 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
     return affectedRows == 1;
   }
 
-  public List<Visit> getVisitsByPatientId(int patientId) {
+  public List<Visit> getVisitsByPatientIdAndFacilityId(int patientId, int facilityId) {
     String sql =
-        "SELECT id, status, interview, diagnosis, recommendations, total_cost, facility_id, service_id, patient_information, patient_id "
-            + "FROM visit WHERE patient_id = ?";
+        """
+                  SELECT id, status, interview, diagnosis, recommendations, total_cost, facility_id, service_id, patient_information, patient_id
+                  FROM visit
+                  WHERE patient_id = ?
+                  AND facility_id = ?
+                 """;
 
-    return jdbcTemplate.query(sql, rowMapper, patientId);
+    return jdbcTemplate.query(sql, rowMapper, patientId, facilityId);
   }
 
-  public List<Visit> getVisitsByDoctorId(int doctorId) {
+  public List<Visit> getVisitsByDoctorIdAndFacilityId(int doctorId, int facilityId) {
     String sql =
-        "SELECT DISTINCT v.id, status, interview, diagnosis, recommendations, total_cost, facility_id, service_id, patient_information, patient_id "
-            + "FROM visit v "
-            + "JOIN time_slot ON v.id = time_slot.visit_id "
-            + "WHERE time_slot.doctor_id = ?";
+        """
+                  SELECT DISTINCT v.id, status, interview, diagnosis, recommendations, total_cost, facility_id, service_id, patient_information, patient_id
+                  FROM visit v
+                  JOIN time_slot ON v.id = time_slot.visit_id
+                  WHERE time_slot.doctor_id = ?
+                  AND v.facility_id = ?
+                 """;
 
-    return jdbcTemplate.query(sql, rowMapper, doctorId);
+    return jdbcTemplate.query(sql, rowMapper, doctorId, facilityId);
   }
 
   public Visit update(Visit visit) {
     String sql =
         """
-        UPDATE visit
-        SET interview = ?,
-        diagnosis = ?,
-        recommendations = ?
-        WHERE id = ?;
-  """;
+                  UPDATE visit
+                  SET interview = ?,
+                  diagnosis = ?,
+                  recommendations = ?
+                  WHERE id = ?;
+                 """;
 
     jdbcTemplate.update(
         sql, visit.getInterview(), visit.getDiagnosis(), visit.getRecommendations(), visit.getId());

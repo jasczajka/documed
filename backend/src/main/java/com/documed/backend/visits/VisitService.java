@@ -86,19 +86,22 @@ public class VisitService {
   }
 
   List<Visit> getVisitsForCurrentPatient() {
-    return visitDAO.getVisitsByPatientId(authService.getCurrentUserId());
+    return visitDAO.getVisitsByPatientIdAndFacilityId(
+        authService.getCurrentUserId(), authService.getCurrentFacilityId());
   }
 
   List<Visit> getVisitsByPatientId(int patientId) {
-    return visitDAO.getVisitsByPatientId(patientId);
+    return visitDAO.getVisitsByPatientIdAndFacilityId(
+        patientId, authService.getCurrentFacilityId());
   }
 
   List<Visit> getVisitsByDoctorId(int doctorId) {
-    return visitDAO.getVisitsByDoctorId(doctorId);
+    return visitDAO.getVisitsByDoctorIdAndFacilityId(doctorId, authService.getCurrentFacilityId());
   }
 
   List<Visit> getVisitsForCurrentDoctor() {
-    return visitDAO.getVisitsByDoctorId(authService.getCurrentUserId());
+    return visitDAO.getVisitsByDoctorIdAndFacilityId(
+        authService.getCurrentUserId(), authService.getCurrentFacilityId());
   }
 
   Visit updateVisit(int visitId, UpdateVisitDTO updateVisitDTO) {
