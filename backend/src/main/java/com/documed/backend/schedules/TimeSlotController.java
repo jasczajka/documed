@@ -6,7 +6,6 @@ import com.documed.backend.schedules.dtos.TimeSlotMapper;
 import com.documed.backend.schedules.model.TimeSlot;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
