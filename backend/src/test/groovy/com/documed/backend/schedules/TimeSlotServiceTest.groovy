@@ -111,4 +111,260 @@ class TimeSlotServiceTest extends Specification {
 		1 * timeSlotDAO.update({ it == timeSlot1 && it.busy && it.visitId == 112 })
 		1 * timeSlotDAO.update({ it == timeSlot2 && it.busy && it.visitId == 112 })
 	}
+	def "should return empty list when no available slots exist"() {
+		given:
+		def doctorId = 1
+		def neededTimeSlots = 2
+
+		when:
+		timeSlotDAO.getAvailableFutureTimeSlotsByDoctor(doctorId) >> []
+
+		then:
+		timeSlotService.getAvailableFirstTimeSlotsByDoctor(doctorId, neededTimeSlots) == []
+	}
+
+	def "should return first available slot when continuous slots exist"() {
+		given:
+		def doctorId = 1
+		def neededTimeSlots = 2
+		def date = LocalDate.now()
+
+		def slot1 = TimeSlot.builder()
+				.id(1)
+				.doctorId(doctorId)
+				.date(date)
+				.startTime(LocalTime.of(9, 0))
+				.endTime(LocalTime.of(9, 15))
+				.build()
+
+		def slot2 = TimeSlot.builder()
+				.id(2)
+				.doctorId(doctorId)
+				.date(date)
+				.startTime(LocalTime.of(9, 15))
+				.endTime(LocalTime.of(9, 30))
+				.build()
+
+		def slot3 = TimeSlot.builder()
+				.id(3)
+				.doctorId(doctorId)
+				.date(date)
+				.startTime(LocalTime.of(10, 0))
+				.endTime(LocalTime.of(10, 15))
+				.build()
+
+		when:
+		timeSlotDAO.getAvailableFutureTimeSlotsByDoctor(doctorId) >> [slot1, slot2, slot3]
+
+		then:
+		timeSlotService.getAvailableFirstTimeSlotsByDoctor(doctorId, neededTimeSlots) == [slot1]
+	}
+
+	def "should handle multiple dates correctly"() {
+		given:
+		def doctorId = 1
+		def neededTimeSlots = 3
+		def today = LocalDate.now()
+		def tomorrow = today.plusDays(1)
+
+		def todaySlot1 = TimeSlot.builder()
+				.id(1)
+				.doctorId(doctorId)
+				.date(today)
+				.startTime(LocalTime.of(9, 0))
+				.endTime(LocalTime.of(9, 15))
+				.build()
+
+		def todaySlot2 = TimeSlot.builder()
+				.id(2)
+				.doctorId(doctorId)
+				.date(today)
+				.startTime(LocalTime.of(9, 15))
+				.endTime(LocalTime.of(9, 30))
+				.build()
+
+		def tomorrowSlot1 = TimeSlot.builder()
+				.id(3)
+				.doctorId(doctorId)
+				.date(tomorrow)
+				.startTime(LocalTime.of(10, 0))
+				.endTime(LocalTime.of(10, 15))
+				.build()
+
+		def tomorrowSlot2 = TimeSlot.builder()
+				.id(4)
+				.doctorId(doctorId)
+				.date(tomorrow)
+				.startTime(LocalTime.of(10, 15))
+				.endTime(LocalTime.of(10, 30))
+				.build()
+
+		def tomorrowSlot3 = TimeSlot.builder()
+				.id(5)
+				.doctorId(doctorId)
+				.date(tomorrow)
+				.startTime(LocalTime.of(10, 30))
+				.endTime(LocalTime.of(10, 45))
+				.build()
+
+		when:
+		timeSlotDAO.getAvailableFutureTimeSlotsByDoctor(doctorId) >> [
+			todaySlot1,
+			todaySlot2,
+			tomorrowSlot1,
+			tomorrowSlot2,
+			tomorrowSlot3
+		]
+
+		then:
+		timeSlotService.getAvailableFirstTimeSlotsByDoctor(doctorId, neededTimeSlots) == [tomorrowSlot1]
+	}
+
+	def "should skip non-continuous slots"() {
+		given:
+		def doctorId = 1
+		def neededTimeSlots = 2
+		def date = LocalDate.now()
+
+		def slot1 = TimeSlot.builder()
+				.id(1)
+				.doctorId(doctorId)
+				.date(date)
+				.startTime(LocalTime.of(9, 0))
+				.endTime(LocalTime.of(9, 15))
+				.build()
+
+		def slot2 = TimeSlot.builder()
+				.id(2)
+				.doctorId(doctorId)
+				.date(date)
+				.startTime(LocalTime.of(9, 30)) // Gap between slots
+				.endTime(LocalTime.of(9, 45))
+				.build()
+
+		when:
+		timeSlotDAO.getAvailableFutureTimeSlotsByDoctor(doctorId) >> [slot1, slot2]
+
+		then:
+		timeSlotService.getAvailableFirstTimeSlotsByDoctor(doctorId, neededTimeSlots) == []
+	}
+
+	def "should return first slot of multiple blocks when multiple continuous blocks exist"() {
+		given:
+		def doctorId = 1
+		def neededTimeSlots = 2
+		def date = LocalDate.now()
+
+		def slot1 = TimeSlot.builder()
+				.id(1)
+				.doctorId(doctorId)
+				.date(date)
+				.startTime(LocalTime.of(9, 0))
+				.endTime(LocalTime.of(9, 15))
+				.build()
+
+		def slot2 = TimeSlot.builder()
+				.id(2)
+				.doctorId(doctorId)
+				.date(date)
+				.startTime(LocalTime.of(9, 15))
+				.endTime(LocalTime.of(9, 30))
+				.build()
+
+		def slot3 = TimeSlot.builder()
+				.id(3)
+				.doctorId(doctorId)
+				.date(date)
+				.startTime(LocalTime.of(10, 0))
+				.endTime(LocalTime.of(10, 15))
+				.build()
+
+		def slot4 = TimeSlot.builder()
+				.id(4)
+				.doctorId(doctorId)
+				.date(date)
+				.startTime(LocalTime.of(10, 15))
+				.endTime(LocalTime.of(10, 30))
+				.build()
+
+		when:
+		timeSlotDAO.getAvailableFutureTimeSlotsByDoctor(doctorId) >> [slot1, slot2, slot3, slot4]
+
+		then:
+		timeSlotService.getAvailableFirstTimeSlotsByDoctor(doctorId, neededTimeSlots) == [slot1, slot3]
+	}
+
+	def "should handle minimum neededTimeSlots value (1)"() {
+		given:
+		def doctorId = 1
+		def neededTimeSlots = 1
+		def date = LocalDate.now()
+
+		def slot1 = TimeSlot.builder()
+				.id(1)
+				.doctorId(doctorId)
+				.date(date)
+				.startTime(LocalTime.of(9, 0))
+				.endTime(LocalTime.of(9, 15))
+				.build()
+
+		def slot2 = TimeSlot.builder()
+				.id(2)
+				.doctorId(doctorId)
+				.date(date)
+				.startTime(LocalTime.of(10, 0))
+				.endTime(LocalTime.of(10, 15))
+				.build()
+
+		when:
+		timeSlotDAO.getAvailableFutureTimeSlotsByDoctor(doctorId) >> [slot1, slot2]
+
+		then:
+		timeSlotService.getAvailableFirstTimeSlotsByDoctor(doctorId, neededTimeSlots) == [slot1, slot2]
+	}
+
+	def "should handle overlapping continuous blocks correctly"() {
+		given:
+		def doctorId = 1
+		def neededTimeSlots = 2
+		def date = LocalDate.now()
+
+		def slot1 = TimeSlot.builder()
+				.id(1)
+				.doctorId(doctorId)
+				.date(date)
+				.startTime(LocalTime.of(9, 0))
+				.endTime(LocalTime.of(9, 15))
+				.build()
+
+		def slot2 = TimeSlot.builder()
+				.id(2)
+				.doctorId(doctorId)
+				.date(date)
+				.startTime(LocalTime.of(9, 15))
+				.endTime(LocalTime.of(9, 30))
+				.build()
+
+		def slot3 = TimeSlot.builder()
+				.id(3)
+				.doctorId(doctorId)
+				.date(date)
+				.startTime(LocalTime.of(9, 30))
+				.endTime(LocalTime.of(9, 45))
+				.build()
+
+		def slot4 = TimeSlot.builder()
+				.id(4)
+				.doctorId(doctorId)
+				.date(date)
+				.startTime(LocalTime.of(9, 45))
+				.endTime(LocalTime.of(10, 0))
+				.build()
+
+		when:
+		timeSlotDAO.getAvailableFutureTimeSlotsByDoctor(doctorId) >> [slot1, slot2, slot3, slot4]
+
+		then:
+		timeSlotService.getAvailableFirstTimeSlotsByDoctor(doctorId, neededTimeSlots) == [slot1, slot2, slot3]
+	}
 }

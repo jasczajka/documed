@@ -12,9 +12,11 @@ import {
 } from '@mui/material';
 import { FC } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useCreateAdditionalService } from 'shared/api/generated/additional-service-controller/additional-service-controller';
 import { Service } from 'shared/api/generated/generated.schemas';
 import { appConfig } from 'shared/appConfig';
 import { useFileUpload } from 'shared/hooks/useFileUpload';
+import { useNotification } from 'shared/hooks/useNotification';
 import * as Yup from 'yup';
 import { FileUpload } from './FileUpload/FileUpload';
 import { PatientInfoPanel } from './PatientInfoPanel';
@@ -34,12 +36,7 @@ interface AdditionalServiceModalProps {
   allAdditionalServices: Service[];
   confirmText?: string;
   cancelText?: string;
-  onConfirm: (data: {
-    serviceId: number;
-    fulfillerId: number;
-    attachmentIds: number[];
-    description: string;
-  }) => void;
+  onConfirm: () => Promise<void>;
   onCancel: () => void;
   loading?: boolean;
   readOnly?: boolean;
@@ -84,11 +81,21 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
     },
   });
 
-  const onSubmit = (data: FormData) => {
-    onConfirm({
-      ...data,
-      fulfillerId,
-    });
+  const { mutateAsync: createAdditionalService, isPending: isCreateAdditionalServiceLoading } =
+    useCreateAdditionalService();
+  const { showNotification, NotificationComponent } = useNotification();
+
+  const onSubmit = async (data: FormData) => {
+    try {
+      await createAdditionalService({
+        data: { ...data, date: new Date().toISOString(), patientId, fulfillerId },
+      });
+    } catch (err) {
+      console.warn(err);
+      showNotification('Nie udało się zapisać danych usługi dodatkowej', 'error');
+    }
+
+    await onConfirm();
   };
 
   const { uploadFile, deleteFile } = useFileUpload();
@@ -103,6 +110,7 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
           flexDirection: 'column',
           gap: 6,
           overflow: 'visible',
+          minWidth: 600,
         }}
         component="form"
         onSubmit={handleSubmit(onSubmit)}
@@ -178,14 +186,15 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
               type="submit"
               color="success"
               variant="contained"
-              disabled={loading}
-              loading={loading}
+              disabled={loading || isCreateAdditionalServiceLoading}
+              loading={loading || isCreateAdditionalServiceLoading}
             >
               {confirmText}
             </Button>
           </Stack>
         </DialogActions>
       </Card>
+      <NotificationComponent />
     </Dialog>
   );
 };

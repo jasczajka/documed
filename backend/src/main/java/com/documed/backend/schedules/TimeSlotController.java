@@ -1,14 +1,15 @@
 package com.documed.backend.schedules;
 
 import com.documed.backend.auth.annotations.StaffOnly;
+import com.documed.backend.schedules.dtos.AvailableTimeSlotDTO;
+import com.documed.backend.schedules.dtos.TimeSlotMapper;
 import com.documed.backend.schedules.model.TimeSlot;
 import io.swagger.v3.oas.annotations.Operation;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
 @Controller
@@ -25,5 +26,18 @@ public class TimeSlotController {
         .getTimeSlotById(id)
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
+  }
+
+  @GetMapping("/doctors/{id}/available-timeslots")
+  @Operation(summary = "Get available timeslots for doctor by id and required visit length")
+  public ResponseEntity<List<AvailableTimeSlotDTO>> getAvailableFirstTimeSlotsByDoctor(
+      @PathVariable("id") int id, @RequestParam("neededTimeSlots") int neededTimeSlots) {
+
+    List<TimeSlot> timeSlots =
+        timeSlotService.getAvailableFirstTimeSlotsByDoctor(id, neededTimeSlots);
+
+    List<AvailableTimeSlotDTO> dtos = timeSlots.stream().map(TimeSlotMapper::toDto).toList();
+
+    return ResponseEntity.ok(dtos);
   }
 }

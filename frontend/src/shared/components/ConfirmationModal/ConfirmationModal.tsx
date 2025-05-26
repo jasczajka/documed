@@ -15,6 +15,7 @@ export interface ConfirmationModalProps {
   cancelText?: string;
   onConfirm: () => void;
   onCancel: () => void;
+  loading?: boolean;
 }
 
 export const ConfirmationModal: FC<ConfirmationModalProps> = ({
@@ -24,16 +25,19 @@ export const ConfirmationModal: FC<ConfirmationModalProps> = ({
   cancelText = 'Anuluj',
   onConfirm,
   onCancel,
+  loading,
 }) => {
   return (
     <Dialog
       open
       onClose={onCancel}
-      PaperProps={{
-        sx: {
-          p: 3,
-          borderRadius: 3,
-          minWidth: 360,
+      slotProps={{
+        paper: {
+          sx: {
+            p: 3,
+            borderRadius: 3,
+            minWidth: 360,
+          },
         },
       }}
     >
@@ -45,7 +49,14 @@ export const ConfirmationModal: FC<ConfirmationModalProps> = ({
         <Button onClick={onCancel} color="error" variant="outlined" sx={{ minWidth: 100 }}>
           {cancelText}
         </Button>
-        <Button onClick={onConfirm} color="success" variant="contained" sx={{ minWidth: 100 }}>
+        <Button
+          onClick={onConfirm}
+          color="success"
+          variant="contained"
+          sx={{ minWidth: 100 }}
+          loading={loading}
+          disabled={loading}
+        >
           {confirmText}
         </Button>
       </DialogActions>

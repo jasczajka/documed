@@ -12,6 +12,9 @@ public class ScheduleVisitDTO {
   @NotNull(message = "patient ID is required") private final int patientId;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  @NotNull(message = "doctor ID is required") private final int doctorId;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NotNull(message = "time slot ID is required") private final int firstTimeSlotId;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)

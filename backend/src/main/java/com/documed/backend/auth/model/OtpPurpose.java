@@ -1,5 +1,8 @@
 package com.documed.backend.auth.model;
 
+import lombok.Getter;
+
+@Getter
 public enum OtpPurpose {
   REGISTRATION("weryfikacja konta", "Twój kod weryfikacyjny DocuMed"),
   PASSWORD_RESET("reset hasła", "DocuMed - kod do resetu hasła");
@@ -10,13 +13,5 @@ public enum OtpPurpose {
   OtpPurpose(String actionDescription, String subject) {
     this.actionDescription = actionDescription;
     this.subject = subject;
-  }
-
-  public String getActionDescription() {
-    return actionDescription;
-  }
-
-  public String getSubject() {
-    return subject;
   }
 }

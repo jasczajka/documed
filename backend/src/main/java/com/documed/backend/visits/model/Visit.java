@@ -1,6 +1,8 @@
 package com.documed.backend.visits.model;
 
+import com.documed.backend.schedules.model.TimeSlot;
 import java.math.BigDecimal;
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -18,4 +20,7 @@ public class Visit {
   private int serviceId;
   private String patientInformation;
   private int patientId;
+  private int doctorId;
+  private List<TimeSlot> reservedTimeSlots;
+  // @TODO feedback
 }
