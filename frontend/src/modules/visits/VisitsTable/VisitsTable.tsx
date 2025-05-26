@@ -3,7 +3,7 @@ import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { FC, useCallback, useState } from 'react';
-import { Service, VisitDTO } from 'shared/api/generated/generated.schemas';
+import { Service, VisitDTO, VisitStatus } from 'shared/api/generated/generated.schemas';
 import { appConfig } from 'shared/appConfig';
 import { ReviewModal } from 'shared/components/ReviewModal';
 import { TableFilters } from 'shared/components/TableFilters';
@@ -130,7 +130,7 @@ export const VisitsTable: FC<VisitTableProps> = ({
   loading,
 }) => {
   const [filters, setFilters] = useState<VisitsFilters>({
-    status: '',
+    status: VisitStatus.PLANNED,
     patientName: '',
     service: '',
     specialist: '',

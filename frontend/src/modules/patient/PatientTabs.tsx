@@ -4,7 +4,7 @@ import VisitsTable from 'modules/visits/VisitsTable/VisitsTable';
 import { FC, useEffect } from 'react';
 import { FileInfoDTO, Service, VisitDTO } from 'shared/api/generated/generated.schemas';
 import { useCancelPlannedVisit } from 'shared/api/generated/visit-controller/visit-controller';
-import ConfirmationModal from 'shared/components/ConfirmationModal/ConfirmationModal';
+import CancelVisitModal from 'shared/components/ConfirmationModal/CancelVisitModal';
 import { PatientInfoPanelProps } from 'shared/components/PatientInfoPanel';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
@@ -31,22 +31,11 @@ export const PatientTabs: FC<PatientTabsProps> = ({
 }) => {
   const { showNotification, NotificationComponent } = useNotification();
   const { openModal } = useModal();
-  const {
-    mutateAsync: cancelVisit,
-    isPending: isCancelVisitLoading,
-    isError: isCancelVisitError,
-  } = useCancelPlannedVisit();
+  const { isPending: isCancelVisitLoading, isError: isCancelVisitError } = useCancelPlannedVisit();
 
-  const handleCancelVisit = async (visitId: number) => {
+  const handleCancelVisit = (visitId: number) => {
     openModal('cancelVisitModal', (close) => (
-      <ConfirmationModal
-        onConfirm={async () => {
-          await cancelVisit({ id: visitId });
-          refetch();
-          close();
-        }}
-        onCancel={close}
-      />
+      <CancelVisitModal visitId={visitId} onClose={close} onSuccess={refetch} />
     ));
   };
 

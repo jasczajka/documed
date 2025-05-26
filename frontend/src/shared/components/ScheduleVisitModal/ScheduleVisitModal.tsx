@@ -12,15 +12,21 @@ import {
 } from '@mui/material';
 import { FC, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { DoctorDetailsDTO, Service } from 'shared/api/generated/generated.schemas';
+import {
+  DoctorDetailsDTO,
+  ScheduleVisitDTO,
+  Service,
+} from 'shared/api/generated/generated.schemas';
 import { useGetAvailableFirstTimeSlotsByDoctor } from 'shared/api/generated/time-slot-controller/time-slot-controller';
+import { useScheduleVisit } from 'shared/api/generated/visit-controller/visit-controller';
 import { appConfig } from 'shared/appConfig';
+import { useNotification } from 'shared/hooks/useNotification';
 import * as Yup from 'yup';
 import { PatientInfoPanel } from '../PatientInfoPanel';
 import { VisitDatepicker } from '../VisitDatepicker/VisitDatepicker';
 import { calculateNeededTimeSlots } from './utils';
 
-interface FormData {
+export interface FormData {
   serviceId: number;
   doctorId: number;
   visitDate: Date;
@@ -37,12 +43,7 @@ interface ScheduleVisitModalProps {
   allServices: Service[];
   confirmText?: string;
   cancelText?: string;
-  onConfirm: (data: {
-    serviceId: number;
-    doctorId: number;
-    firstTimeSlotId: number;
-    additionalInfo?: string;
-  }) => Promise<void>;
+  onConfirm: () => Promise<void>;
   onCancel: () => void;
   loading?: boolean;
 }
@@ -89,6 +90,8 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
   const selectedServiceId = watch('serviceId');
   const selectedDoctorId = watch('doctorId');
 
+  const { showNotification, NotificationComponent } = useNotification();
+
   const neededTimeSlots = useMemo(() => {
     return calculateNeededTimeSlots(
       selectedServiceId,
@@ -96,6 +99,17 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
       appConfig.timeSlotLengthInMinutes,
     );
   }, [selectedServiceId]);
+
+  const { mutateAsync: scheduleVisit, isPending: isScheduleVisitLoading } = useScheduleVisit();
+
+  const handleScheduleVisit = async (data: ScheduleVisitDTO) => {
+    try {
+      await scheduleVisit({ data });
+    } catch (err) {
+      console.warn(err);
+      showNotification('Nie udało się umówić wizyty', 'error');
+    }
+  };
 
   const {
     data: availableTimeSlots = [],
@@ -110,7 +124,9 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
   );
 
   const possibleStartTimes = useMemo(() => {
-    if (!availableTimeSlots) return [];
+    if (!availableTimeSlots) {
+      return [];
+    }
 
     return availableTimeSlots.map((slot) => new Date(slot.startTime));
   }, [availableTimeSlots]);
@@ -133,7 +149,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
     });
   }, [allDoctors, allServices, selectedServiceId]);
 
-  const onSubmit = (data: Partial<FormData>) => {
+  const onSubmit = async (data: Partial<FormData>) => {
     if (data.serviceId && data.doctorId && data.visitDate) {
       const selectedTimeSlot = availableTimeSlots.find(
         (slot) => new Date(slot.startTime).getTime() === data.visitDate!.getTime(),
@@ -143,13 +159,15 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
         console.error('No matching time slot found');
         return;
       }
-      console.log(data);
-      onConfirm({
-        serviceId: data.serviceId,
+
+      await handleScheduleVisit({
+        patientInformation: data.additionalInfo,
+        patientId: patientId,
         doctorId: data.doctorId,
         firstTimeSlotId: selectedTimeSlot.id,
-        additionalInfo: data.additionalInfo,
+        serviceId: data.serviceId,
       });
+      await onConfirm();
     }
   };
 
@@ -279,14 +297,15 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
               type="submit"
               color="success"
               variant="contained"
-              disabled={loading || isPossibleStartTimesLoading}
-              loading={loading || isPossibleStartTimesLoading}
+              disabled={loading || isPossibleStartTimesLoading || isScheduleVisitLoading}
+              loading={loading || isPossibleStartTimesLoading || isScheduleVisitLoading}
             >
               {confirmText}
             </Button>
           </Stack>
         </DialogActions>
       </Card>
+      <NotificationComponent />
     </Dialog>
   );
 };

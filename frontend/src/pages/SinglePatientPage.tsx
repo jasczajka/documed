@@ -2,21 +2,12 @@ import { Button, CardHeader } from '@mui/material';
 import { PatientTabs } from 'modules/patient/PatientTabs';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
-import { useCreateAdditionalService } from 'shared/api/generated/additional-service-controller/additional-service-controller';
 import { useGetFilesForPatient } from 'shared/api/generated/attachment-controller/attachment-controller';
 import { useGetAllDoctors } from 'shared/api/generated/doctors-controller/doctors-controller';
-import {
-  CreateAdditionalServiceDTO,
-  ScheduleVisitDTO,
-  Service,
-  ServiceType,
-} from 'shared/api/generated/generated.schemas';
+import { Service, ServiceType } from 'shared/api/generated/generated.schemas';
 import { useGetPatientDetails } from 'shared/api/generated/patients-controller/patients-controller';
 import { useGetAllServices } from 'shared/api/generated/service-controller/service-controller';
-import {
-  scheduleVisit,
-  useGetVisitsByPatientId,
-} from 'shared/api/generated/visit-controller/visit-controller';
+import { useGetVisitsByPatientId } from 'shared/api/generated/visit-controller/visit-controller';
 import { AdditionalServiceModal } from 'shared/components/AdditionalServiceModal';
 import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
 import { ScheduleVisitModal } from 'shared/components/ScheduleVisitModal/ScheduleVisitModal';
@@ -73,12 +64,6 @@ const SinglePatientPage: FC = () => {
     refetch: refetchPatientVisits,
   } = useGetVisitsByPatientId(patientId);
 
-  const {
-    mutateAsync: createAdditionalService,
-    isError: isCreateAdditionalServiceError,
-    isPending: isCreateAdditionalServiceLoading,
-  } = useCreateAdditionalService();
-
   const isInitialLoading =
     isServicesLoading ||
     isPatientInfoLoading ||
@@ -97,23 +82,8 @@ const SinglePatientPage: FC = () => {
     [patientInfo],
   );
 
-  const handleCreateAdditionalService = async (data: CreateAdditionalServiceDTO) => {
-    await createAdditionalService({ data });
-    showNotification('Zapisano', 'success');
-  };
-
-  const handleScheduleVisit = async (data: ScheduleVisitDTO) => {
-    try {
-      await scheduleVisit(data);
-      showNotification('Zapisano', 'success');
-    } catch (err) {
-      console.warn('Error scheduling the visit: ', err);
-      showNotification('Wystąpił bład przy umawianiu wizyty', 'error');
-    }
-  };
-
   const handleAdditionalServiceClick = useCallback(async () => {
-    if (fulfillerId && patientId) {
+    if (fulfillerId !== undefined && patientId !== undefined) {
       openModal(
         'additionalServiceModal',
         <AdditionalServiceModal
@@ -122,17 +92,13 @@ const SinglePatientPage: FC = () => {
           fulfillerId={fulfillerId}
           patientFullName={`${patientInfo?.firstName} ${patientInfo?.lastName}`}
           patientAge={patientInfo?.birthdate ? getAge(new Date(patientInfo?.birthdate)) : null}
-          onConfirm={async (data) => {
-            await handleCreateAdditionalService({
-              ...data,
-              date: new Date().toISOString(),
-              patientId,
-            });
-            await refetchPatientAttachments();
+          onConfirm={async () => {
             closeModal('additionalServiceModal');
+            showNotification('Zapisano dane usługi dodatkowej', 'success');
+
+            await refetchPatientAttachments();
           }}
           onCancel={() => closeModal('additionalServiceModal')}
-          loading={isCreateAdditionalServiceLoading}
         />,
       );
     }
@@ -148,16 +114,10 @@ const SinglePatientPage: FC = () => {
           patientId={patientId}
           patientFullName={patientFullName}
           patientAge={patientInfo?.birthdate ? getAge(new Date(patientInfo?.birthdate)) : null}
-          onConfirm={async (formData) => {
-            await handleScheduleVisit({
-              patientInformation: formData.additionalInfo,
-              patientId: patientId,
-              doctorId: formData.doctorId,
-              firstTimeSlotId: formData.firstTimeSlotId,
-              serviceId: formData.serviceId,
-            });
-            await refetchPatientVisits();
+          onConfirm={async () => {
             closeModal('scheduleVisitModal');
+            showNotification('Umówiono wizytę', 'success');
+            await refetchPatientVisits();
           }}
           onCancel={() => closeModal('scheduleVisitModal')}
         />,
@@ -168,9 +128,6 @@ const SinglePatientPage: FC = () => {
   useEffect(() => {
     if (isInitialError) {
       showNotification('Coś poszło nie tak', 'error');
-    }
-    if (isCreateAdditionalServiceError) {
-      showNotification('Nie udało zapisać się danych dodatkowej usługi', 'error');
     }
     if (allServices) {
       console.log(allServices.filter((service) => service.type === ServiceType.ADDITIONAL_SERVICE));
