@@ -56,7 +56,7 @@ public class ServiceController {
     return new ResponseEntity<>(createdService, headers, HttpStatus.CREATED);
   }
 
-  //  @AdminOnly
+  @AdminOnly
   @DeleteMapping("/{id}")
   public ResponseEntity<String> deleteService(@PathVariable int id) {
     int result = serviceService.delete(id);
