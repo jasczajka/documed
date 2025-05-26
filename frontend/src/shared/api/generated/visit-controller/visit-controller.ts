@@ -20,7 +20,7 @@ import type {
 } from '@tanstack/react-query';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import type { ScheduleVisitDTO, UpdateVisitDTO, Visit } from '../generated.schemas';
+import type { ScheduleVisitDTO, UpdateVisitDTO, VisitDTO } from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
@@ -29,7 +29,7 @@ import { customInstance } from '../../axios-instance';
  * @summary schedule/create visit
  */
 export const scheduleVisit = (scheduleVisitDTO: ScheduleVisitDTO, signal?: AbortSignal) => {
-  return customInstance<Visit>({
+  return customInstance<VisitDTO>({
     url: `/api/visits`,
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -104,7 +104,7 @@ export const useScheduleVisit = <TError = ErrorType<unknown>, TContext = unknown
  * @summary Get visit by id
  */
 export const getVisitById = (id: number, signal?: AbortSignal) => {
-  return customInstance<Visit>({ url: `/api/visits/${id}`, method: 'GET', signal });
+  return customInstance<VisitDTO>({ url: `/api/visits/${id}`, method: 'GET', signal });
 };
 
 export const getGetVisitByIdQueryKey = (id: number) => {
@@ -212,7 +212,7 @@ export function useGetVisitById<
  * @summary update visit data
  */
 export const updateVisit = (id: number, updateVisitDTO: UpdateVisitDTO) => {
-  return customInstance<Visit>({
+  return customInstance<VisitDTO>({
     url: `/api/visits/${id}`,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
@@ -286,7 +286,7 @@ export const useUpdateVisit = <TError = ErrorType<unknown>, TContext = unknown>(
  * @summary start visit
  */
 export const startVisit = (id: number) => {
-  return customInstance<Visit>({ url: `/api/visits/${id}/start`, method: 'PATCH' });
+  return customInstance<void>({ url: `/api/visits/${id}/start`, method: 'PATCH' });
 };
 
 export const getStartVisitMutationOptions = <
@@ -349,7 +349,7 @@ export const useStartVisit = <TError = ErrorType<unknown>, TContext = unknown>(
  * @summary finish visit
  */
 export const finishVisit = (id: number, updateVisitDTO: UpdateVisitDTO) => {
-  return customInstance<string>({
+  return customInstance<void>({
     url: `/api/visits/${id}/close`,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
@@ -423,7 +423,7 @@ export const useFinishVisit = <TError = ErrorType<unknown>, TContext = unknown>(
  * @summary cancel visit
  */
 export const cancelPlannedVisit = (id: number) => {
-  return customInstance<string>({ url: `/api/visits/${id}/cancel`, method: 'PATCH' });
+  return customInstance<void>({ url: `/api/visits/${id}/cancel`, method: 'PATCH' });
 };
 
 export const getCancelPlannedVisitMutationOptions = <
@@ -494,7 +494,7 @@ export const useCancelPlannedVisit = <TError = ErrorType<unknown>, TContext = un
  * @summary get all visits for logged in patient
  */
 export const getVisitsForCurrentPatient = (signal?: AbortSignal) => {
-  return customInstance<Visit[]>({ url: `/api/visits/patient`, method: 'GET', signal });
+  return customInstance<VisitDTO[]>({ url: `/api/visits/patient`, method: 'GET', signal });
 };
 
 export const getGetVisitsForCurrentPatientQueryKey = () => {
@@ -608,7 +608,7 @@ export function useGetVisitsForCurrentPatient<
  * @summary get all visits for selected patient
  */
 export const getVisitsByPatientId = (id: number, signal?: AbortSignal) => {
-  return customInstance<Visit[]>({ url: `/api/visits/patient/${id}`, method: 'GET', signal });
+  return customInstance<VisitDTO[]>({ url: `/api/visits/patient/${id}`, method: 'GET', signal });
 };
 
 export const getGetVisitsByPatientIdQueryKey = (id: number) => {
@@ -728,7 +728,7 @@ export function useGetVisitsByPatientId<
  * @summary get all visits assigned for logged in doctor
  */
 export const getVisitsForCurrentDoctor = (signal?: AbortSignal) => {
-  return customInstance<Visit[]>({ url: `/api/visits/doctor`, method: 'GET', signal });
+  return customInstance<VisitDTO[]>({ url: `/api/visits/doctor`, method: 'GET', signal });
 };
 
 export const getGetVisitsForCurrentDoctorQueryKey = () => {
@@ -842,7 +842,7 @@ export function useGetVisitsForCurrentDoctor<
  * @summary get all visits assigned for selected doctor
  */
 export const getVisitsByDoctorId = (id: number, signal?: AbortSignal) => {
-  return customInstance<Visit[]>({ url: `/api/visits/doctor/${id}`, method: 'GET', signal });
+  return customInstance<VisitDTO[]>({ url: `/api/visits/doctor/${id}`, method: 'GET', signal });
 };
 
 export const getGetVisitsByDoctorIdQueryKey = (id: number) => {

@@ -27,7 +27,7 @@ public class UserDAO implements FullDAO<User, User> {
     this.jdbcTemplate = jdbcTemplate;
   }
 
-  private RowMapper<User> userRowMapper =
+  private final RowMapper<User> userRowMapper =
       (rs, rowNum) ->
           User.builder()
               .id(rs.getInt("id"))
@@ -51,7 +51,7 @@ public class UserDAO implements FullDAO<User, User> {
   public Optional<User> getById(int id) {
     String sql = "SELECT * FROM \"User\" WHERE id = ?";
     try {
-      return Optional.ofNullable(jdbcTemplate.queryForObject(sql, userRowMapper, id));
+      return Optional.of(jdbcTemplate.queryForObject(sql, userRowMapper, id));
     } catch (EmptyResultDataAccessException e) {
       return Optional.empty();
     }
@@ -131,7 +131,7 @@ public class UserDAO implements FullDAO<User, User> {
   public Optional<User> getByEmail(String email) {
     String sql = "SELECT * FROM \"User\" WHERE email = ?";
     try {
-      return Optional.ofNullable(jdbcTemplate.queryForObject(sql, userRowMapper, email));
+      return Optional.of(jdbcTemplate.queryForObject(sql, userRowMapper, email));
     } catch (EmptyResultDataAccessException e) {
       return Optional.empty();
     }
@@ -140,10 +140,15 @@ public class UserDAO implements FullDAO<User, User> {
   public Optional<User> getByPesel(String pesel) {
     String sql = "SELECT * FROM \"User\" WHERE pesel = ?";
     try {
-      return Optional.ofNullable(jdbcTemplate.queryForObject(sql, userRowMapper, pesel));
+      return Optional.of(jdbcTemplate.queryForObject(sql, userRowMapper, pesel));
     } catch (EmptyResultDataAccessException e) {
       return Optional.empty();
     }
+  }
+
+  public List<User> getAllByRole(UserRole role) {
+    String sql = "SELECT * FROM \"User\" WHERE role = ?";
+    return jdbcTemplate.query(sql, userRowMapper, role.toString());
   }
 
   public User createAndReturn(User user) {

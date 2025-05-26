@@ -84,7 +84,7 @@ public class SecurityConfig {
     CorsConfiguration configuration = new CorsConfiguration();
 
     configuration.setAllowedOrigins(Arrays.asList(allowedOrigins));
-    System.out.println(Arrays.asList(allowedOrigins));
+    System.out.println("Allowed CORS origins: " + Arrays.asList(allowedOrigins));
     configuration.setAllowedMethods(Arrays.asList("*"));
     configuration.setAllowedHeaders(Arrays.asList("*"));
     configuration.setAllowCredentials(true);

@@ -11,9 +11,8 @@ import java.time.DayOfWeek;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -61,6 +60,10 @@ public class TimeSlotService {
     return timeSlotDAO.getById(id);
   }
 
+  public List<TimeSlot> getTimeSlotsForVisit(int visitId) {
+    return timeSlotDAO.getSortedTimeSlotsForVisit(visitId);
+  }
+
   @Transactional
   public void reserveTimeSlotsForVisit(Visit visit, TimeSlot firstTimeSlot) {
     int serviceId = visit.getServiceId();
@@ -91,8 +94,7 @@ public class TimeSlotService {
 
       TimeSlot slotToReserve = availableSlots.get(startIndex + i);
 
-      if (i > 0
-          && !checkTimeSlotContinuity(availableSlots.get(startIndex + i - 1), slotToReserve)) {
+      if (i > 0 && !areTimeSlotsContinuous(availableSlots.get(startIndex + i - 1), slotToReserve)) {
         throw new NotEnoughTimeInTimeSlotException("Not enough continuous time slots available");
       }
 
@@ -103,7 +105,39 @@ public class TimeSlotService {
     }
   }
 
-  boolean checkTimeSlotContinuity(TimeSlot previousTimeSlot, TimeSlot currentTimeSlot) {
+  public List<TimeSlot> getAvailableFirstTimeSlotsByDoctor(int doctorId, int neededTimeSlots) {
+    List<TimeSlot> allSlots = timeSlotDAO.getAvailableFutureTimeSlotsByDoctor(doctorId);
+
+    Map<LocalDate, List<TimeSlot>> slotsByDate =
+        allSlots.stream()
+            .collect(Collectors.groupingBy(TimeSlot::getDate, TreeMap::new, Collectors.toList()));
+
+    Set<TimeSlot> result = new LinkedHashSet<>();
+
+    slotsByDate.forEach(
+        (date, slotsForDate) -> {
+          slotsForDate.sort(Comparator.comparing(TimeSlot::getStartTime));
+
+          for (int i = 0; i <= slotsForDate.size() - neededTimeSlots; i++) {
+            boolean isContinuous = true;
+
+            for (int j = 0; j < neededTimeSlots - 1; j++) {
+              if (!areTimeSlotsContinuous(slotsForDate.get(i + j), slotsForDate.get(i + j + 1))) {
+                isContinuous = false;
+                break;
+              }
+            }
+
+            if (isContinuous) {
+              result.add(slotsForDate.get(i));
+            }
+          }
+        });
+
+    return new ArrayList<>(result);
+  }
+
+  boolean areTimeSlotsContinuous(TimeSlot previousTimeSlot, TimeSlot currentTimeSlot) {
     return previousTimeSlot.getEndTime().equals(currentTimeSlot.getStartTime());
   }
 

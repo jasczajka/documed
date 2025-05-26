@@ -41,6 +41,8 @@ export const VisitDatepicker: FC<VisitDatepickerProps> = ({
   const selectedEndTime =
     selectedStartTime && addMinutes(selectedStartTime, timeSlotCount * timeSlotLengthInMinutes);
 
+  const isStartTimesListEmpty = Object.keys(startTimesGroupedByDay).length === 0;
+
   return (
     <Paper elevation={0} className="p-2">
       <Box className="flex flex-wrap items-center justify-between gap-4">
@@ -69,35 +71,41 @@ export const VisitDatepicker: FC<VisitDatepickerProps> = ({
           {isDayListOpen ? 'Schowaj dni' : 'Pokaż dni'}
         </Button>
       </Box>
-      <Collapse in={isDayListOpen}>
+      <Collapse in={isDayListOpen && !disabled}>
         <Box className="mt-2 space-y-2">
-          {Object.entries(startTimesGroupedByDay)
-            .sort(([dayA], [dayB]) => new Date(dayA).getTime() - new Date(dayB).getTime())
-            .map(([day, times]) => (
-              <Accordion key={day}>
-                <AccordionSummary expandIcon={<ExpandMore />}>
-                  <Typography>{format(new Date(day), 'd MMMM yyyy', { locale: pl })}</Typography>
-                </AccordionSummary>
-                <AccordionDetails className="flex flex-wrap gap-2">
-                  {times
-                    .sort((a, b) => a.getTime() - b.getTime())
-                    .map((time) => (
-                      <Button
-                        key={time.toISOString()}
-                        variant={
-                          selectedStartTime?.getTime() === time.getTime() ? 'contained' : 'outlined'
-                        }
-                        onClick={() => {
-                          setSelectedStartTime(time);
-                          onConfirmSelectedStartTime(time);
-                        }}
-                      >
-                        {format(time, 'HH:mm')}
-                      </Button>
-                    ))}
-                </AccordionDetails>
-              </Accordion>
-            ))}
+          {isStartTimesListEmpty ? (
+            <Typography variant="subtitle1">Brak terminów dla tego lekarza</Typography>
+          ) : (
+            Object.entries(startTimesGroupedByDay)
+              .sort(([dayA], [dayB]) => new Date(dayA).getTime() - new Date(dayB).getTime())
+              .map(([day, times]) => (
+                <Accordion key={day}>
+                  <AccordionSummary expandIcon={<ExpandMore />}>
+                    <Typography>{format(new Date(day), 'd MMMM yyyy', { locale: pl })}</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails className="flex flex-wrap gap-2">
+                    {times
+                      .sort((a, b) => a.getTime() - b.getTime())
+                      .map((time) => (
+                        <Button
+                          key={time.toISOString()}
+                          variant={
+                            selectedStartTime?.getTime() === time.getTime()
+                              ? 'contained'
+                              : 'outlined'
+                          }
+                          onClick={() => {
+                            setSelectedStartTime(time);
+                            onConfirmSelectedStartTime(time);
+                          }}
+                        >
+                          {format(time, 'HH:mm')}
+                        </Button>
+                      ))}
+                  </AccordionDetails>
+                </Accordion>
+              ))
+          )}
         </Box>
       </Collapse>
     </Paper>

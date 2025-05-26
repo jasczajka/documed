@@ -27,13 +27,14 @@ class VisitServiceTest extends Specification {
 
 	def "scheduleVisit should create and reserve needed time slots"() {
 		given:
-		def dto = new ScheduleVisitDTO("patient info", 1,2 , 3)
+		def dto = new ScheduleVisitDTO("patient info", 1,2 , 3, 4)
 		def slot = Mock(TimeSlot)
 		def createdVisit = Visit.builder()
 				.id(333)
 				.facilityId(222)
 				.serviceId(dto.serviceId)
 				.patientId(dto.patientId)
+				.doctorId(dto.doctorId)
 				.totalCost(BigDecimal.valueOf(50))
 				.status(VisitStatus.PLANNED)
 				.build()
@@ -52,7 +53,7 @@ class VisitServiceTest extends Specification {
 
 	def "scheduleVisit should throw NotFoundException when time slot not found"() {
 		given:
-		def dto = new ScheduleVisitDTO("aaaa", 1, 2, 3)
+		def dto = new ScheduleVisitDTO("aaaa", 1, 2, 3, 4)
 		timeSlotService.getTimeSlotById(dto.firstTimeSlotId) >> Optional.empty()
 
 		when:

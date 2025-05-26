@@ -1,17 +1,18 @@
 import { Box, Button, Paper } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 
-import { endOfDay, format, startOfDay } from 'date-fns';
+import { endOfDay, format, parse, startOfDay } from 'date-fns';
 import { FC, useCallback, useState } from 'react';
+import { Service, VisitDTO, VisitStatus } from 'shared/api/generated/generated.schemas';
 import { appConfig } from 'shared/appConfig';
 import { ReviewModal } from 'shared/components/ReviewModal';
 import { TableFilters } from 'shared/components/TableFilters';
+import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
-import { VisitLite } from 'shared/types/Visit';
 import { useVisitsTable } from './useVisitsTable';
 
 export type VisitsFilters = {
-  serviceType: string;
+  status: string;
   patientName: string;
   service: string;
   specialist: string;
@@ -20,17 +21,20 @@ export type VisitsFilters = {
 };
 
 interface VisitTableProps {
-  visits: VisitLite[];
+  visits: VisitDTO[];
+  allServices: Service[];
   onEdit?: (id: number) => void;
-  onDelete?: (id: number) => void;
+  onCancel: (id: number) => void;
+  loading?: boolean;
 }
 
 const columns = (
+  onCancel: (id: number) => void,
   onEdit?: (id: number) => void,
-  onDelete?: (id: number) => void,
   onAddReview?: (id: number, doctorFullName: string) => void,
   showReviewOption?: boolean,
-): GridColDef<VisitLite>[] => [
+  loading?: boolean,
+): GridColDef<VisitDTO>[] => [
   {
     field: 'index',
     headerName: '#',
@@ -43,7 +47,7 @@ const columns = (
     headerName: 'Pacjent',
     minWidth: 200,
     flex: 1,
-    valueGetter: (_, row) => `${row.patient.firstName} ${row.patient.lastName}`,
+    valueGetter: (_, row) => `${row.patientFullName}`,
   },
   {
     field: 'date',
@@ -51,9 +55,8 @@ const columns = (
     minWidth: 200,
     flex: 1,
     valueGetter: (_, row) => {
-      return row.timeSlots[0]?.date
-        ? format(new Date(row.timeSlots[0].date), 'dd.MM.yyyy')
-        : 'Brak daty';
+      if (row.status === 'CANCELLED') return 'Anulowana';
+      return row.date ? format(new Date(row.date), 'dd.MM.yyyy') : 'Brak daty';
     },
   },
   {
@@ -62,26 +65,33 @@ const columns = (
     minWidth: 200,
     flex: 1,
     valueGetter: (_, row) => {
-      return row.timeSlots[0].startTime ? `${row.timeSlots[0].startTime}` : 'Brak godziny';
+      if (row.status === 'CANCELLED') {
+        return 'Anulowana';
+      }
+
+      if (row.startTime && row.endTime && row.date) {
+        const date = new Date(row.date);
+        const parseTime = (timeStr: string) => parse(timeStr, 'HH:mm:ss', date);
+        const formatTime = (timeStr: string) => format(parseTime(timeStr), 'HH:mm');
+        return `${formatTime(row.startTime)} - ${formatTime(row.endTime)}`;
+      }
+
+      return 'Brak godziny';
     },
   },
-  // @TODO to be finished when we define types for services
   {
     field: 'service',
     headerName: 'Usługa',
     minWidth: 200,
     flex: 1,
-    // valueGetter: (_, row) => 'Kardiologia',
-    valueGetter: () => 'Kardiologia',
-    // || 'Brak usługi',
+    valueGetter: (_, row) => row.serviceName,
   },
   {
     field: 'specialist',
     headerName: 'Specjalista',
     minWidth: 200,
     flex: 1,
-    valueGetter: (_, row) =>
-      row.doctor ? `${row.doctor.firstName} ${row.doctor.lastName}` : 'Brak specjalisty',
+    valueGetter: (_, row) => row.doctorFullName,
   },
   {
     field: 'actions',
@@ -89,42 +99,48 @@ const columns = (
     type: 'actions',
     width: 70,
     flex: 0.5,
-    getActions: (params: { row: VisitLite }) => [
-      <GridActionsCellItem
-        key={`begin-${params.row.id}`}
-        label="Rozpocznij wizytę"
-        onClick={() => onEdit?.(params.row.id)}
-        showInMenu
-      />,
-      <GridActionsCellItem
-        key={`cancel-${params.row.id}`}
-        label="Anuluj wizytę"
-        onClick={() => onDelete?.(params.row.id)}
-        showInMenu
-        sx={{ color: 'error.main' }}
-      />,
-      ...(showReviewOption && !params.row.feedbackRating
-        ? [
-            <GridActionsCellItem
-              key={`review-${params.row.id}`}
-              label="Dodaj opinię"
-              onClick={() =>
-                onAddReview?.(
-                  params.row.id,
-                  `${params.row.doctor?.firstName && params.row.doctor?.lastName ? `${params.row.doctor?.firstName} ${params.row.doctor?.lastName}` : 'Nieznany specjalista'}`,
-                )
-              }
-              showInMenu
-            />,
-          ]
-        : []),
-    ],
+    getActions: (params: { row: VisitDTO }) => {
+      if (params.row.status === 'CANCELLED') return [];
+
+      return [
+        <GridActionsCellItem
+          key={`begin-${params.row.id}`}
+          label="Rozpocznij wizytę"
+          onClick={() => onEdit?.(params.row.id)}
+          showInMenu
+        />,
+        <GridActionsCellItem
+          key={`cancel-${params.row.id}`}
+          label="Anuluj wizytę"
+          disabled={loading}
+          onClick={() => onCancel(params.row.id)}
+          showInMenu
+          sx={{ color: 'error.main' }}
+        />,
+        ...(showReviewOption
+          ? [
+              <GridActionsCellItem
+                key={`review-${params.row.id}`}
+                label="Dodaj opinię"
+                onClick={() => onAddReview?.(params.row.id, params.row.doctorFullName)}
+                showInMenu
+              />,
+            ]
+          : []),
+      ];
+    },
   },
 ];
 
-export const VisitsTable: FC<VisitTableProps> = ({ visits, onEdit, onDelete }) => {
+export const VisitsTable: FC<VisitTableProps> = ({
+  visits,
+  allServices,
+  onEdit,
+  onCancel,
+  loading,
+}) => {
   const [filters, setFilters] = useState<VisitsFilters>({
-    serviceType: '',
+    status: VisitStatus.PLANNED,
     patientName: '',
     service: '',
     specialist: '',
@@ -132,9 +148,8 @@ export const VisitsTable: FC<VisitTableProps> = ({ visits, onEdit, onDelete }) =
     dateTo: '',
   });
 
-  // @TODO replace with useRoles logic when they're done
-  const isPatient = true;
-  const { visitsFilterConfig, filteredVisits } = useVisitsTable({ visits, filters });
+  const { isPatient } = useAuth();
+  const { visitsFilterConfig, filteredVisits } = useVisitsTable({ visits, filters, allServices });
 
   const handleFilterChange = useCallback((name: keyof VisitsFilters, value: string) => {
     setFilters((prev) => ({ ...prev, [name]: value }));
@@ -169,7 +184,7 @@ export const VisitsTable: FC<VisitTableProps> = ({ visits, onEdit, onDelete }) =
 
   const resetFilters = useCallback(() => {
     setFilters({
-      serviceType: '',
+      status: '',
       patientName: '',
       service: '',
       specialist: '',
@@ -193,8 +208,9 @@ export const VisitsTable: FC<VisitTableProps> = ({ visits, onEdit, onDelete }) =
       />
       <Paper sx={{ flexGrow: 1 }}>
         <DataGrid
+          getRowClassName={(params) => (params.row.status === 'CANCELLED' ? 'cancelled-visit' : '')}
           rows={filteredVisits}
-          columns={columns(onEdit, onDelete, handleAddReviewClick, isPatient)}
+          columns={columns(onCancel, onEdit, handleAddReviewClick, isPatient, loading)}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },
@@ -204,6 +220,11 @@ export const VisitsTable: FC<VisitTableProps> = ({ visits, onEdit, onDelete }) =
           paginationMode="client"
           rowHeight={32}
           disableColumnFilter
+          sx={{
+            '& .cancelled-visit': {
+              backgroundColor: '#ffe6e6',
+            },
+          }}
         />
       </Paper>
     </Box>

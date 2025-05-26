@@ -7,9 +7,9 @@ import lombok.NonNull;
 @Data
 @Builder
 public class Attachment {
-  @NonNull private int id;
-  @NonNull private String fileName;
-  @NonNull private String s3Key;
+  private int id;
+  private String fileName;
+  private String s3Key;
   @NonNull AttachmentStatus status;
   private Integer visitId;
   private Integer additionalServiceId;

@@ -188,6 +188,7 @@ CREATE TABLE IF NOT EXISTS Visit (
     service_id int  NOT NULL,
     patient_information varchar(255)  NULL,
     patient_id int  NOT NULL,
+    doctor_id int  NOT NULL,
     CONSTRAINT Visit_pk PRIMARY KEY (id)
 );
 
@@ -471,6 +472,17 @@ DROP CONSTRAINT IF EXISTS Visit_Patient;
 
 ALTER TABLE Visit ADD CONSTRAINT Visit_Patient
     FOREIGN KEY (patient_id)
+    REFERENCES "User" (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: Visit_Doctor (table: Visit)
+ALTER TABLE Visit
+DROP CONSTRAINT IF EXISTS Visit_Doctor;
+
+ALTER TABLE Visit ADD CONSTRAINT Visit_Doctor
+    FOREIGN KEY (doctor_id)
     REFERENCES "User" (id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE

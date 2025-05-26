@@ -12,17 +12,25 @@ import {
 } from '@mui/material';
 import { FC, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { DoctorDetailsDTO, Service } from 'shared/api/generated/generated.schemas';
+import {
+  DoctorDetailsDTO,
+  ScheduleVisitDTO,
+  Service,
+} from 'shared/api/generated/generated.schemas';
+import { useGetAvailableFirstTimeSlotsByDoctor } from 'shared/api/generated/time-slot-controller/time-slot-controller';
+import { useScheduleVisit } from 'shared/api/generated/visit-controller/visit-controller';
 import { appConfig } from 'shared/appConfig';
+import { useNotification } from 'shared/hooks/useNotification';
 import * as Yup from 'yup';
-import { PatientInfoPanel } from './PatientInfoPanel';
-import { VisitDatepicker } from './VisitDatepicker/VisitDatepicker';
-import { generatePossibleStartTimes } from './VisitDatepicker/utils';
+import { PatientInfoPanel } from '../PatientInfoPanel';
+import { VisitDatepicker } from '../VisitDatepicker/VisitDatepicker';
+import { calculateNeededTimeSlots } from './utils';
 
-interface FormData {
+export interface FormData {
   serviceId: number;
   doctorId: number;
   visitDate: Date;
+  firstTimeSlotId: number;
   additionalInfo?: string;
 }
 
@@ -30,17 +38,12 @@ interface ScheduleVisitModalProps {
   title?: string;
   patientId: number;
   patientFullName: string;
-  patientAge: number;
+  patientAge: number | null;
   allDoctors: DoctorDetailsDTO[];
   allServices: Service[];
   confirmText?: string;
   cancelText?: string;
-  onConfirm: (
-    serviceId: number,
-    doctorId: number,
-    visitDate: Date,
-    additionalInfo?: string,
-  ) => void;
+  onConfirm: () => Promise<void>;
   onCancel: () => void;
   loading?: boolean;
 }
@@ -68,16 +71,14 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
   onCancel,
   loading,
 }) => {
-  const possibleStartTimes = useMemo(() => generatePossibleStartTimes(), []);
-
   const {
     control,
     handleSubmit,
     watch,
     formState: { errors },
     resetField,
-  } = useForm<FormData>({
-    resolver: yupResolver(validationSchema),
+  } = useForm<Partial<FormData>>({
+    resolver: yupResolver(validationSchema) as any,
     defaultValues: {
       serviceId: undefined,
       doctorId: undefined,
@@ -89,11 +90,56 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
   const selectedServiceId = watch('serviceId');
   const selectedDoctorId = watch('doctorId');
 
+  const { showNotification, NotificationComponent } = useNotification();
+
+  const neededTimeSlots = useMemo(() => {
+    return calculateNeededTimeSlots(
+      selectedServiceId,
+      allServices,
+      appConfig.timeSlotLengthInMinutes,
+    );
+  }, [selectedServiceId]);
+
+  const { mutateAsync: scheduleVisit, isPending: isScheduleVisitLoading } = useScheduleVisit();
+
+  const handleScheduleVisit = async (data: ScheduleVisitDTO) => {
+    try {
+      await scheduleVisit({ data });
+    } catch (err) {
+      console.warn(err);
+      showNotification('Nie udało się umówić wizyty', 'error');
+    }
+  };
+
+  const {
+    data: availableTimeSlots = [],
+    isLoading: isPossibleStartTimesLoading,
+    refetch: refetchTimeSlots,
+  } = useGetAvailableFirstTimeSlotsByDoctor(
+    selectedDoctorId ?? -1,
+    {
+      neededTimeSlots,
+    },
+    { query: { enabled: !!selectedDoctorId && !!selectedServiceId && !!neededTimeSlots } },
+  );
+
+  const possibleStartTimes = useMemo(() => {
+    if (!availableTimeSlots) {
+      return [];
+    }
+
+    return availableTimeSlots.map((slot) => new Date(slot.startTime));
+  }, [availableTimeSlots]);
+
   const availableDoctorsForChosenService = useMemo(() => {
-    if (!selectedServiceId) return [];
+    if (!selectedServiceId) {
+      return [];
+    }
 
     const service = allServices.find((s) => s.id === selectedServiceId);
-    if (!service) return [];
+    if (!service) {
+      return [];
+    }
 
     return allDoctors.filter((doctor) => {
       const doctorSpecializationIds = doctor.specializations.map((spec) => spec.id);
@@ -103,8 +149,26 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
     });
   }, [allDoctors, allServices, selectedServiceId]);
 
-  const onSubmit = (data: FormData) => {
-    onConfirm(data.serviceId, data.doctorId, data.visitDate, data.additionalInfo);
+  const onSubmit = async (data: Partial<FormData>) => {
+    if (data.serviceId && data.doctorId && data.visitDate) {
+      const selectedTimeSlot = availableTimeSlots.find(
+        (slot) => new Date(slot.startTime).getTime() === data.visitDate!.getTime(),
+      );
+
+      if (!selectedTimeSlot) {
+        console.error('No matching time slot found');
+        return;
+      }
+
+      await handleScheduleVisit({
+        patientInformation: data.additionalInfo,
+        patientId: patientId,
+        doctorId: data.doctorId,
+        firstTimeSlotId: selectedTimeSlot.id,
+        serviceId: data.serviceId,
+      });
+      await onConfirm();
+    }
   };
 
   return (
@@ -116,6 +180,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
           display: 'flex',
           flexDirection: 'column',
           gap: 6,
+          minWidth: 600,
         }}
         component="form"
         onSubmit={handleSubmit(onSubmit)}
@@ -163,11 +228,14 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
               <Autocomplete
                 disabled={!selectedServiceId || loading}
                 options={availableDoctorsForChosenService}
-                getOptionLabel={(option) => `dr. ${option.firstName} ${option.lastName}`}
+                getOptionLabel={(option) => `d ${option.firstName} ${option.lastName}`}
                 onChange={(_, newValue) => {
                   field.onChange(newValue?.id);
-                  // @TODO here we will await new dates, disable stuff, trigger some loading state maybe on the buttons?
+                  console.log('new value id: ', newValue?.id);
                   resetField('visitDate');
+                  if (newValue?.id) {
+                    refetchTimeSlots();
+                  }
                 }}
                 value={allDoctors.find((doctor) => doctor.id === field.value) ?? null}
                 noOptionsText="Brak opcji spełniających wyszukiwanie"
@@ -190,7 +258,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
             control={control}
             render={({ field }) => (
               <VisitDatepicker
-                timeSlotCount={3}
+                timeSlotCount={neededTimeSlots}
                 timeSlotLengthInMinutes={appConfig.timeSlotLengthInMinutes}
                 possibleStartTimes={possibleStartTimes}
                 onConfirmSelectedStartTime={(selectedStartDate) => {
@@ -229,14 +297,15 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
               type="submit"
               color="success"
               variant="contained"
-              disabled={loading}
-              loading={loading}
+              disabled={loading || isPossibleStartTimesLoading || isScheduleVisitLoading}
+              loading={loading || isPossibleStartTimesLoading || isScheduleVisitLoading}
             >
               {confirmText}
             </Button>
           </Stack>
         </DialogActions>
       </Card>
+      <NotificationComponent />
     </Dialog>
   );
 };
