@@ -37,8 +37,7 @@ public class TimeSlotController {
     List<TimeSlot> timeSlots =
         timeSlotService.getAvailableFirstTimeSlotsByDoctor(id, neededTimeSlots);
 
-    List<AvailableTimeSlotDTO> dtos =
-        timeSlots.stream().map(TimeSlotMapper::toDto).toList();
+    List<AvailableTimeSlotDTO> dtos = timeSlots.stream().map(TimeSlotMapper::toDto).toList();
 
     return ResponseEntity.ok(dtos);
   }
