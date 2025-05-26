@@ -61,7 +61,7 @@ public class TimeSlotService {
   }
 
   public List<TimeSlot> getTimeSlotsForVisit(int visitId) {
-    return timeSlotDAO.getTimeSlotsForVisit(visitId);
+    return timeSlotDAO.getSortedTimeSlotsForVisit(visitId);
   }
 
   @Transactional

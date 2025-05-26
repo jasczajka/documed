@@ -105,12 +105,13 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
     return jdbcTemplate.query(sql, rowMapper, doctorId);
   }
 
-  public List<TimeSlot> getTimeSlotsForVisit(int visitId) {
+  public List<TimeSlot> getSortedTimeSlotsForVisit(int visitId) {
     String sql =
         """
             SELECT id, doctor_id, start_time, end_time, date, is_busy, visit_id
             FROM time_slot
             WHERE visit_id = ?
+            ORDER BY start_time
     """;
 
     return jdbcTemplate.query(sql, rowMapper, visitId);
