@@ -1,10 +1,10 @@
 package com.documed.backend.users.services;
 
-import com.documed.backend.auth.exceptions.UserNotFoundException;
-import com.documed.backend.users.UserDAO;
 import com.documed.backend.attachments.S3Service;
 import com.documed.backend.attachments.model.Attachment;
+import com.documed.backend.auth.exceptions.UserNotFoundException;
 import com.documed.backend.exceptions.NotFoundException;
+import com.documed.backend.users.UserDAO;
 import com.documed.backend.users.exceptions.SpecializationToNonDoctorException;
 import com.documed.backend.users.model.*;
 import java.util.List;

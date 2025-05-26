@@ -44,7 +44,7 @@ public class ServiceDAO implements FullDAO<Service, Service> {
         },
         keyHolder);
 
-      Number key = keyHolder.getKey();
+    Number key = keyHolder.getKey();
 
     if (key != null) {
       obj.setId(keyHolder.getKey().intValue());
