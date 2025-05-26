@@ -1,6 +1,7 @@
 package com.documed.backend.services;
 
 import com.documed.backend.FullDAO;
+import com.documed.backend.exceptions.CreationFailException;
 import com.documed.backend.services.model.Service;
 import com.documed.backend.users.SpecializationDAO;
 import com.documed.backend.users.model.Specialization;
@@ -42,7 +43,9 @@ public class ServiceDAO implements FullDAO<Service, Service> {
         },
         keyHolder);
 
-    if (keyHolder.getKey() != null) {
+      Number key = keyHolder.getKey();
+
+    if (key != null) {
       obj.setId(keyHolder.getKey().intValue());
     } else {
       throw new RuntimeException("Failed retrieve id value");
@@ -158,9 +161,9 @@ public class ServiceDAO implements FullDAO<Service, Service> {
         });
   }
 
-    public List<Service> getAllRegular() {
-        String sql =
-                """
+  public List<Service> getAllRegular() {
+    String sql =
+        """
                 SELECT
                     s.id AS service_id,
                     s.name,
@@ -171,31 +174,31 @@ public class ServiceDAO implements FullDAO<Service, Service> {
                 WHERE s.type = 'REGULAR_SERVICE'
                 """;
 
-        return jdbcTemplate.query(
-                sql,
-                rs -> {
-                    Map<Integer, Service> services = new LinkedHashMap<>();
+    return jdbcTemplate.query(
+        sql,
+        rs -> {
+          Map<Integer, Service> services = new LinkedHashMap<>();
 
-                    while (rs.next()) {
-                        int serviceId = rs.getInt("service_id");
-                        Service service = services.get(serviceId);
+          while (rs.next()) {
+            int serviceId = rs.getInt("service_id");
+            Service service = services.get(serviceId);
 
-                        if (service == null) {
-                            service =
-                                    Service.builder()
-                                            .id(serviceId)
-                                            .name(rs.getString("name"))
-                                            .price(rs.getBigDecimal("price"))
-                                            .type(ServiceType.valueOf(rs.getString("type")))
-                                            .estimatedTime(rs.getInt("estimated_time"))
-                                            .build();
-                            services.put(serviceId, service);
-                        }
-                    }
+            if (service == null) {
+              service =
+                  Service.builder()
+                      .id(serviceId)
+                      .name(rs.getString("name"))
+                      .price(rs.getBigDecimal("price"))
+                      .type(ServiceType.valueOf(rs.getString("type")))
+                      .estimatedTime(rs.getInt("estimated_time"))
+                      .build();
+              services.put(serviceId, service);
+            }
+          }
 
-                    return new ArrayList<>(services.values());
-                });
-    }
+          return new ArrayList<>(services.values());
+        });
+  }
 
   public Service updatePrice(int id, BigDecimal price) {
     String sql = "UPDATE service SET price = ? WHERE id = ?";
@@ -228,7 +231,7 @@ public class ServiceDAO implements FullDAO<Service, Service> {
     if (affectedRows == 1) {
       return specializationDAO.getById(specializationId).orElseThrow(RuntimeException::new);
     } else {
-      throw new RuntimeException("Failed to add specialization to the service");
+      throw new CreationFailException("Failed to add specialization to the service");
     }
   }
 
@@ -250,7 +253,7 @@ public class ServiceDAO implements FullDAO<Service, Service> {
     if (totalAffected >= 1) {
       return getById(serviceId).orElseThrow(RuntimeException::new);
     } else {
-      throw new RuntimeException("Failed to add specializations to the service");
+      throw new CreationFailException("Failed to add specializations to the service");
     }
   }
 
@@ -258,5 +261,10 @@ public class ServiceDAO implements FullDAO<Service, Service> {
     String sql =
         "DELETE FROM specialization_service WHERE service_id = ? AND specialization_id = ?";
     return jdbcTemplate.update(sql, serviceId, specializationId);
+  }
+
+  public void removeAllSpecializationFromService(int serviceId) {
+    String sql = "DELETE FROM specialization_service WHERE service_id = ?";
+    jdbcTemplate.update(sql, serviceId);
   }
 }

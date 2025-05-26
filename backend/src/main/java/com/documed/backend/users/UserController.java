@@ -81,14 +81,12 @@ public class UserController {
   }
 
   @Operation(
-          summary = "Set patient subscription",
-          description = "To cancel subscription set subscriptionId to null or 0"
-  )
+      summary = "Set patient subscription",
+      description = "To cancel subscription set subscriptionId to null or 0")
   @PatchMapping("/{id}/subscription")
   public ResponseEntity<String> updateUserSubscription(
-          @PathVariable("id") int userId, @RequestBody int subscriptionId) {
+      @PathVariable("id") int userId, @RequestBody int subscriptionId) {
     userService.updateUserSubscription(userId, subscriptionId);
     return new ResponseEntity<>("Subscription updated", HttpStatus.OK);
   }
-
 }

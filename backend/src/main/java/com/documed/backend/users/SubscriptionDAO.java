@@ -1,10 +1,8 @@
 package com.documed.backend.users;
 
 import com.documed.backend.FullDAO;
-import com.documed.backend.ReadDAO;
 import com.documed.backend.exceptions.CreationFailException;
 import com.documed.backend.users.model.Subscription;
-
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
@@ -59,13 +57,13 @@ public class SubscriptionDAO implements FullDAO<Subscription, Subscription> {
     KeyHolder keyHolder = new GeneratedKeyHolder();
 
     jdbcTemplate.update(
-            connection -> {
-              PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-              ps.setString(1, creationObject.getName());
-              ps.setBigDecimal(2, creationObject.getPrice());
-              return ps;
-            }, keyHolder
-    );
+        connection -> {
+          PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+          ps.setString(1, creationObject.getName());
+          ps.setBigDecimal(2, creationObject.getPrice());
+          return ps;
+        },
+        keyHolder);
 
     Number key = keyHolder.getKey();
 

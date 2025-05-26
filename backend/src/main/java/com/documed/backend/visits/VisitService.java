@@ -128,10 +128,10 @@ public class VisitService {
     if (subscriptionId == 0) {
       return basicPrice;
     } else {
-      BigDecimal discount = BigDecimal.valueOf(
-              (100 - subscriptionService.getDiscountForService(serviceId, subscriptionId)))
-              .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP
-      );
+      BigDecimal discount =
+          BigDecimal.valueOf(
+                  (100 - subscriptionService.getDiscountForService(serviceId, subscriptionId)))
+              .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
       if (discount.compareTo(BigDecimal.ZERO) > 0) {
         return basicPrice.multiply(discount).setScale(2, RoundingMode.HALF_UP);
       } else {

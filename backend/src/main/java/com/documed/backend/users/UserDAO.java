@@ -304,5 +304,4 @@ public class UserDAO implements FullDAO<User, User> {
       throw new SubscriptionAssignmentException("Failed to assign subscription");
     }
   }
-
 }

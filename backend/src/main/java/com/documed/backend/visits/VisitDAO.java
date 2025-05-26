@@ -1,6 +1,7 @@
 package com.documed.backend.visits;
 
 import com.documed.backend.FullDAO;
+import com.documed.backend.exceptions.CreationFailException;
 import com.documed.backend.visits.model.Visit;
 import com.documed.backend.visits.model.VisitStatus;
 import java.sql.PreparedStatement;
@@ -61,7 +62,7 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
       creationObject.setId(key.intValue());
       return creationObject;
     } else {
-      throw new IllegalStateException("Failed retrieve id value");
+      throw new CreationFailException("Failed create subscription");
     }
   }
 

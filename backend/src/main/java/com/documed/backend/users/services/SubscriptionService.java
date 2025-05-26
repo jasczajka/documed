@@ -5,14 +5,11 @@ import com.documed.backend.services.ServiceDAO;
 import com.documed.backend.users.SubscriptionDAO;
 import com.documed.backend.users.SubscriptionToServiceDAO;
 import com.documed.backend.users.model.Subscription;
-
+import com.documed.backend.users.model.SubscriptionToService;
 import java.math.BigDecimal;
 import java.util.List;
-
-import com.documed.backend.users.model.SubscriptionToService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -41,7 +38,8 @@ public class SubscriptionService {
     return createdSubscription;
   }
 
-  public List<SubscriptionToService> getAllSubscriptionToServiceForSubscription(int subscriptionId) {
+  public List<SubscriptionToService> getAllSubscriptionToServiceForSubscription(
+      int subscriptionId) {
     return subscriptionToServiceDAO.getForSubscription(subscriptionId);
   }
 
@@ -57,16 +55,33 @@ public class SubscriptionService {
     subscriptionToServiceDAO.update(subscriptionToService);
   }
 
-  public void createSubscriptionToServiceForNewService(int serviceId){
+  public void createSubscriptionToServiceForNewService(int serviceId) {
     List<Subscription> subscriptions = getAll();
-    subscriptions.forEach(subscription ->
-            createSubscriptionToService(new SubscriptionToService(serviceId, subscription.getId(), 0)));
+    subscriptions.forEach(
+        subscription ->
+            createSubscriptionToService(
+                new SubscriptionToService(subscription.getId(), serviceId, 0)));
   }
 
   void createSubscriptionToServiceForNewSubscription(int subscriptionId) {
     List<com.documed.backend.services.model.Service> services = serviceDAO.getAllRegular();
 
-    services.forEach(service ->
-            createSubscriptionToService(new SubscriptionToService(subscriptionId, service.getId(), 0)));
+    services.forEach(
+        service ->
+            createSubscriptionToService(
+                new SubscriptionToService(subscriptionId, service.getId(), 0)));
+  }
+
+  public void deleteSubscriptionToServiceForService(int serviceId) {
+    subscriptionToServiceDAO.deleteForService(serviceId);
+  }
+
+  void deleteSubscriptionToServiceForSubscription(int subscriptionId) {
+    subscriptionToServiceDAO.deleteForSubscription(subscriptionId);
+  }
+
+  public void deleteSubscription(int subscriptionId) {
+    deleteSubscriptionToServiceForSubscription(subscriptionId);
+    subscriptionDAO.delete(subscriptionId);
   }
 }

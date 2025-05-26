@@ -1,11 +1,10 @@
 package com.documed.backend.services;
 
 import com.documed.backend.users.model.Specialization;
+import com.documed.backend.users.services.SubscriptionService;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
-
-import com.documed.backend.users.services.SubscriptionService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,7 @@ public class ServiceService {
   }
 
   @Transactional
-  com.documed.backend.services.model.Service createService(
+  public com.documed.backend.services.model.Service createService(
       String name,
       BigDecimal price,
       ServiceType type,
@@ -51,8 +50,10 @@ public class ServiceService {
     return createdService;
   }
 
-  int delete(int id) {
-    return serviceDAO.delete(id);
+  int delete(int serviceId) {
+    removeAllSpecializationFromService(serviceId);
+    subscriptionService.deleteSubscriptionToServiceForService(serviceId);
+    return serviceDAO.delete(serviceId);
   }
 
   com.documed.backend.services.model.Service updatePrice(int serviceId, BigDecimal price) {
@@ -82,11 +83,14 @@ public class ServiceService {
     return serviceDAO.removeSpecializationFromService(serviceId, specializationId);
   }
 
+  void removeAllSpecializationFromService(int serviceId) {
+    serviceDAO.removeAllSpecializationFromService(serviceId);
+  }
+
   public BigDecimal getPriceForService(int serviceId) {
     return serviceDAO
         .getById(serviceId)
         .map(com.documed.backend.services.model.Service::getPrice)
         .orElseThrow(RuntimeException::new);
   }
-
 }
