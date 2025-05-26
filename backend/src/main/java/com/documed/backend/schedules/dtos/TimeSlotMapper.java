@@ -4,8 +4,6 @@ import com.documed.backend.schedules.model.TimeSlot;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneOffset;
-import java.util.Date;
 
 public class TimeSlotMapper {
 
@@ -17,12 +15,12 @@ public class TimeSlotMapper {
     return AvailableTimeSlotDTO.builder()
         .id(timeSlot.getId())
         .doctorId(timeSlot.getDoctorId())
-        .startTime(convertToDate(timeSlot.getDate(), timeSlot.getStartTime()))
+        .startTime(convertToLocalDateTime(timeSlot.getDate(), timeSlot.getStartTime()))
         .isBusy(timeSlot.isBusy())
         .build();
   }
 
-  private static Date convertToDate(LocalDate date, LocalTime time) {
-    return Date.from(LocalDateTime.of(date, time).toInstant(ZoneOffset.UTC));
+  private static LocalDateTime convertToLocalDateTime(LocalDate date, LocalTime time) {
+    return LocalDateTime.of(date, time);
   }
 }

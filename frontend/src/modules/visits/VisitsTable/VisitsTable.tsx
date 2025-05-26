@@ -1,7 +1,7 @@
 import { Box, Button, Paper } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 
-import { endOfDay, format, startOfDay } from 'date-fns';
+import { endOfDay, format, parse, startOfDay } from 'date-fns';
 import { FC, useCallback, useState } from 'react';
 import { Service, VisitDTO, VisitStatus } from 'shared/api/generated/generated.schemas';
 import { appConfig } from 'shared/appConfig';
@@ -65,8 +65,18 @@ const columns = (
     minWidth: 200,
     flex: 1,
     valueGetter: (_, row) => {
-      if (row.status === 'CANCELLED') return 'Anulowana';
-      return row.startTime ? row.startTime : 'Brak godziny';
+      if (row.status === 'CANCELLED') {
+        return 'Anulowana';
+      }
+
+      if (row.startTime && row.endTime && row.date) {
+        const date = new Date(row.date);
+        const parseTime = (timeStr: string) => parse(timeStr, 'HH:mm:ss', date);
+        const formatTime = (timeStr: string) => format(parseTime(timeStr), 'HH:mm');
+        return `${formatTime(row.startTime)} - ${formatTime(row.endTime)}`;
+      }
+
+      return 'Brak godziny';
     },
   },
   {

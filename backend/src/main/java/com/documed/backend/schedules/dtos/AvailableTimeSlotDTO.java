@@ -1,7 +1,7 @@
 package com.documed.backend.schedules.dtos;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.Date;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Data;
 
@@ -15,7 +15,7 @@ public class AvailableTimeSlotDTO {
   private final int doctorId;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private final Date startTime;
+  private final LocalDateTime startTime;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private boolean isBusy;
