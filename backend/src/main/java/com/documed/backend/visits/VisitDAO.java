@@ -40,7 +40,7 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
   @Override
   public Visit create(Visit creationObject) {
     String sql =
-        "INSERT INTO visit (status, facility_id, service_id, patient_id, doctor_id, patient_information, total_cost) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
+        "INSERT INTO visit (status, facility_id, service_id, patient_id, doctor_id, patient_information, total_cost) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id";
 
     KeyHolder keyHolder = new GeneratedKeyHolder();
 

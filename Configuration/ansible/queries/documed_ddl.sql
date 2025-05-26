@@ -438,7 +438,7 @@ ALTER TABLE Visit
 DROP CONSTRAINT IF EXISTS Visit_Facility;
 
 ALTER TABLE Visit ADD CONSTRAINT Visit_Facility
-    FOREIGN KEY (placowka_id)
+    FOREIGN KEY (facility_id)
     REFERENCES Facility (id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
