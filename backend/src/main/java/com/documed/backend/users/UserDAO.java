@@ -304,4 +304,33 @@ public class UserDAO implements FullDAO<User, User> {
       throw new SubscriptionAssignmentException("Failed to assign subscription");
     }
   }
+
+  @Transactional
+  public Integer deletePatientPersonalData(int patientId) {
+    User user =
+        getById(patientId)
+            .orElseThrow(
+                () -> new UserNotFoundException("Patient not found with ID: " + patientId));
+
+    if (user.getRole() != UserRole.PATIENT) {
+      throw new IllegalArgumentException("Only patient accounts can be processed this way");
+    }
+
+    String sql =
+        """
+        UPDATE "User"
+        SET
+            first_name = '[deleted]',
+            last_name = '[deleted]',
+            email = CONCAT('deleted_', id, '@example.com'),
+            address = '[deleted]',
+            pesel = NULL,
+            phone_number = NULL,
+            account_status = 'DEACTIVATED',
+            password = '[deleted]'
+        WHERE id = ?
+        """;
+
+    return jdbcTemplate.update(sql, patientId);
+  }
 }
