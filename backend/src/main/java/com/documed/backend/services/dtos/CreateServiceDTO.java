@@ -1,6 +1,6 @@
 package com.documed.backend.services.dtos;
 
-import com.documed.backend.services.ServiceType;
+import com.documed.backend.services.model.ServiceType;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 import java.util.List;

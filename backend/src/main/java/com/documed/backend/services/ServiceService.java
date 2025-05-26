@@ -1,5 +1,6 @@
 package com.documed.backend.services;
 
+import com.documed.backend.services.model.ServiceType;
 import com.documed.backend.users.model.Specialization;
 import com.documed.backend.users.services.SubscriptionService;
 import java.math.BigDecimal;

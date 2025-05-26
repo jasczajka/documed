@@ -1,11 +1,14 @@
 package com.documed.backend.attachments;
 
 import com.documed.backend.attachments.dtos.CompleteUploadRequestDTO;
+import com.documed.backend.attachments.dtos.FileInfoDTO;
 import com.documed.backend.attachments.dtos.GenerateUploadUrlRequestDTO;
 import com.documed.backend.attachments.dtos.UploadUrlResponseDTO;
 import com.documed.backend.attachments.model.Attachment;
 import com.documed.backend.attachments.model.AttachmentStatus;
+import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class AttachmentController {
   private final S3Service s3Service;
 
-  @PostMapping("/get-upload-url")
+  @PostMapping("/start-upload")
   public ResponseEntity<UploadUrlResponseDTO> generateUploadUrl(
       @Valid @RequestBody GenerateUploadUrlRequestDTO request) {
 
@@ -56,7 +59,7 @@ public class AttachmentController {
     return ResponseEntity.status(HttpStatus.OK).body(downloadUrl);
   }
 
-  @GetMapping("/{id}/download-url")
+  @GetMapping("/{id}")
   public ResponseEntity<String> getDownloadUrl(@PathVariable int id) {
     Attachment attachment = s3Service.getUploadedById(id);
 
@@ -67,6 +70,15 @@ public class AttachmentController {
 
     return ResponseEntity.status(HttpStatus.OK)
         .body(s3Service.generatePresignedGetUrl(attachment.getS3Key()));
+  }
+
+  @StaffOnlyOrSelf
+  @GetMapping("patients/{userId}")
+  public ResponseEntity<List<FileInfoDTO>> getFilesForPatient(@PathVariable int userId) {
+    List<Attachment> attachmentList = this.s3Service.getAttachmentsForPatient(userId);
+
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(s3Service.generateFileInfoDtosForAttachments(attachmentList));
   }
 
   @DeleteMapping("/{id}")

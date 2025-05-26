@@ -3,6 +3,7 @@ package com.documed.backend.services;
 import com.documed.backend.FullDAO;
 import com.documed.backend.exceptions.CreationFailException;
 import com.documed.backend.services.model.Service;
+import com.documed.backend.services.model.ServiceType;
 import com.documed.backend.users.SpecializationDAO;
 import com.documed.backend.users.model.Specialization;
 import java.math.BigDecimal;

@@ -1,6 +1,7 @@
 package com.documed.backend.users
 
-import com.documed.backend.auth.exceptions.UserNotFoundException
+import com.documed.backend.attachments.S3Service
+import com.documed.backend.exceptions.NotFoundException
 import com.documed.backend.users.exceptions.SpecializationToNonDoctorException
 import com.documed.backend.users.model.AccountStatus
 import com.documed.backend.users.model.User
@@ -12,9 +13,10 @@ import spock.lang.Subject
 class UserServiceTest extends Specification {
 
 	def userDAO = Mock(UserDAO)
+	def s3Service = Mock(S3Service)
 
 	@Subject
-	UserService userService = new UserService(userDAO)
+	UserService userService = new UserService(userDAO, s3Service)
 
 	private User buildUser(Map overrides = [:]) {
 		return User.builder()
@@ -156,7 +158,7 @@ class UserServiceTest extends Specification {
 		activatedUser.accountStatus == AccountStatus.ACTIVE
 	}
 
-	def "activateUser throws UserNotFoundException when user not found"() {
+	def "activateUser throws NotFoundException when user not found"() {
 		given:
 		userDAO.getByEmail("notfound@test.com") >> Optional.empty()
 
@@ -164,12 +166,14 @@ class UserServiceTest extends Specification {
 		userService.activateUser("notfound@test.com")
 
 		then:
-		thrown(UserNotFoundException)
+		thrown(NotFoundException)
 	}
 
 	def "deactivateUser returns true when user is deleted"() {
 		given:
-		userDAO.delete(1) >> 1
+		def attachments = []
+		s3Service.getAttachmentsForPatient(1) >> attachments
+		userDAO.deletePatientPersonalData(1) >> 1
 
 		when:
 		def result = userService.deactivateUser(1)
@@ -180,7 +184,9 @@ class UserServiceTest extends Specification {
 
 	def "deactivateUser returns false when no user deleted"() {
 		given:
-		userDAO.delete(1) >> 0
+		def attachments = []
+		s3Service.getAttachmentsForPatient(1) >> attachments
+		userDAO.deletePatientPersonalData(1) >> 0
 
 		when:
 		def result = userService.deactivateUser(1)
@@ -189,7 +195,7 @@ class UserServiceTest extends Specification {
 		!result
 	}
 
-	def "addSpecializationsToUser throws UserNotFoundException when user not found"() {
+	def "addSpecializationsToUser throws NotFoundException when user not found"() {
 		given:
 		userDAO.getById(1) >> Optional.empty()
 
@@ -197,7 +203,7 @@ class UserServiceTest extends Specification {
 		userService.addSpecializationsToUser(1, [1, 2])
 
 		then:
-		thrown(UserNotFoundException)
+		thrown(NotFoundException)
 	}
 
 	def "addSpecializationsToUser throws SpecializationToNonDoctorException for non-doctor role"() {
@@ -257,7 +263,7 @@ class UserServiceTest extends Specification {
 		!result
 	}
 
-	def "areNotificationsOn throws UserNotFoundException when user not found"() {
+	def "areNotificationsOn throws NotFoundException when user not found"() {
 		given:
 		userDAO.getById(1) >> Optional.empty()
 
@@ -265,6 +271,6 @@ class UserServiceTest extends Specification {
 		userService.areNotificationsOn(1)
 
 		then:
-		thrown(UserNotFoundException)
+		thrown(NotFoundException)
 	}
 }
