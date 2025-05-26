@@ -1,8 +1,8 @@
 package com.documed.backend.schedules;
 
 import com.documed.backend.auth.annotations.StaffOnly;
+import com.documed.backend.schedules.dtos.WorkTimeDTO;
 import com.documed.backend.schedules.model.WorkTime;
-import com.documed.backend.schedules.model.WorkTimeDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.util.List;

@@ -4,16 +4,22 @@ import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 import { useCreateAdditionalService } from 'shared/api/generated/additional-service-controller/additional-service-controller';
 import { useGetFilesForPatient } from 'shared/api/generated/attachment-controller/attachment-controller';
+import { useGetAllDoctors } from 'shared/api/generated/doctors-controller/doctors-controller';
 import {
   CreateAdditionalServiceDTO,
+  ScheduleVisitDTO,
   Service,
   ServiceType,
 } from 'shared/api/generated/generated.schemas';
+import { useGetPatientDetails } from 'shared/api/generated/patients-controller/patients-controller';
 import { useGetAllServices } from 'shared/api/generated/service-controller/service-controller';
-import { useGetPatientDetails } from 'shared/api/generated/user-controller/user-controller';
-import { useGetVisitsByPatientId } from 'shared/api/generated/visit-controller/visit-controller';
+import {
+  scheduleVisit,
+  useGetVisitsByPatientId,
+} from 'shared/api/generated/visit-controller/visit-controller';
 import { AdditionalServiceModal } from 'shared/components/AdditionalServiceModal';
 import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
+import { ScheduleVisitModal } from 'shared/components/ScheduleVisitModal/ScheduleVisitModal';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
@@ -41,6 +47,12 @@ const SinglePatientPage: FC = () => {
   } = useGetAllServices();
 
   const {
+    data: allDoctors,
+    isLoading: isDoctorsLoading,
+    isError: isDoctorsError,
+  } = useGetAllDoctors();
+
+  const {
     data: patientInfo,
     isLoading: isPatientInfoLoading,
     isError: isPatientInfoError,
@@ -58,7 +70,7 @@ const SinglePatientPage: FC = () => {
     data: patientVisits,
     isLoading: isPatientVisitsLoading,
     isError: isPatientVisitsError,
-    // refetch: refetchPatientVisits,
+    refetch: refetchPatientVisits,
   } = useGetVisitsByPatientId(patientId);
 
   const {
@@ -71,16 +83,36 @@ const SinglePatientPage: FC = () => {
     isServicesLoading ||
     isPatientInfoLoading ||
     isPatientAttachmentsLoading ||
-    isPatientVisitsLoading;
+    isPatientVisitsLoading ||
+    isDoctorsLoading;
   const isInitialError =
-    isServicesError || isPatientInfoError || isPatientAttachmentsError || isPatientVisitsError;
+    isServicesError ||
+    isPatientInfoError ||
+    isPatientAttachmentsError ||
+    isPatientVisitsError ||
+    isDoctorsError;
+
+  const patientFullName = useMemo(
+    () => `${patientInfo?.firstName} ${patientInfo?.lastName}`,
+    [patientInfo],
+  );
 
   const handleCreateAdditionalService = async (data: CreateAdditionalServiceDTO) => {
     await createAdditionalService({ data });
     showNotification('Zapisano', 'success');
   };
 
-  const handleScheduleVisitClick = useCallback(async () => {
+  const handleScheduleVisit = async (data: ScheduleVisitDTO) => {
+    try {
+      await scheduleVisit(data);
+      showNotification('Zapisano', 'success');
+    } catch (err) {
+      console.warn('Error scheduling the visit: ', err);
+      showNotification('Wystąpił bład przy umawianiu wizyty', 'error');
+    }
+  };
+
+  const handleAdditionalServiceClick = useCallback(async () => {
     if (fulfillerId && patientId) {
       openModal(
         'additionalServiceModal',
@@ -104,12 +136,34 @@ const SinglePatientPage: FC = () => {
         />,
       );
     }
-  }, [openModal, closeModal, isInitialLoading, additionalServices]);
+  }, [openModal, closeModal, isInitialLoading, additionalServices, patientInfo, patientId]);
 
-  const patientFullName = useMemo(
-    () => `${patientInfo?.firstName} ${patientInfo?.lastName}`,
-    [patientInfo],
-  );
+  const handleScheduleVisitClick = useCallback(async () => {
+    if (allDoctors !== undefined && allServices !== undefined) {
+      openModal(
+        'scheduleVisitModal',
+        <ScheduleVisitModal
+          allDoctors={allDoctors}
+          allServices={allServices}
+          patientId={patientId}
+          patientFullName={patientFullName}
+          patientAge={patientInfo?.birthdate ? getAge(new Date(patientInfo?.birthdate)) : null}
+          onConfirm={async (formData) => {
+            await handleScheduleVisit({
+              patientInformation: formData.additionalInfo,
+              patientId: patientId,
+              doctorId: formData.doctorId,
+              firstTimeSlotId: formData.firstTimeSlotId,
+              serviceId: formData.serviceId,
+            });
+            await refetchPatientVisits();
+            closeModal('scheduleVisitModal');
+          }}
+          onCancel={() => closeModal('scheduleVisitModal')}
+        />,
+      );
+    }
+  }, [openModal, closeModal, allDoctors, allServices, patientInfo, patientId]);
 
   useEffect(() => {
     if (isInitialError) {
@@ -138,11 +192,11 @@ const SinglePatientPage: FC = () => {
     <div className="flex flex-col">
       <div className="flex w-full items-center justify-between">
         <CardHeader title={patientFullName} />
-        <div className="flex-shrink-0">
-          <Button onClick={() => {}} variant="contained">
+        <div className="flex gap-2">
+          <Button onClick={() => handleScheduleVisitClick()} variant="contained">
             Umów wizytę dla pacjenta
           </Button>
-          <Button onClick={() => handleScheduleVisitClick()} variant="contained">
+          <Button onClick={() => handleAdditionalServiceClick()} variant="contained">
             Rozpocznij usługę dodatkową
           </Button>
         </div>
@@ -158,7 +212,10 @@ const SinglePatientPage: FC = () => {
         patientAttachments={patientAttachments ?? []}
         patientVisits={patientVisits}
         allServices={allServices}
-        refetch={() => refetchPatientInfo()}
+        refetch={() => {
+          refetchPatientInfo();
+          refetchPatientVisits();
+        }}
       />
       <NotificationComponent />
     </div>

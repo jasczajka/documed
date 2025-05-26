@@ -1,4 +1,4 @@
-package com.documed.backend.schedules.model;
+package com.documed.backend.schedules.dtos;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

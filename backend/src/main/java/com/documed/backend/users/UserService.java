@@ -97,6 +97,10 @@ public class UserService {
     return user.get().isEmailNotifications();
   }
 
+  public List<User> getAllByRole(UserRole role) {
+    return userDAO.getAllByRole(role);
+  }
+
   private boolean isUserAssignedToRole(int userId, UserRole role) {
     User user = getById(userId).orElseThrow(() -> new NotFoundException("User not found"));
 

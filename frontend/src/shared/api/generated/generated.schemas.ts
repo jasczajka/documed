@@ -66,6 +66,7 @@ export interface AdditionalServiceReturnDTO {
 export interface ScheduleVisitDTO {
   patientInformation?: string;
   patientId: number;
+  doctorId: number;
   firstTimeSlotId: number;
   serviceId: number;
 }
@@ -381,20 +382,11 @@ export interface TimeSlot {
   busy?: boolean;
 }
 
-export interface PatientDetailsDTO {
+export interface AvailableTimeSlotDTO {
   id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  birthdate: string;
-}
-
-export interface DoctorDetailsDTO {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  specializations: Specialization[];
+  doctorId: number;
+  startTime: string;
+  busy?: boolean;
 }
 
 export interface MedicineWithAmount {
@@ -403,6 +395,14 @@ export interface MedicineWithAmount {
   commonName: string;
   dosage: string;
   amount: number;
+}
+
+export interface PatientDetailsDTO {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  birthdate: string;
 }
 
 export interface FacilityLoginReturnDTO {
@@ -439,7 +439,16 @@ export interface Visit {
   serviceId?: number;
   patientInformation?: string;
   patientId?: number;
+  doctorId?: number;
   reservedTimeSlots?: TimeSlot[];
+}
+
+export interface DoctorDetailsDTO {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  specializations: Specialization[];
 }
 
 export type MeDTORole = (typeof MeDTORole)[keyof typeof MeDTORole];
@@ -471,6 +480,10 @@ export type UpdateDescription200 = { [key: string]: unknown };
 
 export type AddMedicineToPrescriptionParams = {
   amount?: number;
+};
+
+export type GetAvailableFirstTimeSlotsByDoctorParams = {
+  neededTimeSlots: number;
 };
 
 export type GetAllMedicinesParams = {

@@ -12,7 +12,7 @@ import { useModal } from 'shared/hooks/useModal';
 import { useVisitsTable } from './useVisitsTable';
 
 export type VisitsFilters = {
-  serviceType: string;
+  status: string;
   patientName: string;
   service: string;
   specialist: string;
@@ -24,14 +24,16 @@ interface VisitTableProps {
   visits: VisitDTO[];
   allServices: Service[];
   onEdit?: (id: number) => void;
-  onDelete?: (id: number) => void;
+  onCancel: (id: number) => void;
+  loading?: boolean;
 }
 
 const columns = (
+  onCancel: (id: number) => void,
   onEdit?: (id: number) => void,
-  onDelete?: (id: number) => void,
   onAddReview?: (id: number, doctorFullName: string) => void,
   showReviewOption?: boolean,
+  loading?: boolean,
 ): GridColDef<VisitDTO>[] => [
   {
     field: 'index',
@@ -53,6 +55,7 @@ const columns = (
     minWidth: 200,
     flex: 1,
     valueGetter: (_, row) => {
+      if (row.status === 'CANCELLED') return 'Anulowana';
       return row.date ? format(new Date(row.date), 'dd.MM.yyyy') : 'Brak daty';
     },
   },
@@ -62,6 +65,7 @@ const columns = (
     minWidth: 200,
     flex: 1,
     valueGetter: (_, row) => {
+      if (row.status === 'CANCELLED') return 'Anulowana';
       return row.startTime ? row.startTime : 'Brak godziny';
     },
   },
@@ -85,39 +89,48 @@ const columns = (
     type: 'actions',
     width: 70,
     flex: 0.5,
-    getActions: (params: { row: VisitDTO }) => [
-      <GridActionsCellItem
-        key={`begin-${params.row.id}`}
-        label="Rozpocznij wizytę"
-        onClick={() => onEdit?.(params.row.id)}
-        showInMenu
-      />,
-      <GridActionsCellItem
-        key={`cancel-${params.row.id}`}
-        label="Anuluj wizytę"
-        onClick={() => onDelete?.(params.row.id)}
-        showInMenu
-        sx={{ color: 'error.main' }}
-      />,
-      // @TODO adjust when reviews module is done
-      // ...(showReviewOption && !params.row.feedbackRating
-      ...(showReviewOption
-        ? [
-            <GridActionsCellItem
-              key={`review-${params.row.id}`}
-              label="Dodaj opinię"
-              onClick={() => onAddReview?.(params.row.id, params.row.doctorFullName)}
-              showInMenu
-            />,
-          ]
-        : []),
-    ],
+    getActions: (params: { row: VisitDTO }) => {
+      if (params.row.status === 'CANCELLED') return [];
+
+      return [
+        <GridActionsCellItem
+          key={`begin-${params.row.id}`}
+          label="Rozpocznij wizytę"
+          onClick={() => onEdit?.(params.row.id)}
+          showInMenu
+        />,
+        <GridActionsCellItem
+          key={`cancel-${params.row.id}`}
+          label="Anuluj wizytę"
+          disabled={loading}
+          onClick={() => onCancel(params.row.id)}
+          showInMenu
+          sx={{ color: 'error.main' }}
+        />,
+        ...(showReviewOption
+          ? [
+              <GridActionsCellItem
+                key={`review-${params.row.id}`}
+                label="Dodaj opinię"
+                onClick={() => onAddReview?.(params.row.id, params.row.doctorFullName)}
+                showInMenu
+              />,
+            ]
+          : []),
+      ];
+    },
   },
 ];
 
-export const VisitsTable: FC<VisitTableProps> = ({ visits, allServices, onEdit, onDelete }) => {
+export const VisitsTable: FC<VisitTableProps> = ({
+  visits,
+  allServices,
+  onEdit,
+  onCancel,
+  loading,
+}) => {
   const [filters, setFilters] = useState<VisitsFilters>({
-    serviceType: '',
+    status: '',
     patientName: '',
     service: '',
     specialist: '',
@@ -161,7 +174,7 @@ export const VisitsTable: FC<VisitTableProps> = ({ visits, allServices, onEdit, 
 
   const resetFilters = useCallback(() => {
     setFilters({
-      serviceType: '',
+      status: '',
       patientName: '',
       service: '',
       specialist: '',
@@ -185,8 +198,9 @@ export const VisitsTable: FC<VisitTableProps> = ({ visits, allServices, onEdit, 
       />
       <Paper sx={{ flexGrow: 1 }}>
         <DataGrid
+          getRowClassName={(params) => (params.row.status === 'CANCELLED' ? 'cancelled-visit' : '')}
           rows={filteredVisits}
-          columns={columns(onEdit, onDelete, handleAddReviewClick, isPatient)}
+          columns={columns(onCancel, onEdit, handleAddReviewClick, isPatient, loading)}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },
@@ -196,6 +210,11 @@ export const VisitsTable: FC<VisitTableProps> = ({ visits, allServices, onEdit, 
           paginationMode="client"
           rowHeight={32}
           disableColumnFilter
+          sx={{
+            '& .cancelled-visit': {
+              backgroundColor: '#ffe6e6',
+            },
+          }}
         />
       </Paper>
     </Box>

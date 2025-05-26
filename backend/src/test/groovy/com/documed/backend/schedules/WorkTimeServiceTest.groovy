@@ -1,8 +1,8 @@
 package com.documed.backend.schedules
 
+import com.documed.backend.schedules.dtos.WorkTimeDTO
 import com.documed.backend.schedules.exceptions.WrongTimesGivenException
 import com.documed.backend.schedules.model.WorkTime
-import com.documed.backend.schedules.model.WorkTimeDTO
 import java.time.DayOfWeek
 import java.time.LocalTime
 import spock.lang.Specification

@@ -2,12 +2,13 @@ import { CardHeader } from '@mui/material';
 import { SpecialistTabs } from 'modules/specialist/SpecialistTabs';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
-import { Specialization, WorkTime } from 'shared/api/generated/generated.schemas';
-import { useGetAllSpecializations } from 'shared/api/generated/specialization-controller/specialization-controller';
 import {
   useGetDoctorDetails,
   useUpdateDoctorSpecializations,
-} from 'shared/api/generated/user-controller/user-controller';
+} from 'shared/api/generated/doctors-controller/doctors-controller';
+import { Specialization, WorkTime } from 'shared/api/generated/generated.schemas';
+import { useGetAllSpecializations } from 'shared/api/generated/specialization-controller/specialization-controller';
+
 import {
   useGetWorkTimesForUser,
   useUpdateWorkTimesForUser,

@@ -477,6 +477,17 @@ ALTER TABLE Visit ADD CONSTRAINT Visit_Patient
     INITIALLY IMMEDIATE
 ;
 
+-- Reference: Visit_Doctor (table: Visit)
+ALTER TABLE Visit
+DROP CONSTRAINT IF EXISTS Visit_Doctor;
+
+ALTER TABLE Visit ADD CONSTRAINT Visit_Doctor
+    FOREIGN KEY (doctor_id)
+    REFERENCES "User" (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
 -- Reference: Visit_Service (table: Visit)
 ALTER TABLE Visit
 DROP CONSTRAINT IF EXISTS Visit_Service;

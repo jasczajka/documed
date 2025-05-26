@@ -1,19 +1,22 @@
-package com.documed.backend.visits.dtos;
+package com.documed.backend.schedules.dtos;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.Date;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class FacilityLoginReturnDTO {
-
+public class AvailableTimeSlotDTO {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private int id;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private String address;
+  private final int doctorId;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private String city;
+  private final Date startTime;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private boolean isBusy;
 }

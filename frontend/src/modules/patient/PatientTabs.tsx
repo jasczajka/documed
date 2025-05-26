@@ -1,9 +1,13 @@
 import { CalendarMonth, Cloud, CreditCard, Person2 } from '@mui/icons-material';
 import { Box, Paper, Tab, Tabs } from '@mui/material';
 import VisitsTable from 'modules/visits/VisitsTable/VisitsTable';
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import { FileInfoDTO, Service, VisitDTO } from 'shared/api/generated/generated.schemas';
+import { useCancelPlannedVisit } from 'shared/api/generated/visit-controller/visit-controller';
+import ConfirmationModal from 'shared/components/ConfirmationModal/ConfirmationModal';
 import { PatientInfoPanelProps } from 'shared/components/PatientInfoPanel';
+import { useModal } from 'shared/hooks/useModal';
+import { useNotification } from 'shared/hooks/useNotification';
 import { AttachmentsTab } from './tabs/AttachmentsTab';
 import { PersonalDataTab } from './tabs/PersonalDataTab';
 
@@ -15,7 +19,6 @@ interface PatientTabsProps {
   patientVisits: VisitDTO[];
   allServices: Service[];
   refetch: () => void;
-  // loading?: boolean;
 }
 export const PatientTabs: FC<PatientTabsProps> = ({
   patientInfo,
@@ -25,8 +28,33 @@ export const PatientTabs: FC<PatientTabsProps> = ({
   patientVisits,
   allServices,
   refetch,
-  // loading,
 }) => {
+  const { showNotification, NotificationComponent } = useNotification();
+  const { openModal } = useModal();
+  const {
+    mutateAsync: cancelVisit,
+    isPending: isCancelVisitLoading,
+    isError: isCancelVisitError,
+  } = useCancelPlannedVisit();
+
+  const handleCancelVisit = async (visitId: number) => {
+    openModal('cancelVisitModal', (close) => (
+      <ConfirmationModal
+        onConfirm={async () => {
+          await cancelVisit({ id: visitId });
+          refetch();
+          close();
+        }}
+        onCancel={close}
+      />
+    ));
+  };
+
+  useEffect(() => {
+    if (isCancelVisitError) {
+      showNotification('Nie udało się anulować wizyty', 'error');
+    }
+  }, [isCancelVisitError]);
   return (
     <Box
       sx={{
@@ -60,12 +88,20 @@ export const PatientTabs: FC<PatientTabsProps> = ({
 
       <Paper sx={{ height: '100%', width: '100%', padding: 8, minHeight: '532px' }} elevation={1}>
         {tabIndex === 0 && <AttachmentsTab attachments={patientAttachments} />}
-        {tabIndex === 1 && <VisitsTable visits={patientVisits} allServices={allServices} />}
+        {tabIndex === 1 && (
+          <VisitsTable
+            visits={patientVisits}
+            allServices={allServices}
+            onCancel={handleCancelVisit}
+            loading={isCancelVisitLoading}
+          />
+        )}
         {tabIndex === 2 && (
           <PersonalDataTab patientInfo={patientInfo} onSuccessfulDeactivate={refetch} />
         )}
         {tabIndex === 3 && <div>Abonament</div>}
       </Paper>
+      <NotificationComponent />
     </Box>
   );
 };

@@ -1,16 +1,18 @@
 import { useMemo } from 'react';
-import { Service, ServiceType, VisitDTO } from 'shared/api/generated/generated.schemas';
+import { Service, VisitDTO, VisitStatus } from 'shared/api/generated/generated.schemas';
 import { FilterConfig } from 'shared/components/TableFilters';
 import { VisitsFilters } from './VisitsTable';
 
 const generateVisitsFilterConfig = (allServices: Service[]): FilterConfig[] => [
   {
-    name: 'serviceType',
-    label: 'Rodzaj usługi',
+    name: 'status',
+    label: 'Status wizyty',
     type: 'select',
     options: [
-      { value: ServiceType.REGULAR_SERVICE.toString(), label: 'Wizyta' },
-      { value: ServiceType.ADDITIONAL_SERVICE.toString(), label: 'Dodatkowa usługa' },
+      { value: VisitStatus.CANCELLED.toString(), label: 'Anulowana' },
+      { value: VisitStatus.CLOSED.toString(), label: 'Zakończona' },
+      { value: VisitStatus.IN_PROGRESS.toString(), label: 'W trakcie' },
+      { value: VisitStatus.PLANNED.toString(), label: 'Zaplanowana' },
     ],
   },
   {
@@ -54,13 +56,17 @@ export const useVisitsTable = ({
   filters: VisitsFilters;
   allServices: Service[];
 }) => {
-  // const filterByServiceType = useMemo(() => {
-  //   if (!filters.serviceType) return null;
-  //   return (visit: VisitDTO) => visit.service.type === filters.serviceType;
-  // }, [filters.serviceType]);
+  const filterByStatus = useMemo(() => {
+    if (!filters.status) {
+      return null;
+    }
+    return (visit: VisitDTO) => visit.status.toString() === filters.status;
+  }, [filters.status]);
 
   const filterByPatientName = useMemo(() => {
-    if (!filters.patientName) return null;
+    if (!filters.patientName) {
+      return null;
+    }
     const searchTerm = filters.patientName.toLowerCase();
     return (visit: VisitDTO) => visit.patientFullName.toLowerCase().includes(searchTerm);
   }, [filters.patientName]);
@@ -72,7 +78,9 @@ export const useVisitsTable = ({
   }, [filters.service]);
 
   const filterBySpecialist = useMemo(() => {
-    if (!filters.specialist) return null;
+    if (!filters.specialist) {
+      return null;
+    }
     const searchTerm = filters.specialist.toLowerCase();
     return (visit: VisitDTO) => {
       return visit.doctorFullName.toLowerCase().includes(searchTerm);
@@ -102,7 +110,7 @@ export const useVisitsTable = ({
 
   const filteredVisits = useMemo(() => {
     const activeFilters = [
-      // filterByServiceType,
+      filterByStatus,
       filterByPatientName,
       filterByService,
       filterBySpecialist,
@@ -114,7 +122,7 @@ export const useVisitsTable = ({
     return visits.filter((visit) => activeFilters.every((filterFn) => filterFn(visit)));
   }, [
     visits,
-    // filterByServiceType,
+    filterByStatus,
     filterByPatientName,
     filterByService,
     filterBySpecialist,

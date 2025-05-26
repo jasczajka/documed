@@ -18,8 +18,6 @@ const PrescriptionsPage = lazy(() => import('./PrescriptionsPage'));
 const AdministrationPage = lazy(() => import('./AdministrationPage'));
 const SingleSpecialistPage = lazy(() => import('./SingleSpecialistPage'));
 const SinglePatientPage = lazy(() => import('./SinglePatientPage'));
-const FileUploadTestPage = lazy(() => import('./FileUploadTestPage'));
-const VisitDatepickerTestPage = lazy(() => import('./VisitDatepickerTestPage'));
 
 const getDefaultRoutes = () => [
   {
@@ -38,8 +36,6 @@ const getDefaultRoutes = () => [
     path: '/forgot-password',
     element: <ForgotPasswordPage />,
   },
-  // TODO to remove in the future
-  { path: '/datepicker-test', element: <VisitDatepickerTestPage /> },
   {
     path: '*',
     element: <Navigate to="/login" replace />,
@@ -56,8 +52,6 @@ const getAuthRoutes = (
     path: '/',
     element: <LoggedLayout />,
     children: [
-      // TODO to remove in the future
-      { path: '/file-upload-test', element: <FileUploadTestPage /> },
       { path: '/', element: <Navigate to="/visits" replace /> },
       { path: '/visits', element: <VisitsPage /> },
       {
@@ -100,8 +94,6 @@ const getAuthRoutes = (
           />
         ),
       },
-      // TODO to remove in the future
-      { path: '/datepicker-test', element: <VisitDatepickerTestPage /> },
       { path: '*', element: <Navigate to="/visits" replace /> },
     ],
   },

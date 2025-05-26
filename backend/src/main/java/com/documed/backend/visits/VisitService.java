@@ -62,8 +62,10 @@ public class VisitService {
             .facilityId(authService.getCurrentFacilityId())
             .serviceId(scheduleVisitDTO.getServiceId())
             .patientId(scheduleVisitDTO.getPatientId())
+            .doctorId(scheduleVisitDTO.getDoctorId())
             .totalCost(totalCost)
             .status(VisitStatus.PLANNED)
+            .patientInformation(scheduleVisitDTO.getPatientInformation())
             .build();
     return visitDAO.create(visit);
   }
