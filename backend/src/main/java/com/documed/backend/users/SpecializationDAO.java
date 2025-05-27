@@ -4,11 +4,11 @@ import com.documed.backend.ReadDAO;
 import com.documed.backend.users.model.Specialization;
 import java.util.List;
 import java.util.Optional;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Repository
 public class SpecializationDAO implements ReadDAO<Specialization> {
 

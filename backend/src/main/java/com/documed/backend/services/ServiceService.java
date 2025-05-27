@@ -2,19 +2,22 @@ package com.documed.backend.services;
 
 import com.documed.backend.services.model.ServiceType;
 import com.documed.backend.users.model.Specialization;
+import com.documed.backend.users.services.SubscriptionService;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
 public class ServiceService {
 
   private final ServiceDAO serviceDAO;
+  private final SubscriptionService subscriptionService;
 
-  List<com.documed.backend.services.model.Service> getAll() {
+  public List<com.documed.backend.services.model.Service> getAll() {
     return serviceDAO.getAll();
   }
 
@@ -22,7 +25,8 @@ public class ServiceService {
     return serviceDAO.getById(id);
   }
 
-  com.documed.backend.services.model.Service createService(
+  @Transactional
+  public com.documed.backend.services.model.Service createService(
       String name,
       BigDecimal price,
       ServiceType type,
@@ -40,11 +44,18 @@ public class ServiceService {
     com.documed.backend.services.model.Service createdService = serviceDAO.create(service);
     addSpecializationsToService(createdService.getId(), specializationIds);
 
+    if (type == ServiceType.REGULAR_SERVICE) {
+      subscriptionService.createSubscriptionToServiceForNewService(createdService.getId());
+    }
+
     return createdService;
   }
 
-  int delete(int id) {
-    return serviceDAO.delete(id);
+  @Transactional
+  public int delete(int serviceId) {
+    removeAllSpecializationFromService(serviceId);
+    subscriptionService.deleteSubscriptionToServiceForService(serviceId);
+    return serviceDAO.delete(serviceId);
   }
 
   com.documed.backend.services.model.Service updatePrice(int serviceId, BigDecimal price) {
@@ -72,6 +83,10 @@ public class ServiceService {
 
   int removeSpecializationFromService(int serviceId, int specializationId) {
     return serviceDAO.removeSpecializationFromService(serviceId, specializationId);
+  }
+
+  void removeAllSpecializationFromService(int serviceId) {
+    serviceDAO.removeAllSpecializationFromService(serviceId);
   }
 
   public BigDecimal getPriceForService(int serviceId) {

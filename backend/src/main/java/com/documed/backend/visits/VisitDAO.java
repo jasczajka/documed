@@ -1,6 +1,7 @@
 package com.documed.backend.visits;
 
 import com.documed.backend.FullDAO;
+import com.documed.backend.exceptions.CreationFailException;
 import com.documed.backend.visits.model.Visit;
 import com.documed.backend.visits.model.VisitStatus;
 import java.sql.PreparedStatement;
@@ -32,13 +33,14 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
               .facilityId(rs.getInt("facility_id"))
               .serviceId(rs.getInt("service_id"))
               .patientId(rs.getInt("patient_id"))
+              .patientInformation(rs.getString("patient_information"))
               .doctorId(rs.getInt("doctor_id"))
               .build();
 
   @Override
   public Visit create(Visit creationObject) {
     String sql =
-        "INSERT INTO visit (status, facility_id, service_id, patient_id, doctor_id, patient_information) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
+        "INSERT INTO visit (status, facility_id, service_id, patient_id, doctor_id, patient_information, total_cost) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id";
 
     KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -51,6 +53,7 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
           ps.setInt(4, creationObject.getPatientId());
           ps.setInt(5, creationObject.getDoctorId());
           ps.setString(6, creationObject.getPatientInformation());
+          ps.setBigDecimal(7, creationObject.getTotalCost());
           return ps;
         },
         keyHolder);
@@ -61,7 +64,7 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
       creationObject.setId(key.intValue());
       return creationObject;
     } else {
-      throw new IllegalStateException("Failed to retrieve id value");
+      throw new CreationFailException("Failed create subscription");
     }
   }
 

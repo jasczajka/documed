@@ -7,12 +7,15 @@ import com.documed.backend.schedules.TimeSlotService;
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.services.ServiceService;
 import com.documed.backend.users.model.UserRole;
+import com.documed.backend.users.services.SubscriptionService;
+import com.documed.backend.users.services.UserService;
 import com.documed.backend.visits.dtos.UpdateVisitDTO;
 import com.documed.backend.visits.exceptions.WrongVisitStatusException;
 import com.documed.backend.visits.model.ScheduleVisitDTO;
 import com.documed.backend.visits.model.Visit;
 import com.documed.backend.visits.model.VisitStatus;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +29,8 @@ public class VisitService {
   private final TimeSlotService timeSlotService;
   private final AuthService authService;
   private final ServiceService serviceService;
+  private final UserService userService;
+  private final SubscriptionService subscriptionService;
 
   public Visit getById(int id) {
     Visit visit = visitDAO.getById(id).orElseThrow(() -> new NotFoundException("Visit not found"));
@@ -122,8 +127,21 @@ public class VisitService {
   BigDecimal calculateTotalCost(int serviceId, int patientId) {
 
     BigDecimal basicPrice = serviceService.getPriceForService(serviceId);
-    // @TODO: calculate total cost based on subscription
-    return basicPrice;
+    int subscriptionId = userService.getSubscriptionIdForPatient(patientId);
+
+    if (subscriptionId == 0) {
+      return basicPrice;
+    } else {
+      BigDecimal discount =
+          BigDecimal.valueOf(
+                  (100 - subscriptionService.getDiscountForService(serviceId, subscriptionId)))
+              .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+      if (discount.compareTo(BigDecimal.ZERO) > 0) {
+        return basicPrice.multiply(discount).setScale(2, RoundingMode.HALF_UP);
+      } else {
+        return basicPrice;
+      }
+    }
   }
 
   @Transactional

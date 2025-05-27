@@ -1,5 +1,6 @@
 package com.documed.backend.services;
 
+import com.documed.backend.auth.annotations.AdminOnly;
 import com.documed.backend.services.dtos.CreateServiceDTO;
 import com.documed.backend.services.model.Service;
 import com.documed.backend.users.model.Specialization;
@@ -37,6 +38,7 @@ public class ServiceController {
     }
   }
 
+  @AdminOnly
   @Transactional
   @PostMapping()
   public ResponseEntity<Service> createService(@RequestBody CreateServiceDTO createServiceDTO) {
@@ -54,6 +56,7 @@ public class ServiceController {
     return new ResponseEntity<>(createdService, headers, HttpStatus.CREATED);
   }
 
+  @AdminOnly
   @DeleteMapping("/{id}")
   public ResponseEntity<String> deleteService(@PathVariable int id) {
     int result = serviceService.delete(id);
@@ -65,6 +68,7 @@ public class ServiceController {
     }
   }
 
+  @AdminOnly
   @PatchMapping("/{id}/price")
   public ResponseEntity<Service> updateServicePrice(
       @PathVariable int id, @RequestBody BigDecimal price) {
@@ -72,6 +76,7 @@ public class ServiceController {
     return new ResponseEntity<>(updatedService, HttpStatus.OK);
   }
 
+  @AdminOnly
   @PatchMapping("/{id}/time")
   public ResponseEntity<Service> updateServiceTime(
       @PathVariable int id, @RequestBody int estimatedTime) {
@@ -79,6 +84,7 @@ public class ServiceController {
     return new ResponseEntity<>(updatedService, HttpStatus.CREATED);
   }
 
+  @AdminOnly
   @PostMapping("/{id}/specialization")
   public ResponseEntity<Specialization> addSpecializationToService(
       @PathVariable int id, @RequestBody int specializationId) {
@@ -87,6 +93,7 @@ public class ServiceController {
     return new ResponseEntity<>(addedSpecialization, HttpStatus.OK);
   }
 
+  @AdminOnly
   @DeleteMapping("/{id}/specialization")
   public ResponseEntity<String> removeSpecializationFromService(
       @PathVariable int id, @RequestBody int specializationId) {

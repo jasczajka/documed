@@ -1,8 +1,8 @@
 package com.documed.backend.users;
 
 import com.documed.backend.auth.AuthService;
-import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.users.model.Specialization;
+import com.documed.backend.users.services.UserService;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,12 +33,5 @@ public class UserController {
       @PathVariable("id") int userId) {
     List<Specialization> specs = this.userService.getUserSpecializationsById(userId);
     return new ResponseEntity<>(specs, HttpStatus.OK);
-  }
-
-  @StaffOnly
-  @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deletePatientPersonalData(@PathVariable("id") int userId) {
-    this.userService.deactivateUser(userId);
-    return new ResponseEntity<>(HttpStatus.OK);
   }
 }

@@ -1,13 +1,12 @@
-package com.documed.backend.users;
+package com.documed.backend.users.services;
 
 import com.documed.backend.attachments.S3Service;
 import com.documed.backend.attachments.model.Attachment;
+import com.documed.backend.auth.exceptions.UserNotFoundException;
 import com.documed.backend.exceptions.NotFoundException;
+import com.documed.backend.users.UserDAO;
 import com.documed.backend.users.exceptions.SpecializationToNonDoctorException;
-import com.documed.backend.users.model.AccountStatus;
-import com.documed.backend.users.model.Specialization;
-import com.documed.backend.users.model.User;
-import com.documed.backend.users.model.UserRole;
+import com.documed.backend.users.model.*;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -105,5 +104,16 @@ public class UserService {
     User user = getById(userId).orElseThrow(() -> new NotFoundException("User not found"));
 
     return user.getRole() == role;
+  }
+
+  public void updateUserSubscription(int userId, int subscriptionId) {
+    userDAO.updateUserSubscription(userId, subscriptionId);
+  }
+
+  public int getSubscriptionIdForPatient(int userId) {
+    User patient =
+        userDAO.getById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
+
+    return patient.getSubscriptionId();
   }
 }

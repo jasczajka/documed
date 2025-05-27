@@ -3,12 +3,15 @@ package com.documed.backend.services
 import com.documed.backend.services.model.Service
 import com.documed.backend.services.model.ServiceType
 import com.documed.backend.users.model.Specialization
+import com.documed.backend.users.model.Subscription
+import com.documed.backend.users.services.SubscriptionService
 import spock.lang.Specification
 
 class ServiceServiceTest extends Specification {
 
 	def serviceDAO = Mock(ServiceDAO)
-	def serviceService = new ServiceService(serviceDAO)
+	def subscriptionService = Mock(SubscriptionService)
+	def serviceService = new ServiceService(serviceDAO, subscriptionService)
 
 	def "getAll returns all services"() {
 		given:

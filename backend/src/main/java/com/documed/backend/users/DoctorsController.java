@@ -8,6 +8,7 @@ import com.documed.backend.users.exceptions.UserNotDoctorException;
 import com.documed.backend.users.model.Specialization;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
+import com.documed.backend.users.services.UserService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;

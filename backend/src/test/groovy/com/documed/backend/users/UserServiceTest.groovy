@@ -6,6 +6,7 @@ import com.documed.backend.users.exceptions.SpecializationToNonDoctorException
 import com.documed.backend.users.model.AccountStatus
 import com.documed.backend.users.model.User
 import com.documed.backend.users.model.UserRole
+import com.documed.backend.users.services.UserService
 import spock.lang.Specification
 import spock.lang.Subject
 
