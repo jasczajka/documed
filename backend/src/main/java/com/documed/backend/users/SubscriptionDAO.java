@@ -31,7 +31,8 @@ public class SubscriptionDAO implements FullDAO<Subscription, Subscription> {
                     .id(rs.getInt("id"))
                     .name(rs.getString("name"))
                     .price(rs.getBigDecimal("price"))
-                    .build());
+                    .build(),
+            id);
 
     return subscriptions.stream().findFirst();
   }

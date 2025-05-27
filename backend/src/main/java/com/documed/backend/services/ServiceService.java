@@ -51,7 +51,8 @@ public class ServiceService {
     return createdService;
   }
 
-  int delete(int serviceId) {
+  @Transactional
+  public int delete(int serviceId) {
     removeAllSpecializationFromService(serviceId);
     subscriptionService.deleteSubscriptionToServiceForService(serviceId);
     return serviceDAO.delete(serviceId);

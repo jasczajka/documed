@@ -1,5 +1,6 @@
 package com.documed.backend.users.services;
 
+import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.services.ServiceDAO;
 import com.documed.backend.users.SubscriptionDAO;
@@ -51,8 +52,11 @@ public class SubscriptionService {
     subscriptionToServiceDAO.create(subscriptionToService);
   }
 
-  public void updateSubscriptionToService(SubscriptionToService subscriptionToService) {
-    subscriptionToServiceDAO.update(subscriptionToService);
+  public void updateSubscriptionToService(int serviceId, int subscriptionId, int discount) {
+    if (discount < 0 || discount > 100) {
+      throw new BadRequestException("Discount must be between 0 and 100");
+    }
+    subscriptionToServiceDAO.update(new SubscriptionToService(serviceId, subscriptionId, discount));
   }
 
   public void createSubscriptionToServiceForNewService(int serviceId) {

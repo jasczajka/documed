@@ -51,14 +51,18 @@ public class SubscriptionController {
   @PutMapping("{subscriptionId}/services/{serviceId}")
   public ResponseEntity<String> updateServiceDiscount(
       @PathVariable int subscriptionId, @PathVariable int serviceId, @RequestBody int discount) {
-    subscriptionService.updateSubscriptionToService(
-        new SubscriptionToService(serviceId, subscriptionId, discount));
+    subscriptionService.updateSubscriptionToService(serviceId, subscriptionId, discount);
     return new ResponseEntity<>("Service discount updated", HttpStatus.OK);
   }
 
   @AdminOnly
   @PostMapping
   public ResponseEntity<Subscription> createSubscription(String name, BigDecimal price) {
+
+    if (price.compareTo(BigDecimal.ZERO) <= 0) {
+      return ResponseEntity.badRequest().build();
+    }
+
     Subscription subscription = subscriptionService.createSubscription(name, price);
     return new ResponseEntity<>(subscription, HttpStatus.CREATED);
   }
