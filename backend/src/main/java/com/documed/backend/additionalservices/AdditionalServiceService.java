@@ -4,6 +4,7 @@ import com.documed.backend.additionalservices.model.AdditionalService;
 import com.documed.backend.attachments.AttachmentDAO;
 import com.documed.backend.attachments.S3Service;
 import com.documed.backend.attachments.model.Attachment;
+import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.exceptions.InvalidAssignmentException;
 import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.services.ServiceDAO;
@@ -11,7 +12,7 @@ import com.documed.backend.services.model.ServiceType;
 import com.documed.backend.users.UserDAO;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -45,20 +46,21 @@ public class AdditionalServiceService {
 
   @Transactional
   public AdditionalService createAdditionalService(
-      String description, Date date, int fulfillerId, int patientId, int serviceId) {
+      String description, LocalDate date, int patientId, int fulfillerId, int serviceId) {
 
     User fulfiller =
         userDAO
             .getById(fulfillerId)
             .orElseThrow(() -> new NotFoundException("Fulfiller not found"));
+
     if (fulfiller.getRole() == UserRole.PATIENT) {
-      throw new InvalidAssignmentException("Patient cannot be a fulfiller");
+      throw new BadRequestException("Patient cannot be a fulfiller");
     }
 
     User patient =
         userDAO.getById(patientId).orElseThrow(() -> new NotFoundException("Patient not found"));
     if (patient.getRole() != UserRole.PATIENT) {
-      throw new InvalidAssignmentException("Patient has to be a patient");
+      throw new BadRequestException("Patient has to be a patient");
     }
 
     com.documed.backend.services.model.Service service =
@@ -71,9 +73,9 @@ public class AdditionalServiceService {
         AdditionalService.builder()
             .description(description)
             .date(date)
-            .fulfiller(fulfiller)
-            .patient(patient)
-            .service(service)
+            .fulfillerId(fulfillerId)
+            .patientId(patientId)
+            .serviceId(serviceId)
             .build();
 
     AdditionalService createdService = additionalServiceDAO.create(additionalService);

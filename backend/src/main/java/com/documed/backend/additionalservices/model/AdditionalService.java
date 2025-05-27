@@ -1,10 +1,7 @@
 package com.documed.backend.additionalservices.model;
 
 import com.documed.backend.notifications.Notification;
-import com.documed.backend.services.model.Service;
-import com.documed.backend.users.model.User;
-import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
@@ -13,18 +10,17 @@ import lombok.NonNull;
 @Data
 @Builder
 public class AdditionalService {
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private int id;
 
   private String description;
 
-  @NonNull private Date date;
+  @NonNull private LocalDate date;
 
-  @NonNull private User fulfiller;
+  private int fulfillerId;
 
-  @NonNull private User patient;
+  private int patientId;
 
-  @NonNull private Service service;
+  private int serviceId;
 
   private List<Notification> notifications;
 

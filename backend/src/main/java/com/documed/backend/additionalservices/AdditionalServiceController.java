@@ -4,19 +4,29 @@ import com.documed.backend.additionalservices.dtos.*;
 import com.documed.backend.additionalservices.model.AdditionalService;
 import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
+import com.documed.backend.exceptions.NotFoundException;
+import com.documed.backend.services.ServiceService;
+import com.documed.backend.services.model.Service;
+import com.documed.backend.users.model.User;
+import com.documed.backend.users.services.UserService;
 import jakarta.validation.Valid;
 import java.util.Collections;
 import java.util.List;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/additional_services")
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AdditionalServiceController {
   private final AdditionalServiceService additionalServiceService;
+  private final UserService userService;
+  private final ServiceService serviceService;
+  private static final Logger log = LoggerFactory.getLogger(AdditionalServiceController.class);
 
   @StaffOnly
   @PostMapping
@@ -26,8 +36,8 @@ public class AdditionalServiceController {
         additionalServiceService.createAdditionalService(
             createDto.getDescription(),
             createDto.getDate(),
-            createDto.getFulfillerId(),
             createDto.getPatientId(),
+            createDto.getFulfillerId(),
             createDto.getServiceId());
 
     List<Integer> attachmentIds = createDto.getAttachmentIds();
@@ -40,7 +50,7 @@ public class AdditionalServiceController {
             additionalService.getId(), attachmentIds);
 
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(AdditionalServiceMapper.toDto(additionalServiceWithAttachments));
+        .body(this.enrichAdditionalServiceToDto(additionalServiceWithAttachments));
   }
 
   @StaffOnly
@@ -49,34 +59,36 @@ public class AdditionalServiceController {
     AdditionalService additionalService = additionalServiceService.getById(id);
 
     return ResponseEntity.status(HttpStatus.OK)
-        .body(AdditionalServiceMapper.toDto(additionalService));
+        .body(this.enrichAdditionalServiceToDto(additionalService));
   }
 
   @StaffOnly
-  @GetMapping("/by-fulfiller/{userId}")
-  public ResponseEntity<List<AdditionalServiceReturnDTO>> getByFulfiller(@PathVariable int userId) {
+  @GetMapping("/fulfillers/{userId}")
+  public ResponseEntity<List<AdditionalServiceReturnDTO>> getAdditionalServicesByFulfiller(
+      @PathVariable int userId) {
     List<AdditionalService> services = additionalServiceService.getByFulfiller(userId);
     List<AdditionalServiceReturnDTO> dtos =
-        services.stream().map(AdditionalServiceMapper::toDto).toList();
+        services.stream().map(this::enrichAdditionalServiceToDto).toList();
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
   @StaffOnly
-  @GetMapping("/by-service/{serviceId}")
-  public ResponseEntity<List<AdditionalServiceReturnDTO>> getByService(
+  @GetMapping("/services/{serviceId}")
+  public ResponseEntity<List<AdditionalServiceReturnDTO>> getAdditionalServicesByService(
       @PathVariable int serviceId) {
     List<AdditionalService> services = additionalServiceService.getByService(serviceId);
     List<AdditionalServiceReturnDTO> dtos =
-        services.stream().map(AdditionalServiceMapper::toDto).toList();
+        services.stream().map(this::enrichAdditionalServiceToDto).toList();
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
   @StaffOnlyOrSelf
-  @GetMapping("/by-patient/{userId}")
-  public ResponseEntity<List<AdditionalServiceReturnDTO>> getByPatient(@PathVariable int userId) {
+  @GetMapping("/patients/{userId}")
+  public ResponseEntity<List<AdditionalServiceReturnDTO>> getAdditionalServicesByPatient(
+      @PathVariable int userId) {
     List<AdditionalService> services = additionalServiceService.getByPatient(userId);
     List<AdditionalServiceReturnDTO> dtos =
-        services.stream().map(AdditionalServiceMapper::toDto).toList();
+        services.stream().map(this::enrichAdditionalServiceToDto).toList();
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
@@ -85,13 +97,13 @@ public class AdditionalServiceController {
   public ResponseEntity<List<AdditionalServiceReturnDTO>> getAllAdditionalServices() {
     List<AdditionalService> services = additionalServiceService.getAll();
     List<AdditionalServiceReturnDTO> dtos =
-        services.stream().map(AdditionalServiceMapper::toDto).toList();
+        services.stream().map(this::enrichAdditionalServiceToDto).toList();
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
   @StaffOnly
   @PutMapping("/{id}/description")
-  public ResponseEntity<?> updateDescription(
+  public ResponseEntity<Void> updateAdditionalServiceDescription(
       @PathVariable int id, @RequestBody @Valid UpdateDescriptionDTO createDto) {
     additionalServiceService.updateDescription(id, createDto.getDescription());
     return ResponseEntity.status(HttpStatus.OK).build();
@@ -99,12 +111,43 @@ public class AdditionalServiceController {
 
   @StaffOnly
   @PutMapping("/{id}/attachments")
-  public ResponseEntity<AdditionalServiceReturnDTO> updateAttachments(
+  public ResponseEntity<AdditionalServiceReturnDTO> updatAdditionalServiceAttachments(
       @PathVariable int id, @RequestBody @Valid UpdateAttachmentsDTO updateDto) {
     AdditionalService updatedService =
         additionalServiceService.updateAttachmentsForAdditionalService(
             id, updateDto.getAttachmentIds());
 
-    return ResponseEntity.ok(AdditionalServiceMapper.toDto(updatedService));
+    return ResponseEntity.ok(this.enrichAdditionalServiceToDto(updatedService));
+  }
+
+  private AdditionalServiceReturnDTO enrichAdditionalServiceToDto(
+      AdditionalService additionalService) {
+    User patient =
+        userService
+            .getById(additionalService.getPatientId())
+            .orElseThrow(
+                () -> {
+                  log.warn("Patient not found with ID: {}", additionalService.getPatientId());
+                  return new NotFoundException("Patient not found");
+                });
+
+    User fulfiller =
+        userService
+            .getById(additionalService.getFulfillerId())
+            .orElseThrow(
+                () -> {
+                  log.warn("Fulfiller not found with ID: {}", additionalService.getFulfillerId());
+                  return new NotFoundException("Fulfiller not found");
+                });
+    Service service =
+        serviceService
+            .getById(additionalService.getServiceId())
+            .orElseThrow(
+                () -> {
+                  log.warn("Service not found with ID: {}", additionalService.getServiceId());
+                  return new NotFoundException("Service not found");
+                });
+
+    return AdditionalServiceMapper.toDto(additionalService, patient, fulfiller, service);
   }
 }

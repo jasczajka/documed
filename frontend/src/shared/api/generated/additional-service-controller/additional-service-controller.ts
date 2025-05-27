@@ -24,15 +24,17 @@ import type {
   AdditionalServiceReturnDTO,
   CreateAdditionalServiceDTO,
   UpdateAttachmentsDTO,
-  UpdateDescription200,
   UpdateDescriptionDTO,
 } from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
 
-export const updateDescription = (id: number, updateDescriptionDTO: UpdateDescriptionDTO) => {
-  return customInstance<UpdateDescription200>({
+export const updateAdditionalServiceDescription = (
+  id: number,
+  updateDescriptionDTO: UpdateDescriptionDTO,
+) => {
+  return customInstance<void>({
     url: `/api/additional_services/${id}/description`,
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -40,23 +42,23 @@ export const updateDescription = (id: number, updateDescriptionDTO: UpdateDescri
   });
 };
 
-export const getUpdateDescriptionMutationOptions = <
+export const getUpdateAdditionalServiceDescriptionMutationOptions = <
   TError = ErrorType<unknown>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateDescription>>,
+    Awaited<ReturnType<typeof updateAdditionalServiceDescription>>,
     TError,
     { id: number; data: UpdateDescriptionDTO },
     TContext
   >;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof updateDescription>>,
+  Awaited<ReturnType<typeof updateAdditionalServiceDescription>>,
   TError,
   { id: number; data: UpdateDescriptionDTO },
   TContext
 > => {
-  const mutationKey = ['updateDescription'];
+  const mutationKey = ['updateAdditionalServiceDescription'];
   const { mutation: mutationOptions } = options
     ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
       ? options
@@ -64,27 +66,30 @@ export const getUpdateDescriptionMutationOptions = <
     : { mutation: { mutationKey } };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof updateDescription>>,
+    Awaited<ReturnType<typeof updateAdditionalServiceDescription>>,
     { id: number; data: UpdateDescriptionDTO }
   > = (props) => {
     const { id, data } = props ?? {};
 
-    return updateDescription(id, data);
+    return updateAdditionalServiceDescription(id, data);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type UpdateDescriptionMutationResult = NonNullable<
-  Awaited<ReturnType<typeof updateDescription>>
+export type UpdateAdditionalServiceDescriptionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateAdditionalServiceDescription>>
 >;
-export type UpdateDescriptionMutationBody = UpdateDescriptionDTO;
-export type UpdateDescriptionMutationError = ErrorType<unknown>;
+export type UpdateAdditionalServiceDescriptionMutationBody = UpdateDescriptionDTO;
+export type UpdateAdditionalServiceDescriptionMutationError = ErrorType<unknown>;
 
-export const useUpdateDescription = <TError = ErrorType<unknown>, TContext = unknown>(
+export const useUpdateAdditionalServiceDescription = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof updateDescription>>,
+      Awaited<ReturnType<typeof updateAdditionalServiceDescription>>,
       TError,
       { id: number; data: UpdateDescriptionDTO },
       TContext
@@ -92,16 +97,19 @@ export const useUpdateDescription = <TError = ErrorType<unknown>, TContext = unk
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof updateDescription>>,
+  Awaited<ReturnType<typeof updateAdditionalServiceDescription>>,
   TError,
   { id: number; data: UpdateDescriptionDTO },
   TContext
 > => {
-  const mutationOptions = getUpdateDescriptionMutationOptions(options);
+  const mutationOptions = getUpdateAdditionalServiceDescriptionMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
-export const updateAttachments = (id: number, updateAttachmentsDTO: UpdateAttachmentsDTO) => {
+export const updatAdditionalServiceAttachments = (
+  id: number,
+  updateAttachmentsDTO: UpdateAttachmentsDTO,
+) => {
   return customInstance<AdditionalServiceReturnDTO>({
     url: `/api/additional_services/${id}/attachments`,
     method: 'PUT',
@@ -110,23 +118,23 @@ export const updateAttachments = (id: number, updateAttachmentsDTO: UpdateAttach
   });
 };
 
-export const getUpdateAttachmentsMutationOptions = <
+export const getUpdatAdditionalServiceAttachmentsMutationOptions = <
   TError = ErrorType<unknown>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateAttachments>>,
+    Awaited<ReturnType<typeof updatAdditionalServiceAttachments>>,
     TError,
     { id: number; data: UpdateAttachmentsDTO },
     TContext
   >;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof updateAttachments>>,
+  Awaited<ReturnType<typeof updatAdditionalServiceAttachments>>,
   TError,
   { id: number; data: UpdateAttachmentsDTO },
   TContext
 > => {
-  const mutationKey = ['updateAttachments'];
+  const mutationKey = ['updatAdditionalServiceAttachments'];
   const { mutation: mutationOptions } = options
     ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
       ? options
@@ -134,27 +142,30 @@ export const getUpdateAttachmentsMutationOptions = <
     : { mutation: { mutationKey } };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof updateAttachments>>,
+    Awaited<ReturnType<typeof updatAdditionalServiceAttachments>>,
     { id: number; data: UpdateAttachmentsDTO }
   > = (props) => {
     const { id, data } = props ?? {};
 
-    return updateAttachments(id, data);
+    return updatAdditionalServiceAttachments(id, data);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type UpdateAttachmentsMutationResult = NonNullable<
-  Awaited<ReturnType<typeof updateAttachments>>
+export type UpdatAdditionalServiceAttachmentsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updatAdditionalServiceAttachments>>
 >;
-export type UpdateAttachmentsMutationBody = UpdateAttachmentsDTO;
-export type UpdateAttachmentsMutationError = ErrorType<unknown>;
+export type UpdatAdditionalServiceAttachmentsMutationBody = UpdateAttachmentsDTO;
+export type UpdatAdditionalServiceAttachmentsMutationError = ErrorType<unknown>;
 
-export const useUpdateAttachments = <TError = ErrorType<unknown>, TContext = unknown>(
+export const useUpdatAdditionalServiceAttachments = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof updateAttachments>>,
+      Awaited<ReturnType<typeof updatAdditionalServiceAttachments>>,
       TError,
       { id: number; data: UpdateAttachmentsDTO },
       TContext
@@ -162,12 +173,12 @@ export const useUpdateAttachments = <TError = ErrorType<unknown>, TContext = unk
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof updateAttachments>>,
+  Awaited<ReturnType<typeof updatAdditionalServiceAttachments>>,
   TError,
   { id: number; data: UpdateAttachmentsDTO },
   TContext
 > => {
-  const mutationOptions = getUpdateAttachmentsMutationOptions(options);
+  const mutationOptions = getUpdatAdditionalServiceAttachmentsMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
@@ -475,102 +486,115 @@ export function useGetAdditionalService<
   return query;
 }
 
-export const getByService = (serviceId: number, signal?: AbortSignal) => {
+export const getAdditionalServicesByService = (serviceId: number, signal?: AbortSignal) => {
   return customInstance<AdditionalServiceReturnDTO[]>({
-    url: `/api/additional_services/by-service/${serviceId}`,
+    url: `/api/additional_services/services/${serviceId}`,
     method: 'GET',
     signal,
   });
 };
 
-export const getGetByServiceQueryKey = (serviceId: number) => {
-  return [`/api/additional_services/by-service/${serviceId}`] as const;
+export const getGetAdditionalServicesByServiceQueryKey = (serviceId: number) => {
+  return [`/api/additional_services/services/${serviceId}`] as const;
 };
 
-export const getGetByServiceQueryOptions = <
-  TData = Awaited<ReturnType<typeof getByService>>,
+export const getGetAdditionalServicesByServiceQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAdditionalServicesByService>>,
   TError = ErrorType<unknown>,
 >(
   serviceId: number,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getByService>>, TError, TData>>;
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdditionalServicesByService>>, TError, TData>
+    >;
   },
 ) => {
   const { query: queryOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetByServiceQueryKey(serviceId);
+  const queryKey = queryOptions?.queryKey ?? getGetAdditionalServicesByServiceQueryKey(serviceId);
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getByService>>> = ({ signal }) =>
-    getByService(serviceId, signal);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdditionalServicesByService>>> = ({
+    signal,
+  }) => getAdditionalServicesByService(serviceId, signal);
 
   return { queryKey, queryFn, enabled: !!serviceId, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getByService>>,
+    Awaited<ReturnType<typeof getAdditionalServicesByService>>,
     TError,
     TData
   > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type GetByServiceQueryResult = NonNullable<Awaited<ReturnType<typeof getByService>>>;
-export type GetByServiceQueryError = ErrorType<unknown>;
+export type GetAdditionalServicesByServiceQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAdditionalServicesByService>>
+>;
+export type GetAdditionalServicesByServiceQueryError = ErrorType<unknown>;
 
-export function useGetByService<
-  TData = Awaited<ReturnType<typeof getByService>>,
+export function useGetAdditionalServicesByService<
+  TData = Awaited<ReturnType<typeof getAdditionalServicesByService>>,
   TError = ErrorType<unknown>,
 >(
   serviceId: number,
   options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getByService>>, TError, TData>> &
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdditionalServicesByService>>, TError, TData>
+    > &
       Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getByService>>,
+          Awaited<ReturnType<typeof getAdditionalServicesByService>>,
           TError,
-          Awaited<ReturnType<typeof getByService>>
+          Awaited<ReturnType<typeof getAdditionalServicesByService>>
         >,
         'initialData'
       >;
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetByService<
-  TData = Awaited<ReturnType<typeof getByService>>,
+export function useGetAdditionalServicesByService<
+  TData = Awaited<ReturnType<typeof getAdditionalServicesByService>>,
   TError = ErrorType<unknown>,
 >(
   serviceId: number,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getByService>>, TError, TData>> &
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdditionalServicesByService>>, TError, TData>
+    > &
       Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getByService>>,
+          Awaited<ReturnType<typeof getAdditionalServicesByService>>,
           TError,
-          Awaited<ReturnType<typeof getByService>>
+          Awaited<ReturnType<typeof getAdditionalServicesByService>>
         >,
         'initialData'
       >;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetByService<
-  TData = Awaited<ReturnType<typeof getByService>>,
+export function useGetAdditionalServicesByService<
+  TData = Awaited<ReturnType<typeof getAdditionalServicesByService>>,
   TError = ErrorType<unknown>,
 >(
   serviceId: number,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getByService>>, TError, TData>>;
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdditionalServicesByService>>, TError, TData>
+    >;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-export function useGetByService<
-  TData = Awaited<ReturnType<typeof getByService>>,
+export function useGetAdditionalServicesByService<
+  TData = Awaited<ReturnType<typeof getAdditionalServicesByService>>,
   TError = ErrorType<unknown>,
 >(
   serviceId: number,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getByService>>, TError, TData>>;
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdditionalServicesByService>>, TError, TData>
+    >;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getGetByServiceQueryOptions(serviceId, options);
+  const queryOptions = getGetAdditionalServicesByServiceQueryOptions(serviceId, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;
@@ -581,102 +605,115 @@ export function useGetByService<
   return query;
 }
 
-export const getByPatient = (userId: number, signal?: AbortSignal) => {
+export const getAdditionalServicesByPatient = (userId: number, signal?: AbortSignal) => {
   return customInstance<AdditionalServiceReturnDTO[]>({
-    url: `/api/additional_services/by-patient/${userId}`,
+    url: `/api/additional_services/patients/${userId}`,
     method: 'GET',
     signal,
   });
 };
 
-export const getGetByPatientQueryKey = (userId: number) => {
-  return [`/api/additional_services/by-patient/${userId}`] as const;
+export const getGetAdditionalServicesByPatientQueryKey = (userId: number) => {
+  return [`/api/additional_services/patients/${userId}`] as const;
 };
 
-export const getGetByPatientQueryOptions = <
-  TData = Awaited<ReturnType<typeof getByPatient>>,
+export const getGetAdditionalServicesByPatientQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAdditionalServicesByPatient>>,
   TError = ErrorType<unknown>,
 >(
   userId: number,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getByPatient>>, TError, TData>>;
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdditionalServicesByPatient>>, TError, TData>
+    >;
   },
 ) => {
   const { query: queryOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetByPatientQueryKey(userId);
+  const queryKey = queryOptions?.queryKey ?? getGetAdditionalServicesByPatientQueryKey(userId);
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getByPatient>>> = ({ signal }) =>
-    getByPatient(userId, signal);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdditionalServicesByPatient>>> = ({
+    signal,
+  }) => getAdditionalServicesByPatient(userId, signal);
 
   return { queryKey, queryFn, enabled: !!userId, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getByPatient>>,
+    Awaited<ReturnType<typeof getAdditionalServicesByPatient>>,
     TError,
     TData
   > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type GetByPatientQueryResult = NonNullable<Awaited<ReturnType<typeof getByPatient>>>;
-export type GetByPatientQueryError = ErrorType<unknown>;
+export type GetAdditionalServicesByPatientQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAdditionalServicesByPatient>>
+>;
+export type GetAdditionalServicesByPatientQueryError = ErrorType<unknown>;
 
-export function useGetByPatient<
-  TData = Awaited<ReturnType<typeof getByPatient>>,
+export function useGetAdditionalServicesByPatient<
+  TData = Awaited<ReturnType<typeof getAdditionalServicesByPatient>>,
   TError = ErrorType<unknown>,
 >(
   userId: number,
   options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getByPatient>>, TError, TData>> &
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdditionalServicesByPatient>>, TError, TData>
+    > &
       Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getByPatient>>,
+          Awaited<ReturnType<typeof getAdditionalServicesByPatient>>,
           TError,
-          Awaited<ReturnType<typeof getByPatient>>
+          Awaited<ReturnType<typeof getAdditionalServicesByPatient>>
         >,
         'initialData'
       >;
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetByPatient<
-  TData = Awaited<ReturnType<typeof getByPatient>>,
+export function useGetAdditionalServicesByPatient<
+  TData = Awaited<ReturnType<typeof getAdditionalServicesByPatient>>,
   TError = ErrorType<unknown>,
 >(
   userId: number,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getByPatient>>, TError, TData>> &
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdditionalServicesByPatient>>, TError, TData>
+    > &
       Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getByPatient>>,
+          Awaited<ReturnType<typeof getAdditionalServicesByPatient>>,
           TError,
-          Awaited<ReturnType<typeof getByPatient>>
+          Awaited<ReturnType<typeof getAdditionalServicesByPatient>>
         >,
         'initialData'
       >;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetByPatient<
-  TData = Awaited<ReturnType<typeof getByPatient>>,
+export function useGetAdditionalServicesByPatient<
+  TData = Awaited<ReturnType<typeof getAdditionalServicesByPatient>>,
   TError = ErrorType<unknown>,
 >(
   userId: number,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getByPatient>>, TError, TData>>;
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdditionalServicesByPatient>>, TError, TData>
+    >;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-export function useGetByPatient<
-  TData = Awaited<ReturnType<typeof getByPatient>>,
+export function useGetAdditionalServicesByPatient<
+  TData = Awaited<ReturnType<typeof getAdditionalServicesByPatient>>,
   TError = ErrorType<unknown>,
 >(
   userId: number,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getByPatient>>, TError, TData>>;
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdditionalServicesByPatient>>, TError, TData>
+    >;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getGetByPatientQueryOptions(userId, options);
+  const queryOptions = getGetAdditionalServicesByPatientQueryOptions(userId, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;
@@ -687,102 +724,115 @@ export function useGetByPatient<
   return query;
 }
 
-export const getByFulfiller = (userId: number, signal?: AbortSignal) => {
+export const getAdditionalServicesByFulfiller = (userId: number, signal?: AbortSignal) => {
   return customInstance<AdditionalServiceReturnDTO[]>({
-    url: `/api/additional_services/by-fulfiller/${userId}`,
+    url: `/api/additional_services/fulfillers/${userId}`,
     method: 'GET',
     signal,
   });
 };
 
-export const getGetByFulfillerQueryKey = (userId: number) => {
-  return [`/api/additional_services/by-fulfiller/${userId}`] as const;
+export const getGetAdditionalServicesByFulfillerQueryKey = (userId: number) => {
+  return [`/api/additional_services/fulfillers/${userId}`] as const;
 };
 
-export const getGetByFulfillerQueryOptions = <
-  TData = Awaited<ReturnType<typeof getByFulfiller>>,
+export const getGetAdditionalServicesByFulfillerQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAdditionalServicesByFulfiller>>,
   TError = ErrorType<unknown>,
 >(
   userId: number,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getByFulfiller>>, TError, TData>>;
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdditionalServicesByFulfiller>>, TError, TData>
+    >;
   },
 ) => {
   const { query: queryOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetByFulfillerQueryKey(userId);
+  const queryKey = queryOptions?.queryKey ?? getGetAdditionalServicesByFulfillerQueryKey(userId);
 
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getByFulfiller>>> = ({ signal }) =>
-    getByFulfiller(userId, signal);
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdditionalServicesByFulfiller>>> = ({
+    signal,
+  }) => getAdditionalServicesByFulfiller(userId, signal);
 
   return { queryKey, queryFn, enabled: !!userId, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getByFulfiller>>,
+    Awaited<ReturnType<typeof getAdditionalServicesByFulfiller>>,
     TError,
     TData
   > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type GetByFulfillerQueryResult = NonNullable<Awaited<ReturnType<typeof getByFulfiller>>>;
-export type GetByFulfillerQueryError = ErrorType<unknown>;
+export type GetAdditionalServicesByFulfillerQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAdditionalServicesByFulfiller>>
+>;
+export type GetAdditionalServicesByFulfillerQueryError = ErrorType<unknown>;
 
-export function useGetByFulfiller<
-  TData = Awaited<ReturnType<typeof getByFulfiller>>,
+export function useGetAdditionalServicesByFulfiller<
+  TData = Awaited<ReturnType<typeof getAdditionalServicesByFulfiller>>,
   TError = ErrorType<unknown>,
 >(
   userId: number,
   options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getByFulfiller>>, TError, TData>> &
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdditionalServicesByFulfiller>>, TError, TData>
+    > &
       Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getByFulfiller>>,
+          Awaited<ReturnType<typeof getAdditionalServicesByFulfiller>>,
           TError,
-          Awaited<ReturnType<typeof getByFulfiller>>
+          Awaited<ReturnType<typeof getAdditionalServicesByFulfiller>>
         >,
         'initialData'
       >;
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetByFulfiller<
-  TData = Awaited<ReturnType<typeof getByFulfiller>>,
+export function useGetAdditionalServicesByFulfiller<
+  TData = Awaited<ReturnType<typeof getAdditionalServicesByFulfiller>>,
   TError = ErrorType<unknown>,
 >(
   userId: number,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getByFulfiller>>, TError, TData>> &
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdditionalServicesByFulfiller>>, TError, TData>
+    > &
       Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getByFulfiller>>,
+          Awaited<ReturnType<typeof getAdditionalServicesByFulfiller>>,
           TError,
-          Awaited<ReturnType<typeof getByFulfiller>>
+          Awaited<ReturnType<typeof getAdditionalServicesByFulfiller>>
         >,
         'initialData'
       >;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetByFulfiller<
-  TData = Awaited<ReturnType<typeof getByFulfiller>>,
+export function useGetAdditionalServicesByFulfiller<
+  TData = Awaited<ReturnType<typeof getAdditionalServicesByFulfiller>>,
   TError = ErrorType<unknown>,
 >(
   userId: number,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getByFulfiller>>, TError, TData>>;
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdditionalServicesByFulfiller>>, TError, TData>
+    >;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-export function useGetByFulfiller<
-  TData = Awaited<ReturnType<typeof getByFulfiller>>,
+export function useGetAdditionalServicesByFulfiller<
+  TData = Awaited<ReturnType<typeof getAdditionalServicesByFulfiller>>,
   TError = ErrorType<unknown>,
 >(
   userId: number,
   options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getByFulfiller>>, TError, TData>>;
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdditionalServicesByFulfiller>>, TError, TData>
+    >;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getGetByFulfillerQueryOptions(userId, options);
+  const queryOptions = getGetAdditionalServicesByFulfillerQueryOptions(userId, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;

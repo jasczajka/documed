@@ -25,6 +25,8 @@ interface VisitTableProps {
   allServices: Service[];
   onEdit?: (id: number) => void;
   onCancel: (id: number) => void;
+  patientId?: number;
+  doctorId?: number;
   loading?: boolean;
 }
 
@@ -138,6 +140,8 @@ export const VisitsTable: FC<VisitTableProps> = ({
   onEdit,
   onCancel,
   loading,
+  patientId,
+  doctorId,
 }) => {
   const [filters, setFilters] = useState<VisitsFilters>({
     status: VisitStatus.PLANNED,
@@ -149,7 +153,14 @@ export const VisitsTable: FC<VisitTableProps> = ({
   });
 
   const { isPatient } = useAuth();
-  const { visitsFilterConfig, filteredVisits } = useVisitsTable({ visits, filters, allServices });
+  const { visitsFilterConfig, filteredVisits } = useVisitsTable({
+    visits,
+    filters,
+    allServices,
+    isPatient,
+    patientId,
+    doctorId,
+  });
 
   const handleFilterChange = useCallback((name: keyof VisitsFilters, value: string) => {
     setFilters((prev) => ({ ...prev, [name]: value }));

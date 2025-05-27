@@ -2,9 +2,10 @@ import { Button, CardHeader } from '@mui/material';
 import { PatientTabs } from 'modules/patient/PatientTabs';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
+import { useGetAdditionalServicesByPatient } from 'shared/api/generated/additional-service-controller/additional-service-controller';
 import { useGetFilesForPatient } from 'shared/api/generated/attachment-controller/attachment-controller';
 import { useGetAllDoctors } from 'shared/api/generated/doctors-controller/doctors-controller';
-import { Service, ServiceType } from 'shared/api/generated/generated.schemas';
+import { ServiceType } from 'shared/api/generated/generated.schemas';
 import { useGetPatientDetails } from 'shared/api/generated/patients-controller/patients-controller';
 import { useGetAllServices } from 'shared/api/generated/service-controller/service-controller';
 import { useGetVisitsByPatientId } from 'shared/api/generated/visit-controller/visit-controller';
@@ -21,7 +22,6 @@ const SinglePatientPage: FC = () => {
   const patientId = Number(id);
   const fulfillerId = useAuthStore((state) => state.user?.id);
 
-  const [additionalServices, setAdditionalServices] = useState<Service[]>([]);
   const [tabIndex, setTabIndex] = useState(0);
 
   const onTabChange = useCallback((index: number) => {
@@ -64,30 +64,46 @@ const SinglePatientPage: FC = () => {
     refetch: refetchPatientVisits,
   } = useGetVisitsByPatientId(patientId);
 
+  const {
+    data: patientAdditionalServices,
+    isLoading: isPatientAdditionalServicesLoading,
+    isError: isPatientAdditionalServicesError,
+    refetch: refetchPatientAdditionalServices,
+  } = useGetAdditionalServicesByPatient(patientId);
+
   const isInitialLoading =
     isServicesLoading ||
     isPatientInfoLoading ||
     isPatientAttachmentsLoading ||
     isPatientVisitsLoading ||
-    isDoctorsLoading;
+    isDoctorsLoading ||
+    isPatientAdditionalServicesLoading;
   const isInitialError =
     isServicesError ||
     isPatientInfoError ||
     isPatientAttachmentsError ||
     isPatientVisitsError ||
-    isDoctorsError;
+    isDoctorsError ||
+    isPatientAdditionalServicesError;
 
   const patientFullName = useMemo(
     () => `${patientInfo?.firstName} ${patientInfo?.lastName}`,
     [patientInfo],
   );
 
+  const allAdditionalServices = useMemo(() => {
+    if (!allServices) {
+      return [];
+    }
+    return allServices.filter((service) => service.type === ServiceType.ADDITIONAL_SERVICE);
+  }, [allServices]);
+
   const handleAdditionalServiceClick = useCallback(async () => {
-    if (fulfillerId !== undefined && patientId !== undefined) {
+    if (fulfillerId !== undefined && patientId !== undefined && allServices !== undefined) {
       openModal(
         'additionalServiceModal',
         <AdditionalServiceModal
-          allAdditionalServices={additionalServices}
+          allAdditionalServices={allAdditionalServices}
           patientId={patientId}
           fulfillerId={fulfillerId}
           patientFullName={`${patientInfo?.firstName} ${patientInfo?.lastName}`}
@@ -97,12 +113,13 @@ const SinglePatientPage: FC = () => {
             showNotification('Zapisano dane usługi dodatkowej', 'success');
 
             await refetchPatientAttachments();
+            await refetchPatientAdditionalServices();
           }}
           onCancel={() => closeModal('additionalServiceModal')}
         />,
       );
     }
-  }, [openModal, closeModal, isInitialLoading, additionalServices, patientInfo, patientId]);
+  }, [openModal, closeModal, isInitialLoading, allServices, patientInfo, patientId]);
 
   const handleScheduleVisitClick = useCallback(async () => {
     if (allDoctors !== undefined && allServices !== undefined) {
@@ -131,18 +148,21 @@ const SinglePatientPage: FC = () => {
     }
     if (allServices) {
       console.log(allServices.filter((service) => service.type === ServiceType.ADDITIONAL_SERVICE));
-      setAdditionalServices(
-        allServices.filter((service) => service.type === ServiceType.ADDITIONAL_SERVICE),
-      );
     }
   }, [allServices, isInitialError]);
 
-  if (!patientInfo || !fulfillerId || patientVisits == undefined || allServices == undefined) {
-    return <NotificationComponent />;
-  }
-
   if (isInitialLoading) {
     return <FullPageLoadingSpinner />;
+  }
+
+  if (
+    !patientInfo ||
+    !fulfillerId ||
+    patientVisits === undefined ||
+    allServices === undefined ||
+    patientAdditionalServices === undefined
+  ) {
+    return <NotificationComponent />;
   }
 
   return (
@@ -150,10 +170,10 @@ const SinglePatientPage: FC = () => {
       <div className="flex w-full items-center justify-between">
         <CardHeader title={patientFullName} />
         <div className="flex gap-2">
-          <Button onClick={() => handleScheduleVisitClick()} variant="contained">
+          <Button onClick={handleScheduleVisitClick} variant="contained">
             Umów wizytę dla pacjenta
           </Button>
-          <Button onClick={() => handleAdditionalServiceClick()} variant="contained">
+          <Button onClick={handleAdditionalServiceClick} variant="contained">
             Rozpocznij usługę dodatkową
           </Button>
         </div>
@@ -168,7 +188,9 @@ const SinglePatientPage: FC = () => {
         onTabChange={onTabChange}
         patientAttachments={patientAttachments ?? []}
         patientVisits={patientVisits}
+        patientAdditionalServices={patientAdditionalServices}
         allServices={allServices}
+        allAdditionalServices={allAdditionalServices}
         refetch={() => {
           refetchPatientInfo();
           refetchPatientVisits();

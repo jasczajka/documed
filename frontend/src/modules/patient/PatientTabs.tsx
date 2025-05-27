@@ -1,8 +1,20 @@
-import { CalendarMonth, Cloud, CreditCard, Person2 } from '@mui/icons-material';
+import {
+  CalendarMonth,
+  CalendarMonthOutlined,
+  Cloud,
+  CreditCard,
+  Person2,
+} from '@mui/icons-material';
 import { Box, Paper, Tab, Tabs } from '@mui/material';
+import AdditionalServicesTable from 'modules/additionalServices/additionalServicesTable/AdditionalServicesTable';
 import VisitsTable from 'modules/visits/VisitsTable/VisitsTable';
 import { FC, useEffect } from 'react';
-import { FileInfoDTO, Service, VisitDTO } from 'shared/api/generated/generated.schemas';
+import {
+  AdditionalServiceReturnDTO,
+  FileInfoDTO,
+  Service,
+  VisitDTO,
+} from 'shared/api/generated/generated.schemas';
 import { useCancelPlannedVisit } from 'shared/api/generated/visit-controller/visit-controller';
 import CancelVisitModal from 'shared/components/ConfirmationModal/CancelVisitModal';
 import { PatientInfoPanelProps } from 'shared/components/PatientInfoPanel';
@@ -17,7 +29,9 @@ interface PatientTabsProps {
   onTabChange: (index: number) => void;
   patientAttachments: FileInfoDTO[];
   patientVisits: VisitDTO[];
+  patientAdditionalServices: AdditionalServiceReturnDTO[];
   allServices: Service[];
+  allAdditionalServices: Service[];
   refetch: () => void;
 }
 export const PatientTabs: FC<PatientTabsProps> = ({
@@ -26,14 +40,16 @@ export const PatientTabs: FC<PatientTabsProps> = ({
   onTabChange,
   patientAttachments,
   patientVisits,
+  patientAdditionalServices,
   allServices,
+  allAdditionalServices,
   refetch,
 }) => {
   const { showNotification, NotificationComponent } = useNotification();
   const { openModal } = useModal();
   const { isPending: isCancelVisitLoading, isError: isCancelVisitError } = useCancelPlannedVisit();
 
-  const handleCancelVisit = (visitId: number) => {
+  const handleCancelVisitClick = (visitId: number) => {
     openModal('cancelVisitModal', (close) => (
       <CancelVisitModal visitId={visitId} onClose={close} onSuccess={refetch} />
     ));
@@ -71,6 +87,7 @@ export const PatientTabs: FC<PatientTabsProps> = ({
       >
         <Tab icon={<Cloud />} iconPosition="start" label="Załączniki pacjenta" />
         <Tab icon={<CalendarMonth />} iconPosition="start" label="Wizyty" />
+        <Tab icon={<CalendarMonthOutlined />} iconPosition="start" label="Usługi dodatkowe" />
         <Tab icon={<Person2 />} iconPosition="start" label="Dane osobowe" />
         <Tab icon={<CreditCard />} iconPosition="start" label="Abonament" />
       </Tabs>
@@ -81,14 +98,26 @@ export const PatientTabs: FC<PatientTabsProps> = ({
           <VisitsTable
             visits={patientVisits}
             allServices={allServices}
-            onCancel={handleCancelVisit}
+            onCancel={handleCancelVisitClick}
             loading={isCancelVisitLoading}
+            patientId={patientInfo.patientId}
           />
         )}
         {tabIndex === 2 && (
+          <AdditionalServicesTable
+            additionalServices={patientAdditionalServices}
+            allAdditionalServices={allAdditionalServices}
+            loading={isCancelVisitLoading}
+            onEdit={() => {
+              console.log('edytuj');
+            }}
+            patientId={patientInfo.patientId}
+          />
+        )}
+        {tabIndex === 3 && (
           <PersonalDataTab patientInfo={patientInfo} onSuccessfulDeactivate={refetch} />
         )}
-        {tabIndex === 3 && <div>Abonament</div>}
+        {tabIndex === 4 && <div>Abonament</div>}
       </Paper>
       <NotificationComponent />
     </Box>

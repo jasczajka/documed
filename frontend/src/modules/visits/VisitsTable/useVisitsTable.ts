@@ -3,7 +3,12 @@ import { Service, VisitDTO, VisitStatus } from 'shared/api/generated/generated.s
 import { FilterConfig } from 'shared/components/TableFilters';
 import { VisitsFilters } from './VisitsTable';
 
-const generateVisitsFilterConfig = (allServices: Service[]): FilterConfig[] => [
+const generateVisitsFilterConfig = (
+  allServices: Service[],
+  isPatient: boolean,
+  hasPatientId: boolean,
+  hasDoctorId: boolean,
+): FilterConfig[] => [
   {
     name: 'status',
     label: 'Status wizyty',
@@ -15,11 +20,15 @@ const generateVisitsFilterConfig = (allServices: Service[]): FilterConfig[] => [
       { value: VisitStatus.PLANNED.toString(), label: 'Zaplanowana' },
     ],
   },
-  {
-    name: 'patientName',
-    label: 'Pacjent',
-    type: 'text',
-  },
+  ...(!isPatient && !hasPatientId
+    ? [
+        {
+          name: 'patientName',
+          label: 'Pacjent',
+          type: 'text',
+        } as const,
+      ]
+    : []),
 
   {
     name: 'service',
@@ -30,11 +39,15 @@ const generateVisitsFilterConfig = (allServices: Service[]): FilterConfig[] => [
       label: service.name,
     })),
   },
-  {
-    name: 'specialist',
-    label: 'Specjalista',
-    type: 'text',
-  },
+  ...(hasDoctorId
+    ? []
+    : [
+        {
+          name: 'specialist',
+          label: 'Specjalista',
+          type: 'text',
+        } as const,
+      ]),
   {
     name: 'dateFrom',
     label: 'Od',
@@ -51,10 +64,16 @@ export const useVisitsTable = ({
   visits,
   filters,
   allServices,
+  isPatient,
+  patientId,
+  doctorId,
 }: {
   visits: VisitDTO[];
   filters: VisitsFilters;
   allServices: Service[];
+  isPatient: boolean;
+  patientId?: number;
+  doctorId?: number;
 }) => {
   const filterByStatus = useMemo(() => {
     if (!filters.status) {
@@ -129,7 +148,10 @@ export const useVisitsTable = ({
     filterByDateRange,
   ]);
 
-  const visitsFilterConfig = useMemo(() => generateVisitsFilterConfig(allServices), [allServices]);
+  const visitsFilterConfig = useMemo(
+    () => generateVisitsFilterConfig(allServices, isPatient, !!patientId, !!doctorId),
+    [allServices, isPatient, patientId, doctorId],
+  );
 
   return {
     visitsFilterConfig,

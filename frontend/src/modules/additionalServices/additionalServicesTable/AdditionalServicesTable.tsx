@@ -1,0 +1,158 @@
+import { Box, Button, Paper } from '@mui/material';
+import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
+
+import { endOfDay, format, startOfDay } from 'date-fns';
+import { FC, useCallback, useState } from 'react';
+import { AdditionalServiceReturnDTO, Service } from 'shared/api/generated/generated.schemas';
+import { appConfig } from 'shared/appConfig';
+import { TableFilters } from 'shared/components/TableFilters';
+import { useAuth } from 'shared/hooks/useAuth';
+import { useAdditionalServicesTable } from './useAdditionalServicesTable';
+
+export type AdditionalServiceFilters = {
+  patientName: string;
+  service: string;
+  fulfiller: string;
+  dateFrom: string;
+  dateTo: string;
+};
+
+interface AdditionalServicesTableProps {
+  additionalServices: AdditionalServiceReturnDTO[];
+  allAdditionalServices: Service[];
+  onEdit?: (id: number) => void;
+  patientId?: number;
+  doctorId?: number;
+  loading?: boolean;
+}
+
+const columns = (onEdit?: (id: number) => void): GridColDef<AdditionalServiceReturnDTO>[] => [
+  {
+    field: 'index',
+    headerName: '#',
+    width: 70,
+    valueGetter: (_value, row, _, apiRef) =>
+      apiRef.current.getRowIndexRelativeToVisibleRows(row.id) + 1,
+  },
+  {
+    field: 'patientName',
+    headerName: 'Pacjent',
+    minWidth: 200,
+    flex: 1,
+    valueGetter: (_, row) => `${row.patientFullName}`,
+  },
+  {
+    field: 'date',
+    headerName: 'Data',
+    minWidth: 200,
+    flex: 1,
+    valueGetter: (_, row) => (row.date ? format(new Date(row.date), 'dd.MM.yyyy') : 'Brak daty'),
+  },
+  {
+    field: 'service',
+    headerName: 'Usługa',
+    minWidth: 200,
+    flex: 1,
+    valueGetter: (_, row) => row.serviceName,
+  },
+  {
+    field: 'fulfiller',
+    headerName: 'Wykonawca',
+    minWidth: 200,
+    flex: 1,
+    valueGetter: (_, row) => row.fulfillerFullName,
+  },
+  {
+    field: 'actions',
+    headerName: 'Akcje',
+    type: 'actions',
+    width: 70,
+    flex: 0.5,
+    getActions: (params: { row: AdditionalServiceReturnDTO }) => {
+      return [
+        <GridActionsCellItem
+          key={`begin-${params.row.id}`}
+          label="Wyświetl szczegóły"
+          onClick={() => onEdit?.(params.row.id)}
+          showInMenu
+        />,
+      ];
+    },
+  },
+];
+
+export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
+  additionalServices,
+  allAdditionalServices,
+  onEdit,
+  patientId,
+  doctorId,
+}) => {
+  const { isPatient } = useAuth();
+  const [filters, setFilters] = useState<AdditionalServiceFilters>({
+    patientName: '',
+    service: '',
+    fulfiller: '',
+    dateFrom: '',
+    dateTo: '',
+  });
+
+  const { additionalServicesFilterConfig, filteredAdditionalServices } = useAdditionalServicesTable(
+    { additionalServices, filters, allAdditionalServices, isPatient, patientId, doctorId },
+  );
+
+  const handleFilterChange = useCallback((name: keyof AdditionalServiceFilters, value: string) => {
+    setFilters((prev) => ({ ...prev, [name]: value }));
+  }, []);
+
+  const setFilterDateToToday = useCallback(() => {
+    const todayStart = format(startOfDay(new Date()), appConfig.dateTimeFormat);
+    const todayEnd = format(endOfDay(new Date()), appConfig.dateTimeFormat);
+
+    handleFilterChange('dateFrom', todayStart);
+    handleFilterChange('dateTo', todayEnd);
+  }, [handleFilterChange]);
+
+  const resetFilters = useCallback(() => {
+    setFilters({
+      patientName: '',
+      service: '',
+      fulfiller: '',
+      dateFrom: '',
+      dateTo: '',
+    });
+  }, []);
+
+  return (
+    <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', p: 2 }}>
+      <Box sx={{ paddingBottom: 2 }}>
+        <Button variant="contained" onClick={setFilterDateToToday}>
+          Pokaż dzisiejsze
+        </Button>
+      </Box>
+      <TableFilters<AdditionalServiceFilters>
+        filters={filters}
+        filterConfig={additionalServicesFilterConfig}
+        onFilterChange={handleFilterChange}
+        onReset={resetFilters}
+      />
+      <Paper sx={{ flexGrow: 1 }}>
+        <DataGrid
+          rows={filteredAdditionalServices}
+          columns={columns(onEdit)}
+          initialState={{
+            pagination: {
+              paginationModel: { page: 0, pageSize: 10 },
+            },
+          }}
+          pageSizeOptions={[5, 10, 25]}
+          paginationMode="client"
+          rowHeight={32}
+          disableColumnFilter
+        />
+      </Paper>
+    </Box>
+  );
+};
+
+export default AdditionalServicesTable;

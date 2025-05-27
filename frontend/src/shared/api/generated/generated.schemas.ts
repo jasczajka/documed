@@ -58,8 +58,11 @@ export interface AdditionalServiceReturnDTO {
   description?: string;
   date: string;
   fulfillerId: number;
+  fulfillerFullName: string;
   patientId: number;
+  patientFullName: string;
   serviceId: number;
+  serviceName: string;
   attachmentUrls: string[];
 }
 
@@ -99,6 +102,12 @@ export interface VisitDTO {
   date?: string;
   startTime?: string;
   endTime?: string;
+}
+
+export interface Subscription {
+  id?: number;
+  name?: string;
+  price?: number;
 }
 
 export type CreateServiceDTOType = (typeof CreateServiceDTOType)[keyof typeof CreateServiceDTOType];
@@ -389,6 +398,12 @@ export interface AvailableTimeSlotDTO {
   busy?: boolean;
 }
 
+export interface SubscriptionToService {
+  subscriptionId?: number;
+  serviceId?: number;
+  discount?: number;
+}
+
 export interface MedicineWithAmount {
   id: string;
   name: string;
@@ -476,7 +491,12 @@ export interface FileInfoDTO {
   fileName: string;
 }
 
-export type UpdateDescription200 = { [key: string]: unknown };
+export type GetAllSubscriptions200 = { [key: string]: unknown };
+
+export type CreateSubscriptionParams = {
+  name: string;
+  price: number;
+};
 
 export type AddMedicineToPrescriptionParams = {
   amount?: number;
