@@ -58,6 +58,8 @@ const SingleVisitPage: FC = () => {
   const { openModal } = useModal();
 
   const [fileUploadLoading, setFileUploadLoading] = useState(false);
+  const [fileIdsToDeleteOnConfirm, setFileIdsToDeleteOnConfirm] = useState<number[]>([]);
+  const [hasUnuploadedFiles, setHasUnuploadedFiles] = useState(false);
 
   const {
     data: visitInfo,
@@ -120,6 +122,25 @@ const SingleVisitPage: FC = () => {
     },
   });
 
+  const deleteFilesMarkedForDeletion = async () => {
+    const fileDeletes = fileIdsToDeleteOnConfirm.map((fileIdToDelete) => {
+      return deleteFile({ id: fileIdToDelete });
+    });
+
+    await Promise.all(fileDeletes);
+  };
+
+  const validateUnuploadedFiles = (): boolean => {
+    if (hasUnuploadedFiles) {
+      showNotification(
+        'Proszę przesłać lub usunąć wszystkie załadowane pliki przed kontynuowaniem',
+        'error',
+      );
+      return false;
+    }
+    return true;
+  };
+
   const handleCancelVisitClick = async () => {
     openModal('confirmCancelVisitModal', (close) => (
       <ConfirmationModal
@@ -160,11 +181,16 @@ const SingleVisitPage: FC = () => {
       <ConfirmationModal
         title="Na pewno chcesz zakończyć wizytę?"
         onConfirm={async () => {
+          if (!validateUnuploadedFiles()) {
+            return;
+          }
           const formData = getValues();
 
           close();
           await finishVisit({ id: visitId, data: formData });
+          await deleteFilesMarkedForDeletion();
           await refetchVisitInfo();
+          await refetchVisitAttachments();
           showNotification('Wizyta została zakończona', 'success');
         }}
         onCancel={close}
@@ -174,8 +200,14 @@ const SingleVisitPage: FC = () => {
 
   const onSubmit = useCallback(
     async (updateData: UpdateVisitDTO) => {
+      if (!validateUnuploadedFiles()) {
+        return;
+      }
+
       await updateVisit({ id: visitId, data: updateData });
+      await deleteFilesMarkedForDeletion();
       await refetchVisitInfo();
+      await refetchVisitAttachments();
       showNotification('Pomyślnie zaktualizowano wizytę!', 'success');
     },
     [updateVisit, refetchVisitInfo, showNotification],
@@ -362,7 +394,6 @@ const SingleVisitPage: FC = () => {
       />
 
       <FileUpload
-        title={isPatient ? 'Załączniki' : 'Załączniki - uwaga, załączniki są usuwane od razu'}
         onConfirmUpload={async (file) => {
           setFileUploadLoading(true);
           const res = await uploadFile(file, visitId);
@@ -370,13 +401,10 @@ const SingleVisitPage: FC = () => {
           setFileUploadLoading(false);
           return res;
         }}
-        onDeleteUploaded={async (fileId) => {
-          setFileUploadLoading(true);
-          const res = await deleteFile({ id: fileId });
-          await refetchVisitAttachments();
-          setFileUploadLoading(false);
-          return res;
+        onDeleteUploaded={(fileId) => {
+          setFileIdsToDeleteOnConfirm([...fileIdsToDeleteOnConfirm, fileId]);
         }}
+        onHasUnuploadedFiles={setHasUnuploadedFiles}
         initialFiles={visitAttachments}
         disabled={isPatient}
         uploadFileLoading={fileUploadLoading}

@@ -83,7 +83,6 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
     control,
     handleSubmit,
     formState: { errors },
-    setValue,
   } = useForm<FormData>({
     resolver: yupResolver(validationSchema),
     defaultValues: {
@@ -94,6 +93,8 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
   });
 
   const [onConfirmLoading, setOnConfirmLoading] = useState(false);
+  const [fileIdsToDeleteOnConfirm, setFileIdsToDeleteOnConfirm] = useState<number[]>([]);
+  const [hasUnuploadedFiles, setHasUnuploadedFiles] = useState(false);
 
   const watchedDescription = useWatch({ control, name: 'description' });
 
@@ -108,6 +109,14 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
   const { uploadFile, deleteFile } = useFileUpload();
 
   const onSubmit = async (data: FormData) => {
+    if (hasUnuploadedFiles) {
+      showNotification(
+        'Proszę przesłać lub usunąć wszystkie załadowane pliki przed kontynuowaniem',
+        'error',
+      );
+      return;
+    }
+
     setOnConfirmLoading(true);
     if (mode === 'create') {
       try {
@@ -139,7 +148,11 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
         showNotification('Nie udało się zaktualizować danych usługi dodatkowej', 'error');
       }
     }
+    const fileDeletes = fileIdsToDeleteOnConfirm.map((fileIdToDelete) => {
+      return deleteFile({ id: fileIdToDelete });
+    });
 
+    await Promise.all(fileDeletes);
     await onConfirm();
     setOnConfirmLoading(false);
   };
@@ -226,16 +239,10 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
             setOnConfirmLoading(false);
             return res;
           }}
-          onDeleteUploaded={async (fileId) => {
-            setOnConfirmLoading(true);
-            const res = await deleteFile({ id: fileId });
-            if (refetch) {
-              await refetch();
-            }
-            setOnConfirmLoading(false);
-            return res;
+          onDeleteUploaded={(fileId) => {
+            setFileIdsToDeleteOnConfirm([...fileIdsToDeleteOnConfirm, fileId]);
           }}
-          onAttachmentsChange={(fileIds) => setValue('attachmentIds', fileIds)}
+          onHasUnuploadedFiles={setHasUnuploadedFiles}
           initialFiles={existingServiceData?.existingAttachments}
           disabled={readOnly}
         />
