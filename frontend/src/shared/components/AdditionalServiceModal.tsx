@@ -10,10 +10,13 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { FC } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { useCreateAdditionalService } from 'shared/api/generated/additional-service-controller/additional-service-controller';
-import { Service } from 'shared/api/generated/generated.schemas';
+import { FC, useState } from 'react';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import {
+  useCreateAdditionalService,
+  useUpdateAdditionalServiceDescription,
+} from 'shared/api/generated/additional-service-controller/additional-service-controller';
+import { FileInfoDTO, Service } from 'shared/api/generated/generated.schemas';
 import { appConfig } from 'shared/appConfig';
 import { useFileUpload } from 'shared/hooks/useFileUpload';
 import { useNotification } from 'shared/hooks/useNotification';
@@ -28,7 +31,6 @@ interface FormData {
 }
 
 interface AdditionalServiceModalProps {
-  title?: string;
   patientId: number;
   fulfillerId: number;
   patientFullName: string;
@@ -38,8 +40,16 @@ interface AdditionalServiceModalProps {
   cancelText?: string;
   onConfirm: () => Promise<void>;
   onCancel: () => void;
+  refetch?: () => Promise<void>;
+  mode: 'create' | 'edit';
   loading?: boolean;
   readOnly?: boolean;
+  existingServiceData?: {
+    id: number;
+    serviceId: number;
+    existingAttachments: FileInfoDTO[];
+    description?: string;
+  };
 }
 
 const validationSchema = Yup.object().shape({
@@ -54,7 +64,6 @@ const validationSchema = Yup.object().shape({
 });
 
 export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
-  title = 'Dodatkowa usługa',
   patientId,
   fulfillerId,
   patientFullName,
@@ -64,8 +73,11 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
   cancelText = 'Anuluj',
   onConfirm,
   onCancel,
+  refetch,
   loading,
   readOnly = false,
+  mode,
+  existingServiceData,
 }) => {
   const {
     control,
@@ -75,30 +87,62 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
   } = useForm<FormData>({
     resolver: yupResolver(validationSchema),
     defaultValues: {
-      serviceId: undefined,
-      description: undefined,
-      attachmentIds: [],
+      serviceId: existingServiceData?.serviceId ?? undefined,
+      description: existingServiceData?.description ?? '',
+      attachmentIds: existingServiceData?.existingAttachments.map((file) => file.id) ?? [],
     },
   });
 
+  const [onConfirmLoading, setOnConfirmLoading] = useState(false);
+
+  const watchedDescription = useWatch({ control, name: 'description' });
+
   const { mutateAsync: createAdditionalService, isPending: isCreateAdditionalServiceLoading } =
     useCreateAdditionalService();
+  const {
+    mutateAsync: updateAdditionalServiceDescription,
+    isPending: isUpdateAdditionalServiceDescriptionLoading,
+  } = useUpdateAdditionalServiceDescription();
+
   const { showNotification, NotificationComponent } = useNotification();
+  const { uploadFile, deleteFile } = useFileUpload();
 
   const onSubmit = async (data: FormData) => {
-    try {
-      await createAdditionalService({
-        data: { ...data, date: new Date().toISOString(), patientId, fulfillerId },
-      });
-    } catch (err) {
-      console.warn(err);
-      showNotification('Nie udało się zapisać danych usługi dodatkowej', 'error');
+    setOnConfirmLoading(true);
+    if (mode === 'create') {
+      try {
+        await createAdditionalService({
+          data: { ...data, date: new Date().toISOString(), patientId, fulfillerId },
+        });
+      } catch (err) {
+        console.warn(err);
+        showNotification('Nie udało się zapisać danych usługi dodatkowej', 'error');
+      }
+    }
+
+    if (mode === 'edit' && existingServiceData) {
+      try {
+        const updates: Promise<any>[] = [];
+
+        if (watchedDescription !== existingServiceData.description) {
+          updates.push(
+            updateAdditionalServiceDescription({
+              id: existingServiceData.id,
+              data: { description: watchedDescription },
+            }),
+          );
+        }
+
+        await Promise.all(updates);
+      } catch (err) {
+        console.warn(err);
+        showNotification('Nie udało się zaktualizować danych usługi dodatkowej', 'error');
+      }
     }
 
     await onConfirm();
+    setOnConfirmLoading(false);
   };
-
-  const { uploadFile, deleteFile } = useFileUpload();
 
   return (
     <Dialog maxWidth={false} open onClose={onCancel}>
@@ -116,7 +160,7 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
         onSubmit={handleSubmit(onSubmit)}
       >
         <Typography variant="h6" fontWeight="bold">
-          {title}
+          Dodatkowa usługa
         </Typography>
         <PatientInfoPanel
           patientId={patientId}
@@ -129,7 +173,7 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
             control={control}
             render={({ field }) => (
               <Autocomplete
-                disabled={loading}
+                disabled={loading || readOnly || mode === 'edit'}
                 options={allAdditionalServices}
                 getOptionLabel={(option) => option.name}
                 onChange={(_, newValue) => {
@@ -143,7 +187,7 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
                     label="Rodzaj usługi"
                     error={!!errors.serviceId}
                     helperText={errors.serviceId?.message}
-                    disabled={readOnly}
+                    disabled={loading || readOnly || mode === 'edit'}
                   />
                 )}
                 fullWidth
@@ -172,27 +216,58 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
           />
         </DialogContent>
         <FileUpload
-          onConfirmUpload={(file) => uploadFile(file)}
-          onDeleteUploaded={(fileId) => deleteFile({ id: fileId })}
+          title={`Załączniki${mode === 'edit' ? ' - uwaga, załączniki są usuwane i dodawane od razu' : ''}`}
+          onConfirmUpload={async (file) => {
+            setOnConfirmLoading(true);
+            const res = await uploadFile(file, undefined, existingServiceData?.id);
+            if (refetch) {
+              await refetch();
+            }
+            setOnConfirmLoading(false);
+            return res;
+          }}
+          onDeleteUploaded={async (fileId) => {
+            setOnConfirmLoading(true);
+            const res = await deleteFile({ id: fileId });
+            if (refetch) {
+              await refetch();
+            }
+            setOnConfirmLoading(false);
+            return res;
+          }}
           onAttachmentsChange={(fileIds) => setValue('attachmentIds', fileIds)}
+          initialFiles={existingServiceData?.existingAttachments}
+          disabled={readOnly}
         />
-        <DialogActions sx={{ p: 0 }}>
-          <Stack direction="row" spacing={8} width="100%">
-            <Button fullWidth onClick={onCancel} color="error" variant="contained">
-              {cancelText}
-            </Button>
-            <Button
-              fullWidth
-              type="submit"
-              color="success"
-              variant="contained"
-              disabled={loading || isCreateAdditionalServiceLoading}
-              loading={loading || isCreateAdditionalServiceLoading}
-            >
-              {confirmText}
-            </Button>
-          </Stack>
-        </DialogActions>
+        {!readOnly && (
+          <DialogActions sx={{ p: 0 }}>
+            <Stack direction="row" spacing={8} width="100%">
+              <Button fullWidth onClick={onCancel} color="error" variant="contained">
+                {cancelText}
+              </Button>
+              <Button
+                fullWidth
+                type="submit"
+                color="success"
+                variant="contained"
+                disabled={
+                  loading ||
+                  isCreateAdditionalServiceLoading ||
+                  isUpdateAdditionalServiceDescriptionLoading ||
+                  onConfirmLoading
+                }
+                loading={
+                  loading ||
+                  isCreateAdditionalServiceLoading ||
+                  isUpdateAdditionalServiceDescriptionLoading ||
+                  onConfirmLoading
+                }
+              >
+                {confirmText}
+              </Button>
+            </Stack>
+          </DialogActions>
+        )}
       </Card>
       <NotificationComponent />
     </Dialog>

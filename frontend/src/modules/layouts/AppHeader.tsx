@@ -36,7 +36,8 @@ export const AppHeader = memo(() => {
 
   const paths = useMemo(() => {
     return [
-      { path: sitemap.visits, label: 'Wizyty i Usługi Dodatkowe' },
+      { path: sitemap.visits, label: 'Wizyty' },
+      { path: sitemap.additionalServices, label: 'Usługi dod.' },
       ...(!isPatient ? [{ path: sitemap.patients, label: 'Pacjenci' }] : []),
       { path: sitemap.specialists, label: 'Specjaliści' },
       { path: sitemap.referrals, label: 'Skierowania' },

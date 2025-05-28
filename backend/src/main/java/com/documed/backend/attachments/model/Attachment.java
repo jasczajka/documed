@@ -13,4 +13,5 @@ public class Attachment {
   @NonNull AttachmentStatus status;
   private Integer visitId;
   private Integer additionalServiceId;
+  private long sizeBytes;
 }

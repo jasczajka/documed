@@ -1,13 +1,19 @@
 package com.documed.backend.additionalservices.dtos;
 
 import com.documed.backend.additionalservices.model.AdditionalService;
+import com.documed.backend.attachments.dtos.FileInfoDTO;
 import com.documed.backend.services.model.Service;
 import com.documed.backend.users.model.User;
+import java.util.List;
 
 public class AdditionalServiceMapper {
 
   public static AdditionalServiceReturnDTO toDto(
-      AdditionalService additionalService, User patient, User fulfiller, Service service) {
+      AdditionalService additionalService,
+      User patient,
+      User fulfiller,
+      Service service,
+      List<FileInfoDTO> fileInfoDTOS) {
     if (additionalService == null) {
       return null;
     }
@@ -22,7 +28,7 @@ public class AdditionalServiceMapper {
         .patientFullName(patient.getFirstName() + " " + patient.getLastName())
         .serviceId(additionalService.getServiceId())
         .serviceName(service.getName())
-        .attachmentUrls(additionalService.getAttachmentUrls())
+        .attachments(fileInfoDTOS)
         .build();
   }
 }

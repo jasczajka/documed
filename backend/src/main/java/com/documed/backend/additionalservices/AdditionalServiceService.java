@@ -28,20 +28,13 @@ public class AdditionalServiceService {
   private final ServiceDAO serviceDAO;
 
   public List<AdditionalService> getAll() {
-    List<AdditionalService> services = additionalServiceDAO.getAll();
-    enrichWithAttachmentUrls(services);
-    return services;
+    return additionalServiceDAO.getAll();
   }
 
   public AdditionalService getById(int additionalServiceId) {
-    AdditionalService additionalService =
-        additionalServiceDAO
-            .getById(additionalServiceId)
-            .orElseThrow(() -> new NotFoundException("Additional service not found"));
-    List<String> attachmentGetUrls =
-        this.s3Service.generatePresignedGetUrlsForAdditionalService(additionalServiceId);
-    additionalService.setAttachmentUrls(attachmentGetUrls);
-    return additionalService;
+    return additionalServiceDAO
+        .getById(additionalServiceId)
+        .orElseThrow(() -> new NotFoundException("Additional service not found"));
   }
 
   @Transactional
@@ -95,21 +88,18 @@ public class AdditionalServiceService {
   public List<AdditionalService> getByFulfiller(int fulfillerId) {
     userDAO.getById(fulfillerId).orElseThrow(() -> new NotFoundException("Fulfiller not found"));
     List<AdditionalService> services = additionalServiceDAO.getByFulfillerId(fulfillerId);
-    enrichWithAttachmentUrls(services);
     return services;
   }
 
   public List<AdditionalService> getByService(int serviceId) {
     serviceDAO.getById(serviceId).orElseThrow(() -> new NotFoundException("Service not found"));
     List<AdditionalService> services = additionalServiceDAO.getByServiceId(serviceId);
-    enrichWithAttachmentUrls(services);
     return services;
   }
 
   public List<AdditionalService> getByPatient(int patientId) {
     userDAO.getById(patientId).orElseThrow(() -> new NotFoundException("Patient not found"));
     List<AdditionalService> services = additionalServiceDAO.getByPatientId(patientId);
-    enrichWithAttachmentUrls(services);
     return services;
   }
 
@@ -137,14 +127,5 @@ public class AdditionalServiceService {
         .getById(id)
         .orElseThrow(() -> new NotFoundException("Additional service not found"));
     this.additionalServiceDAO.updateDescription(id, newDescription);
-  }
-
-  private void enrichWithAttachmentUrls(List<AdditionalService> services) {
-    services.forEach(
-        service -> {
-          List<String> urls =
-              s3Service.generatePresignedGetUrlsForAdditionalService(service.getId());
-          service.setAttachmentUrls(urls);
-        });
   }
 }

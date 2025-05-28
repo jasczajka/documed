@@ -2,6 +2,8 @@ package com.documed.backend.additionalservices;
 
 import com.documed.backend.additionalservices.dtos.*;
 import com.documed.backend.additionalservices.model.AdditionalService;
+import com.documed.backend.attachments.S3Service;
+import com.documed.backend.attachments.dtos.FileInfoDTO;
 import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
 import com.documed.backend.exceptions.NotFoundException;
@@ -26,6 +28,7 @@ public class AdditionalServiceController {
   private final AdditionalServiceService additionalServiceService;
   private final UserService userService;
   private final ServiceService serviceService;
+  private final S3Service s3service;
   private static final Logger log = LoggerFactory.getLogger(AdditionalServiceController.class);
 
   @StaffOnly
@@ -111,7 +114,7 @@ public class AdditionalServiceController {
 
   @StaffOnly
   @PutMapping("/{id}/attachments")
-  public ResponseEntity<AdditionalServiceReturnDTO> updatAdditionalServiceAttachments(
+  public ResponseEntity<AdditionalServiceReturnDTO> updateAdditionalServiceAttachments(
       @PathVariable int id, @RequestBody @Valid UpdateAttachmentsDTO updateDto) {
     AdditionalService updatedService =
         additionalServiceService.updateAttachmentsForAdditionalService(
@@ -122,6 +125,9 @@ public class AdditionalServiceController {
 
   private AdditionalServiceReturnDTO enrichAdditionalServiceToDto(
       AdditionalService additionalService) {
+    List<FileInfoDTO> fileInfoDTOS =
+        s3service.generateFileInfosForAdditionalService(additionalService.getId());
+
     User patient =
         userService
             .getById(additionalService.getPatientId())
@@ -148,6 +154,7 @@ public class AdditionalServiceController {
                   return new NotFoundException("Service not found");
                 });
 
-    return AdditionalServiceMapper.toDto(additionalService, patient, fulfiller, service);
+    return AdditionalServiceMapper.toDto(
+        additionalService, patient, fulfiller, service, fileInfoDTOS);
   }
 }

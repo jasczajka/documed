@@ -106,7 +106,7 @@ export const useUpdateAdditionalServiceDescription = <
 
   return useMutation(mutationOptions, queryClient);
 };
-export const updatAdditionalServiceAttachments = (
+export const updateAdditionalServiceAttachments = (
   id: number,
   updateAttachmentsDTO: UpdateAttachmentsDTO,
 ) => {
@@ -118,23 +118,23 @@ export const updatAdditionalServiceAttachments = (
   });
 };
 
-export const getUpdatAdditionalServiceAttachmentsMutationOptions = <
+export const getUpdateAdditionalServiceAttachmentsMutationOptions = <
   TError = ErrorType<unknown>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updatAdditionalServiceAttachments>>,
+    Awaited<ReturnType<typeof updateAdditionalServiceAttachments>>,
     TError,
     { id: number; data: UpdateAttachmentsDTO },
     TContext
   >;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof updatAdditionalServiceAttachments>>,
+  Awaited<ReturnType<typeof updateAdditionalServiceAttachments>>,
   TError,
   { id: number; data: UpdateAttachmentsDTO },
   TContext
 > => {
-  const mutationKey = ['updatAdditionalServiceAttachments'];
+  const mutationKey = ['updateAdditionalServiceAttachments'];
   const { mutation: mutationOptions } = options
     ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
       ? options
@@ -142,30 +142,30 @@ export const getUpdatAdditionalServiceAttachmentsMutationOptions = <
     : { mutation: { mutationKey } };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof updatAdditionalServiceAttachments>>,
+    Awaited<ReturnType<typeof updateAdditionalServiceAttachments>>,
     { id: number; data: UpdateAttachmentsDTO }
   > = (props) => {
     const { id, data } = props ?? {};
 
-    return updatAdditionalServiceAttachments(id, data);
+    return updateAdditionalServiceAttachments(id, data);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type UpdatAdditionalServiceAttachmentsMutationResult = NonNullable<
-  Awaited<ReturnType<typeof updatAdditionalServiceAttachments>>
+export type UpdateAdditionalServiceAttachmentsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateAdditionalServiceAttachments>>
 >;
-export type UpdatAdditionalServiceAttachmentsMutationBody = UpdateAttachmentsDTO;
-export type UpdatAdditionalServiceAttachmentsMutationError = ErrorType<unknown>;
+export type UpdateAdditionalServiceAttachmentsMutationBody = UpdateAttachmentsDTO;
+export type UpdateAdditionalServiceAttachmentsMutationError = ErrorType<unknown>;
 
-export const useUpdatAdditionalServiceAttachments = <
+export const useUpdateAdditionalServiceAttachments = <
   TError = ErrorType<unknown>,
   TContext = unknown,
 >(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof updatAdditionalServiceAttachments>>,
+      Awaited<ReturnType<typeof updateAdditionalServiceAttachments>>,
       TError,
       { id: number; data: UpdateAttachmentsDTO },
       TContext
@@ -173,12 +173,12 @@ export const useUpdatAdditionalServiceAttachments = <
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof updatAdditionalServiceAttachments>>,
+  Awaited<ReturnType<typeof updateAdditionalServiceAttachments>>,
   TError,
   { id: number; data: UpdateAttachmentsDTO },
   TContext
 > => {
-  const mutationOptions = getUpdatAdditionalServiceAttachmentsMutationOptions(options);
+  const mutationOptions = getUpdateAdditionalServiceAttachmentsMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

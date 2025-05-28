@@ -11,6 +11,7 @@ const LoginPage = lazy(() => import('../modules/auth/LoginPage'));
 const RegisterPage = lazy(() => import('../modules/auth/RegisterPage'));
 const ForgotPasswordPage = lazy(() => import('../modules/auth/ForgotPasswordPage'));
 const VisitsPage = lazy(() => import('./VisitsPage'));
+const AdditionalServicesPage = lazy(() => import('./AdditionalServicesPage'));
 const PatientsPage = lazy(() => import('./PatientsPage'));
 const SpecialistsPage = lazy(() => import('./SpecialistsPage'));
 const ReferralsPage = lazy(() => import('./ReferralsPage'));
@@ -54,6 +55,7 @@ const getAuthRoutes = (
     children: [
       { path: '/', element: <Navigate to="/visits" replace /> },
       { path: '/visits', element: <VisitsPage /> },
+      { path: '/additional-services', element: <AdditionalServicesPage /> },
       {
         path: '/patients',
         element: (

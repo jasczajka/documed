@@ -124,6 +124,13 @@ public class S3Service {
     return this.generatePresignedGetUrlsForAttachments(attachments);
   }
 
+  public List<FileInfoDTO> generateFileInfosForAdditionalService(int additionalServiceId) {
+    List<Attachment> attachments =
+        this.attachmentDAO.getUploadedByAdditionalServiceId(additionalServiceId);
+
+    return this.generateFileInfoDtosForAttachments(attachments);
+  }
+
   public List<String> generatePresignedGetUrlsForAdditionalService(int additionalServiceId) {
     List<Attachment> attachments =
         this.attachmentDAO.getUploadedByAdditionalServiceId(additionalServiceId);
@@ -162,6 +169,7 @@ public class S3Service {
               .id(attachment.getId())
               .fileName(attachment.getFileName())
               .downloadUrl(generatePresignedGetUrl(attachment.getS3Key()))
+              .sizeBytes(attachment.getSizeBytes())
               .build());
     }
     return dtos;

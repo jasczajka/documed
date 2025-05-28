@@ -3,10 +3,17 @@ import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { FC, useCallback, useState } from 'react';
-import { AdditionalServiceReturnDTO, Service } from 'shared/api/generated/generated.schemas';
+import {
+  AdditionalServiceReturnDTO,
+  FileInfoDTO,
+  Service,
+} from 'shared/api/generated/generated.schemas';
 import { appConfig } from 'shared/appConfig';
+import { AdditionalServiceModal } from 'shared/components/AdditionalServiceModal';
 import { TableFilters } from 'shared/components/TableFilters';
 import { useAuth } from 'shared/hooks/useAuth';
+import { useModal } from 'shared/hooks/useModal';
+import { useNotification } from 'shared/hooks/useNotification';
 import { useAdditionalServicesTable } from './useAdditionalServicesTable';
 
 export type AdditionalServiceFilters = {
@@ -20,13 +27,26 @@ export type AdditionalServiceFilters = {
 interface AdditionalServicesTableProps {
   additionalServices: AdditionalServiceReturnDTO[];
   allAdditionalServices: Service[];
-  onEdit?: (id: number) => void;
+  refetch: () => Promise<void>;
   patientId?: number;
   doctorId?: number;
   loading?: boolean;
 }
 
-const columns = (onEdit?: (id: number) => void): GridColDef<AdditionalServiceReturnDTO>[] => [
+const columns = (
+  onEdit: (
+    fulfillerId: number,
+    patientId: number,
+    patientFullName: string,
+    patientAge: number,
+    existingServiceData: {
+      id: number;
+      serviceId: number;
+      existingAttachments: FileInfoDTO[];
+      description?: string;
+    },
+  ) => void,
+): GridColDef<AdditionalServiceReturnDTO>[] => [
   {
     field: 'index',
     headerName: '#',
@@ -73,7 +93,14 @@ const columns = (onEdit?: (id: number) => void): GridColDef<AdditionalServiceRet
         <GridActionsCellItem
           key={`begin-${params.row.id}`}
           label="Wyświetl szczegóły"
-          onClick={() => onEdit?.(params.row.id)}
+          onClick={() =>
+            onEdit(params.row.fulfillerId, params.row.patientId, params.row.patientFullName, 12, {
+              id: params.row.id,
+              serviceId: params.row.serviceId,
+              existingAttachments: params.row.attachments,
+              description: params.row.description,
+            })
+          }
           showInMenu
         />,
       ];
@@ -84,11 +111,13 @@ const columns = (onEdit?: (id: number) => void): GridColDef<AdditionalServiceRet
 export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
   additionalServices,
   allAdditionalServices,
-  onEdit,
+  refetch,
   patientId,
   doctorId,
 }) => {
   const { isPatient } = useAuth();
+  const { openModal, closeModal } = useModal();
+  const { showNotification, NotificationComponent } = useNotification();
   const [filters, setFilters] = useState<AdditionalServiceFilters>({
     patientName: '',
     service: '',
@@ -104,6 +133,42 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
   const handleFilterChange = useCallback((name: keyof AdditionalServiceFilters, value: string) => {
     setFilters((prev) => ({ ...prev, [name]: value }));
   }, []);
+
+  const handleEditClick = useCallback(
+    async (
+      fulfillerId: number,
+      patientId: number,
+      patientFullName: string,
+      patientAge: number,
+      existingServiceData: {
+        id: number;
+        serviceId: number;
+        existingAttachments: FileInfoDTO[];
+        description?: string;
+      },
+    ) => {
+      openModal(
+        'editAdditionalServiceModal',
+        <AdditionalServiceModal
+          allAdditionalServices={allAdditionalServices}
+          patientId={patientId}
+          fulfillerId={fulfillerId}
+          patientFullName={patientFullName}
+          patientAge={patientAge}
+          onConfirm={async () => {
+            await refetch();
+            closeModal('editAdditionalServiceModal');
+            showNotification('Zaktualizowano dane usługi dodatkowej', 'success');
+          }}
+          onCancel={() => closeModal('editAdditionalServiceModal')}
+          mode="edit"
+          existingServiceData={existingServiceData}
+          refetch={refetch}
+        />,
+      );
+    },
+    [openModal, closeModal, allAdditionalServices],
+  );
 
   const setFilterDateToToday = useCallback(() => {
     const todayStart = format(startOfDay(new Date()), appConfig.dateTimeFormat);
@@ -139,7 +204,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
       <Paper sx={{ flexGrow: 1 }}>
         <DataGrid
           rows={filteredAdditionalServices}
-          columns={columns(onEdit)}
+          columns={columns(handleEditClick)}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },
@@ -151,6 +216,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
           disableColumnFilter
         />
       </Paper>
+      <NotificationComponent />
     </Box>
   );
 };

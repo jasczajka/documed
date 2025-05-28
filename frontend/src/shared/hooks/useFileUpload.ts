@@ -28,12 +28,12 @@ export const useFileUpload = () => {
     visitId?: number,
     additionalServiceId?: number,
   ): Promise<{ downloadUrl: string; fileId: number }> => {
-    const { name: fileName, size: fileSizeBytes } = file;
+    const { name: fileName, size: sizeBytes } = file;
 
     const uploadUrlResponse = await generateUploadUrl({
       data: {
         fileName,
-        fileSizeBytes,
+        sizeBytes,
         visitId,
         additionalServiceId,
       },

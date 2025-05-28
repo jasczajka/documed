@@ -30,6 +30,7 @@ public class AttachmentDAO implements FullDAO<Attachment, Attachment> {
               .id(rs.getInt("id"))
               .fileName(rs.getString("file_name"))
               .s3Key(rs.getString("s3_key"))
+              .sizeBytes(rs.getLong("size_bytes"))
               .status(AttachmentStatus.valueOf(rs.getString("status")))
               .visitId((Integer) rs.getObject("visit_id"))
               .additionalServiceId((Integer) rs.getObject("additional_service_id"))
@@ -40,8 +41,8 @@ public class AttachmentDAO implements FullDAO<Attachment, Attachment> {
     String sql =
         """
                   INSERT INTO attachment
-                    (file_name, s3_key,status, visit_id, additional_service_id )
-                  VALUES (?, ?, ?, ?, ?)
+                    (file_name, s3_key, size_bytes, status, visit_id, additional_service_id )
+                  VALUES (?, ?, ?, ?, ?, ?)
                   RETURNING id
                   """;
     KeyHolder kh = new GeneratedKeyHolder();
@@ -50,9 +51,10 @@ public class AttachmentDAO implements FullDAO<Attachment, Attachment> {
           PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
           ps.setString(1, attachment.getFileName());
           ps.setString(2, attachment.getS3Key());
-          ps.setString(3, attachment.getStatus().toString());
-          ps.setObject(4, attachment.getVisitId(), Types.INTEGER);
-          ps.setObject(5, attachment.getAdditionalServiceId(), Types.INTEGER);
+          ps.setLong(3, attachment.getSizeBytes());
+          ps.setString(4, attachment.getStatus().toString());
+          ps.setObject(5, attachment.getVisitId(), Types.INTEGER);
+          ps.setObject(6, attachment.getAdditionalServiceId(), Types.INTEGER);
 
           return ps;
         },
@@ -70,7 +72,7 @@ public class AttachmentDAO implements FullDAO<Attachment, Attachment> {
   public Optional<Attachment> getById(int id) {
     String sql =
         """
-                 SELECT id, file_name, s3_key, status, visit_id, additional_service_id FROM
+                 SELECT id, file_name, s3_key, size_bytes, status, visit_id, additional_service_id FROM
                  attachment WHERE id = ?
                  """;
     return jdbcTemplate.query(sql, rowMapper, id).stream().findFirst();
@@ -79,7 +81,7 @@ public class AttachmentDAO implements FullDAO<Attachment, Attachment> {
   public Optional<Attachment> getUploadedById(int id) {
     String sql =
         """
-                SELECT id, file_name, s3_key, status, visit_id, additional_service_id FROM attachment
+                SELECT id, file_name, s3_key, size_bytes, status, visit_id, additional_service_id FROM attachment
                 WHERE id = ?
                 AND status = 'UPLOADED'
                  """;
@@ -105,7 +107,7 @@ public class AttachmentDAO implements FullDAO<Attachment, Attachment> {
   public List<Attachment> getAll() {
     String sql =
         """
-                SELECT id, file_name, s3_key, status, visit_id, additional_service_id
+                SELECT id, file_name, s3_key, size_bytes, status, visit_id, additional_service_id
                 FROM attachment
                 """;
     return jdbcTemplate.query(sql, rowMapper);
@@ -114,7 +116,7 @@ public class AttachmentDAO implements FullDAO<Attachment, Attachment> {
   public List<Attachment> getUploadedByVisitId(int visitId) {
     String sql =
         """
-           SELECT id, file_name, s3_key, status, visit_id, additional_service_id
+           SELECT id, file_name, s3_key, size_bytes, status, visit_id, additional_service_id
            FROM attachment WHERE visit_id = ? AND status = 'UPLOADED'
            """;
     return jdbcTemplate.query(sql, rowMapper, visitId);
@@ -123,7 +125,7 @@ public class AttachmentDAO implements FullDAO<Attachment, Attachment> {
   public List<Attachment> getUploadedByAdditionalServiceId(int additionalServiceId) {
     String sql =
         """
-                SELECT id, file_name, s3_key, status, visit_id, additional_service_id
+                SELECT id, file_name, s3_key, size_bytes, status, visit_id, additional_service_id
                 FROM attachment WHERE additional_service_id = ?
                  AND status = 'UPLOADED'
                  """;
@@ -133,7 +135,7 @@ public class AttachmentDAO implements FullDAO<Attachment, Attachment> {
   public List<Attachment> getUploadedByPatientId(int patientId) {
     String sql =
         """
-                SELECT a.id, a.file_name, a.s3_key, a.status, a.visit_id, a.additional_service_id
+                SELECT a.id, a.file_name, a.s3_key, a.size_bytes, a.status, a.visit_id, a.additional_service_id
                 FROM attachment a
                 LEFT JOIN visit v ON a.visit_id = v.id
                 LEFT JOIN additional_service ads ON a.additional_service_id = ads.id

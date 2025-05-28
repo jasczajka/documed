@@ -101,7 +101,7 @@ const SinglePatientPage: FC = () => {
   const handleAdditionalServiceClick = useCallback(async () => {
     if (fulfillerId !== undefined && patientId !== undefined && allServices !== undefined) {
       openModal(
-        'additionalServiceModal',
+        'createAdditionalServiceModal',
         <AdditionalServiceModal
           allAdditionalServices={allAdditionalServices}
           patientId={patientId}
@@ -115,7 +115,8 @@ const SinglePatientPage: FC = () => {
             await refetchPatientAttachments();
             await refetchPatientAdditionalServices();
           }}
-          onCancel={() => closeModal('additionalServiceModal')}
+          onCancel={() => closeModal('createAdditionalServiceModal')}
+          mode="create"
         />,
       );
     }
@@ -132,9 +133,9 @@ const SinglePatientPage: FC = () => {
           patientFullName={patientFullName}
           patientAge={patientInfo?.birthdate ? getAge(new Date(patientInfo?.birthdate)) : null}
           onConfirm={async () => {
+            await refetchPatientVisits();
             closeModal('scheduleVisitModal');
             showNotification('Umówiono wizytę', 'success');
-            await refetchPatientVisits();
           }}
           onCancel={() => closeModal('scheduleVisitModal')}
         />,
@@ -191,9 +192,14 @@ const SinglePatientPage: FC = () => {
         patientAdditionalServices={patientAdditionalServices}
         allServices={allServices}
         allAdditionalServices={allAdditionalServices}
-        refetch={() => {
-          refetchPatientInfo();
-          refetchPatientVisits();
+        refetchVisits={async () => {
+          await refetchPatientVisits();
+        }}
+        refetchAdditionalServices={async () => {
+          await refetchPatientAdditionalServices();
+        }}
+        refetchPatientInfo={async () => {
+          await refetchPatientInfo();
         }}
       />
       <NotificationComponent />

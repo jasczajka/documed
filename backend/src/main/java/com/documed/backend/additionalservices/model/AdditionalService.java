@@ -24,5 +24,5 @@ public class AdditionalService {
 
   private List<Notification> notifications;
 
-  private List<String> attachmentUrls;
+  private List<String> attachmentIds;
 }

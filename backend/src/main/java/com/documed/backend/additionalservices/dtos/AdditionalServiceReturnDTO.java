@@ -1,5 +1,6 @@
 package com.documed.backend.additionalservices.dtos;
 
+import com.documed.backend.attachments.dtos.FileInfoDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.util.List;
@@ -37,5 +38,5 @@ public class AdditionalServiceReturnDTO {
   private String serviceName;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private List<String> attachmentUrls;
+  private List<FileInfoDTO> attachments;
 }

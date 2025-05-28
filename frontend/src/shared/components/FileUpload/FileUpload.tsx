@@ -2,6 +2,7 @@ import { UploadFile } from '@mui/icons-material';
 import { Box, Card, CardHeader, Typography } from '@mui/material';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { ErrorCode, FileError, FileRejection, useDropzone } from 'react-dropzone';
+import { FileInfoDTO } from 'shared/api/generated/generated.schemas';
 import FileCard from './FileCard';
 import { formatFileName, formatFileSize, readFileAsUrl } from './utils';
 
@@ -45,32 +46,43 @@ interface TrackedFile {
   id?: number;
   status: 'loading' | 'error' | 'loaded' | 'uploaded';
   downloadUrl?: string;
+  size?: number;
   errors?: string[];
 }
 
 interface FileUploadProps {
+  title?: string;
   onConfirmUpload: (file: File) => Promise<{ downloadUrl: string; fileId: number }>;
   onDeleteUploaded: (fileId: number) => Promise<string>;
   onAttachmentsChange?: (fileIds: number[]) => void;
   className?: string;
   uploadFileLoading?: boolean;
+  disabled?: boolean;
+  initialFiles?: FileInfoDTO[];
 }
 
 export const FileUpload: FC<FileUploadProps> = ({
+  title = 'Załączniki',
   onConfirmUpload,
   onDeleteUploaded,
   onAttachmentsChange,
   className,
   uploadFileLoading,
+  disabled = false,
+  initialFiles,
 }) => {
   const [acceptedFiles, setAcceptedFiles] = useState<TrackedFile[]>([]);
   const [rejectedFiles, setRejectedFiles] = useState<TrackedFile[]>([]);
-  const isDisabled = useMemo(() => acceptedFiles.length >= MAX_FILE_COUNT, [acceptedFiles]);
+  const dropZoneDisabled = useMemo(
+    () => acceptedFiles.length >= MAX_FILE_COUNT || disabled,
+    [acceptedFiles, disabled],
+  );
   const isEmpty = !acceptedFiles.length && !rejectedFiles.length;
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: ACCEPT_FILE_TYPES,
     maxSize: MAX_FILE_SIZE,
+    disabled: dropZoneDisabled,
     onDrop: async (accepted: File[], rejected: FileRejection[]) => {
       const remainingSlots = MAX_FILE_COUNT - acceptedFiles.length;
 
@@ -169,39 +181,59 @@ export const FileUpload: FC<FileUploadProps> = ({
     notifyAttachmentsChange();
   }, [acceptedFiles]);
 
+  useEffect(() => {
+    if (initialFiles) {
+      const preloaded = initialFiles.map((f) => ({
+        file: new File([], f.fileName),
+        id: f.id,
+        downloadUrl: f.downloadUrl,
+        status: 'uploaded' as const,
+        size: f.sizeBytes,
+      }));
+      setAcceptedFiles(preloaded);
+    }
+  }, [initialFiles]);
+
   return (
     <Card className={className} sx={{ width: '100%', maxWidth: 600 }}>
-      <CardHeader title={<Typography variant="body2">Załączniki</Typography>} />
-      <Box
-        {...getRootProps()}
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 2,
-          border: '1px dashed #D3D3D3',
-          padding: 4,
-          mb: isEmpty ? 2 : 0,
-          textAlign: 'center',
-          cursor: isDisabled ? 'not-allowed' : 'pointer',
-          '&:hover': {
-            backgroundColor: isDisabled ? undefined : 'rgba(0, 0, 0, 0.05)',
-          },
-        }}
-      >
-        <input {...getInputProps()} disabled={acceptedFiles.length >= MAX_FILE_COUNT} />
-        <UploadFile color="primary" />
-        <Typography variant="subtitle1">Kliknij lub przeciągnij i upuść</Typography>
-        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-          Maksymalnie {MAX_FILE_COUNT} plików o rozmiarze max. {formatFileSize(MAX_FILE_SIZE)}
-        </Typography>
-      </Box>
+      <CardHeader title={<Typography variant="body2">{title}</Typography>} />
+      {!disabled && (
+        <Box
+          {...getRootProps()}
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2,
+            border: '1px dashed #D3D3D3',
+            padding: 4,
+            mb: isEmpty ? 2 : 0,
+            textAlign: 'center',
+            cursor: dropZoneDisabled ? 'not-allowed' : 'pointer',
+            '&:hover': {
+              backgroundColor: dropZoneDisabled ? undefined : 'rgba(0, 0, 0, 0.05)',
+            },
+          }}
+        >
+          <input {...getInputProps()} disabled={acceptedFiles.length >= MAX_FILE_COUNT} />
+          <UploadFile color="primary" />
+          <Typography variant="subtitle1">Kliknij lub przeciągnij i upuść</Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            Maksymalnie {MAX_FILE_COUNT} plików o rozmiarze max. {formatFileSize(MAX_FILE_SIZE)}
+          </Typography>
+        </Box>
+      )}
+
       <Box>
         {acceptedFiles.map((file) => (
           <FileCard
-            key={file.file.name}
+            key={`${file.file.name} - ${file.id}`}
             fileName={formatFileName(file.file.name)}
-            fileSize={formatFileSize(file.file.size)}
+            fileSize={
+              file.file.size === 0 && file.size
+                ? formatFileSize(file.size)
+                : formatFileSize(file.file.size)
+            }
             status={file.status}
             downloadUrl={file.downloadUrl}
             onDelete={() => handleDeleteAcceptedFile(file)}

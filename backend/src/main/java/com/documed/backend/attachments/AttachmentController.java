@@ -34,11 +34,12 @@ public class AttachmentController {
             .visitId(request.getVisitId())
             .additionalServiceId(request.getAdditionalServiceId())
             .status(AttachmentStatus.PENDING)
+            .sizeBytes(request.getSizeBytes())
             .build();
 
     Attachment createdAttachment = s3Service.createAttachment(attachment);
 
-    String uploadUrl = s3Service.generatePreSignedPutUrl(objectKey, request.getFileSizeBytes());
+    String uploadUrl = s3Service.generatePreSignedPutUrl(objectKey, request.getSizeBytes());
 
     UploadUrlResponseDTO response =
         UploadUrlResponseDTO.builder()

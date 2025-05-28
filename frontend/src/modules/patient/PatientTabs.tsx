@@ -32,7 +32,9 @@ interface PatientTabsProps {
   patientAdditionalServices: AdditionalServiceReturnDTO[];
   allServices: Service[];
   allAdditionalServices: Service[];
-  refetch: () => void;
+  refetchVisits: () => Promise<void>;
+  refetchAdditionalServices: () => Promise<void>;
+  refetchPatientInfo: () => Promise<void>;
 }
 export const PatientTabs: FC<PatientTabsProps> = ({
   patientInfo,
@@ -43,7 +45,9 @@ export const PatientTabs: FC<PatientTabsProps> = ({
   patientAdditionalServices,
   allServices,
   allAdditionalServices,
-  refetch,
+  refetchVisits,
+  refetchAdditionalServices,
+  refetchPatientInfo,
 }) => {
   const { showNotification, NotificationComponent } = useNotification();
   const { openModal } = useModal();
@@ -51,7 +55,7 @@ export const PatientTabs: FC<PatientTabsProps> = ({
 
   const handleCancelVisitClick = (visitId: number) => {
     openModal('cancelVisitModal', (close) => (
-      <CancelVisitModal visitId={visitId} onClose={close} onSuccess={refetch} />
+      <CancelVisitModal visitId={visitId} onClose={close} onSuccess={refetchVisits} />
     ));
   };
 
@@ -108,14 +112,12 @@ export const PatientTabs: FC<PatientTabsProps> = ({
             additionalServices={patientAdditionalServices}
             allAdditionalServices={allAdditionalServices}
             loading={isCancelVisitLoading}
-            onEdit={() => {
-              console.log('edytuj');
-            }}
+            refetch={refetchAdditionalServices}
             patientId={patientInfo.patientId}
           />
         )}
         {tabIndex === 3 && (
-          <PersonalDataTab patientInfo={patientInfo} onSuccessfulDeactivate={refetch} />
+          <PersonalDataTab patientInfo={patientInfo} onSuccessfulDeactivate={refetchPatientInfo} />
         )}
         {tabIndex === 4 && <div>Abonament</div>}
       </Paper>

@@ -63,7 +63,14 @@ export interface AdditionalServiceReturnDTO {
   patientFullName: string;
   serviceId: number;
   serviceName: string;
-  attachmentUrls: string[];
+  attachments: FileInfoDTO[];
+}
+
+export interface FileInfoDTO {
+  id: number;
+  downloadUrl: string;
+  fileName: string;
+  sizeBytes: number;
 }
 
 export interface ScheduleVisitDTO {
@@ -343,7 +350,7 @@ export interface ChangePasswordRequestDTO {
 }
 
 export interface GenerateUploadUrlRequestDTO {
-  fileSizeBytes: number;
+  sizeBytes: number;
   fileName: string;
   visitId?: number;
   additionalServiceId?: number;
@@ -483,12 +490,6 @@ export interface MeDTO {
   lastName: string;
   email: string;
   role: MeDTORole;
-}
-
-export interface FileInfoDTO {
-  id: number;
-  downloadUrl: string;
-  fileName: string;
 }
 
 export type GetAllSubscriptions200 = { [key: string]: unknown };
