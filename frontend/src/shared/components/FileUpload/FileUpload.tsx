@@ -79,7 +79,7 @@ export const FileUpload: FC<FileUploadProps> = ({
     [acceptedFiles, disabled],
   );
 
-  const hasLoadedButNotUploadedFiles = useMemo(() => {
+  const hasUnuploadedFiles = useMemo(() => {
     return acceptedFiles.some((file) => file.status === 'loaded' && !file.id);
   }, [acceptedFiles]);
 
@@ -177,9 +177,9 @@ export const FileUpload: FC<FileUploadProps> = ({
 
   useEffect(() => {
     if (onHasUnuploadedFiles) {
-      onHasUnuploadedFiles(hasLoadedButNotUploadedFiles);
+      onHasUnuploadedFiles(hasUnuploadedFiles);
     }
-  }, [hasLoadedButNotUploadedFiles]);
+  }, [hasUnuploadedFiles]);
 
   useEffect(() => {
     if (initialFiles) {
