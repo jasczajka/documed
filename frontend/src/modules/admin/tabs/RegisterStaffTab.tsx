@@ -75,7 +75,6 @@ export const RegisterStaffTab: FC = () => {
   });
 
   const onSubmit = async (data: FormData) => {
-    console.log(data);
     await registerDoctor({
       data: {
         role: data.role,

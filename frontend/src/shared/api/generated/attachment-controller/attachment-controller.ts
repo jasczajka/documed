@@ -335,6 +335,112 @@ export const useDeleteFile = <TError = ErrorType<unknown>, TContext = unknown>(
 
   return useMutation(mutationOptions, queryClient);
 };
+export const getFilesForVisit = (visitId: number, signal?: AbortSignal) => {
+  return customInstance<FileInfoDTO[]>({
+    url: `/api/attachments/visits/${visitId}`,
+    method: 'GET',
+    signal,
+  });
+};
+
+export const getGetFilesForVisitQueryKey = (visitId: number) => {
+  return [`/api/attachments/visits/${visitId}`] as const;
+};
+
+export const getGetFilesForVisitQueryOptions = <
+  TData = Awaited<ReturnType<typeof getFilesForVisit>>,
+  TError = ErrorType<unknown>,
+>(
+  visitId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFilesForVisit>>, TError, TData>>;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetFilesForVisitQueryKey(visitId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getFilesForVisit>>> = ({ signal }) =>
+    getFilesForVisit(visitId, signal);
+
+  return { queryKey, queryFn, enabled: !!visitId, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getFilesForVisit>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetFilesForVisitQueryResult = NonNullable<Awaited<ReturnType<typeof getFilesForVisit>>>;
+export type GetFilesForVisitQueryError = ErrorType<unknown>;
+
+export function useGetFilesForVisit<
+  TData = Awaited<ReturnType<typeof getFilesForVisit>>,
+  TError = ErrorType<unknown>,
+>(
+  visitId: number,
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFilesForVisit>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getFilesForVisit>>,
+          TError,
+          Awaited<ReturnType<typeof getFilesForVisit>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetFilesForVisit<
+  TData = Awaited<ReturnType<typeof getFilesForVisit>>,
+  TError = ErrorType<unknown>,
+>(
+  visitId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFilesForVisit>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getFilesForVisit>>,
+          TError,
+          Awaited<ReturnType<typeof getFilesForVisit>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetFilesForVisit<
+  TData = Awaited<ReturnType<typeof getFilesForVisit>>,
+  TError = ErrorType<unknown>,
+>(
+  visitId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFilesForVisit>>, TError, TData>>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useGetFilesForVisit<
+  TData = Awaited<ReturnType<typeof getFilesForVisit>>,
+  TError = ErrorType<unknown>,
+>(
+  visitId: number,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFilesForVisit>>, TError, TData>>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetFilesForVisitQueryOptions(visitId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
 export const getFilesForPatient = (userId: number, signal?: AbortSignal) => {
   return customInstance<FileInfoDTO[]>({
     url: `/api/attachments/patients/${userId}`,

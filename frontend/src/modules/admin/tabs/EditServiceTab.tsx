@@ -8,7 +8,7 @@ import {
   useUpdateServicePrice,
   useUpdateServiceTime,
 } from 'shared/api/generated/service-controller/service-controller';
-import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
+import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { useNotification } from 'shared/hooks/useNotification';
 import { mapApiError } from 'shared/utils/mapApiError';
 import * as Yup from 'yup';

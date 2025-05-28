@@ -2,7 +2,7 @@ import { LoggedLayout } from 'modules/layouts/LoggedLayout';
 import { SettingsTabs } from 'modules/settings/SettingsTabs';
 import { lazy, useLayoutEffect, useMemo, useState } from 'react';
 import { createBrowserRouter, Navigate, RouteObject, RouterProvider } from 'react-router';
-import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
+import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { ProtectedRoute } from 'shared/components/ProtectedRoute';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { useAuth } from 'shared/hooks/useAuth';
@@ -19,6 +19,7 @@ const PrescriptionsPage = lazy(() => import('./PrescriptionsPage'));
 const AdministrationPage = lazy(() => import('./AdministrationPage'));
 const SingleSpecialistPage = lazy(() => import('./SingleSpecialistPage'));
 const SinglePatientPage = lazy(() => import('./SinglePatientPage'));
+const SingleVisitPage = lazy(() => import('./SingleVisitPage'));
 
 const getDefaultRoutes = () => [
   {
@@ -55,6 +56,7 @@ const getAuthRoutes = (
     children: [
       { path: '/', element: <Navigate to="/visits" replace /> },
       { path: '/visits', element: <VisitsPage /> },
+      { path: '/visits/:id', element: <SingleVisitPage /> },
       { path: '/additional-services', element: <AdditionalServicesPage /> },
       {
         path: '/patients',

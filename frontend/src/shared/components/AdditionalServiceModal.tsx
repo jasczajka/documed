@@ -57,8 +57,8 @@ const validationSchema = Yup.object().shape({
   description: Yup.string()
     .required('Wypełnij wyniki usługi dodatkowej')
     .max(
-      appConfig.maxDescriptionAdditionalServiceLength,
-      `Maksymalna długość to ${appConfig.maxDescriptionAdditionalServiceLength} znaków`,
+      appConfig.maxTextFieldLength,
+      `Maksymalna długość to ${appConfig.maxTextFieldLength} znaków`,
     ),
   attachmentIds: Yup.array().of(Yup.number().required()).required(),
 });
@@ -204,7 +204,7 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
                 {...field}
                 multiline
                 slotProps={{
-                  htmlInput: { maxLength: appConfig.maxDescriptionAdditionalServiceLength },
+                  htmlInput: { maxLength: appConfig.maxTextFieldLength },
                 }}
                 label="Wyniki"
                 fullWidth

@@ -8,6 +8,7 @@ import com.documed.backend.medicines.model.MedicineWithAmount;
 import com.documed.backend.users.model.UserRole;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,9 +32,9 @@ public class PrescriptionController {
   @StaffOnly
   @GetMapping("/visit/{visit_id}")
   @Operation(summary = "Get Prescription For Visit")
-  public ResponseEntity<Prescription> getPrescriptionForVisit(
+  public ResponseEntity<Optional<Prescription>> getPrescriptionForVisit(
       @PathVariable("visit_id") int visitId) {
-    Prescription prescription = prescriptionService.getPrescriptionForVisit(visitId);
+    Optional<Prescription> prescription = prescriptionService.getPrescriptionForVisit(visitId);
     return ResponseEntity.ok(prescription);
   }
 

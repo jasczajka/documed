@@ -13,7 +13,7 @@ import {
   useGetWorkTimesForUser,
   useUpdateWorkTimesForUser,
 } from 'shared/api/generated/work-time-controller/work-time-controller';
-import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
+import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { useNotification } from 'shared/hooks/useNotification';
 
 export type WorkTimeWithoutIdAndUser = Omit<WorkTime, 'id' | 'userId'>;

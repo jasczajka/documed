@@ -1,7 +1,7 @@
 package com.documed.backend.users.dtos;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.Date;
+import java.time.LocalDate;
 import lombok.*;
 
 @Data
@@ -22,5 +22,5 @@ public class PatientDetailsDTO {
   @NonNull private String email;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  @NonNull Date birthdate;
+  @NonNull LocalDate birthdate;
 }

@@ -6,7 +6,7 @@ import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.schedules.model.WorkTime;
 import com.documed.backend.visits.model.Visit;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.*;
 
@@ -40,7 +40,7 @@ public class User {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull private AccountStatus accountStatus;
 
-  @Schema private Date birthDate;
+  @Schema private LocalDate birthDate;
 
   @Schema private String pwzNumber;
 

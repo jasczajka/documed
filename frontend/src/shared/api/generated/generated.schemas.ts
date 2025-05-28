@@ -99,13 +99,14 @@ export interface VisitDTO {
   recommendations?: string;
   totalCost?: number;
   facilityId: number;
-  serviceName: string;
   serviceId: number;
+  serviceName: string;
   patientInformation?: string;
-  patientFullName: string;
   patientId: number;
-  doctorFullName: string;
+  patientFullName: string;
+  patientBirthDate: string;
   doctorId: number;
+  doctorFullName: string;
   date?: string;
   startTime?: string;
   endTime?: string;

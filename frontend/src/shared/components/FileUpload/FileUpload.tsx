@@ -239,6 +239,7 @@ export const FileUpload: FC<FileUploadProps> = ({
             onDelete={() => handleDeleteAcceptedFile(file)}
             onConfirmUpload={() => handleConfirmUpload(file.file)}
             loading={uploadFileLoading}
+            disabled={disabled}
           />
         ))}
       </Box>
@@ -252,6 +253,7 @@ export const FileUpload: FC<FileUploadProps> = ({
             errorMessage={errors?.join(', ')}
             onDelete={() => handleDeleteRejectedFile(file)}
             loading={uploadFileLoading}
+            disabled={disabled}
           />
         ))}
       </Box>

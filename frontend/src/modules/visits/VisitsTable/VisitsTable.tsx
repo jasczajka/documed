@@ -3,12 +3,14 @@ import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 
 import { endOfDay, format, parse, startOfDay } from 'date-fns';
 import { FC, useCallback, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { Service, VisitDTO, VisitStatus } from 'shared/api/generated/generated.schemas';
 import { appConfig } from 'shared/appConfig';
 import { ReviewModal } from 'shared/components/ReviewModal';
 import { TableFilters } from 'shared/components/TableFilters';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
+import { useSitemap } from 'shared/hooks/useSitemap';
 import { useVisitsTable } from './useVisitsTable';
 
 export type VisitsFilters = {
@@ -23,7 +25,6 @@ export type VisitsFilters = {
 interface VisitTableProps {
   visits: VisitDTO[];
   allServices: Service[];
-  onEdit?: (id: number) => void;
   onCancel: (id: number) => void;
   patientId?: number;
   doctorId?: number;
@@ -32,7 +33,7 @@ interface VisitTableProps {
 
 const columns = (
   onCancel: (id: number) => void,
-  onEdit?: (id: number) => void,
+  onNavigateToVisit: (id: number) => void,
   onAddReview?: (id: number, doctorFullName: string) => void,
   showReviewOption?: boolean,
   loading?: boolean,
@@ -107,8 +108,8 @@ const columns = (
       return [
         <GridActionsCellItem
           key={`begin-${params.row.id}`}
-          label="Rozpocznij wizytę"
-          onClick={() => onEdit?.(params.row.id)}
+          label="Przejdź do wizyty"
+          onClick={() => onNavigateToVisit(params.row.id)}
           showInMenu
         />,
         <GridActionsCellItem
@@ -137,7 +138,6 @@ const columns = (
 export const VisitsTable: FC<VisitTableProps> = ({
   visits,
   allServices,
-  onEdit,
   onCancel,
   loading,
   patientId,
@@ -153,6 +153,8 @@ export const VisitsTable: FC<VisitTableProps> = ({
   });
 
   const { isPatient } = useAuth();
+  const navigate = useNavigate();
+  const sitemap = useSitemap();
   const { visitsFilterConfig, filteredVisits } = useVisitsTable({
     visits,
     filters,
@@ -193,6 +195,13 @@ export const VisitsTable: FC<VisitTableProps> = ({
     [openModal, closeModal],
   );
 
+  const onNavigateToVisit = useCallback(
+    (id: number) => {
+      navigate(sitemap.visit(id));
+    },
+    [navigate],
+  );
+
   const resetFilters = useCallback(() => {
     setFilters({
       status: '',
@@ -221,7 +230,7 @@ export const VisitsTable: FC<VisitTableProps> = ({
         <DataGrid
           getRowClassName={(params) => (params.row.status === 'CANCELLED' ? 'cancelled-visit' : '')}
           rows={filteredVisits}
-          columns={columns(onCancel, onEdit, handleAddReviewClick, isPatient, loading)}
+          columns={columns(onCancel, onNavigateToVisit, handleAddReviewClick, isPatient, loading)}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },

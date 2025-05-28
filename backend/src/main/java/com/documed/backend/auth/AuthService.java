@@ -11,7 +11,6 @@ import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
 import com.documed.backend.users.services.UserService;
 import com.documed.backend.visits.FacilityService;
-import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -105,7 +104,7 @@ public class AuthService {
               .password(passwordEncoder.encode(password))
               .accountStatus(AccountStatus.PENDING_CONFIRMATION)
               .role(UserRole.valueOf(role))
-              .birthDate(Date.valueOf(birthDate))
+              .birthDate(birthDate)
               .build();
 
       User createdUser = userService.createPendingUser(user);

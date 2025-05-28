@@ -1,8 +1,7 @@
 import { useAuthStore } from './stores/useAuthStore';
 
-// this buidler will be used later in development to use query params (e.g. patient/:id)
 export const buildUrl = (parts: string[], queryParams?: Record<string, string | undefined>) => {
-  const path = parts.filter(Boolean).join('/');
+  const path = '/' + parts.filter(Boolean).join('/');
 
   if (!queryParams) {
     return path;
@@ -25,6 +24,7 @@ export const buildUrl = (parts: string[], queryParams?: Record<string, string | 
 const authSitemap = Object.freeze({
   main: '/',
   visits: '/visits',
+  visit: (id: number) => buildUrl(['visits', String(id)]),
   additionalServices: '/additional-services',
   patients: '/patients',
   specialists: '/specialists',
@@ -40,6 +40,7 @@ const authSitemap = Object.freeze({
 const defaultSitemap = Object.freeze({
   main: '/',
   visits: '/',
+  visit: (_id: number) => '/',
   additionalServices: '/',
   patients: '/',
   specialists: '/',

@@ -4,7 +4,7 @@ export interface AppConfig {
   snackBarDuration: number;
   timeSlotLengthInMinutes: number;
   maxAdditionalInfoVisitLength: number;
-  maxDescriptionAdditionalServiceLength: number;
+  maxTextFieldLength: number;
 }
 
 export const appConfig: AppConfig = {
@@ -13,5 +13,5 @@ export const appConfig: AppConfig = {
   snackBarDuration: 10000,
   timeSlotLengthInMinutes: 15,
   maxAdditionalInfoVisitLength: 255,
-  maxDescriptionAdditionalServiceLength: 5000,
+  maxTextFieldLength: 5000,
 };

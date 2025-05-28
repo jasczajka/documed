@@ -38,9 +38,10 @@ public class UserDAO implements FullDAO<User, User> {
               .password(rs.getString("password"))
               .accountStatus(AccountStatus.valueOf(rs.getString("account_status")))
               .role(UserRole.valueOf(rs.getString("role")))
-              .birthDate(rs.getDate("birthdate"))
               .emailNotifications(rs.getBoolean("email_notifications"))
               // Optional fields
+              .birthDate(
+                  rs.getDate("birthdate") != null ? rs.getDate("birthdate").toLocalDate() : null)
               .pesel(rs.getString("pesel"))
               .phoneNumber(rs.getString("phone_number"))
               .pwzNumber(rs.getString("pwz"))
@@ -84,7 +85,7 @@ public class UserDAO implements FullDAO<User, User> {
             user.getRole().toString(),
             user.getPesel(),
             user.getPhoneNumber(),
-            user.getBirthDate() != null ? new java.sql.Date(user.getBirthDate().getTime()) : null,
+            user.getBirthDate() != null ? java.sql.Date.valueOf(user.getBirthDate()) : null,
             user.getPwzNumber());
 
     return getById(generatedId)
@@ -110,7 +111,7 @@ public class UserDAO implements FullDAO<User, User> {
             user.getRole().toString(),
             user.getPesel(),
             user.getPhoneNumber(),
-            user.getBirthDate() != null ? new java.sql.Date(user.getBirthDate().getTime()) : null,
+            user.getBirthDate() != null ? java.sql.Date.valueOf(user.getBirthDate()) : null,
             user.getPwzNumber(),
             user.getId());
 
@@ -171,7 +172,7 @@ public class UserDAO implements FullDAO<User, User> {
             user.getRole().toString(),
             user.getPesel(),
             user.getPhoneNumber(),
-            user.getBirthDate() != null ? new java.sql.Date(user.getBirthDate().getTime()) : null,
+            user.getBirthDate() != null ? java.sql.Date.valueOf(user.getBirthDate()) : null,
             user.getPwzNumber());
 
     return getById(generatedId)

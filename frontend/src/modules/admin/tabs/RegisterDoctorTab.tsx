@@ -4,7 +4,7 @@ import { FC } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useRegisterDoctor } from 'shared/api/generated/auth-controller/auth-controller';
 import { useGetAllSpecializations } from 'shared/api/generated/specialization-controller/specialization-controller';
-import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
+import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { SpecializationSelect } from 'shared/components/SpecializationSelect';
 import { useNotification } from 'shared/hooks/useNotification';
 import { mapAuthError } from 'shared/utils/mapAuthError';
