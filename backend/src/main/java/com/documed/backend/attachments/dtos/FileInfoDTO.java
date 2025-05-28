@@ -16,4 +16,7 @@ public class FileInfoDTO {
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NotNull(message = "Nazwa pliku jest wymagana") private String fileName;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private long sizeBytes;
 }

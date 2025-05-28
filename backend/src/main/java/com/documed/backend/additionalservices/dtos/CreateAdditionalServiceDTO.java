@@ -3,7 +3,7 @@ package com.documed.backend.additionalservices.dtos;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +15,7 @@ public class CreateAdditionalServiceDTO {
   @NotBlank() private String description;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  @NotNull() private Date date;
+  @NotNull() private LocalDate date;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NotNull() private Integer fulfillerId;

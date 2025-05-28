@@ -228,10 +228,9 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
               <Autocomplete
                 disabled={!selectedServiceId || loading}
                 options={availableDoctorsForChosenService}
-                getOptionLabel={(option) => `d ${option.firstName} ${option.lastName}`}
+                getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
                 onChange={(_, newValue) => {
                   field.onChange(newValue?.id);
-                  console.log('new value id: ', newValue?.id);
                   resetField('visitDate');
                   if (newValue?.id) {
                     refetchTimeSlots();

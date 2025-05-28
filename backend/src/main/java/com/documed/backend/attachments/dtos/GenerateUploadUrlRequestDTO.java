@@ -10,7 +10,7 @@ import lombok.Data;
 @Builder
 public class GenerateUploadUrlRequestDTO {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  @Positive @NotNull(message = "Rozmiar pliku jest wymagany") private Long fileSizeBytes;
+  @Positive @NotNull(message = "Rozmiar pliku jest wymagany") private Long sizeBytes;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NotNull(message = "Nazwa pliku jest wymagana") private String fileName;

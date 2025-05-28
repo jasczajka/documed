@@ -58,9 +58,19 @@ export interface AdditionalServiceReturnDTO {
   description?: string;
   date: string;
   fulfillerId: number;
+  fulfillerFullName: string;
   patientId: number;
+  patientFullName: string;
   serviceId: number;
-  attachmentUrls: string[];
+  serviceName: string;
+  attachments: FileInfoDTO[];
+}
+
+export interface FileInfoDTO {
+  id: number;
+  downloadUrl: string;
+  fileName: string;
+  sizeBytes: number;
 }
 
 export interface ScheduleVisitDTO {
@@ -99,6 +109,12 @@ export interface VisitDTO {
   date?: string;
   startTime?: string;
   endTime?: string;
+}
+
+export interface Subscription {
+  id?: number;
+  name?: string;
+  price?: number;
 }
 
 export type CreateServiceDTOType = (typeof CreateServiceDTOType)[keyof typeof CreateServiceDTOType];
@@ -334,7 +350,7 @@ export interface ChangePasswordRequestDTO {
 }
 
 export interface GenerateUploadUrlRequestDTO {
-  fileSizeBytes: number;
+  sizeBytes: number;
   fileName: string;
   visitId?: number;
   additionalServiceId?: number;
@@ -387,6 +403,12 @@ export interface AvailableTimeSlotDTO {
   doctorId: number;
   startTime: string;
   busy?: boolean;
+}
+
+export interface SubscriptionToService {
+  subscriptionId?: number;
+  serviceId?: number;
+  discount?: number;
 }
 
 export interface MedicineWithAmount {
@@ -470,13 +492,12 @@ export interface MeDTO {
   role: MeDTORole;
 }
 
-export interface FileInfoDTO {
-  id: number;
-  downloadUrl: string;
-  fileName: string;
-}
+export type GetAllSubscriptions200 = { [key: string]: unknown };
 
-export type UpdateDescription200 = { [key: string]: unknown };
+export type CreateSubscriptionParams = {
+  name: string;
+  price: number;
+};
 
 export type AddMedicineToPrescriptionParams = {
   amount?: number;

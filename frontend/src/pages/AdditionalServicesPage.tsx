@@ -1,13 +1,13 @@
 import { CardHeader } from '@mui/material';
 import { FC } from 'react';
 
-const VisitsPage: FC = () => {
+const AdditionalServicesPage: FC = () => {
   return (
     <div className="flex flex-col">
-      <CardHeader title={'Wizyty'} />
+      <CardHeader title={'Usługi Dodatkowe'} />
       {/* <VisitsTable visits={exampleVisits} /> */}
     </div>
   );
 };
 
-export default VisitsPage;
+export default AdditionalServicesPage;

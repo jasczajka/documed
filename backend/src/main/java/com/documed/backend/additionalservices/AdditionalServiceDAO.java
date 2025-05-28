@@ -2,10 +2,8 @@ package com.documed.backend.additionalservices;
 
 import com.documed.backend.FullDAO;
 import com.documed.backend.additionalservices.model.AdditionalService;
-import com.documed.backend.exceptions.NotFoundException;
-import com.documed.backend.services.ServiceDAO;
-import com.documed.backend.users.UserDAO;
-import java.util.Date;
+import com.documed.backend.exceptions.CreationFailException;
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,14 +14,10 @@ import org.springframework.stereotype.Repository;
 public class AdditionalServiceDAO implements FullDAO<AdditionalService, AdditionalService> {
 
   private final JdbcTemplate jdbcTemplate;
-  private final UserDAO userDAO;
-  private final ServiceDAO serviceDAO;
   private final RowMapper<AdditionalService> rowMapper;
 
-  public AdditionalServiceDAO(JdbcTemplate jdbcTemplate, UserDAO userDAO, ServiceDAO serviceDAO) {
+  public AdditionalServiceDAO(JdbcTemplate jdbcTemplate) {
     this.jdbcTemplate = jdbcTemplate;
-    this.userDAO = userDAO;
-    this.serviceDAO = serviceDAO;
     this.rowMapper = createRowMapper();
   }
 
@@ -32,19 +26,10 @@ public class AdditionalServiceDAO implements FullDAO<AdditionalService, Addition
         AdditionalService.builder()
             .id(rs.getInt("id"))
             .description(rs.getString("description"))
-            .date(new java.util.Date(rs.getDate("date").getTime()))
-            .fulfiller(
-                userDAO
-                    .getById(rs.getInt("fulfiller_id"))
-                    .orElseThrow(() -> new NotFoundException("Fulfiller not found")))
-            .patient(
-                userDAO
-                    .getById(rs.getInt("patient_id"))
-                    .orElseThrow(() -> new NotFoundException("Patient not found")))
-            .service(
-                serviceDAO
-                    .getById(rs.getInt("service_id"))
-                    .orElseThrow(() -> new NotFoundException("Service not found")))
+            .date(rs.getDate("date").toLocalDate())
+            .fulfillerId(rs.getInt("fulfiller_id"))
+            .patientId(rs.getInt("patient_id"))
+            .serviceId(rs.getInt("service_id"))
             .build();
   }
 
@@ -59,14 +44,13 @@ public class AdditionalServiceDAO implements FullDAO<AdditionalService, Addition
             sql,
             (rs, rowNum) -> rs.getInt("id"),
             additionalService.getDescription(),
-            new Date(additionalService.getDate().getTime()),
-            additionalService.getFulfiller().getId(),
-            additionalService.getPatient().getId(),
-            additionalService.getService().getId());
-
+            Date.valueOf(additionalService.getDate()),
+            additionalService.getFulfillerId(),
+            additionalService.getPatientId(),
+            additionalService.getServiceId());
     return getById(generatedId)
         .orElseThrow(
-            () -> new IllegalStateException("Failed to retrieve created additional service"));
+            () -> new CreationFailException("Failed to retrieve created additional service"));
   }
 
   @Override

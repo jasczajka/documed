@@ -25,6 +25,7 @@ export const buildUrl = (parts: string[], queryParams?: Record<string, string | 
 const authSitemap = Object.freeze({
   main: '/',
   visits: '/visits',
+  additionalServices: '/additional-services',
   patients: '/patients',
   specialists: '/specialists',
   prescriptions: '/prescriptions',
@@ -39,6 +40,7 @@ const authSitemap = Object.freeze({
 const defaultSitemap = Object.freeze({
   main: '/',
   visits: '/',
+  additionalServices: '/',
   patients: '/',
   specialists: '/',
   prescriptions: '/',

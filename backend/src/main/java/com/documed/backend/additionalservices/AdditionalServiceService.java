@@ -4,6 +4,7 @@ import com.documed.backend.additionalservices.model.AdditionalService;
 import com.documed.backend.attachments.AttachmentDAO;
 import com.documed.backend.attachments.S3Service;
 import com.documed.backend.attachments.model.Attachment;
+import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.exceptions.InvalidAssignmentException;
 import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.services.ServiceDAO;
@@ -11,7 +12,7 @@ import com.documed.backend.services.model.ServiceType;
 import com.documed.backend.users.UserDAO;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,38 +28,32 @@ public class AdditionalServiceService {
   private final ServiceDAO serviceDAO;
 
   public List<AdditionalService> getAll() {
-    List<AdditionalService> services = additionalServiceDAO.getAll();
-    enrichWithAttachmentUrls(services);
-    return services;
+    return additionalServiceDAO.getAll();
   }
 
   public AdditionalService getById(int additionalServiceId) {
-    AdditionalService additionalService =
-        additionalServiceDAO
-            .getById(additionalServiceId)
-            .orElseThrow(() -> new NotFoundException("Additional service not found"));
-    List<String> attachmentGetUrls =
-        this.s3Service.generatePresignedGetUrlsForAdditionalService(additionalServiceId);
-    additionalService.setAttachmentUrls(attachmentGetUrls);
-    return additionalService;
+    return additionalServiceDAO
+        .getById(additionalServiceId)
+        .orElseThrow(() -> new NotFoundException("Additional service not found"));
   }
 
   @Transactional
   public AdditionalService createAdditionalService(
-      String description, Date date, int fulfillerId, int patientId, int serviceId) {
+      String description, LocalDate date, int patientId, int fulfillerId, int serviceId) {
 
     User fulfiller =
         userDAO
             .getById(fulfillerId)
             .orElseThrow(() -> new NotFoundException("Fulfiller not found"));
+
     if (fulfiller.getRole() == UserRole.PATIENT) {
-      throw new InvalidAssignmentException("Patient cannot be a fulfiller");
+      throw new BadRequestException("Patient cannot be a fulfiller");
     }
 
     User patient =
         userDAO.getById(patientId).orElseThrow(() -> new NotFoundException("Patient not found"));
     if (patient.getRole() != UserRole.PATIENT) {
-      throw new InvalidAssignmentException("Patient has to be a patient");
+      throw new BadRequestException("Patient has to be a patient");
     }
 
     com.documed.backend.services.model.Service service =
@@ -71,9 +66,9 @@ public class AdditionalServiceService {
         AdditionalService.builder()
             .description(description)
             .date(date)
-            .fulfiller(fulfiller)
-            .patient(patient)
-            .service(service)
+            .fulfillerId(fulfillerId)
+            .patientId(patientId)
+            .serviceId(serviceId)
             .build();
 
     AdditionalService createdService = additionalServiceDAO.create(additionalService);
@@ -93,21 +88,18 @@ public class AdditionalServiceService {
   public List<AdditionalService> getByFulfiller(int fulfillerId) {
     userDAO.getById(fulfillerId).orElseThrow(() -> new NotFoundException("Fulfiller not found"));
     List<AdditionalService> services = additionalServiceDAO.getByFulfillerId(fulfillerId);
-    enrichWithAttachmentUrls(services);
     return services;
   }
 
   public List<AdditionalService> getByService(int serviceId) {
     serviceDAO.getById(serviceId).orElseThrow(() -> new NotFoundException("Service not found"));
     List<AdditionalService> services = additionalServiceDAO.getByServiceId(serviceId);
-    enrichWithAttachmentUrls(services);
     return services;
   }
 
   public List<AdditionalService> getByPatient(int patientId) {
     userDAO.getById(patientId).orElseThrow(() -> new NotFoundException("Patient not found"));
     List<AdditionalService> services = additionalServiceDAO.getByPatientId(patientId);
-    enrichWithAttachmentUrls(services);
     return services;
   }
 
@@ -135,14 +127,5 @@ public class AdditionalServiceService {
         .getById(id)
         .orElseThrow(() -> new NotFoundException("Additional service not found"));
     this.additionalServiceDAO.updateDescription(id, newDescription);
-  }
-
-  private void enrichWithAttachmentUrls(List<AdditionalService> services) {
-    services.forEach(
-        service -> {
-          List<String> urls =
-              s3Service.generatePresignedGetUrlsForAdditionalService(service.getId());
-          service.setAttachmentUrls(urls);
-        });
   }
 }
