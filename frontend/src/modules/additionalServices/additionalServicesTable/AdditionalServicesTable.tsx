@@ -1,4 +1,4 @@
-import { Box, Button, Link, Paper } from '@mui/material';
+import { Box, Button, Link, Paper, Typography } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 
 import { endOfDay, format, startOfDay } from 'date-fns';
@@ -49,6 +49,7 @@ const columns = (
     },
   ) => void,
   onNavigateToPatient: (id: number) => void,
+  isPatient: boolean,
 ): GridColDef<AdditionalServiceReturnDTO>[] => [
   {
     field: 'index',
@@ -62,17 +63,20 @@ const columns = (
     headerName: 'Pacjent',
     minWidth: 200,
     flex: 1,
-    renderCell: ({ row }) => (
-      <Link
-        component="button"
-        onClick={() => onNavigateToPatient(row.patientId)}
-        underline="hover"
-        color="primary"
-        sx={{ cursor: 'pointer', fontWeight: 500 }}
-      >
-        {row.patientFullName}
-      </Link>
-    ),
+    renderCell: ({ row }) =>
+      isPatient ? (
+        <Typography>{row.patientFullName}</Typography>
+      ) : (
+        <Link
+          component="button"
+          onClick={() => onNavigateToPatient(row.patientId)}
+          underline="hover"
+          color="primary"
+          sx={{ cursor: 'pointer', fontWeight: 500 }}
+        >
+          {row.patientFullName}
+        </Link>
+      ),
   },
   {
     field: 'date',
@@ -226,7 +230,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
       <Paper sx={{ flexGrow: 1 }}>
         <DataGrid
           rows={filteredAdditionalServices}
-          columns={columns(handleEditClick, onNavigateToPatient)}
+          columns={columns(handleEditClick, onNavigateToPatient, isPatient)}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },

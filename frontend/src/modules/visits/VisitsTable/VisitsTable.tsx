@@ -1,4 +1,4 @@
-import { Box, Button, Link, Paper } from '@mui/material';
+import { Box, Button, Link, Paper, Typography } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 
 import { endOfDay, format, parse, startOfDay } from 'date-fns';
@@ -35,6 +35,7 @@ const columns = (
   onCancel: (id: number) => void,
   onNavigateToVisit: (id: number) => void,
   onNavigateToPatient: (id: number) => void,
+  isPatient: boolean,
   onAddReview?: (id: number, doctorFullName: string) => void,
   showReviewOption?: boolean,
   loading?: boolean,
@@ -51,17 +52,20 @@ const columns = (
     headerName: 'Pacjent',
     minWidth: 200,
     flex: 1,
-    renderCell: ({ row }) => (
-      <Link
-        component="button"
-        onClick={() => onNavigateToPatient(row.patientId)}
-        underline="hover"
-        color="primary"
-        sx={{ cursor: 'pointer', fontWeight: 500 }}
-      >
-        {row.patientFullName}
-      </Link>
-    ),
+    renderCell: ({ row }) =>
+      isPatient ? (
+        <Typography>{row.patientFullName}</Typography>
+      ) : (
+        <Link
+          component="button"
+          onClick={() => onNavigateToPatient(row.patientId)}
+          underline="hover"
+          color="primary"
+          sx={{ cursor: 'pointer', fontWeight: 500 }}
+        >
+          {row.patientFullName}
+        </Link>
+      ),
   },
   {
     field: 'date',
@@ -252,6 +256,7 @@ export const VisitsTable: FC<VisitTableProps> = ({
             onCancel,
             onNavigateToVisit,
             onNavigateToPatient,
+            isPatient,
             handleAddReviewClick,
             isPatient,
             loading,
