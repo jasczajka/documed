@@ -2,6 +2,7 @@ package com.documed.backend.prescriptions;
 
 import com.documed.backend.auth.AuthService;
 import com.documed.backend.auth.annotations.StaffOnly;
+import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
 import com.documed.backend.auth.exceptions.UnauthorizedException;
 import com.documed.backend.medicines.model.Medicine;
 import com.documed.backend.medicines.model.MedicineWithAmount;
@@ -29,15 +30,25 @@ public class PrescriptionController {
     return new ResponseEntity<>(prescriptionService.createPrescription(visitId), HttpStatus.OK);
   }
 
-  @StaffOnly
   @GetMapping("/visit/{visit_id}")
   @Operation(summary = "Get Prescription For Visit")
   public ResponseEntity<Optional<Prescription>> getPrescriptionForVisit(
       @PathVariable("visit_id") int visitId) {
     Optional<Prescription> prescription = prescriptionService.getPrescriptionForVisit(visitId);
+    if (prescription.isPresent()) {
+      int userId = authService.getCurrentUserId();
+      int prescriptionUserId =
+          prescriptionService.getUserIdForPrescriptionById(prescription.get().getId());
+      UserRole userRole = authService.getCurrentUserRole();
+      if (userRole == UserRole.PATIENT && prescriptionUserId != userId) {
+        throw new UnauthorizedException("This patient has no access to this prescription");
+      }
+    }
+
     return ResponseEntity.ok(prescription);
   }
 
+  @StaffOnlyOrSelf
   @GetMapping("/user/{user_id}")
   public ResponseEntity<List<Prescription>> getPrescriptionsForUser(
       @PathVariable("user_id") int userId) {
