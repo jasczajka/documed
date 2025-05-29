@@ -193,6 +193,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
           mode="edit"
           existingServiceData={existingServiceData}
           refetch={refetch}
+          readOnly={isPatient}
         />,
       );
     },

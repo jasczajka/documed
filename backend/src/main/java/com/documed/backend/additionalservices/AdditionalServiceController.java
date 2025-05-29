@@ -114,9 +114,8 @@ public class AdditionalServiceController {
   @PutMapping("/{id}/attachments")
   public ResponseEntity<AdditionalServiceWithDetails> updateAdditionalServiceAttachments(
       @PathVariable int id, @RequestBody @Valid UpdateAttachmentsDTO updateDto) {
-    AdditionalService updatedService =
-        additionalServiceService.updateAttachmentsForAdditionalService(
-            id, updateDto.getAttachmentIds());
+    additionalServiceService.updateAttachmentsForAdditionalService(
+        id, updateDto.getAttachmentIds());
 
     return ResponseEntity.ok(
         this.enrichAdditionalServiceToDto(additionalServiceService.getByIdWithDetails(id)));

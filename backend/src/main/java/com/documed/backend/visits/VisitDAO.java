@@ -113,13 +113,13 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
 
   public List<VisitWithDetails> findAllWithDetails() {
     String sql =
-        getVisitDetailsBaseQuery() + " ORDER BY v.id DESC, first_ts.date, first_ts.start_time";
+        VISIT_DETAILS_BASE_QUERY + " ORDER BY v.id DESC, first_ts.date, first_ts.start_time";
     return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper());
   }
 
   public Optional<VisitWithDetails> findByIdWithDetails(int id) {
     String sql =
-        getVisitDetailsBaseQuery()
+        VISIT_DETAILS_BASE_QUERY
             + " WHERE v.id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
     List<VisitWithDetails> visits = jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), id);
     return visits.stream().findFirst();
@@ -127,14 +127,14 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
 
   public List<VisitWithDetails> findByPatientIdWithDetails(int patientId) {
     String sql =
-        getVisitDetailsBaseQuery()
+        VISIT_DETAILS_BASE_QUERY
             + " WHERE v.patient_id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
     return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), patientId);
   }
 
   public List<VisitWithDetails> findByDoctorIdWithDetails(int doctorId) {
     String sql =
-        getVisitDetailsBaseQuery()
+        VISIT_DETAILS_BASE_QUERY
             + " WHERE v.doctor_id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
     return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), doctorId);
   }
@@ -142,7 +142,7 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
   public List<VisitWithDetails> findByPatientIdAndFacilityIdWithDetails(
       int patientId, int facilityId) {
     String sql =
-        getVisitDetailsBaseQuery()
+        VISIT_DETAILS_BASE_QUERY
             + " WHERE v.patient_id = ? AND v.facility_id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
     return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), patientId, facilityId);
   }
@@ -150,7 +150,7 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
   public List<VisitWithDetails> findByDoctorIdAndFacilityIdWithDetails(
       int doctorId, int facilityId) {
     String sql =
-        getVisitDetailsBaseQuery()
+        VISIT_DETAILS_BASE_QUERY
             + " WHERE v.doctor_id = ? AND v.facility_id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
     return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), doctorId, facilityId);
   }
@@ -216,8 +216,8 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
         .orElseThrow();
   }
 
-  private String getVisitDetailsBaseQuery() {
-    return """
+  private static final String VISIT_DETAILS_BASE_QUERY =
+      """
            SELECT
                v.*,
                p.first_name AS patient_first_name,
@@ -250,5 +250,4 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
                LIMIT 1
            ) last_ts ON true
            """;
-  }
 }
