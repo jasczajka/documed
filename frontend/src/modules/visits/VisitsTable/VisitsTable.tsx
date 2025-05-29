@@ -27,6 +27,7 @@ interface VisitTableProps {
   allServices: Service[];
   onCancel: (id: number) => void;
   patientId?: number;
+  patientPesel?: string;
   doctorId?: number;
   loading?: boolean;
 }

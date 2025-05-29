@@ -104,7 +104,6 @@ export const PatientTabs: FC<PatientTabsProps> = ({
             allServices={allServices}
             onCancel={handleCancelVisitClick}
             loading={isCancelVisitLoading}
-            patientId={patientInfo.patientId}
           />
         )}
         {tabIndex === 2 && (
@@ -113,7 +112,6 @@ export const PatientTabs: FC<PatientTabsProps> = ({
             allAdditionalServices={allAdditionalServices}
             loading={isCancelVisitLoading}
             refetch={refetchAdditionalServices}
-            patientId={patientInfo.patientId}
           />
         )}
         {tabIndex === 3 && (

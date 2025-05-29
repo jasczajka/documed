@@ -47,6 +47,7 @@ const columns = (
       existingAttachments: FileInfoDTO[];
       description?: string;
     },
+    patientPesel?: string,
   ) => void,
   onNavigateToPatient: (id: number) => void,
   isPatient: boolean,
@@ -111,12 +112,19 @@ const columns = (
           key={`begin-${params.row.id}`}
           label="Wyświetl szczegóły"
           onClick={() =>
-            onEdit(params.row.fulfillerId, params.row.patientId, params.row.patientFullName, 12, {
-              id: params.row.id,
-              serviceId: params.row.serviceId,
-              existingAttachments: params.row.attachments,
-              description: params.row.description,
-            })
+            onEdit(
+              params.row.fulfillerId,
+              params.row.patientId,
+              params.row.patientFullName,
+              12,
+              {
+                id: params.row.id,
+                serviceId: params.row.serviceId,
+                existingAttachments: params.row.attachments,
+                description: params.row.description,
+              },
+              params.row.patientPesel,
+            )
           }
           showInMenu
         />,
@@ -165,12 +173,14 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
         existingAttachments: FileInfoDTO[];
         description?: string;
       },
+      patientPesel?: string,
     ) => {
       openModal(
         'editAdditionalServiceModal',
         <AdditionalServiceModal
           allAdditionalServices={allAdditionalServices}
           patientId={patientId}
+          patientPesel={patientPesel}
           fulfillerId={fulfillerId}
           patientFullName={patientFullName}
           patientAge={patientAge}
@@ -183,6 +193,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
           mode="edit"
           existingServiceData={existingServiceData}
           refetch={refetch}
+          readOnly={isPatient}
         />,
       );
     },

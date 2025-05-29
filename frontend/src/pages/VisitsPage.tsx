@@ -4,7 +4,7 @@ import { FC, useEffect } from 'react';
 import { useGetAllServices } from 'shared/api/generated/service-controller/service-controller';
 import {
   useGetAllVisits,
-  useGetVisitsByPatientId,
+  useGetVisitsForCurrentPatient,
 } from 'shared/api/generated/visit-controller/visit-controller';
 import CancelVisitModal from 'shared/components/ConfirmationModal/CancelVisitModal';
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
@@ -25,7 +25,7 @@ const VisitsPage: FC = () => {
     data: patientVisits,
     isLoading: isPatientVisitsLoading,
     isError: isPatientVisitsError,
-  } = useGetVisitsByPatientId(user.id, { query: { enabled: isPatient } });
+  } = useGetVisitsForCurrentPatient({ query: { enabled: isPatient } });
 
   const {
     data: allVisits,

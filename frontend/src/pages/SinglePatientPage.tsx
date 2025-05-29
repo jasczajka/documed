@@ -104,6 +104,7 @@ const SinglePatientPage: FC = () => {
         'createAdditionalServiceModal',
         <AdditionalServiceModal
           allAdditionalServices={allAdditionalServices}
+          patientPesel={patientInfo?.pesel}
           patientId={patientId}
           fulfillerId={fulfillerId}
           patientFullName={`${patientInfo?.firstName} ${patientInfo?.lastName}`}

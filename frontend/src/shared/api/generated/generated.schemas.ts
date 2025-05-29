@@ -61,6 +61,7 @@ export interface AdditionalServiceWithDetails {
   fulfillerFullName: string;
   patientId: number;
   patientFullName: string;
+  patientPesel: string;
   serviceId: number;
   serviceName: string;
   attachments: FileInfoDTO[];
@@ -105,6 +106,7 @@ export interface VisitWithDetails {
   patientInformation?: string;
   patientId: number;
   patientFullName: string;
+  patientPesel: string;
   patientBirthDate: string;
   doctorId: number;
   doctorFullName: string;
@@ -430,6 +432,7 @@ export interface PatientDetailsDTO {
   firstName: string;
   lastName: string;
   email: string;
+  pesel: string;
   birthdate: string;
 }
 

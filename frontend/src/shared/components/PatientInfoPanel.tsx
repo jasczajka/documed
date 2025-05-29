@@ -3,12 +3,13 @@ import { FC } from 'react';
 
 export interface PatientInfoPanelProps {
   patientId: number;
+  patientPesel?: string;
   patientFullName: string;
   patientAge: number | null;
 }
 
 export const PatientInfoPanel: FC<PatientInfoPanelProps> = ({
-  patientId,
+  patientPesel,
   patientFullName,
   patientAge,
 }) => {
@@ -24,9 +25,11 @@ export const PatientInfoPanel: FC<PatientInfoPanelProps> = ({
         width: 'fit-content',
       }}
     >
-      <Typography>
-        Pacjent #<strong>{patientId}</strong>
-      </Typography>
+      {patientPesel && (
+        <Typography>
+          Pesel <strong>{patientPesel}</strong>
+        </Typography>
+      )}
       <Typography>
         Imię i nazwisko: <strong>{patientFullName}</strong>
       </Typography>
