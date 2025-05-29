@@ -1,4 +1,4 @@
-package com.documed.backend.visits.model;
+package com.documed.backend.visits.dtos;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

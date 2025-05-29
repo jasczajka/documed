@@ -1,6 +1,7 @@
 package com.documed.backend.additionalservices;
 
 import com.documed.backend.additionalservices.model.AdditionalService;
+import com.documed.backend.additionalservices.model.AdditionalServiceWithDetails;
 import com.documed.backend.attachments.AttachmentDAO;
 import com.documed.backend.attachments.S3Service;
 import com.documed.backend.attachments.model.Attachment;
@@ -26,6 +27,33 @@ public class AdditionalServiceService {
   private final AttachmentDAO attachmentDAO;
   private final UserDAO userDAO;
   private final ServiceDAO serviceDAO;
+
+  public List<AdditionalServiceWithDetails> getAllWithDetails() {
+    return additionalServiceDAO.findAllWithDetails();
+  }
+
+  public AdditionalServiceWithDetails getByIdWithDetails(int id) {
+    return additionalServiceDAO
+        .findByIdWithDetails(id)
+        .orElseThrow(() -> new NotFoundException("Additional service not found"));
+  }
+
+  public List<AdditionalServiceWithDetails> getByPatientIdWithDetails(int patientId) {
+    return additionalServiceDAO.findByPatientIdWithDetails(patientId);
+  }
+
+  public List<AdditionalServiceWithDetails> getByFulfillerIdWithDetails(int fulfillerId) {
+    return additionalServiceDAO.findByFulfillerIdWithDetails(fulfillerId);
+  }
+
+  public List<AdditionalServiceWithDetails> getByServiceIdWithDetails(int serviceId) {
+    return additionalServiceDAO.findByServiceIdWithDetails(serviceId);
+  }
+
+  public List<AdditionalServiceWithDetails> getByPatientIdAndFulfillerIdWithDetails(
+      int patientId, int fulfillerId) {
+    return additionalServiceDAO.findByPatientIdAndFulfillerIdWithDetails(patientId, fulfillerId);
+  }
 
   public List<AdditionalService> getAll() {
     return additionalServiceDAO.getAll();
@@ -71,9 +99,7 @@ public class AdditionalServiceService {
             .serviceId(serviceId)
             .build();
 
-    AdditionalService createdService = additionalServiceDAO.create(additionalService);
-
-    return createdService;
+    return additionalServiceDAO.create(additionalService);
   }
 
   @Transactional
@@ -87,20 +113,17 @@ public class AdditionalServiceService {
 
   public List<AdditionalService> getByFulfiller(int fulfillerId) {
     userDAO.getById(fulfillerId).orElseThrow(() -> new NotFoundException("Fulfiller not found"));
-    List<AdditionalService> services = additionalServiceDAO.getByFulfillerId(fulfillerId);
-    return services;
+    return additionalServiceDAO.getByFulfillerId(fulfillerId);
   }
 
   public List<AdditionalService> getByService(int serviceId) {
     serviceDAO.getById(serviceId).orElseThrow(() -> new NotFoundException("Service not found"));
-    List<AdditionalService> services = additionalServiceDAO.getByServiceId(serviceId);
-    return services;
+    return additionalServiceDAO.getByServiceId(serviceId);
   }
 
   public List<AdditionalService> getByPatient(int patientId) {
     userDAO.getById(patientId).orElseThrow(() -> new NotFoundException("Patient not found"));
-    List<AdditionalService> services = additionalServiceDAO.getByPatientId(patientId);
-    return services;
+    return additionalServiceDAO.getByPatientId(patientId);
   }
 
   @Transactional

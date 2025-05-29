@@ -32,6 +32,7 @@ interface FormData {
 
 interface AdditionalServiceModalProps {
   patientId: number;
+  patientPesel?: string;
   fulfillerId: number;
   patientFullName: string;
   patientAge: number | null;
@@ -65,6 +66,7 @@ const validationSchema = Yup.object().shape({
 
 export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
   patientId,
+  patientPesel,
   fulfillerId,
   patientFullName,
   patientAge,
@@ -177,6 +179,7 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
         </Typography>
         <PatientInfoPanel
           patientId={patientId}
+          patientPesel={patientPesel}
           patientFullName={patientFullName}
           patientAge={patientAge}
         />
@@ -229,7 +232,6 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
           />
         </DialogContent>
         <FileUpload
-          title={`Załączniki${mode === 'edit' ? ' - uwaga, załączniki są usuwane i dodawane od razu' : ''}`}
           onConfirmUpload={async (file) => {
             setOnConfirmLoading(true);
             const res = await uploadFile(file, undefined, existingServiceData?.id);

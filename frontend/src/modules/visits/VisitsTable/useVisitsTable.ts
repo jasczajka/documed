@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Service, VisitDTO, VisitStatus } from 'shared/api/generated/generated.schemas';
+import { Service, VisitStatus, VisitWithDetails } from 'shared/api/generated/generated.schemas';
 import { FilterConfig } from 'shared/components/TableFilters';
 import { VisitsFilters } from './VisitsTable';
 
@@ -68,7 +68,7 @@ export const useVisitsTable = ({
   patientId,
   doctorId,
 }: {
-  visits: VisitDTO[];
+  visits: VisitWithDetails[];
   filters: VisitsFilters;
   allServices: Service[];
   isPatient: boolean;
@@ -79,7 +79,7 @@ export const useVisitsTable = ({
     if (!filters.status) {
       return null;
     }
-    return (visit: VisitDTO) => visit.status.toString() === filters.status;
+    return (visit: VisitWithDetails) => visit.status.toString() === filters.status;
   }, [filters.status]);
 
   const filterByPatientName = useMemo(() => {
@@ -87,13 +87,13 @@ export const useVisitsTable = ({
       return null;
     }
     const searchTerm = filters.patientName.toLowerCase();
-    return (visit: VisitDTO) => visit.patientFullName.toLowerCase().includes(searchTerm);
+    return (visit: VisitWithDetails) => visit.patientFullName.toLowerCase().includes(searchTerm);
   }, [filters.patientName]);
 
   const filterByService = useMemo(() => {
     if (!filters.service) return null;
     const searchTerm = filters.service.toLowerCase();
-    return (visit: VisitDTO) => visit.serviceName.toLowerCase().includes(searchTerm);
+    return (visit: VisitWithDetails) => visit.serviceName.toLowerCase().includes(searchTerm);
   }, [filters.service]);
 
   const filterBySpecialist = useMemo(() => {
@@ -101,7 +101,7 @@ export const useVisitsTable = ({
       return null;
     }
     const searchTerm = filters.specialist.toLowerCase();
-    return (visit: VisitDTO) => {
+    return (visit: VisitWithDetails) => {
       return visit.doctorFullName.toLowerCase().includes(searchTerm);
     };
   }, [filters.specialist]);
@@ -111,7 +111,7 @@ export const useVisitsTable = ({
       return null;
     }
 
-    return (visit: VisitDTO) => {
+    return (visit: VisitWithDetails) => {
       if (!visit.date || !visit.startTime) {
         return false;
       }
@@ -134,7 +134,7 @@ export const useVisitsTable = ({
       filterByService,
       filterBySpecialist,
       filterByDateRange,
-    ].filter(Boolean) as ((visit: VisitDTO) => boolean)[];
+    ].filter(Boolean) as ((visit: VisitWithDetails) => boolean)[];
 
     if (activeFilters.length === 0) return visits;
 

@@ -4,6 +4,9 @@ import com.documed.backend.FullDAO;
 import com.documed.backend.exceptions.CreationFailException;
 import com.documed.backend.visits.model.Visit;
 import com.documed.backend.visits.model.VisitStatus;
+import com.documed.backend.visits.model.VisitWithDetails;
+import com.documed.backend.visits.model.VisitWithDetailsRowMapper;
+import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
@@ -21,21 +24,35 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
 
   private final JdbcTemplate jdbcTemplate;
 
-  private final RowMapper<Visit> rowMapper =
-      (rs, rowNum) ->
-          Visit.builder()
-              .id(rs.getInt("id"))
-              .status(VisitStatus.valueOf(rs.getString("status")))
-              .interview(rs.getString("interview"))
-              .diagnosis(rs.getString("diagnosis"))
-              .recommendations(rs.getString("recommendations"))
-              .totalCost(rs.getBigDecimal("total_cost"))
-              .facilityId(rs.getInt("facility_id"))
-              .serviceId(rs.getInt("service_id"))
-              .patientId(rs.getInt("patient_id"))
-              .patientInformation(rs.getString("patient_information"))
-              .doctorId(rs.getInt("doctor_id"))
-              .build();
+  private static final RowMapper<Visit> rowMapper =
+      (rs, rowNum) -> {
+        Visit.VisitBuilder builder =
+            Visit.builder()
+                .id(rs.getInt("id"))
+                .status(VisitStatus.valueOf(rs.getString("status")))
+                .facilityId(rs.getInt("facility_id"))
+                .serviceId(rs.getInt("service_id"))
+                .patientId(rs.getInt("patient_id"))
+                .doctorId(rs.getInt("doctor_id"));
+
+        // nullable
+        String interview = rs.getString("interview");
+        if (interview != null) builder.interview(interview);
+
+        String diagnosis = rs.getString("diagnosis");
+        if (diagnosis != null) builder.diagnosis(diagnosis);
+
+        String recommendations = rs.getString("recommendations");
+        if (recommendations != null) builder.recommendations(recommendations);
+
+        BigDecimal totalCost = rs.getBigDecimal("total_cost");
+        if (totalCost != null) builder.totalCost(totalCost);
+
+        String patientInfo = rs.getString("patient_information");
+        if (patientInfo != null) builder.patientInformation(patientInfo);
+
+        return builder.build();
+      };
 
   @Override
   public Visit create(Visit creationObject) {
@@ -86,7 +103,56 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
 
   @Override
   public List<Visit> getAll() {
-    return List.of();
+    String sql =
+        """
+          SELECT id, status, interview, diagnosis, recommendations, total_cost, facility_id, service_id, patient_information, patient_id, doctor_id
+          FROM visit
+         """;
+    return jdbcTemplate.query(sql, rowMapper);
+  }
+
+  public List<VisitWithDetails> findAllWithDetails() {
+    String sql =
+        VISIT_DETAILS_BASE_QUERY + " ORDER BY v.id DESC, first_ts.date, first_ts.start_time";
+    return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper());
+  }
+
+  public Optional<VisitWithDetails> findByIdWithDetails(int id) {
+    String sql =
+        VISIT_DETAILS_BASE_QUERY
+            + " WHERE v.id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
+    List<VisitWithDetails> visits = jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), id);
+    return visits.stream().findFirst();
+  }
+
+  public List<VisitWithDetails> findByPatientIdWithDetails(int patientId) {
+    String sql =
+        VISIT_DETAILS_BASE_QUERY
+            + " WHERE v.patient_id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
+    return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), patientId);
+  }
+
+  public List<VisitWithDetails> findByDoctorIdWithDetails(int doctorId) {
+    String sql =
+        VISIT_DETAILS_BASE_QUERY
+            + " WHERE v.doctor_id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
+    return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), doctorId);
+  }
+
+  public List<VisitWithDetails> findByPatientIdAndFacilityIdWithDetails(
+      int patientId, int facilityId) {
+    String sql =
+        VISIT_DETAILS_BASE_QUERY
+            + " WHERE v.patient_id = ? AND v.facility_id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
+    return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), patientId, facilityId);
+  }
+
+  public List<VisitWithDetails> findByDoctorIdAndFacilityIdWithDetails(
+      int doctorId, int facilityId) {
+    String sql =
+        VISIT_DETAILS_BASE_QUERY
+            + " WHERE v.doctor_id = ? AND v.facility_id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
+    return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), doctorId, facilityId);
   }
 
   public boolean updateVisitStatus(int visitId, VisitStatus status) {
@@ -142,4 +208,46 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
         .findFirst()
         .orElseThrow();
   }
+
+  public int getVisitPatientId(int visitId) {
+    String sql = "SELECT patient_id FROM visit WHERE id = ?";
+    return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("patient_id"), visitId).stream()
+        .findFirst()
+        .orElseThrow();
+  }
+
+  private static final String VISIT_DETAILS_BASE_QUERY =
+      """
+           SELECT
+               v.*,
+               p.first_name AS patient_first_name,
+               p.last_name AS patient_last_name,
+               p.birthdate AS patient_birth_date,
+               p.pesel AS patient_pesel,
+               d.first_name AS doctor_first_name,
+               d.last_name AS doctor_last_name,
+               s.id AS service_id,
+               s.name AS service_name,
+               first_ts.start_time AS timeslot_start,
+               last_ts.end_time AS timeslot_end,
+               first_ts.date AS timeslot_date
+           FROM visit v
+           JOIN "User" p ON v.patient_id = p.id
+           JOIN "User" d ON v.doctor_id = d.id
+           JOIN service s ON v.service_id = s.id
+           LEFT JOIN LATERAL (
+               SELECT ts.start_time, ts.date
+               FROM time_slot ts
+               WHERE ts.visit_id = v.id
+               ORDER BY ts.start_time ASC
+               LIMIT 1
+           ) first_ts ON true
+           LEFT JOIN LATERAL (
+               SELECT ts.end_time
+               FROM time_slot ts
+               WHERE ts.visit_id = v.id
+               ORDER BY ts.start_time DESC
+               LIMIT 1
+           ) last_ts ON true
+           """;
 }

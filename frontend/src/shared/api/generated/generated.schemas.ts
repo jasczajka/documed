@@ -53,7 +53,7 @@ export interface UpdateAttachmentsDTO {
   attachmentIds: number[];
 }
 
-export interface AdditionalServiceReturnDTO {
+export interface AdditionalServiceWithDetails {
   id: number;
   description?: string;
   date: string;
@@ -61,6 +61,7 @@ export interface AdditionalServiceReturnDTO {
   fulfillerFullName: string;
   patientId: number;
   patientFullName: string;
+  patientPesel: string;
   serviceId: number;
   serviceName: string;
   attachments: FileInfoDTO[];
@@ -81,19 +82,20 @@ export interface ScheduleVisitDTO {
   serviceId: number;
 }
 
-export type VisitDTOStatus = (typeof VisitDTOStatus)[keyof typeof VisitDTOStatus];
+export type VisitWithDetailsStatus =
+  (typeof VisitWithDetailsStatus)[keyof typeof VisitWithDetailsStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const VisitDTOStatus = {
+export const VisitWithDetailsStatus = {
   PLANNED: 'PLANNED',
   IN_PROGRESS: 'IN_PROGRESS',
   CLOSED: 'CLOSED',
   CANCELLED: 'CANCELLED',
 } as const;
 
-export interface VisitDTO {
+export interface VisitWithDetails {
   id: number;
-  status: VisitDTOStatus;
+  status: VisitWithDetailsStatus;
   interview?: string;
   diagnosis?: string;
   recommendations?: string;
@@ -104,6 +106,7 @@ export interface VisitDTO {
   patientInformation?: string;
   patientId: number;
   patientFullName: string;
+  patientPesel: string;
   patientBirthDate: string;
   doctorId: number;
   doctorFullName: string;
@@ -425,6 +428,7 @@ export interface PatientDetailsDTO {
   firstName: string;
   lastName: string;
   email: string;
+  pesel: string;
   birthdate: string;
 }
 

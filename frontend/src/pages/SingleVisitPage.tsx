@@ -237,7 +237,18 @@ const SingleVisitPage: FC = () => {
     if (isFinishVisitError) {
       showNotification('Nie udało się zakończyć wizyty', 'error');
     }
-  }, [isError, isUpdateVisitError, isCancelVisitError, isStartVisitError, isFinishVisitError]);
+    if (visitInfo?.status === VisitStatus.PLANNED && !isPatient) {
+      showNotification('Rozpocznij wizytę, aby edytować jej szczegóły', 'warning');
+    }
+  }, [
+    isError,
+    isUpdateVisitError,
+    isCancelVisitError,
+    isStartVisitError,
+    isFinishVisitError,
+    visitInfo,
+    isPatient,
+  ]);
 
   useEffect(() => {
     if (visitInfo) {
@@ -285,6 +296,7 @@ const SingleVisitPage: FC = () => {
           />
           <PatientInfoPanel
             patientId={visitInfo.patientId}
+            patientPesel={visitInfo.patientPesel}
             patientFullName={visitInfo.patientFullName}
             patientAge={getAgeFromBirthDate(new Date(visitInfo.patientBirthDate))}
           />
@@ -337,61 +349,66 @@ const SingleVisitPage: FC = () => {
           </Box>
         )}
       </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 8, width: '70%' }}>
+        <TextField
+          value={visitInfo.patientInformation ?? ''}
+          label="Informacje od pacjenta"
+          multiline
+          minRows={5}
+          slotProps={{ input: { readOnly: true } }}
+          sx={{
+            pointerEvents: 'none',
+          }}
+        />
 
-      <Controller
-        name="interview"
-        control={control}
-        render={({ field }) => (
-          <TextField
-            {...field}
-            label="Wywiad"
-            multiline
-            minRows={10}
-            error={!!errors.interview}
-            helperText={errors.interview?.message}
-            disabled={inputsDisabled}
-          />
-        )}
-      />
+        <Controller
+          name="interview"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              label="Wywiad"
+              multiline
+              minRows={10}
+              error={!!errors.interview}
+              helperText={errors.interview?.message}
+              disabled={inputsDisabled}
+            />
+          )}
+        />
 
-      <Controller
-        name="diagnosis"
-        control={control}
-        render={({ field }) => (
-          <TextField
-            {...field}
-            label="Diagnoza"
-            multiline
-            minRows={8}
-            error={!!errors.diagnosis}
-            helperText={errors.diagnosis?.message}
-            disabled={inputsDisabled}
-          />
-        )}
-      />
+        <Controller
+          name="diagnosis"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              label="Diagnoza"
+              multiline
+              minRows={8}
+              error={!!errors.diagnosis}
+              helperText={errors.diagnosis?.message}
+              disabled={inputsDisabled}
+            />
+          )}
+        />
 
-      <Controller
-        name="recommendations"
-        control={control}
-        render={({ field }) => (
-          <TextField
-            {...field}
-            label="Zalecenia"
-            multiline
-            minRows={8}
-            error={!!errors.recommendations}
-            helperText={errors.recommendations?.message}
-            disabled={inputsDisabled}
-          />
-        )}
-      />
-      <TextField
-        value={visitInfo.patientInformation ?? ''}
-        label="Informacje od pacjenta"
-        multiline
-        minRows={5}
-        slotProps={{ input: { readOnly: true } }}
-      />
+        <Controller
+          name="recommendations"
+          control={control}
+          render={({ field }) => (
+            <TextField
+              {...field}
+              label="Zalecenia"
+              multiline
+              minRows={8}
+              error={!!errors.recommendations}
+              helperText={errors.recommendations?.message}
+              disabled={inputsDisabled}
+            />
+          )}
+        />
+      </Box>
 
       <FileUpload
         onConfirmUpload={async (file) => {
@@ -406,7 +423,7 @@ const SingleVisitPage: FC = () => {
         }}
         onHasUnuploadedFiles={setHasUnuploadedFiles}
         initialFiles={visitAttachments}
-        disabled={isPatient}
+        disabled={inputsDisabled}
         uploadFileLoading={fileUploadLoading}
       />
 

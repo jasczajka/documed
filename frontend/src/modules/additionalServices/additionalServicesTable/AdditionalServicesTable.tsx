@@ -1,10 +1,11 @@
-import { Box, Button, Paper } from '@mui/material';
+import { Box, Button, Link, Paper, Typography } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { FC, useCallback, useState } from 'react';
+import { useNavigate } from 'react-router';
 import {
-  AdditionalServiceReturnDTO,
+  AdditionalServiceWithDetails,
   FileInfoDTO,
   Service,
 } from 'shared/api/generated/generated.schemas';
@@ -14,6 +15,7 @@ import { TableFilters } from 'shared/components/TableFilters';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
+import { useSitemap } from 'shared/hooks/useSitemap';
 import { useAdditionalServicesTable } from './useAdditionalServicesTable';
 
 export type AdditionalServiceFilters = {
@@ -25,7 +27,7 @@ export type AdditionalServiceFilters = {
 };
 
 interface AdditionalServicesTableProps {
-  additionalServices: AdditionalServiceReturnDTO[];
+  additionalServices: AdditionalServiceWithDetails[];
   allAdditionalServices: Service[];
   refetch: () => Promise<void>;
   patientId?: number;
@@ -45,8 +47,11 @@ const columns = (
       existingAttachments: FileInfoDTO[];
       description?: string;
     },
+    patientPesel?: string,
   ) => void,
-): GridColDef<AdditionalServiceReturnDTO>[] => [
+  onNavigateToPatient: (id: number) => void,
+  isPatient: boolean,
+): GridColDef<AdditionalServiceWithDetails>[] => [
   {
     field: 'index',
     headerName: '#',
@@ -59,7 +64,20 @@ const columns = (
     headerName: 'Pacjent',
     minWidth: 200,
     flex: 1,
-    valueGetter: (_, row) => `${row.patientFullName}`,
+    renderCell: ({ row }) =>
+      isPatient ? (
+        <Typography>{row.patientFullName}</Typography>
+      ) : (
+        <Link
+          component="button"
+          onClick={() => onNavigateToPatient(row.patientId)}
+          underline="hover"
+          color="primary"
+          sx={{ cursor: 'pointer', fontWeight: 500 }}
+        >
+          {row.patientFullName}
+        </Link>
+      ),
   },
   {
     field: 'date',
@@ -88,18 +106,25 @@ const columns = (
     type: 'actions',
     width: 70,
     flex: 0.5,
-    getActions: (params: { row: AdditionalServiceReturnDTO }) => {
+    getActions: (params: { row: AdditionalServiceWithDetails }) => {
       return [
         <GridActionsCellItem
           key={`begin-${params.row.id}`}
           label="Wyświetl szczegóły"
           onClick={() =>
-            onEdit(params.row.fulfillerId, params.row.patientId, params.row.patientFullName, 12, {
-              id: params.row.id,
-              serviceId: params.row.serviceId,
-              existingAttachments: params.row.attachments,
-              description: params.row.description,
-            })
+            onEdit(
+              params.row.fulfillerId,
+              params.row.patientId,
+              params.row.patientFullName,
+              12,
+              {
+                id: params.row.id,
+                serviceId: params.row.serviceId,
+                existingAttachments: params.row.attachments,
+                description: params.row.description,
+              },
+              params.row.patientPesel,
+            )
           }
           showInMenu
         />,
@@ -116,6 +141,8 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
   doctorId,
 }) => {
   const { isPatient } = useAuth();
+  const navigate = useNavigate();
+  const sitemap = useSitemap();
   const { openModal, closeModal } = useModal();
   const { showNotification, NotificationComponent } = useNotification();
   const [filters, setFilters] = useState<AdditionalServiceFilters>({
@@ -146,12 +173,14 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
         existingAttachments: FileInfoDTO[];
         description?: string;
       },
+      patientPesel?: string,
     ) => {
       openModal(
         'editAdditionalServiceModal',
         <AdditionalServiceModal
           allAdditionalServices={allAdditionalServices}
           patientId={patientId}
+          patientPesel={patientPesel}
           fulfillerId={fulfillerId}
           patientFullName={patientFullName}
           patientAge={patientAge}
@@ -164,6 +193,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
           mode="edit"
           existingServiceData={existingServiceData}
           refetch={refetch}
+          readOnly={isPatient}
         />,
       );
     },
@@ -177,6 +207,13 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
     handleFilterChange('dateFrom', todayStart);
     handleFilterChange('dateTo', todayEnd);
   }, [handleFilterChange]);
+
+  const onNavigateToPatient = useCallback(
+    (id: number) => {
+      navigate(sitemap.patient(id));
+    },
+    [navigate],
+  );
 
   const resetFilters = useCallback(() => {
     setFilters({
@@ -204,7 +241,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
       <Paper sx={{ flexGrow: 1 }}>
         <DataGrid
           rows={filteredAdditionalServices}
-          columns={columns(handleEditClick)}
+          columns={columns(handleEditClick, onNavigateToPatient, isPatient)}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },

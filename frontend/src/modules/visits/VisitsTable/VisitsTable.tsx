@@ -1,10 +1,10 @@
-import { Box, Button, Paper } from '@mui/material';
+import { Box, Button, Link, Paper, Typography } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 
 import { endOfDay, format, parse, startOfDay } from 'date-fns';
 import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Service, VisitDTO, VisitStatus } from 'shared/api/generated/generated.schemas';
+import { Service, VisitStatus, VisitWithDetails } from 'shared/api/generated/generated.schemas';
 import { appConfig } from 'shared/appConfig';
 import { ReviewModal } from 'shared/components/ReviewModal';
 import { TableFilters } from 'shared/components/TableFilters';
@@ -23,10 +23,11 @@ export type VisitsFilters = {
 };
 
 interface VisitTableProps {
-  visits: VisitDTO[];
+  visits: VisitWithDetails[];
   allServices: Service[];
   onCancel: (id: number) => void;
   patientId?: number;
+  patientPesel?: string;
   doctorId?: number;
   loading?: boolean;
 }
@@ -34,10 +35,12 @@ interface VisitTableProps {
 const columns = (
   onCancel: (id: number) => void,
   onNavigateToVisit: (id: number) => void,
+  onNavigateToPatient: (id: number) => void,
+  isPatient: boolean,
   onAddReview?: (id: number, doctorFullName: string) => void,
   showReviewOption?: boolean,
   loading?: boolean,
-): GridColDef<VisitDTO>[] => [
+): GridColDef<VisitWithDetails>[] => [
   {
     field: 'index',
     headerName: '#',
@@ -50,7 +53,20 @@ const columns = (
     headerName: 'Pacjent',
     minWidth: 200,
     flex: 1,
-    valueGetter: (_, row) => `${row.patientFullName}`,
+    renderCell: ({ row }) =>
+      isPatient ? (
+        <Typography>{row.patientFullName}</Typography>
+      ) : (
+        <Link
+          component="button"
+          onClick={() => onNavigateToPatient(row.patientId)}
+          underline="hover"
+          color="primary"
+          sx={{ cursor: 'pointer', fontWeight: 500 }}
+        >
+          {row.patientFullName}
+        </Link>
+      ),
   },
   {
     field: 'date',
@@ -102,7 +118,7 @@ const columns = (
     type: 'actions',
     width: 70,
     flex: 0.5,
-    getActions: (params: { row: VisitDTO }) => {
+    getActions: (params: { row: VisitWithDetails }) => {
       if (params.row.status === 'CANCELLED') return [];
 
       return [
@@ -202,6 +218,13 @@ export const VisitsTable: FC<VisitTableProps> = ({
     [navigate],
   );
 
+  const onNavigateToPatient = useCallback(
+    (id: number) => {
+      navigate(sitemap.patient(id));
+    },
+    [navigate],
+  );
+
   const resetFilters = useCallback(() => {
     setFilters({
       status: '',
@@ -230,7 +253,15 @@ export const VisitsTable: FC<VisitTableProps> = ({
         <DataGrid
           getRowClassName={(params) => (params.row.status === 'CANCELLED' ? 'cancelled-visit' : '')}
           rows={filteredVisits}
-          columns={columns(onCancel, onNavigateToVisit, handleAddReviewClick, isPatient, loading)}
+          columns={columns(
+            onCancel,
+            onNavigateToVisit,
+            onNavigateToPatient,
+            isPatient,
+            handleAddReviewClick,
+            isPatient,
+            loading,
+          )}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },
