@@ -7,6 +7,7 @@ import com.documed.backend.prescriptions.model.CreatePrescriptionObject;
 import com.documed.backend.prescriptions.model.Prescription;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -135,5 +136,10 @@ public class PrescriptionDAO implements FullDAO<Prescription, CreatePrescription
         WHERE id = ?;
     """;
     return jdbcTemplate.update(sql, status, prescriptionId);
+  }
+
+  public int updatePrescriptionExpirationDate(int prescriptionId, LocalDate newExpirationDate) {
+    String sql = "UPDATE prescription SET expiration_date = ? WHERE id = ?";
+    return jdbcTemplate.update(sql, newExpirationDate, prescriptionId);
   }
 }

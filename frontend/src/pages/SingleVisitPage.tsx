@@ -15,6 +15,7 @@ import {
   useGetMedicinesForPrescription,
   useGetPrescriptionForVisit,
   useRemoveMedicineFromPrescription,
+  useUpdatePrescriptionExpirationDate,
 } from 'shared/api/generated/prescription-controller/prescription-controller';
 import {
   useCancelPlannedVisit,
@@ -68,8 +69,10 @@ const SingleVisitPage: FC = () => {
   const [fileIdsToDeleteOnConfirm, setFileIdsToDeleteOnConfirm] = useState<number[]>([]);
   const [hasUnuploadedFiles, setHasUnuploadedFiles] = useState(false);
 
-  const [medicineIdsToDeleteOnConfirm, setMedicineIdsToDeleteOnConfirm] = useState<string[]>([]);
-  const [medicinesToAddOnConfirm, setMedicinesToAddOnConfirm] = useState<[string, number][]>([]);
+  const [medicineOperations, setMedicineOperations] = useState<{
+    toAdd: Map<string, number>;
+    toDelete: Set<string>;
+  }>({ toAdd: new Map(), toDelete: new Set() });
   const [prescriptionExpirationDate, setPrescriptionExpirationDate] = useState<Date>(
     addDays(new Date(), 30),
   );
@@ -109,6 +112,8 @@ const SingleVisitPage: FC = () => {
   const { mutateAsync: removeMedicineFromPrescription } = useRemoveMedicineFromPrescription();
 
   const { mutateAsync: createPrescription } = useCreatePrescription();
+
+  const { mutateAsync: updatePrescriptionExpirationDate } = useUpdatePrescriptionExpirationDate();
 
   const {
     mutateAsync: updateVisit,
@@ -169,10 +174,40 @@ const SingleVisitPage: FC = () => {
     return true;
   };
 
+  const handleAddMedicine = (medicineId: string, amount: number) => {
+    setMedicineOperations((prev) => {
+      const newToAdd = new Map(prev.toAdd);
+      const newToDelete = new Set(prev.toDelete);
+
+      if (newToDelete.has(medicineId)) {
+        newToDelete.delete(medicineId);
+      }
+
+      newToAdd.set(medicineId, amount);
+      return { toAdd: newToAdd, toDelete: newToDelete };
+    });
+  };
+
+  const handleRemoveMedicine = (medicineId: string) => {
+    setMedicineOperations((prev) => {
+      const newToAdd = new Map(prev.toAdd);
+      const newToDelete = new Set(prev.toDelete);
+
+      if (newToAdd.has(medicineId)) {
+        newToAdd.delete(medicineId);
+      } else {
+        if (prescriptionMedicines?.some((m) => m.id === medicineId)) {
+          newToDelete.add(medicineId);
+        }
+      }
+
+      return { toAdd: newToAdd, toDelete: newToDelete };
+    });
+  };
+
   const saveMedicinesToPrescription = async () => {
     let prescriptionId: number;
-    const medicineUploads: Promise<any>[] = [];
-    const medicineDeletions: Promise<any>[] = [];
+    const operations: Promise<any>[] = [];
 
     if (!visitPrescription) {
       const createPrescriptionRes = await createPrescription({
@@ -184,18 +219,18 @@ const SingleVisitPage: FC = () => {
       prescriptionId = visitPrescription.id;
     }
 
-    medicinesToAddOnConfirm.forEach(([medicineId, medicineAmount]) => {
-      medicineUploads.push(
+    medicineOperations.toAdd.forEach((amount, medicineId) => {
+      operations.push(
         addMedicineToPrescription({
           prescriptionId,
           medicineId,
-          params: { amount: medicineAmount },
+          params: { amount },
         }),
       );
     });
 
-    medicineIdsToDeleteOnConfirm.forEach((medicineId) => {
-      medicineDeletions.push(
+    medicineOperations.toDelete.forEach((medicineId) => {
+      operations.push(
         removeMedicineFromPrescription({
           prescriptionId,
           medicineId,
@@ -203,10 +238,36 @@ const SingleVisitPage: FC = () => {
       );
     });
 
-    if (medicineUploads.length > 0 || medicineDeletions.length > 0) {
-      await Promise.all([...medicineUploads, ...medicineDeletions]);
+    console.log('medicineOperations: :', medicineOperations);
+
+    if (operations.length > 0) {
+      await Promise.all(operations);
+      setMedicineOperations({ toAdd: new Map(), toDelete: new Set() });
       await refetchVisitPrescription();
       await refetchPrescriptionMedicines();
+    }
+  };
+
+  const handlePrescriptionExpirationDateUpdate = async () => {
+    if (!visitPrescription || !prescriptionExpirationDate) {
+      return;
+    }
+
+    const serverDateFormatted = format(
+      new Date(visitPrescription.expirationDate),
+      appConfig.localDateFormat,
+    );
+    const formDateFormatted = format(
+      new Date(prescriptionExpirationDate),
+      appConfig.localDateFormat,
+    );
+
+    if (serverDateFormatted !== formDateFormatted) {
+      await updatePrescriptionExpirationDate({
+        prescriptionId: visitPrescription.id,
+        data: formDateFormatted,
+      });
+      setPrescriptionExpirationDate(new Date(prescriptionExpirationDate));
     }
   };
 
@@ -259,6 +320,7 @@ const SingleVisitPage: FC = () => {
           await finishVisit({ id: visitId, data: formData });
           await deleteFilesMarkedForDeletion();
           await saveMedicinesToPrescription();
+          await handlePrescriptionExpirationDateUpdate();
           await refetchVisitInfo();
           await refetchVisitAttachments();
           showNotification('Wizyta została zakończona', 'success');
@@ -277,11 +339,20 @@ const SingleVisitPage: FC = () => {
       await updateVisit({ id: visitId, data: updateData });
       await deleteFilesMarkedForDeletion();
       await saveMedicinesToPrescription();
+      await handlePrescriptionExpirationDateUpdate();
       await refetchVisitInfo();
       await refetchVisitAttachments();
       showNotification('Pomyślnie zaktualizowano wizytę!', 'success');
     },
-    [updateVisit, refetchVisitInfo, showNotification],
+    [
+      updateVisit,
+      deleteFilesMarkedForDeletion,
+      saveMedicinesToPrescription,
+      handlePrescriptionExpirationDateUpdate,
+      refetchVisitInfo,
+      refetchVisitAttachments,
+      showNotification,
+    ],
   );
 
   const isLoading =
@@ -291,7 +362,7 @@ const SingleVisitPage: FC = () => {
     isUpdateVisitLoading ||
     isPrescriptionMedicinesLoading;
 
-  const isError = isVisitInfoError || isVisitAttachmentsError || isVisitPrescriptionError;
+  const isError = isVisitAttachmentsError || isVisitPrescriptionError;
 
   useEffect(() => {
     if (isError) {
@@ -312,6 +383,9 @@ const SingleVisitPage: FC = () => {
     if (prescriptionMedicinesError) {
       showNotification('Nie udało się pobrać leków recepty', 'error');
     }
+    if (isVisitInfoError) {
+      showNotification('Nie udało się pobrać danych wizyty', 'error');
+    }
     if (visitInfo?.status === VisitStatus.PLANNED && !isPatient) {
       showNotification('Rozpocznij wizytę, aby edytować jej szczegóły', 'warning');
     }
@@ -321,8 +395,11 @@ const SingleVisitPage: FC = () => {
     isCancelVisitError,
     isStartVisitError,
     isFinishVisitError,
+    prescriptionMedicinesError,
     visitInfo,
+    isVisitInfoError,
     isPatient,
+    showNotification,
   ]);
 
   useEffect(() => {
@@ -340,7 +417,7 @@ const SingleVisitPage: FC = () => {
   }
 
   if (!visitInfo) {
-    return null;
+    return <NotificationComponent />;
   }
 
   const { label: visitStatusLabel, color: visitStatusColor } = getVisitStatusLabel(
@@ -503,18 +580,11 @@ const SingleVisitPage: FC = () => {
       />
       <SinglePrescriptionTable
         existingMedicines={prescriptionMedicines}
-        onAddMedicineToPrescription={(newMedicineId, newMedicineAmount) =>
-          setMedicinesToAddOnConfirm([
-            ...medicinesToAddOnConfirm,
-            [newMedicineId, newMedicineAmount],
-          ])
-        }
-        onRemoveMedicineFromPrescription={(medicineIdToDelete) => {
-          setMedicineIdsToDeleteOnConfirm([...medicineIdsToDeleteOnConfirm, medicineIdToDelete]);
-        }}
+        onAddMedicineToPrescription={handleAddMedicine}
+        onRemoveMedicineFromPrescription={handleRemoveMedicine}
         prescriptionExpirationDate={prescriptionExpirationDate}
         handlePrescriptionExpirationDateChange={(newDate) => setPrescriptionExpirationDate(newDate)}
-        disablePrescriptionExpirationDateSelect={!!visitPrescription}
+        disabled={inputsDisabled}
       />
 
       <NotificationComponent />

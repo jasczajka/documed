@@ -79,6 +79,14 @@ public class PrescriptionService {
     }
   }
 
+  public Prescription updatePrescriptionExpirationDate(
+      int prescriptionId, LocalDate newExpirationDate) {
+    prescriptionDAO.updatePrescriptionExpirationDate(prescriptionId, newExpirationDate);
+    return prescriptionDAO
+        .getById(prescriptionId)
+        .orElseThrow(() -> new IllegalStateException("Prescription not found after update"));
+  }
+
   public Integer getUserIdForPrescriptionById(int prescriptionId) {
     return prescriptionDAO.getUserIdForPrescriptionById(prescriptionId);
   }

@@ -32,22 +32,35 @@ const validationSchema = Yup.object().shape({
 interface AddMedicineToPrescriptionModalProps {
   onSubmitForm: (data: FormData) => void;
   onCancel: () => void;
+  getExistingMedicineIds?: () => string[];
 }
 
 export const AddMedicineToPrescriptionModal: FC<AddMedicineToPrescriptionModalProps> = ({
   onSubmitForm,
   onCancel,
+  getExistingMedicineIds,
 }) => {
   const {
     control,
     handleSubmit,
     formState: { errors },
+    setError,
+    clearErrors,
     setValue,
   } = useForm<FormData>({
     resolver: yupResolver(validationSchema),
   });
 
+  const existingMedicineIds = getExistingMedicineIds ? getExistingMedicineIds() : [];
+
   const onSubmit = (data: FormData) => {
+    if (existingMedicineIds.includes(data.medicine.id)) {
+      setError('medicine', {
+        type: 'manual',
+        message: 'Ten lek jest już na recepcie',
+      });
+      return;
+    }
     onSubmitForm({
       amount: data.amount,
       medicine: {
@@ -80,9 +93,11 @@ export const AddMedicineToPrescriptionModal: FC<AddMedicineToPrescriptionModalPr
         <MedicineSearch
           onChange={(medicine) => {
             if (medicine) {
+              clearErrors('medicine');
               setValue('medicine', medicine);
             }
           }}
+          excludeIds={existingMedicineIds}
         />
         <Controller
           name="amount"

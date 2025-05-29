@@ -6,9 +6,10 @@ import { useDebounce } from 'use-debounce';
 
 interface MedicineSearchProps {
   onChange: (medicine: Medicine | null) => void;
+  excludeIds?: string[];
 }
 
-export const MedicineSearch: FC<MedicineSearchProps> = ({ onChange }) => {
+export const MedicineSearch: FC<MedicineSearchProps> = ({ onChange, excludeIds = [] }) => {
   const [open, setOpen] = useState(false);
   const [medicineQuery, setMedicineQuery] = useState('');
   const [options, setOptions] = useState<Medicine[]>([]);
@@ -34,11 +35,12 @@ export const MedicineSearch: FC<MedicineSearchProps> = ({ onChange }) => {
 
   useEffect(() => {
     if (data) {
-      setOptions(data);
+      const filteredOptions = data.filter((medicine) => !excludeIds.includes(medicine.id));
+      setOptions(filteredOptions);
     } else {
       setOptions([]);
     }
-  }, [data]);
+  }, [data, excludeIds]);
 
   return (
     <Autocomplete

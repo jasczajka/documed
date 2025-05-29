@@ -13,7 +13,7 @@ interface SinglePrescriptionTableProps {
   onRemoveMedicineFromPrescription: (medicineId: string) => void;
   prescriptionExpirationDate: Date | null;
   handlePrescriptionExpirationDateChange: (newDate: Date) => void;
-  disablePrescriptionExpirationDateSelect: boolean;
+  disabled?: boolean;
 }
 
 export const SinglePrescriptionTable: FC<SinglePrescriptionTableProps> = ({
@@ -22,12 +22,12 @@ export const SinglePrescriptionTable: FC<SinglePrescriptionTableProps> = ({
   onRemoveMedicineFromPrescription,
   prescriptionExpirationDate,
   handlePrescriptionExpirationDateChange,
-  disablePrescriptionExpirationDateSelect,
+  disabled = false,
 }) => {
   const [medicines, setMedicines] = useState<MedicineWithAmount[]>(existingMedicines ?? []);
   const { openModal } = useModal();
 
-  const handleAddNewMedicineClick = () => {
+  const handleAddNewMedicineClick: () => void = () => {
     openModal('cancelVisitModal', (close) => (
       <AddMedicineToPrescriptionModal
         onSubmitForm={(data) => {
@@ -45,6 +45,7 @@ export const SinglePrescriptionTable: FC<SinglePrescriptionTableProps> = ({
           close();
         }}
         onCancel={close}
+        getExistingMedicineIds={() => medicines.map((m) => m.id)}
       />
     ));
   };
@@ -66,18 +67,22 @@ export const SinglePrescriptionTable: FC<SinglePrescriptionTableProps> = ({
       { field: 'commonName', headerName: 'Nazwa zwyczajowa', flex: 1 },
       { field: 'dosage', headerName: 'Dawkowanie', flex: 1 },
       { field: 'amount', headerName: 'Ilość', type: 'number', flex: 0.5 },
-      {
-        field: 'actions',
-        headerName: 'Akcje',
-        flex: 0.5,
-        renderCell: ({ row }) => (
-          <IconButton onClick={() => handleRemoveMedicine(row.id)}>
-            <Delete />
-          </IconButton>
-        ),
-      },
+      ...(disabled
+        ? []
+        : [
+            {
+              field: 'actions',
+              headerName: 'Akcje',
+              flex: 0.5,
+              renderCell: ({ row }: { row: MedicineWithAmount }) => (
+                <IconButton onClick={() => handleRemoveMedicine(row.id)}>
+                  <Delete />
+                </IconButton>
+              ),
+            },
+          ]),
     ],
-    [],
+    [disabled],
   );
   return (
     <Paper sx={{ height: '100%' }}>
@@ -90,16 +95,16 @@ export const SinglePrescriptionTable: FC<SinglePrescriptionTableProps> = ({
           gap: 2,
           alignItems: 'flex-start',
         }}
-        component="form"
       >
         <Typography variant="h6" sx={{ mb: 1 }}>
           Recepta
         </Typography>
         <Box sx={{ width: '100%', alignItems: 'flex-start', display: 'flex', gap: 8 }}>
-          <Button variant="contained" onClick={handleAddNewMedicineClick}>
-            Dodaj lek
-          </Button>
-
+          {!disabled && (
+            <Button variant="contained" onClick={handleAddNewMedicineClick}>
+              Dodaj lek
+            </Button>
+          )}
           <TextField
             label="Data ważności"
             type="date"
@@ -121,7 +126,7 @@ export const SinglePrescriptionTable: FC<SinglePrescriptionTableProps> = ({
                 max: dayjs().add(365, 'day').format('YYYY-MM-DD'),
               },
             }}
-            disabled={disablePrescriptionExpirationDateSelect}
+            disabled={disabled}
           />
         </Box>
 
