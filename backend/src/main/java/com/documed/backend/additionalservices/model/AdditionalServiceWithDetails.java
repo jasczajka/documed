@@ -1,4 +1,4 @@
-package com.documed.backend.additionalservices.dtos;
+package com.documed.backend.additionalservices.model;
 
 import com.documed.backend.attachments.dtos.FileInfoDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,7 +10,7 @@ import lombok.NonNull;
 
 @Data
 @Builder
-public class AdditionalServiceReturnDTO {
+public class AdditionalServiceWithDetails {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private int id;
 

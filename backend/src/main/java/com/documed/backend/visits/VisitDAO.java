@@ -112,13 +112,15 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
   }
 
   public List<VisitWithDetails> findAllWithDetails() {
-    String sql = getVisitDetailsBaseQuery() + " ORDER BY v.id DESC, ts.date, ts.start_time";
+    String sql =
+        getVisitDetailsBaseQuery() + " ORDER BY v.id DESC, first_ts.date, first_ts.start_time";
     return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper());
   }
 
   public Optional<VisitWithDetails> findByIdWithDetails(int id) {
     String sql =
-        getVisitDetailsBaseQuery() + " WHERE v.id = ? ORDER BY v.id, ts.date, ts.start_time";
+        getVisitDetailsBaseQuery()
+            + " WHERE v.id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
     List<VisitWithDetails> visits = jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), id);
     return visits.stream().findFirst();
   }
@@ -126,13 +128,14 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
   public List<VisitWithDetails> findByPatientIdWithDetails(int patientId) {
     String sql =
         getVisitDetailsBaseQuery()
-            + " WHERE v.patient_id = ? ORDER BY v.id, ts.date, ts.start_time";
+            + " WHERE v.patient_id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
     return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), patientId);
   }
 
   public List<VisitWithDetails> findByDoctorIdWithDetails(int doctorId) {
     String sql =
-        getVisitDetailsBaseQuery() + " WHERE v.doctor_id = ? ORDER BY v.id, ts.date, ts.start_time";
+        getVisitDetailsBaseQuery()
+            + " WHERE v.doctor_id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
     return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), doctorId);
   }
 
@@ -140,7 +143,7 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
       int patientId, int facilityId) {
     String sql =
         getVisitDetailsBaseQuery()
-            + " WHERE v.patient_id = ? AND v.facility_id = ? ORDER BY v.id, ts.date, ts.start_time";
+            + " WHERE v.patient_id = ? AND v.facility_id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
     return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), patientId, facilityId);
   }
 
@@ -148,7 +151,7 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
       int doctorId, int facilityId) {
     String sql =
         getVisitDetailsBaseQuery()
-            + " WHERE v.doctor_id = ? AND v.facility_id = ? ORDER BY v.id, ts.date, ts.start_time";
+            + " WHERE v.doctor_id = ? AND v.facility_id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
     return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), doctorId, facilityId);
   }
 
@@ -215,23 +218,36 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
 
   private String getVisitDetailsBaseQuery() {
     return """
-           SELECT DISTINCT ON (v.id)
-                  v.*,
-                  p.first_name AS patient_first_name,
-                  p.last_name AS patient_last_name,
-                  p.birthdate AS patient_birth_date,
-                  d.first_name AS doctor_first_name,
-                  d.last_name AS doctor_last_name,
-                  s.id AS service_id,
-                  s.name AS service_name,
-                  ts.start_time AS timeslot_start,
-                  ts.end_time AS timeslot_end,
-                  ts.date AS timeslot_date
+           SELECT
+               v.*,
+               p.first_name AS patient_first_name,
+               p.last_name AS patient_last_name,
+               p.birthdate AS patient_birth_date,
+               d.first_name AS doctor_first_name,
+               d.last_name AS doctor_last_name,
+               s.id AS service_id,
+               s.name AS service_name,
+               first_ts.start_time AS timeslot_start,
+               last_ts.end_time AS timeslot_end,
+               first_ts.date AS timeslot_date
            FROM visit v
            JOIN "User" p ON v.patient_id = p.id
            JOIN "User" d ON v.doctor_id = d.id
            JOIN service s ON v.service_id = s.id
-           LEFT JOIN time_slot ts ON v.id = ts.visit_id
+           LEFT JOIN LATERAL (
+               SELECT ts.start_time, ts.date
+               FROM time_slot ts
+               WHERE ts.visit_id = v.id
+               ORDER BY ts.start_time ASC
+               LIMIT 1
+           ) first_ts ON true
+           LEFT JOIN LATERAL (
+               SELECT ts.end_time
+               FROM time_slot ts
+               WHERE ts.visit_id = v.id
+               ORDER BY ts.start_time DESC
+               LIMIT 1
+           ) last_ts ON true
            """;
   }
 }

@@ -1,8 +1,9 @@
-import { Box, Button, Paper } from '@mui/material';
+import { Box, Button, Link, Paper } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { FC, useCallback, useState } from 'react';
+import { useNavigate } from 'react-router';
 import {
   AdditionalServiceReturnDTO,
   FileInfoDTO,
@@ -14,6 +15,7 @@ import { TableFilters } from 'shared/components/TableFilters';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
+import { useSitemap } from 'shared/hooks/useSitemap';
 import { useAdditionalServicesTable } from './useAdditionalServicesTable';
 
 export type AdditionalServiceFilters = {
@@ -46,6 +48,7 @@ const columns = (
       description?: string;
     },
   ) => void,
+  onNavigateToPatient: (id: number) => void,
 ): GridColDef<AdditionalServiceReturnDTO>[] => [
   {
     field: 'index',
@@ -59,7 +62,17 @@ const columns = (
     headerName: 'Pacjent',
     minWidth: 200,
     flex: 1,
-    valueGetter: (_, row) => `${row.patientFullName}`,
+    renderCell: ({ row }) => (
+      <Link
+        component="button"
+        onClick={() => onNavigateToPatient(row.patientId)}
+        underline="hover"
+        color="primary"
+        sx={{ cursor: 'pointer', fontWeight: 500 }}
+      >
+        {row.patientFullName}
+      </Link>
+    ),
   },
   {
     field: 'date',
@@ -116,6 +129,8 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
   doctorId,
 }) => {
   const { isPatient } = useAuth();
+  const navigate = useNavigate();
+  const sitemap = useSitemap();
   const { openModal, closeModal } = useModal();
   const { showNotification, NotificationComponent } = useNotification();
   const [filters, setFilters] = useState<AdditionalServiceFilters>({
@@ -178,6 +193,13 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
     handleFilterChange('dateTo', todayEnd);
   }, [handleFilterChange]);
 
+  const onNavigateToPatient = useCallback(
+    (id: number) => {
+      navigate(sitemap.patient(id));
+    },
+    [navigate],
+  );
+
   const resetFilters = useCallback(() => {
     setFilters({
       patientName: '',
@@ -204,7 +226,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
       <Paper sx={{ flexGrow: 1 }}>
         <DataGrid
           rows={filteredAdditionalServices}
-          columns={columns(handleEditClick)}
+          columns={columns(handleEditClick, onNavigateToPatient)}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },

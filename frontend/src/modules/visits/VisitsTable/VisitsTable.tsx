@@ -1,4 +1,4 @@
-import { Box, Button, Paper } from '@mui/material';
+import { Box, Button, Link, Paper } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 
 import { endOfDay, format, parse, startOfDay } from 'date-fns';
@@ -34,6 +34,7 @@ interface VisitTableProps {
 const columns = (
   onCancel: (id: number) => void,
   onNavigateToVisit: (id: number) => void,
+  onNavigateToPatient: (id: number) => void,
   onAddReview?: (id: number, doctorFullName: string) => void,
   showReviewOption?: boolean,
   loading?: boolean,
@@ -50,7 +51,17 @@ const columns = (
     headerName: 'Pacjent',
     minWidth: 200,
     flex: 1,
-    valueGetter: (_, row) => `${row.patientFullName}`,
+    renderCell: ({ row }) => (
+      <Link
+        component="button"
+        onClick={() => onNavigateToPatient(row.patientId)}
+        underline="hover"
+        color="primary"
+        sx={{ cursor: 'pointer', fontWeight: 500 }}
+      >
+        {row.patientFullName}
+      </Link>
+    ),
   },
   {
     field: 'date',
@@ -202,6 +213,13 @@ export const VisitsTable: FC<VisitTableProps> = ({
     [navigate],
   );
 
+  const onNavigateToPatient = useCallback(
+    (id: number) => {
+      navigate(sitemap.patient(id));
+    },
+    [navigate],
+  );
+
   const resetFilters = useCallback(() => {
     setFilters({
       status: '',
@@ -230,7 +248,14 @@ export const VisitsTable: FC<VisitTableProps> = ({
         <DataGrid
           getRowClassName={(params) => (params.row.status === 'CANCELLED' ? 'cancelled-visit' : '')}
           rows={filteredVisits}
-          columns={columns(onCancel, onNavigateToVisit, handleAddReviewClick, isPatient, loading)}
+          columns={columns(
+            onCancel,
+            onNavigateToVisit,
+            onNavigateToPatient,
+            handleAddReviewClick,
+            isPatient,
+            loading,
+          )}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },

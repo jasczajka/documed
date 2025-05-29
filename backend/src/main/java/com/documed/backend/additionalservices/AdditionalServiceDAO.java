@@ -2,6 +2,8 @@ package com.documed.backend.additionalservices;
 
 import com.documed.backend.FullDAO;
 import com.documed.backend.additionalservices.model.AdditionalService;
+import com.documed.backend.additionalservices.model.AdditionalServiceWithDetails;
+import com.documed.backend.additionalservices.model.AdditionalServiceWithDetailsRowMapper;
 import com.documed.backend.exceptions.CreationFailException;
 import java.sql.Date;
 import java.util.List;
@@ -59,6 +61,45 @@ public class AdditionalServiceDAO implements FullDAO<AdditionalService, Addition
     return jdbcTemplate.update(sql, id);
   }
 
+  public List<AdditionalServiceWithDetails> findAllWithDetails() {
+    String sql = getAdditionalServiceDetailsBaseQuery() + " ORDER BY a.id DESC";
+    return jdbcTemplate.query(sql, new AdditionalServiceWithDetailsRowMapper());
+  }
+
+  public Optional<AdditionalServiceWithDetails> findByIdWithDetails(int id) {
+    String sql = getAdditionalServiceDetailsBaseQuery() + " WHERE a.id = ?";
+    List<AdditionalServiceWithDetails> services =
+        jdbcTemplate.query(sql, new AdditionalServiceWithDetailsRowMapper(), id);
+    return services.stream().findFirst();
+  }
+
+  public List<AdditionalServiceWithDetails> findByPatientIdWithDetails(int patientId) {
+    String sql =
+        getAdditionalServiceDetailsBaseQuery() + " WHERE a.patient_id = ? ORDER BY a.id DESC";
+    return jdbcTemplate.query(sql, new AdditionalServiceWithDetailsRowMapper(), patientId);
+  }
+
+  public List<AdditionalServiceWithDetails> findByFulfillerIdWithDetails(int fulfillerId) {
+    String sql =
+        getAdditionalServiceDetailsBaseQuery() + " WHERE a.fulfiller_id = ? ORDER BY a.id DESC";
+    return jdbcTemplate.query(sql, new AdditionalServiceWithDetailsRowMapper(), fulfillerId);
+  }
+
+  public List<AdditionalServiceWithDetails> findByServiceIdWithDetails(int serviceId) {
+    String sql =
+        getAdditionalServiceDetailsBaseQuery() + " WHERE a.service_id = ? ORDER BY a.id DESC";
+    return jdbcTemplate.query(sql, new AdditionalServiceWithDetailsRowMapper(), serviceId);
+  }
+
+  public List<AdditionalServiceWithDetails> findByPatientIdAndFulfillerIdWithDetails(
+      int patientId, int fulfillerId) {
+    String sql =
+        getAdditionalServiceDetailsBaseQuery()
+            + " WHERE a.patient_id = ? AND a.fulfiller_id = ? ORDER BY a.id DESC";
+    return jdbcTemplate.query(
+        sql, new AdditionalServiceWithDetailsRowMapper(), patientId, fulfillerId);
+  }
+
   @Override
   public Optional<AdditionalService> getById(int id) {
     String sql = "SELECT * FROM Additional_service WHERE id = ?";
@@ -88,5 +129,21 @@ public class AdditionalServiceDAO implements FullDAO<AdditionalService, Addition
   public int updateDescription(int id, String description) {
     String sql = "UPDATE Additional_service SET description = ? WHERE id = ?";
     return jdbcTemplate.update(sql, description, id);
+  }
+
+  private String getAdditionalServiceDetailsBaseQuery() {
+    return """
+           SELECT
+               a.*,
+               p.first_name AS patient_first_name,
+               p.last_name AS patient_last_name,
+               f.first_name AS fulfiller_first_name,
+               f.last_name AS fulfiller_last_name,
+               s.name AS service_name
+           FROM Additional_service a
+           JOIN "User" p ON a.patient_id = p.id
+           JOIN "User" f ON a.fulfiller_id = f.id
+           JOIN service s ON a.service_id = s.id
+           """;
   }
 }
