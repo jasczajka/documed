@@ -237,7 +237,18 @@ const SingleVisitPage: FC = () => {
     if (isFinishVisitError) {
       showNotification('Nie udało się zakończyć wizyty', 'error');
     }
-  }, [isError, isUpdateVisitError, isCancelVisitError, isStartVisitError, isFinishVisitError]);
+    if (visitInfo?.status === VisitStatus.PLANNED && !isPatient) {
+      showNotification('Rozpocznij wizytę, aby edytować jej szczegóły', 'warning');
+    }
+  }, [
+    isError,
+    isUpdateVisitError,
+    isCancelVisitError,
+    isStartVisitError,
+    isFinishVisitError,
+    visitInfo,
+    isPatient,
+  ]);
 
   useEffect(() => {
     if (visitInfo) {

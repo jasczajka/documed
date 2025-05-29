@@ -229,7 +229,6 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
           />
         </DialogContent>
         <FileUpload
-          title={`Załączniki${mode === 'edit' ? ' - uwaga, załączniki są usuwane i dodawane od razu' : ''}`}
           onConfirmUpload={async (file) => {
             setOnConfirmLoading(true);
             const res = await uploadFile(file, undefined, existingServiceData?.id);
