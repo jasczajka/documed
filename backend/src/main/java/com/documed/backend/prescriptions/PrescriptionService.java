@@ -29,7 +29,7 @@ public class PrescriptionService {
     return prescriptionDAO.create(visitId);
   }
 
-  Prescription getPrescriptionForVisit(int visitId) {
+  Optional<Prescription> getPrescriptionForVisit(int visitId) {
     return prescriptionDAO.getPrescriptionForVisit(visitId);
   }
 

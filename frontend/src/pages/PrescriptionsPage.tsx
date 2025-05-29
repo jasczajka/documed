@@ -5,7 +5,7 @@ import {
   useGetAllPrescriptions,
   useGetPrescriptionsForUser,
 } from 'shared/api/generated/prescription-controller/prescription-controller';
-import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
+import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { useAuth } from 'shared/hooks/useAuth';
 
 const PrescriptionsPage: FC = () => {

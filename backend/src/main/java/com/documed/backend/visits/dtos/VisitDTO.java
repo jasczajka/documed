@@ -27,24 +27,27 @@ public class VisitDTO {
   private int facilityId;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private String serviceName;
-
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private int serviceId;
 
-  private String patientInformation;
-
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private String patientFullName;
+  private String serviceName;
+
+  private String patientInformation;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private int patientId;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private String doctorFullName;
+  private String patientFullName;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private LocalDate patientBirthDate;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private int doctorId;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private String doctorFullName;
 
   LocalDate date;
 

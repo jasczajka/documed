@@ -71,13 +71,25 @@ class PrescriptionServiceTest extends Specification {
 		given:
 		def visitId = 10
 		def expected = Prescription.builder().id(visitId).build()
-		prescriptionDAO.getPrescriptionForVisit(visitId) >> expected
+		prescriptionDAO.getPrescriptionForVisit(visitId) >> Optional.of(expected) // Wrap in Optional
 
 		when:
 		def result = service.getPrescriptionForVisit(visitId)
 
 		then:
-		result == expected
+		result.isPresent() && result.get() == expected
+	}
+
+	def "getPrescriptionForVisit returns empty when not found"() {
+		given:
+		def visitId = 10
+		prescriptionDAO.getPrescriptionForVisit(visitId) >> Optional.empty()
+
+		when:
+		def result = service.getPrescriptionForVisit(visitId)
+
+		then:
+		result.isEmpty()
 	}
 
 	def "getPrescriptionsForUser returns list from DAO"() {

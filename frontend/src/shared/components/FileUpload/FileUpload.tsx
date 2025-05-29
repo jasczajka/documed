@@ -53,8 +53,8 @@ interface TrackedFile {
 interface FileUploadProps {
   title?: string;
   onConfirmUpload: (file: File) => Promise<{ downloadUrl: string; fileId: number }>;
-  onDeleteUploaded: (fileId: number) => Promise<string>;
-  onAttachmentsChange?: (fileIds: number[]) => void;
+  onDeleteUploaded: (fileId: number) => void;
+  onHasUnuploadedFiles?: (hasUnuploadedFiles: boolean) => void;
   className?: string;
   uploadFileLoading?: boolean;
   disabled?: boolean;
@@ -65,7 +65,7 @@ export const FileUpload: FC<FileUploadProps> = ({
   title = 'Załączniki',
   onConfirmUpload,
   onDeleteUploaded,
-  onAttachmentsChange,
+  onHasUnuploadedFiles,
   className,
   uploadFileLoading,
   disabled = false,
@@ -73,10 +73,16 @@ export const FileUpload: FC<FileUploadProps> = ({
 }) => {
   const [acceptedFiles, setAcceptedFiles] = useState<TrackedFile[]>([]);
   const [rejectedFiles, setRejectedFiles] = useState<TrackedFile[]>([]);
+
   const dropZoneDisabled = useMemo(
     () => acceptedFiles.length >= MAX_FILE_COUNT || disabled,
     [acceptedFiles, disabled],
   );
+
+  const hasUnuploadedFiles = useMemo(() => {
+    return acceptedFiles.some((file) => file.status === 'loaded' && !file.id);
+  }, [acceptedFiles]);
+
   const isEmpty = !acceptedFiles.length && !rejectedFiles.length;
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -125,12 +131,12 @@ export const FileUpload: FC<FileUploadProps> = ({
   });
 
   const handleDeleteAcceptedFile = useCallback(
-    async (fileToDelete: TrackedFile) => {
+    (fileToDelete: TrackedFile) => {
       setAcceptedFiles((prev) =>
         prev.map((f) => (f === fileToDelete ? { ...f, status: 'loading' } : f)),
       );
       if (fileToDelete.id) {
-        await onDeleteUploaded(fileToDelete.id);
+        onDeleteUploaded(fileToDelete.id);
       }
       setAcceptedFiles((prev) => prev.filter((f) => f.file !== fileToDelete.file));
     },
@@ -168,18 +174,12 @@ export const FileUpload: FC<FileUploadProps> = ({
       );
     }
   };
-  const notifyAttachmentsChange = useCallback(() => {
-    if (onAttachmentsChange) {
-      const uploadedIds = acceptedFiles
-        .filter((f) => f.status === 'uploaded' && f.id !== undefined)
-        .map((f) => f.id!);
-      onAttachmentsChange(uploadedIds);
-    }
-  }, [acceptedFiles, onAttachmentsChange]);
 
   useEffect(() => {
-    notifyAttachmentsChange();
-  }, [acceptedFiles]);
+    if (onHasUnuploadedFiles) {
+      onHasUnuploadedFiles(hasUnuploadedFiles);
+    }
+  }, [hasUnuploadedFiles]);
 
   useEffect(() => {
     if (initialFiles) {
@@ -239,6 +239,7 @@ export const FileUpload: FC<FileUploadProps> = ({
             onDelete={() => handleDeleteAcceptedFile(file)}
             onConfirmUpload={() => handleConfirmUpload(file.file)}
             loading={uploadFileLoading}
+            disabled={disabled}
           />
         ))}
       </Box>
@@ -252,6 +253,7 @@ export const FileUpload: FC<FileUploadProps> = ({
             errorMessage={errors?.join(', ')}
             onDelete={() => handleDeleteRejectedFile(file)}
             loading={uploadFileLoading}
+            disabled={disabled}
           />
         ))}
       </Box>

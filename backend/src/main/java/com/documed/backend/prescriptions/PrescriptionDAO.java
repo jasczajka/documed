@@ -94,9 +94,9 @@ public class PrescriptionDAO implements FullDAO<Prescription, Integer> {
     return jdbcTemplate.query(sql, rowMapper);
   }
 
-  public Prescription getPrescriptionForVisit(int visitId) {
+  public Optional<Prescription> getPrescriptionForVisit(int visitId) {
     String sql = "SELECT * FROM prescription WHERE visit_id = ?";
-    return jdbcTemplate.query(sql, rowMapper, visitId).getFirst();
+    return jdbcTemplate.query(sql, rowMapper, visitId).stream().findFirst();
   }
 
   public Optional<Medicine> addMedicineToPrescription(

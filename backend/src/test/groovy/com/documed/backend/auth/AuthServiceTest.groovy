@@ -46,7 +46,7 @@ class AuthServiceTest extends Specification {
 				.password(overrides.password ?: 'pass')
 				.accountStatus(overrides.accountStatus ?: AccountStatus.ACTIVE)
 				.role(overrides.role ?: UserRole.PATIENT)
-				.birthDate(Date.valueOf(overrides.birthDate ?: LocalDate.now().minusYears(20)))
+				.birthDate(overrides.birthDate ?: LocalDate.now().minusYears(20))
 		return builder.build()
 	}
 

@@ -1,4 +1,4 @@
-import { Delete, Upload, UploadFile } from '@mui/icons-material';
+import { AttachFile, Delete, Upload } from '@mui/icons-material';
 import { Box, IconButton, LinearProgress, Link, Typography } from '@mui/material';
 import { FC } from 'react';
 
@@ -11,6 +11,7 @@ interface FileCardProps {
   downloadUrl?: string;
   errorMessage?: string;
   loading?: boolean;
+  disabled?: boolean;
 }
 
 export const FileCard: FC<FileCardProps> = ({
@@ -22,6 +23,7 @@ export const FileCard: FC<FileCardProps> = ({
   downloadUrl,
   errorMessage,
   loading,
+  disabled = false,
 }) => {
   const isError = status === 'error';
   const isSuccessfullyUploaded = status === 'uploaded';
@@ -68,7 +70,7 @@ export const FileCard: FC<FileCardProps> = ({
       }}
     >
       <Box sx={{ display: 'flex', flexDirection: 'row' }}>
-        <UploadFile
+        <AttachFile
           sx={{ display: 'flex', paddingRight: 4, height: 40, width: 40, alignSelf: 'center' }}
           color={getIconColor()}
         />
@@ -88,36 +90,40 @@ export const FileCard: FC<FileCardProps> = ({
                 {fileSize}
               </Typography>
             )}
-            {!isError && (
+            {!isError && !disabled && (
               <Typography variant="body2" color={isError ? 'error' : 'text.secondary'}>
                 &nbsp;&nbsp;•&nbsp;&nbsp;
               </Typography>
             )}
-            <Typography variant="body2" color={isError ? 'error' : 'text.secondary'}>
-              {getStatusLabel()}
-            </Typography>
+            {!disabled && (
+              <Typography variant="body2" color={isError ? 'error' : 'text.secondary'}>
+                {getStatusLabel()}
+              </Typography>
+            )}
           </Box>
-          <LinearProgress
-            sx={{
-              mt: 1,
-            }}
-            color={getIconColor()}
-            variant={
-              isSuccessfullyLoaded || isSuccessfullyUploaded || isError
-                ? 'determinate'
-                : 'indeterminate'
-            }
-            value={isSuccessfullyLoaded || isSuccessfullyUploaded ? 100 : isError ? 0 : undefined}
-          />
+          {!disabled && (
+            <LinearProgress
+              sx={{
+                mt: 1,
+              }}
+              color={getIconColor()}
+              variant={
+                isSuccessfullyLoaded || isSuccessfullyUploaded || isError
+                  ? 'determinate'
+                  : 'indeterminate'
+              }
+              value={isSuccessfullyLoaded || isSuccessfullyUploaded ? 100 : isError ? 0 : undefined}
+            />
+          )}
         </Box>
       </Box>
       <Box>
-        {!isLoading && (
+        {!isLoading && !disabled && (
           <IconButton onClick={onDelete} disabled={loading}>
             <Delete color="action" />
           </IconButton>
         )}
-        {isSuccessfullyLoaded && (
+        {isSuccessfullyLoaded && !disabled && (
           <IconButton onClick={onConfirmUpload} loading={loading} disabled={loading}>
             <Upload color="action" />
           </IconButton>

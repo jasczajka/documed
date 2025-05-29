@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Link } from 'react-router';
 import { getAllFacilities } from 'shared/api/generated/facility-controller/facility-controller';
 import { FacilityLoginReturnDTO } from 'shared/api/generated/generated.schemas';
-import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
+import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useSitemap } from 'shared/hooks/useSitemap';
 import { DocuMedLogo } from 'shared/icons/DocuMedLogo';

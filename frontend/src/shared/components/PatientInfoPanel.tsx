@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import { FC } from 'react';
 
 export interface PatientInfoPanelProps {
@@ -13,24 +13,26 @@ export const PatientInfoPanel: FC<PatientInfoPanelProps> = ({
   patientAge,
 }) => {
   return (
-    <Typography
+    <Box
       sx={{
-        width: '100%',
-        px: '12px',
-        py: '8px',
+        display: 'inline-block',
+        px: 3,
+        py: 2,
         border: 1,
-        borderRadius: '4px',
+        borderRadius: 1,
         borderColor: 'primary.light',
+        width: 'fit-content',
       }}
     >
-      <span>Pacjent nr: </span>
-      <span className="font-bold">{patientId}</span>
-      <br />
-      <span>Imię i nazwisko: </span>
-      <span className="font-bold">{patientFullName}</span>
-      <br />
-      <span>Wiek: </span>
-      <span className="font-bold">{patientAge ?? ''}</span>
-    </Typography>
+      <Typography>
+        Pacjent #<strong>{patientId}</strong>
+      </Typography>
+      <Typography>
+        Imię i nazwisko: <strong>{patientFullName}</strong>
+      </Typography>
+      <Typography>
+        Wiek: <strong>{patientAge ?? ''}</strong>
+      </Typography>
+    </Box>
   );
 };

@@ -6,7 +6,10 @@ import com.documed.backend.attachments.dtos.GenerateUploadUrlRequestDTO;
 import com.documed.backend.attachments.dtos.UploadUrlResponseDTO;
 import com.documed.backend.attachments.model.Attachment;
 import com.documed.backend.attachments.model.AttachmentStatus;
+import com.documed.backend.auth.AuthService;
 import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
+import com.documed.backend.visits.VisitService;
+import com.documed.backend.visits.model.Visit;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +23,8 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class AttachmentController {
   private final S3Service s3Service;
+  private final AuthService authService;
+  private final VisitService visitService;
 
   @PostMapping("/start-upload")
   public ResponseEntity<UploadUrlResponseDTO> generateUploadUrl(
@@ -77,6 +82,15 @@ public class AttachmentController {
   @GetMapping("patients/{userId}")
   public ResponseEntity<List<FileInfoDTO>> getFilesForPatient(@PathVariable int userId) {
     List<Attachment> attachmentList = this.s3Service.getAttachmentsForPatient(userId);
+
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(s3Service.generateFileInfoDtosForAttachments(attachmentList));
+  }
+
+  @GetMapping("visits/{visitId}")
+  public ResponseEntity<List<FileInfoDTO>> getFilesForVisit(@PathVariable int visitId) {
+    Visit visit = visitService.getById(visitId);
+    List<Attachment> attachmentList = this.s3Service.getAttachmentsForVisit(visit.getId());
 
     return ResponseEntity.status(HttpStatus.OK)
         .body(s3Service.generateFileInfoDtosForAttachments(attachmentList));

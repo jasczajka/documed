@@ -10,12 +10,12 @@ import { useGetPatientDetails } from 'shared/api/generated/patients-controller/p
 import { useGetAllServices } from 'shared/api/generated/service-controller/service-controller';
 import { useGetVisitsByPatientId } from 'shared/api/generated/visit-controller/visit-controller';
 import { AdditionalServiceModal } from 'shared/components/AdditionalServiceModal';
-import { FullPageLoadingSpinner } from 'shared/components/FileUpload/FullPageLoadingSpinner';
+import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { ScheduleVisitModal } from 'shared/components/ScheduleVisitModal/ScheduleVisitModal';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
-import { getAge } from 'shared/utils/getAgeFromBirthDate';
+import { getAgeFromBirthDate } from 'shared/utils/getAgeFromBirthDate';
 
 const SinglePatientPage: FC = () => {
   const { id } = useParams();
@@ -107,7 +107,9 @@ const SinglePatientPage: FC = () => {
           patientId={patientId}
           fulfillerId={fulfillerId}
           patientFullName={`${patientInfo?.firstName} ${patientInfo?.lastName}`}
-          patientAge={patientInfo?.birthdate ? getAge(new Date(patientInfo?.birthdate)) : null}
+          patientAge={
+            patientInfo?.birthdate ? getAgeFromBirthDate(new Date(patientInfo?.birthdate)) : null
+          }
           onConfirm={async () => {
             closeModal('additionalServiceModal');
             showNotification('Zapisano dane usługi dodatkowej', 'success');
@@ -131,7 +133,9 @@ const SinglePatientPage: FC = () => {
           allServices={allServices}
           patientId={patientId}
           patientFullName={patientFullName}
-          patientAge={patientInfo?.birthdate ? getAge(new Date(patientInfo?.birthdate)) : null}
+          patientAge={
+            patientInfo?.birthdate ? getAgeFromBirthDate(new Date(patientInfo?.birthdate)) : null
+          }
           onConfirm={async () => {
             await refetchPatientVisits();
             closeModal('scheduleVisitModal');
@@ -183,7 +187,7 @@ const SinglePatientPage: FC = () => {
         patientInfo={{
           patientId: patientInfo.id,
           patientFullName,
-          patientAge: getAge(new Date(patientInfo.birthdate)),
+          patientAge: getAgeFromBirthDate(new Date(patientInfo.birthdate)),
         }}
         tabIndex={tabIndex}
         onTabChange={onTabChange}
