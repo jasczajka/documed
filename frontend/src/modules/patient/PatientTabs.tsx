@@ -10,7 +10,7 @@ import AdditionalServicesTable from 'modules/additionalServices/additionalServic
 import VisitsTable from 'modules/visits/VisitsTable/VisitsTable';
 import { FC, useEffect } from 'react';
 import {
-  AdditionalServiceReturnDTO,
+  AdditionalServiceWithDetails,
   FileInfoDTO,
   Service,
   VisitWithDetails,
@@ -29,7 +29,7 @@ interface PatientTabsProps {
   onTabChange: (index: number) => void;
   patientAttachments: FileInfoDTO[];
   patientVisits: VisitWithDetails[];
-  patientAdditionalServices: AdditionalServiceReturnDTO[];
+  patientAdditionalServices: AdditionalServiceWithDetails[];
   allServices: Service[];
   allAdditionalServices: Service[];
   refetchVisits: () => Promise<void>;
@@ -104,7 +104,6 @@ export const PatientTabs: FC<PatientTabsProps> = ({
             allServices={allServices}
             onCancel={handleCancelVisitClick}
             loading={isCancelVisitLoading}
-            patientId={patientInfo.patientId}
           />
         )}
         {tabIndex === 2 && (
@@ -113,7 +112,6 @@ export const PatientTabs: FC<PatientTabsProps> = ({
             allAdditionalServices={allAdditionalServices}
             loading={isCancelVisitLoading}
             refetch={refetchAdditionalServices}
-            patientId={patientInfo.patientId}
           />
         )}
         {tabIndex === 3 && (

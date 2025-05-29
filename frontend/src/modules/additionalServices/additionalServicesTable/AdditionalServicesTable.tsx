@@ -5,7 +5,7 @@ import { endOfDay, format, startOfDay } from 'date-fns';
 import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 import {
-  AdditionalServiceReturnDTO,
+  AdditionalServiceWithDetails,
   FileInfoDTO,
   Service,
 } from 'shared/api/generated/generated.schemas';
@@ -27,7 +27,7 @@ export type AdditionalServiceFilters = {
 };
 
 interface AdditionalServicesTableProps {
-  additionalServices: AdditionalServiceReturnDTO[];
+  additionalServices: AdditionalServiceWithDetails[];
   allAdditionalServices: Service[];
   refetch: () => Promise<void>;
   patientId?: number;
@@ -47,10 +47,11 @@ const columns = (
       existingAttachments: FileInfoDTO[];
       description?: string;
     },
+    patientPesel?: string,
   ) => void,
   onNavigateToPatient: (id: number) => void,
   isPatient: boolean,
-): GridColDef<AdditionalServiceReturnDTO>[] => [
+): GridColDef<AdditionalServiceWithDetails>[] => [
   {
     field: 'index',
     headerName: '#',
@@ -105,18 +106,25 @@ const columns = (
     type: 'actions',
     width: 70,
     flex: 0.5,
-    getActions: (params: { row: AdditionalServiceReturnDTO }) => {
+    getActions: (params: { row: AdditionalServiceWithDetails }) => {
       return [
         <GridActionsCellItem
           key={`begin-${params.row.id}`}
           label="Wyświetl szczegóły"
           onClick={() =>
-            onEdit(params.row.fulfillerId, params.row.patientId, params.row.patientFullName, 12, {
-              id: params.row.id,
-              serviceId: params.row.serviceId,
-              existingAttachments: params.row.attachments,
-              description: params.row.description,
-            })
+            onEdit(
+              params.row.fulfillerId,
+              params.row.patientId,
+              params.row.patientFullName,
+              12,
+              {
+                id: params.row.id,
+                serviceId: params.row.serviceId,
+                existingAttachments: params.row.attachments,
+                description: params.row.description,
+              },
+              params.row.patientPesel,
+            )
           }
           showInMenu
         />,
@@ -165,12 +173,14 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
         existingAttachments: FileInfoDTO[];
         description?: string;
       },
+      patientPesel?: string,
     ) => {
       openModal(
         'editAdditionalServiceModal',
         <AdditionalServiceModal
           allAdditionalServices={allAdditionalServices}
           patientId={patientId}
+          patientPesel={patientPesel}
           fulfillerId={fulfillerId}
           patientFullName={patientFullName}
           patientAge={patientAge}

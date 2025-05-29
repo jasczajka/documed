@@ -137,6 +137,7 @@ public class AdditionalServiceDAO implements FullDAO<AdditionalService, Addition
                a.*,
                p.first_name AS patient_first_name,
                p.last_name AS patient_last_name,
+               p.pesel AS patient_pesel,
                f.first_name AS fulfiller_first_name,
                f.last_name AS fulfiller_last_name,
                s.name AS service_name

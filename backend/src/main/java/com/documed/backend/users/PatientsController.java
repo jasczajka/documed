@@ -37,6 +37,7 @@ public class PatientsController {
             .lastName(user.getLastName())
             .email(user.getEmail())
             .birthdate(user.getBirthDate())
+            .pesel(user.getPesel())
             .build();
 
     return new ResponseEntity<>(value, HttpStatus.OK);

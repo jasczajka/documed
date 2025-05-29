@@ -40,6 +40,9 @@ public class VisitWithDetails {
   private String patientFullName;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private String patientPesel;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private LocalDate patientBirthDate;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)

@@ -21,7 +21,7 @@ import type {
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import type {
-  AdditionalServiceReturnDTO,
+  AdditionalServiceWithDetails,
   CreateAdditionalServiceDTO,
   UpdateAttachmentsDTO,
   UpdateDescriptionDTO,
@@ -110,7 +110,7 @@ export const updateAdditionalServiceAttachments = (
   id: number,
   updateAttachmentsDTO: UpdateAttachmentsDTO,
 ) => {
-  return customInstance<AdditionalServiceReturnDTO>({
+  return customInstance<AdditionalServiceWithDetails>({
     url: `/api/additional_services/${id}/attachments`,
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
@@ -183,7 +183,7 @@ export const useUpdateAdditionalServiceAttachments = <
   return useMutation(mutationOptions, queryClient);
 };
 export const getAllAdditionalServices = (signal?: AbortSignal) => {
-  return customInstance<AdditionalServiceReturnDTO[]>({
+  return customInstance<AdditionalServiceWithDetails[]>({
     url: `/api/additional_services`,
     method: 'GET',
     signal,
@@ -298,7 +298,7 @@ export const createAdditionalService = (
   createAdditionalServiceDTO: CreateAdditionalServiceDTO,
   signal?: AbortSignal,
 ) => {
-  return customInstance<AdditionalServiceReturnDTO>({
+  return customInstance<AdditionalServiceWithDetails>({
     url: `/api/additional_services`,
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -369,7 +369,7 @@ export const useCreateAdditionalService = <TError = ErrorType<unknown>, TContext
   return useMutation(mutationOptions, queryClient);
 };
 export const getAdditionalService = (id: number, signal?: AbortSignal) => {
-  return customInstance<AdditionalServiceReturnDTO>({
+  return customInstance<AdditionalServiceWithDetails>({
     url: `/api/additional_services/${id}`,
     method: 'GET',
     signal,
@@ -487,7 +487,7 @@ export function useGetAdditionalService<
 }
 
 export const getAdditionalServicesByService = (serviceId: number, signal?: AbortSignal) => {
-  return customInstance<AdditionalServiceReturnDTO[]>({
+  return customInstance<AdditionalServiceWithDetails[]>({
     url: `/api/additional_services/services/${serviceId}`,
     method: 'GET',
     signal,
@@ -606,7 +606,7 @@ export function useGetAdditionalServicesByService<
 }
 
 export const getAdditionalServicesByPatient = (userId: number, signal?: AbortSignal) => {
-  return customInstance<AdditionalServiceReturnDTO[]>({
+  return customInstance<AdditionalServiceWithDetails[]>({
     url: `/api/additional_services/patients/${userId}`,
     method: 'GET',
     signal,
@@ -725,7 +725,7 @@ export function useGetAdditionalServicesByPatient<
 }
 
 export const getAdditionalServicesByFulfiller = (userId: number, signal?: AbortSignal) => {
-  return customInstance<AdditionalServiceReturnDTO[]>({
+  return customInstance<AdditionalServiceWithDetails[]>({
     url: `/api/additional_services/fulfillers/${userId}`,
     method: 'GET',
     signal,

@@ -53,7 +53,7 @@ export interface UpdateAttachmentsDTO {
   attachmentIds: number[];
 }
 
-export interface AdditionalServiceReturnDTO {
+export interface AdditionalServiceWithDetails {
   id: number;
   description?: string;
   date: string;
@@ -61,6 +61,7 @@ export interface AdditionalServiceReturnDTO {
   fulfillerFullName: string;
   patientId: number;
   patientFullName: string;
+  patientPesel: string;
   serviceId: number;
   serviceName: string;
   attachments: FileInfoDTO[];
@@ -105,6 +106,7 @@ export interface VisitWithDetails {
   patientInformation?: string;
   patientId: number;
   patientFullName: string;
+  patientPesel: string;
   patientBirthDate: string;
   doctorId: number;
   doctorFullName: string;
@@ -426,6 +428,7 @@ export interface PatientDetailsDTO {
   firstName: string;
   lastName: string;
   email: string;
+  pesel: string;
   birthdate: string;
 }
 
