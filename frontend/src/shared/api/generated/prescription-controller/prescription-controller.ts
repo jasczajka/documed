@@ -22,6 +22,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import type {
   AddMedicineToPrescriptionParams,
+  CreatePrescriptionDTO,
   Medicine,
   MedicineWithAmount,
   Prescription,
@@ -313,10 +314,16 @@ export function useGetPrescriptionForVisit<
 /**
  * @summary Create Prescription
  */
-export const createPrescription = (visitId: number, signal?: AbortSignal) => {
+export const createPrescription = (
+  visitId: number,
+  createPrescriptionDTO: CreatePrescriptionDTO,
+  signal?: AbortSignal,
+) => {
   return customInstance<Prescription>({
     url: `/api/prescriptions/visit/${visitId}`,
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: createPrescriptionDTO,
     signal,
   });
 };
@@ -328,13 +335,13 @@ export const getCreatePrescriptionMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createPrescription>>,
     TError,
-    { visitId: number },
+    { visitId: number; data: CreatePrescriptionDTO },
     TContext
   >;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof createPrescription>>,
   TError,
-  { visitId: number },
+  { visitId: number; data: CreatePrescriptionDTO },
   TContext
 > => {
   const mutationKey = ['createPrescription'];
@@ -346,11 +353,11 @@ export const getCreatePrescriptionMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof createPrescription>>,
-    { visitId: number }
+    { visitId: number; data: CreatePrescriptionDTO }
   > = (props) => {
-    const { visitId } = props ?? {};
+    const { visitId, data } = props ?? {};
 
-    return createPrescription(visitId);
+    return createPrescription(visitId, data);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -359,7 +366,7 @@ export const getCreatePrescriptionMutationOptions = <
 export type CreatePrescriptionMutationResult = NonNullable<
   Awaited<ReturnType<typeof createPrescription>>
 >;
-
+export type CreatePrescriptionMutationBody = CreatePrescriptionDTO;
 export type CreatePrescriptionMutationError = ErrorType<unknown>;
 
 /**
@@ -370,7 +377,7 @@ export const useCreatePrescription = <TError = ErrorType<unknown>, TContext = un
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof createPrescription>>,
       TError,
-      { visitId: number },
+      { visitId: number; data: CreatePrescriptionDTO },
       TContext
     >;
   },
@@ -378,7 +385,7 @@ export const useCreatePrescription = <TError = ErrorType<unknown>, TContext = un
 ): UseMutationResult<
   Awaited<ReturnType<typeof createPrescription>>,
   TError,
-  { visitId: number },
+  { visitId: number; data: CreatePrescriptionDTO },
   TContext
 > => {
   const mutationOptions = getCreatePrescriptionMutationOptions(options);

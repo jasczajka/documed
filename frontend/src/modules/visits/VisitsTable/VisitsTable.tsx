@@ -270,6 +270,7 @@ export const VisitsTable: FC<VisitTableProps> = ({
           paginationMode="client"
           rowHeight={32}
           disableColumnFilter
+          disableRowSelectionOnClick
           sx={{
             '& .cancelled-visit': {
               backgroundColor: '#ffe6e6',

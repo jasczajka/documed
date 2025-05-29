@@ -53,7 +53,7 @@ export interface UpdateAttachmentsDTO {
   attachmentIds: number[];
 }
 
-export interface AdditionalServiceReturnDTO {
+export interface AdditionalServiceWithDetails {
   id: number;
   description?: string;
   date: string;
@@ -164,6 +164,10 @@ export interface Medicine {
   name: string;
   commonName: string;
   dosage: string;
+}
+
+export interface CreatePrescriptionDTO {
+  expirationDate: string;
 }
 
 export type PrescriptionStatus = (typeof PrescriptionStatus)[keyof typeof PrescriptionStatus];

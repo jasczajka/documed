@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { AdditionalServiceReturnDTO, Service } from 'shared/api/generated/generated.schemas';
+import { AdditionalServiceWithDetails, Service } from 'shared/api/generated/generated.schemas';
 import { FilterConfig } from 'shared/components/TableFilters';
 import { AdditionalServiceFilters } from './AdditionalServicesTable';
 
@@ -59,7 +59,7 @@ export const useAdditionalServicesTable = ({
   patientId,
   doctorId,
 }: {
-  additionalServices: AdditionalServiceReturnDTO[];
+  additionalServices: AdditionalServiceWithDetails[];
   filters: AdditionalServiceFilters;
   allAdditionalServices: Service[];
   isPatient: boolean;
@@ -71,14 +71,14 @@ export const useAdditionalServicesTable = ({
       return null;
     }
     const searchTerm = filters.patientName.toLowerCase();
-    return (additionalService: AdditionalServiceReturnDTO) =>
+    return (additionalService: AdditionalServiceWithDetails) =>
       additionalService.patientFullName.toLowerCase().includes(searchTerm);
   }, [filters.patientName]);
 
   const filterByService = useMemo(() => {
     if (!filters.service) return null;
     const searchTerm = filters.service.toLowerCase();
-    return (additionalService: AdditionalServiceReturnDTO) =>
+    return (additionalService: AdditionalServiceWithDetails) =>
       additionalService.serviceName.toLowerCase().includes(searchTerm);
   }, [filters.service]);
 
@@ -87,7 +87,7 @@ export const useAdditionalServicesTable = ({
       return null;
     }
     const searchTerm = filters.fulfiller.toLowerCase();
-    return (additionalService: AdditionalServiceReturnDTO) => {
+    return (additionalService: AdditionalServiceWithDetails) => {
       return additionalService.fulfillerFullName.toLowerCase().includes(searchTerm);
     };
   }, [filters.fulfiller]);
@@ -97,7 +97,7 @@ export const useAdditionalServicesTable = ({
       return null;
     }
 
-    return (additionalService: AdditionalServiceReturnDTO) => {
+    return (additionalService: AdditionalServiceWithDetails) => {
       if (!additionalService.date) {
         return false;
       }
@@ -120,7 +120,7 @@ export const useAdditionalServicesTable = ({
       filterByService,
       filterBySpecialist,
       filterByDateRange,
-    ].filter(Boolean) as ((additionalService: AdditionalServiceReturnDTO) => boolean)[];
+    ].filter(Boolean) as ((additionalService: AdditionalServiceWithDetails) => boolean)[];
 
     if (activeFilters.length === 0) return additionalServices;
 

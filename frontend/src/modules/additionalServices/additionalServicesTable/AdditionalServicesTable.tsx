@@ -5,7 +5,7 @@ import { endOfDay, format, startOfDay } from 'date-fns';
 import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 import {
-  AdditionalServiceReturnDTO,
+  AdditionalServiceWithDetails,
   FileInfoDTO,
   Service,
 } from 'shared/api/generated/generated.schemas';
@@ -27,7 +27,7 @@ export type AdditionalServiceFilters = {
 };
 
 interface AdditionalServicesTableProps {
-  additionalServices: AdditionalServiceReturnDTO[];
+  additionalServices: AdditionalServiceWithDetails[];
   allAdditionalServices: Service[];
   refetch: () => Promise<void>;
   patientId?: number;
@@ -50,7 +50,7 @@ const columns = (
   ) => void,
   onNavigateToPatient: (id: number) => void,
   isPatient: boolean,
-): GridColDef<AdditionalServiceReturnDTO>[] => [
+): GridColDef<AdditionalServiceWithDetails>[] => [
   {
     field: 'index',
     headerName: '#',
@@ -105,7 +105,7 @@ const columns = (
     type: 'actions',
     width: 70,
     flex: 0.5,
-    getActions: (params: { row: AdditionalServiceReturnDTO }) => {
+    getActions: (params: { row: AdditionalServiceWithDetails }) => {
       return [
         <GridActionsCellItem
           key={`begin-${params.row.id}`}
@@ -240,6 +240,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
           paginationMode="client"
           rowHeight={32}
           disableColumnFilter
+          disableRowSelectionOnClick
         />
       </Paper>
       <NotificationComponent />

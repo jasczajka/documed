@@ -5,6 +5,9 @@ import com.documed.backend.medicines.model.Medicine;
 import com.documed.backend.medicines.model.MedicineWithAmount;
 import com.documed.backend.prescriptions.exceptions.AlreadyIssuedException;
 import com.documed.backend.prescriptions.exceptions.WrongAmountException;
+import com.documed.backend.prescriptions.model.CreatePrescriptionObject;
+import com.documed.backend.prescriptions.model.Prescription;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -25,8 +28,8 @@ public class PrescriptionService {
     return prescriptionDAO.getById(prescriptionId);
   }
 
-  Prescription createPrescription(int visitId) {
-    return prescriptionDAO.create(visitId);
+  Prescription createPrescription(int visitId, LocalDate expirationDate) {
+    return prescriptionDAO.create(new CreatePrescriptionObject(visitId, expirationDate));
   }
 
   Optional<Prescription> getPrescriptionForVisit(int visitId) {

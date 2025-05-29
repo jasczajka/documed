@@ -1,11 +1,14 @@
 package com.documed.backend.prescriptions
 
-import com.documed.backend.auth.exceptions.OtpNotFoundException
+
 import com.documed.backend.medicines.MedicineDAO
 import com.documed.backend.medicines.model.Medicine
 import com.documed.backend.medicines.model.MedicineWithAmount
 import com.documed.backend.prescriptions.exceptions.AlreadyIssuedException
 import com.documed.backend.prescriptions.exceptions.WrongAmountException
+import com.documed.backend.prescriptions.model.CreatePrescriptionObject
+import com.documed.backend.prescriptions.model.Prescription
+import java.time.LocalDate
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -55,18 +58,23 @@ class PrescriptionServiceTest extends Specification {
 		result.isEmpty()
 	}
 
-	def "createPrescription calls DAO with visitId"() {
+	def "createPrescription calls DAO with CreatePrescriptionObject"() {
 		given:
 		def visitId = 5
-		def expected = Prescription.builder().id(visitId).build()
-		prescriptionDAO.create(visitId) >> expected
+		def expirationDate = LocalDate.of(2025, 6, 1)
+		def createObject = new CreatePrescriptionObject(visitId, expirationDate)
+		def expected = Prescription.builder().id(visitId).expirationDate(expirationDate).build()
+
+		and:
+		prescriptionDAO.create(createObject) >> expected
 
 		when:
-		def result = service.createPrescription(visitId)
+		def result = service.createPrescription(visitId, expirationDate)
 
 		then:
 		result == expected
 	}
+
 	def "getPrescriptionForVisit returns DAO result"() {
 		given:
 		def visitId = 10
@@ -148,7 +156,7 @@ class PrescriptionServiceTest extends Specification {
 		prescriptionDAO.addMedicineToPrescription(prescriptionId, medicineId, amount) >> Optional.of(medicine)
 
 		when:
-		def result = service.addMedicineToPrescription(prescriptionId, medicineId, amount)
+		service.addMedicineToPrescription(prescriptionId, medicineId, amount)
 
 		then:
 		thrown(WrongAmountException)

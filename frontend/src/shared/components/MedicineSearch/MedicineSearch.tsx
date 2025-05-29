@@ -1,14 +1,17 @@
 import { Autocomplete, CircularProgress, TextField } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { Medicine } from 'shared/api/generated/generated.schemas';
 import { useSearchMedicines } from 'shared/api/generated/medicine-controller/medicine-controller';
 import { useDebounce } from 'use-debounce';
 
-export const MedicineSearch = () => {
+interface MedicineSearchProps {
+  onChange: (medicine: Medicine | null) => void;
+}
+
+export const MedicineSearch: FC<MedicineSearchProps> = ({ onChange }) => {
   const [open, setOpen] = useState(false);
   const [medicineQuery, setMedicineQuery] = useState('');
-  const [options, setOptions] = useState<readonly Medicine[]>([]);
-
+  const [options, setOptions] = useState<Medicine[]>([]);
   const [debouncedQuery] = useDebounce(medicineQuery, 300);
 
   const { data, isFetching } = useSearchMedicines(
@@ -49,6 +52,7 @@ export const MedicineSearch = () => {
       options={options}
       loading={isFetching}
       onInputChange={(_, value) => setMedicineQuery(value)}
+      onChange={(_, selectedMedicine) => onChange(selectedMedicine)}
       renderInput={(params) => (
         <TextField
           {...params}
