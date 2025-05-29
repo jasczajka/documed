@@ -81,19 +81,20 @@ export interface ScheduleVisitDTO {
   serviceId: number;
 }
 
-export type VisitDTOStatus = (typeof VisitDTOStatus)[keyof typeof VisitDTOStatus];
+export type VisitWithDetailsStatus =
+  (typeof VisitWithDetailsStatus)[keyof typeof VisitWithDetailsStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const VisitDTOStatus = {
+export const VisitWithDetailsStatus = {
   PLANNED: 'PLANNED',
   IN_PROGRESS: 'IN_PROGRESS',
   CLOSED: 'CLOSED',
   CANCELLED: 'CANCELLED',
 } as const;
 
-export interface VisitDTO {
+export interface VisitWithDetails {
   id: number;
-  status: VisitDTOStatus;
+  status: VisitWithDetailsStatus;
   interview?: string;
   diagnosis?: string;
   recommendations?: string;

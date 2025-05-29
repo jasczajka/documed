@@ -20,16 +20,117 @@ import type {
 } from '@tanstack/react-query';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import type { ScheduleVisitDTO, UpdateVisitDTO, VisitDTO } from '../generated.schemas';
+import type { ScheduleVisitDTO, UpdateVisitDTO, VisitWithDetails } from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
 
 /**
+ * @summary Get all visits
+ */
+export const getAllVisits = (signal?: AbortSignal) => {
+  return customInstance<VisitWithDetails[]>({ url: `/api/visits`, method: 'GET', signal });
+};
+
+export const getGetAllVisitsQueryKey = () => {
+  return [`/api/visits`] as const;
+};
+
+export const getGetAllVisitsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAllVisits>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllVisits>>, TError, TData>>;
+}) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetAllVisitsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllVisits>>> = ({ signal }) =>
+    getAllVisits(signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAllVisits>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAllVisitsQueryResult = NonNullable<Awaited<ReturnType<typeof getAllVisits>>>;
+export type GetAllVisitsQueryError = ErrorType<unknown>;
+
+export function useGetAllVisits<
+  TData = Awaited<ReturnType<typeof getAllVisits>>,
+  TError = ErrorType<unknown>,
+>(
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllVisits>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllVisits>>,
+          TError,
+          Awaited<ReturnType<typeof getAllVisits>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAllVisits<
+  TData = Awaited<ReturnType<typeof getAllVisits>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllVisits>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllVisits>>,
+          TError,
+          Awaited<ReturnType<typeof getAllVisits>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAllVisits<
+  TData = Awaited<ReturnType<typeof getAllVisits>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllVisits>>, TError, TData>>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get all visits
+ */
+
+export function useGetAllVisits<
+  TData = Awaited<ReturnType<typeof getAllVisits>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllVisits>>, TError, TData>>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetAllVisitsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
  * @summary schedule/create visit
  */
 export const scheduleVisit = (scheduleVisitDTO: ScheduleVisitDTO, signal?: AbortSignal) => {
-  return customInstance<VisitDTO>({
+  return customInstance<VisitWithDetails>({
     url: `/api/visits`,
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -104,7 +205,7 @@ export const useScheduleVisit = <TError = ErrorType<unknown>, TContext = unknown
  * @summary Get visit by id
  */
 export const getVisitById = (id: number, signal?: AbortSignal) => {
-  return customInstance<VisitDTO>({ url: `/api/visits/${id}`, method: 'GET', signal });
+  return customInstance<VisitWithDetails>({ url: `/api/visits/${id}`, method: 'GET', signal });
 };
 
 export const getGetVisitByIdQueryKey = (id: number) => {
@@ -212,7 +313,7 @@ export function useGetVisitById<
  * @summary update visit data
  */
 export const updateVisit = (id: number, updateVisitDTO: UpdateVisitDTO) => {
-  return customInstance<VisitDTO>({
+  return customInstance<VisitWithDetails>({
     url: `/api/visits/${id}`,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
@@ -494,7 +595,7 @@ export const useCancelPlannedVisit = <TError = ErrorType<unknown>, TContext = un
  * @summary get all visits for logged in patient
  */
 export const getVisitsForCurrentPatient = (signal?: AbortSignal) => {
-  return customInstance<VisitDTO[]>({ url: `/api/visits/patient`, method: 'GET', signal });
+  return customInstance<VisitWithDetails[]>({ url: `/api/visits/patient`, method: 'GET', signal });
 };
 
 export const getGetVisitsForCurrentPatientQueryKey = () => {
@@ -608,7 +709,11 @@ export function useGetVisitsForCurrentPatient<
  * @summary get all visits for selected patient
  */
 export const getVisitsByPatientId = (id: number, signal?: AbortSignal) => {
-  return customInstance<VisitDTO[]>({ url: `/api/visits/patient/${id}`, method: 'GET', signal });
+  return customInstance<VisitWithDetails[]>({
+    url: `/api/visits/patient/${id}`,
+    method: 'GET',
+    signal,
+  });
 };
 
 export const getGetVisitsByPatientIdQueryKey = (id: number) => {
@@ -728,7 +833,7 @@ export function useGetVisitsByPatientId<
  * @summary get all visits assigned for logged in doctor
  */
 export const getVisitsForCurrentDoctor = (signal?: AbortSignal) => {
-  return customInstance<VisitDTO[]>({ url: `/api/visits/doctor`, method: 'GET', signal });
+  return customInstance<VisitWithDetails[]>({ url: `/api/visits/doctor`, method: 'GET', signal });
 };
 
 export const getGetVisitsForCurrentDoctorQueryKey = () => {
@@ -842,7 +947,11 @@ export function useGetVisitsForCurrentDoctor<
  * @summary get all visits assigned for selected doctor
  */
 export const getVisitsByDoctorId = (id: number, signal?: AbortSignal) => {
-  return customInstance<VisitDTO[]>({ url: `/api/visits/doctor/${id}`, method: 'GET', signal });
+  return customInstance<VisitWithDetails[]>({
+    url: `/api/visits/doctor/${id}`,
+    method: 'GET',
+    signal,
+  });
 };
 
 export const getGetVisitsByDoctorIdQueryKey = (id: number) => {

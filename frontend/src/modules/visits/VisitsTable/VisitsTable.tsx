@@ -4,7 +4,7 @@ import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 import { endOfDay, format, parse, startOfDay } from 'date-fns';
 import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Service, VisitDTO, VisitStatus } from 'shared/api/generated/generated.schemas';
+import { Service, VisitStatus, VisitWithDetails } from 'shared/api/generated/generated.schemas';
 import { appConfig } from 'shared/appConfig';
 import { ReviewModal } from 'shared/components/ReviewModal';
 import { TableFilters } from 'shared/components/TableFilters';
@@ -23,7 +23,7 @@ export type VisitsFilters = {
 };
 
 interface VisitTableProps {
-  visits: VisitDTO[];
+  visits: VisitWithDetails[];
   allServices: Service[];
   onCancel: (id: number) => void;
   patientId?: number;
@@ -37,7 +37,7 @@ const columns = (
   onAddReview?: (id: number, doctorFullName: string) => void,
   showReviewOption?: boolean,
   loading?: boolean,
-): GridColDef<VisitDTO>[] => [
+): GridColDef<VisitWithDetails>[] => [
   {
     field: 'index',
     headerName: '#',
@@ -102,7 +102,7 @@ const columns = (
     type: 'actions',
     width: 70,
     flex: 0.5,
-    getActions: (params: { row: VisitDTO }) => {
+    getActions: (params: { row: VisitWithDetails }) => {
       if (params.row.status === 'CANCELLED') return [];
 
       return [

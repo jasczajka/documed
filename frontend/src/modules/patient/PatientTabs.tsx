@@ -13,7 +13,7 @@ import {
   AdditionalServiceReturnDTO,
   FileInfoDTO,
   Service,
-  VisitDTO,
+  VisitWithDetails,
 } from 'shared/api/generated/generated.schemas';
 import { useCancelPlannedVisit } from 'shared/api/generated/visit-controller/visit-controller';
 import CancelVisitModal from 'shared/components/ConfirmationModal/CancelVisitModal';
@@ -28,7 +28,7 @@ interface PatientTabsProps {
   tabIndex: number;
   onTabChange: (index: number) => void;
   patientAttachments: FileInfoDTO[];
-  patientVisits: VisitDTO[];
+  patientVisits: VisitWithDetails[];
   patientAdditionalServices: AdditionalServiceReturnDTO[];
   allServices: Service[];
   allAdditionalServices: Service[];

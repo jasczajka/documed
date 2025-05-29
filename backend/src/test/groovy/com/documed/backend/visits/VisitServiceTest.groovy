@@ -7,6 +7,7 @@ import com.documed.backend.schedules.model.TimeSlot
 import com.documed.backend.services.ServiceService
 import com.documed.backend.users.services.SubscriptionService
 import com.documed.backend.users.services.UserService
+import com.documed.backend.visits.dtos.ScheduleVisitDTO
 import com.documed.backend.visits.dtos.UpdateVisitDTO
 import com.documed.backend.visits.exceptions.*
 import com.documed.backend.visits.model.*

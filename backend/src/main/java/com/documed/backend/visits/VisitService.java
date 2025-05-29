@@ -9,11 +9,12 @@ import com.documed.backend.services.ServiceService;
 import com.documed.backend.users.model.UserRole;
 import com.documed.backend.users.services.SubscriptionService;
 import com.documed.backend.users.services.UserService;
+import com.documed.backend.visits.dtos.ScheduleVisitDTO;
 import com.documed.backend.visits.dtos.UpdateVisitDTO;
 import com.documed.backend.visits.exceptions.WrongVisitStatusException;
-import com.documed.backend.visits.model.ScheduleVisitDTO;
 import com.documed.backend.visits.model.Visit;
 import com.documed.backend.visits.model.VisitStatus;
+import com.documed.backend.visits.model.VisitWithDetails;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -31,6 +32,46 @@ public class VisitService {
   private final ServiceService serviceService;
   private final UserService userService;
   private final SubscriptionService subscriptionService;
+
+  public VisitWithDetails getByIdWithDetails(int id) {
+    VisitWithDetails visit =
+        visitDAO
+            .findByIdWithDetails(id)
+            .orElseThrow(() -> new NotFoundException("Visit not found"));
+
+    if (authService.getCurrentUserRole() == UserRole.PATIENT
+        && visit.getPatientId() != authService.getCurrentUserId()) {
+      throw new UnauthorizedException("You are not authorized to access this resource");
+    }
+
+    return visit;
+  }
+
+  public List<VisitWithDetails> getAllWithDetails() {
+    return visitDAO.findAllWithDetails();
+  }
+
+  public List<VisitWithDetails> getVisitsForCurrentPatientWithDetails() {
+    int patientId = authService.getCurrentUserId();
+    int facilityId = authService.getCurrentFacilityId();
+    return visitDAO.findByPatientIdAndFacilityIdWithDetails(patientId, facilityId);
+  }
+
+  public List<VisitWithDetails> getVisitsByPatientIdWithDetails(int patientId) {
+    int facilityId = authService.getCurrentFacilityId();
+    return visitDAO.findByPatientIdAndFacilityIdWithDetails(patientId, facilityId);
+  }
+
+  public List<VisitWithDetails> getVisitsByDoctorIdWithDetails(int doctorId) {
+    int facilityId = authService.getCurrentFacilityId();
+    return visitDAO.findByDoctorIdAndFacilityIdWithDetails(doctorId, facilityId);
+  }
+
+  public List<VisitWithDetails> getVisitsForCurrentDoctorWithDetails() {
+    int doctorId = authService.getCurrentUserId();
+    int facilityId = authService.getCurrentFacilityId();
+    return visitDAO.findByDoctorIdAndFacilityIdWithDetails(doctorId, facilityId);
+  }
 
   public Visit getById(int id) {
     Visit visit = visitDAO.getById(id).orElseThrow(() -> new NotFoundException("Visit not found"));
@@ -146,7 +187,11 @@ public class VisitService {
 
   @Transactional
   public boolean cancelVisit(int visitId) {
-
+    int patientId = visitDAO.getVisitPatientId(visitId);
+    if (authService.getCurrentUserRole() == UserRole.PATIENT
+        && patientId != authService.getCurrentUserId()) {
+      throw new UnauthorizedException("Patient can only cancel their own visit");
+    }
     timeSlotService.releaseTimeSlotsForVisit(visitId);
     return visitDAO.updateVisitStatus(visitId, VisitStatus.CANCELLED);
   }

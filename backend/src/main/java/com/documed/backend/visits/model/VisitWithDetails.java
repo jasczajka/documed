@@ -1,6 +1,5 @@
-package com.documed.backend.visits.dtos;
+package com.documed.backend.visits.model;
 
-import com.documed.backend.visits.model.VisitStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -11,7 +10,7 @@ import lombok.NonNull;
 
 @Data
 @Builder
-public class VisitDTO {
+public class VisitWithDetails {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private int id;
 
