@@ -580,15 +580,18 @@ const SingleVisitPage: FC = () => {
         disabled={inputsDisabled}
         uploadFileLoading={fileUploadLoading}
       />
-      <SinglePrescriptionTable
-        existingMedicines={prescriptionMedicines}
-        onAddMedicineToPrescription={handleAddMedicine}
-        onRemoveMedicineFromPrescription={handleRemoveMedicine}
-        prescriptionExpirationDate={prescriptionExpirationDate}
-        handlePrescriptionExpirationDateChange={(newDate) => setPrescriptionExpirationDate(newDate)}
-        disabled={inputsDisabled}
-      />
-
+      <Box sx={{ width: '70%' }}>
+        <SinglePrescriptionTable
+          existingMedicines={prescriptionMedicines}
+          onAddMedicineToPrescription={handleAddMedicine}
+          onRemoveMedicineFromPrescription={handleRemoveMedicine}
+          prescriptionExpirationDate={prescriptionExpirationDate}
+          handlePrescriptionExpirationDateChange={(newDate) =>
+            setPrescriptionExpirationDate(newDate)
+          }
+          disabled={inputsDisabled}
+        />
+      </Box>
       <NotificationComponent />
     </form>
   );
