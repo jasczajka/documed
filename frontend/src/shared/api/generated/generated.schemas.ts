@@ -80,6 +80,7 @@ export interface ScheduleVisitDTO {
   doctorId: number;
   firstTimeSlotId: number;
   serviceId: number;
+  facilityId: number;
 }
 
 export type VisitWithDetailsStatus =
