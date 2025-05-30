@@ -3,8 +3,11 @@ package com.documed.backend.prescriptions;
 import com.documed.backend.FullDAO;
 import com.documed.backend.medicines.MedicineService;
 import com.documed.backend.medicines.model.Medicine;
+import com.documed.backend.prescriptions.model.CreatePrescriptionObject;
+import com.documed.backend.prescriptions.model.Prescription;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -16,7 +19,7 @@ import org.springframework.stereotype.Repository;
 
 @AllArgsConstructor
 @Repository
-public class PrescriptionDAO implements FullDAO<Prescription, Integer> {
+public class PrescriptionDAO implements FullDAO<Prescription, CreatePrescriptionObject> {
 
   private final JdbcTemplate jdbcTemplate;
   private final MedicineService medicineService;
@@ -32,15 +35,16 @@ public class PrescriptionDAO implements FullDAO<Prescription, Integer> {
               .build();
 
   @Override
-  public Prescription create(Integer visitId) {
-    String sql = "INSERT INTO prescription (visit_id) VALUES (?) RETURNING id";
+  public Prescription create(CreatePrescriptionObject createObject) {
+    String sql = "INSERT INTO prescription (visit_id, expiration_date) VALUES (?, ?) RETURNING id";
 
     KeyHolder keyHolder = new GeneratedKeyHolder();
 
     jdbcTemplate.update(
         connection -> {
           PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-          ps.setInt(1, visitId);
+          ps.setInt(1, createObject.visitId());
+          ps.setObject(2, createObject.expirationDate());
           return ps;
         },
         keyHolder);
@@ -48,9 +52,10 @@ public class PrescriptionDAO implements FullDAO<Prescription, Integer> {
     Number key = keyHolder.getKey();
 
     if (key != null) {
-      return Prescription.builder().id(key.intValue()).build();
+      String selectSql = "SELECT * FROM prescription WHERE id = ?";
+      return jdbcTemplate.queryForObject(selectSql, rowMapper, key.intValue());
     } else {
-      throw new IllegalStateException("Failed retrieve id value");
+      throw new IllegalStateException("Failed to retrieve generated ID for prescription");
     }
   }
 
@@ -131,5 +136,27 @@ public class PrescriptionDAO implements FullDAO<Prescription, Integer> {
         WHERE id = ?;
     """;
     return jdbcTemplate.update(sql, status, prescriptionId);
+  }
+
+  public void updatePrescriptionExpirationDate(int prescriptionId, LocalDate newExpirationDate) {
+    String sql = "UPDATE prescription SET expiration_date = ? WHERE id = ?";
+    jdbcTemplate.update(sql, newExpirationDate, prescriptionId);
+  }
+
+  public int getNumberOfMedicinesOnPrescriptionByVisitId(int visitId) {
+    String sql =
+        """
+                  SELECT COUNT(*)
+                  FROM medicine_prescription mp
+                  JOIN prescription p ON mp.prescription_id = p.id
+                  WHERE p.visit_id = ?
+                 """;
+    return jdbcTemplate.queryForObject(sql, Integer.class, visitId);
+  }
+
+  public Optional<Integer> getPrescriptionIdForVisitId(int visitId) {
+    String sql = "SELECT id FROM prescription WHERE visit_id = ?";
+    return jdbcTemplate.query(
+        sql, rs -> rs.next() ? Optional.of(rs.getInt("id")) : Optional.empty(), visitId);
   }
 }

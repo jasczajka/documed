@@ -6,8 +6,12 @@ import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
 import com.documed.backend.auth.exceptions.UnauthorizedException;
 import com.documed.backend.medicines.model.Medicine;
 import com.documed.backend.medicines.model.MedicineWithAmount;
+import com.documed.backend.prescriptions.dtos.CreatePrescriptionDTO;
+import com.documed.backend.prescriptions.model.Prescription;
 import com.documed.backend.users.model.UserRole;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -26,8 +30,12 @@ public class PrescriptionController {
   @StaffOnly
   @PostMapping("/visit/{visit_id}")
   @Operation(summary = "Create Prescription")
-  public ResponseEntity<Prescription> createPrescription(@PathVariable("visit_id") int visitId) {
-    return new ResponseEntity<>(prescriptionService.createPrescription(visitId), HttpStatus.OK);
+  public ResponseEntity<Prescription> createPrescription(
+      @PathVariable("visit_id") int visitId,
+      @Valid @RequestBody CreatePrescriptionDTO createPrescriptionDTO) {
+    return new ResponseEntity<>(
+        prescriptionService.createPrescription(visitId, createPrescriptionDTO.getExpirationDate()),
+        HttpStatus.OK);
   }
 
   @GetMapping("/visit/{visit_id}")
@@ -112,10 +120,20 @@ public class PrescriptionController {
   }
 
   @StaffOnly
-  @PatchMapping("/{prescription_id}")
+  @PatchMapping("/{prescription_id}/issue")
   @Operation(summary = "Issue prescription")
   public ResponseEntity<Prescription> issuePrescription(
       @PathVariable("prescription_id") int prescriptionId) {
     return ResponseEntity.ok(prescriptionService.issuePrescription(prescriptionId));
+  }
+
+  @StaffOnly
+  @PatchMapping("/{prescription_id}/expiration-date")
+  @Operation(summary = "Update prescription expiration Date")
+  public ResponseEntity<Prescription> updatePrescriptionExpirationDate(
+      @PathVariable("prescription_id") int prescriptionId,
+      @RequestBody LocalDate newExpirationDate) {
+    return ResponseEntity.ok(
+        prescriptionService.updatePrescriptionExpirationDate(prescriptionId, newExpirationDate));
   }
 }

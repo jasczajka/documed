@@ -7,6 +7,7 @@ import com.documed.backend.visits.exceptions.CancelVisitException;
 import com.documed.backend.visits.model.Visit;
 import com.documed.backend.visits.model.VisitWithDetails;
 import io.swagger.v3.oas.annotations.Operation;
+import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -120,5 +121,13 @@ public class VisitController {
     } else {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+  }
+
+  @GetMapping("/calculate-cost")
+  @Operation(summary = "Calculate visit cost")
+  public ResponseEntity<BigDecimal> calculateVisitCost(
+      @RequestParam int patientId, @RequestParam int serviceId) {
+    return new ResponseEntity<>(
+        visitService.calculateTotalCost(serviceId, patientId), HttpStatus.OK);
   }
 }

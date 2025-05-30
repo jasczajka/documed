@@ -22,6 +22,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import type {
   AddMedicineToPrescriptionParams,
+  CreatePrescriptionDTO,
   Medicine,
   MedicineWithAmount,
   Prescription,
@@ -313,10 +314,16 @@ export function useGetPrescriptionForVisit<
 /**
  * @summary Create Prescription
  */
-export const createPrescription = (visitId: number, signal?: AbortSignal) => {
+export const createPrescription = (
+  visitId: number,
+  createPrescriptionDTO: CreatePrescriptionDTO,
+  signal?: AbortSignal,
+) => {
   return customInstance<Prescription>({
     url: `/api/prescriptions/visit/${visitId}`,
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: createPrescriptionDTO,
     signal,
   });
 };
@@ -328,13 +335,13 @@ export const getCreatePrescriptionMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof createPrescription>>,
     TError,
-    { visitId: number },
+    { visitId: number; data: CreatePrescriptionDTO },
     TContext
   >;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof createPrescription>>,
   TError,
-  { visitId: number },
+  { visitId: number; data: CreatePrescriptionDTO },
   TContext
 > => {
   const mutationKey = ['createPrescription'];
@@ -346,11 +353,11 @@ export const getCreatePrescriptionMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof createPrescription>>,
-    { visitId: number }
+    { visitId: number; data: CreatePrescriptionDTO }
   > = (props) => {
-    const { visitId } = props ?? {};
+    const { visitId, data } = props ?? {};
 
-    return createPrescription(visitId);
+    return createPrescription(visitId, data);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -359,7 +366,7 @@ export const getCreatePrescriptionMutationOptions = <
 export type CreatePrescriptionMutationResult = NonNullable<
   Awaited<ReturnType<typeof createPrescription>>
 >;
-
+export type CreatePrescriptionMutationBody = CreatePrescriptionDTO;
 export type CreatePrescriptionMutationError = ErrorType<unknown>;
 
 /**
@@ -370,7 +377,7 @@ export const useCreatePrescription = <TError = ErrorType<unknown>, TContext = un
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof createPrescription>>,
       TError,
-      { visitId: number },
+      { visitId: number; data: CreatePrescriptionDTO },
       TContext
     >;
   },
@@ -378,81 +385,10 @@ export const useCreatePrescription = <TError = ErrorType<unknown>, TContext = un
 ): UseMutationResult<
   Awaited<ReturnType<typeof createPrescription>>,
   TError,
-  { visitId: number },
+  { visitId: number; data: CreatePrescriptionDTO },
   TContext
 > => {
   const mutationOptions = getCreatePrescriptionMutationOptions(options);
-
-  return useMutation(mutationOptions, queryClient);
-};
-/**
- * @summary Remove prescription
- */
-export const removePrescription = (prescriptionId: number) => {
-  return customInstance<number>({ url: `/api/prescriptions/${prescriptionId}`, method: 'DELETE' });
-};
-
-export const getRemovePrescriptionMutationOptions = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof removePrescription>>,
-    TError,
-    { prescriptionId: number },
-    TContext
-  >;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof removePrescription>>,
-  TError,
-  { prescriptionId: number },
-  TContext
-> => {
-  const mutationKey = ['removePrescription'];
-  const { mutation: mutationOptions } = options
-    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey } };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof removePrescription>>,
-    { prescriptionId: number }
-  > = (props) => {
-    const { prescriptionId } = props ?? {};
-
-    return removePrescription(prescriptionId);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type RemovePrescriptionMutationResult = NonNullable<
-  Awaited<ReturnType<typeof removePrescription>>
->;
-
-export type RemovePrescriptionMutationError = ErrorType<unknown>;
-
-/**
- * @summary Remove prescription
- */
-export const useRemovePrescription = <TError = ErrorType<unknown>, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof removePrescription>>,
-      TError,
-      { prescriptionId: number },
-      TContext
-    >;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof removePrescription>>,
-  TError,
-  { prescriptionId: number },
-  TContext
-> => {
-  const mutationOptions = getRemovePrescriptionMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
@@ -461,7 +397,7 @@ export const useRemovePrescription = <TError = ErrorType<unknown>, TContext = un
  */
 export const issuePrescription = (prescriptionId: number) => {
   return customInstance<Prescription>({
-    url: `/api/prescriptions/${prescriptionId}`,
+    url: `/api/prescriptions/${prescriptionId}/issue`,
     method: 'PATCH',
   });
 };
@@ -527,6 +463,88 @@ export const useIssuePrescription = <TError = ErrorType<unknown>, TContext = unk
   TContext
 > => {
   const mutationOptions = getIssuePrescriptionMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+/**
+ * @summary Update prescription expiration Date
+ */
+export const updatePrescriptionExpirationDate = (
+  prescriptionId: number,
+  updatePrescriptionExpirationDateBody: string,
+) => {
+  return customInstance<Prescription>({
+    url: `/api/prescriptions/${prescriptionId}/expiration-date`,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    data: updatePrescriptionExpirationDateBody,
+  });
+};
+
+export const getUpdatePrescriptionExpirationDateMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updatePrescriptionExpirationDate>>,
+    TError,
+    { prescriptionId: number; data: string },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updatePrescriptionExpirationDate>>,
+  TError,
+  { prescriptionId: number; data: string },
+  TContext
+> => {
+  const mutationKey = ['updatePrescriptionExpirationDate'];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updatePrescriptionExpirationDate>>,
+    { prescriptionId: number; data: string }
+  > = (props) => {
+    const { prescriptionId, data } = props ?? {};
+
+    return updatePrescriptionExpirationDate(prescriptionId, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdatePrescriptionExpirationDateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updatePrescriptionExpirationDate>>
+>;
+export type UpdatePrescriptionExpirationDateMutationBody = string;
+export type UpdatePrescriptionExpirationDateMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Update prescription expiration Date
+ */
+export const useUpdatePrescriptionExpirationDate = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updatePrescriptionExpirationDate>>,
+      TError,
+      { prescriptionId: number; data: string },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updatePrescriptionExpirationDate>>,
+  TError,
+  { prescriptionId: number; data: string },
+  TContext
+> => {
+  const mutationOptions = getUpdatePrescriptionExpirationDateMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
@@ -872,3 +890,75 @@ export function useGetPrescriptionsForUser<
 
   return query;
 }
+
+/**
+ * @summary Remove prescription
+ */
+export const removePrescription = (prescriptionId: number) => {
+  return customInstance<number>({ url: `/api/prescriptions/${prescriptionId}`, method: 'DELETE' });
+};
+
+export const getRemovePrescriptionMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof removePrescription>>,
+    TError,
+    { prescriptionId: number },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof removePrescription>>,
+  TError,
+  { prescriptionId: number },
+  TContext
+> => {
+  const mutationKey = ['removePrescription'];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof removePrescription>>,
+    { prescriptionId: number }
+  > = (props) => {
+    const { prescriptionId } = props ?? {};
+
+    return removePrescription(prescriptionId);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RemovePrescriptionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof removePrescription>>
+>;
+
+export type RemovePrescriptionMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Remove prescription
+ */
+export const useRemovePrescription = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof removePrescription>>,
+      TError,
+      { prescriptionId: number },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof removePrescription>>,
+  TError,
+  { prescriptionId: number },
+  TContext
+> => {
+  const mutationOptions = getRemovePrescriptionMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};

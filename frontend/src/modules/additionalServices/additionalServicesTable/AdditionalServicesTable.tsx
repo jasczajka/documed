@@ -251,6 +251,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
           paginationMode="client"
           rowHeight={32}
           disableColumnFilter
+          disableRowSelectionOnClick
         />
       </Paper>
       <NotificationComponent />

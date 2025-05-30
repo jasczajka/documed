@@ -168,6 +168,10 @@ export interface Medicine {
   dosage: string;
 }
 
+export interface CreatePrescriptionDTO {
+  expirationDate: string;
+}
+
 export type PrescriptionStatus = (typeof PrescriptionStatus)[keyof typeof PrescriptionStatus];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
@@ -510,6 +514,11 @@ export type AddMedicineToPrescriptionParams = {
 
 export type GetAvailableFirstTimeSlotsByDoctorParams = {
   neededTimeSlots: number;
+};
+
+export type CalculateVisitCostParams = {
+  patientId: number;
+  serviceId: number;
 };
 
 export type GetAllMedicinesParams = {

@@ -18,7 +18,10 @@ import {
   Service,
 } from 'shared/api/generated/generated.schemas';
 import { useGetAvailableFirstTimeSlotsByDoctor } from 'shared/api/generated/time-slot-controller/time-slot-controller';
-import { useScheduleVisit } from 'shared/api/generated/visit-controller/visit-controller';
+import {
+  useCalculateVisitCost,
+  useScheduleVisit,
+} from 'shared/api/generated/visit-controller/visit-controller';
 import { appConfig } from 'shared/appConfig';
 import { useNotification } from 'shared/hooks/useNotification';
 import * as Yup from 'yup';
@@ -123,6 +126,11 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
     { query: { enabled: !!selectedDoctorId && !!selectedServiceId && !!neededTimeSlots } },
   );
 
+  const { data: visitCost, refetch: refetchVisitCost } = useCalculateVisitCost(
+    { patientId: patientId, serviceId: selectedServiceId ?? -1 },
+    { query: { enabled: !!selectedServiceId } },
+  );
+
   const possibleStartTimes = useMemo(() => {
     if (!availableTimeSlots) {
       return [];
@@ -180,6 +188,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
           display: 'flex',
           flexDirection: 'column',
           gap: 6,
+          overflow: 'visible',
           minWidth: 600,
         }}
         component="form"
@@ -206,6 +215,9 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
                   field.onChange(newValue?.id);
                   resetField('doctorId');
                   resetField('visitDate');
+                  if (newValue?.id) {
+                    refetchVisitCost();
+                  }
                 }}
                 value={allServices.find((service) => service.id === field.value) ?? null}
                 noOptionsText="Brak opcji spełniających wyszukiwanie"
@@ -251,6 +263,15 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
             )}
           />
         </Stack>
+        <TextField
+          label="Cena wizyty"
+          value={visitCost ? `${visitCost.toFixed(2)} zł` : 'Wybierz usługę, aby poznać cenę'}
+          fullWidth
+          slotProps={{ input: { readOnly: true } }}
+          sx={{
+            pointerEvents: 'none',
+          }}
+        />
         <DialogContent sx={{ p: 0 }}>
           <Controller
             name="visitDate"

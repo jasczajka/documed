@@ -5,6 +5,9 @@ import com.documed.backend.medicines.model.Medicine;
 import com.documed.backend.medicines.model.MedicineWithAmount;
 import com.documed.backend.prescriptions.exceptions.AlreadyIssuedException;
 import com.documed.backend.prescriptions.exceptions.WrongAmountException;
+import com.documed.backend.prescriptions.model.CreatePrescriptionObject;
+import com.documed.backend.prescriptions.model.Prescription;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -25,11 +28,11 @@ public class PrescriptionService {
     return prescriptionDAO.getById(prescriptionId);
   }
 
-  Prescription createPrescription(int visitId) {
-    return prescriptionDAO.create(visitId);
+  Prescription createPrescription(int visitId, LocalDate expirationDate) {
+    return prescriptionDAO.create(new CreatePrescriptionObject(visitId, expirationDate));
   }
 
-  Optional<Prescription> getPrescriptionForVisit(int visitId) {
+  public Optional<Prescription> getPrescriptionForVisit(int visitId) {
     return prescriptionDAO.getPrescriptionForVisit(visitId);
   }
 
@@ -41,7 +44,8 @@ public class PrescriptionService {
     return medicineDAO.getForPrescription(prescriptionId);
   }
 
-  Optional<Medicine> addMedicineToPrescription(int prescriptionId, String medicineId, int amount) {
+  public Optional<Medicine> addMedicineToPrescription(
+      int prescriptionId, String medicineId, int amount) {
     if (amount < 1) {
       throw new WrongAmountException("Amount can't be smaller than 1");
     }
@@ -52,7 +56,7 @@ public class PrescriptionService {
     return prescriptionDAO.removeMedicineFromPrescription(prescriptionId, medicineId);
   }
 
-  int removePrescription(int prescriptionId) {
+  public int removePrescription(int prescriptionId) {
     return prescriptionDAO.delete(prescriptionId);
   }
 
@@ -76,7 +80,23 @@ public class PrescriptionService {
     }
   }
 
+  public Prescription updatePrescriptionExpirationDate(
+      int prescriptionId, LocalDate newExpirationDate) {
+    prescriptionDAO.updatePrescriptionExpirationDate(prescriptionId, newExpirationDate);
+    return prescriptionDAO
+        .getById(prescriptionId)
+        .orElseThrow(() -> new IllegalStateException("Prescription not found after update"));
+  }
+
   public Integer getUserIdForPrescriptionById(int prescriptionId) {
     return prescriptionDAO.getUserIdForPrescriptionById(prescriptionId);
+  }
+
+  public Optional<Integer> getPrescriptionIdForVisitId(int visitId) {
+    return prescriptionDAO.getPrescriptionIdForVisitId(visitId);
+  }
+
+  public Integer getNumberOfMedicinesOnPrescriptionByVisitId(int visitId) {
+    return prescriptionDAO.getNumberOfMedicinesOnPrescriptionByVisitId(visitId);
   }
 }

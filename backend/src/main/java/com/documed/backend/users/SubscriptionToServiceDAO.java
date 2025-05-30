@@ -27,13 +27,11 @@ public class SubscriptionToServiceDAO {
   public int getDiscountForService(int serviceId, int subscriptionId) {
     String sql =
         "SELECT discount FROM subscription_service WHERE service_id = ? AND subscription_id = ?";
-    Integer discount = jdbcTemplate.queryForObject(sql, Integer.class, serviceId, subscriptionId);
 
-    if (discount == null) {
-      return 0;
-    } else {
-      return discount;
-    }
+    List<Integer> results =
+        jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("discount"), serviceId, subscriptionId);
+
+    return results.isEmpty() ? 0 : results.get(0);
   }
 
   public int create(SubscriptionToService subscriptionToService) {
