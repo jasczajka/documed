@@ -49,6 +49,7 @@ const getAuthRoutes = (
   isAdmin: boolean,
   isPatient: boolean,
   canEditDoctorData: boolean,
+  canSeePrescriptions: boolean,
   isStaff: boolean,
 ): RouteObject[] => [
   {
@@ -67,7 +68,16 @@ const getAuthRoutes = (
       },
       { path: '/specialists', element: <SpecialistsPage /> },
       { path: '/referrals', element: <ReferralsPage /> },
-      { path: '/prescriptions', element: <PrescriptionsPage /> },
+      {
+        path: '/prescriptions',
+        element: (
+          <ProtectedRoute
+            element={<PrescriptionsPage />}
+            isAllowed={canSeePrescriptions}
+            redirectTo="/visits"
+          />
+        ),
+      },
       { path: '/settings', element: <SettingsTabs /> },
       {
         path: '/specialists/:id',
@@ -105,14 +115,21 @@ const getAuthRoutes = (
 ];
 
 export const AppRouter = () => {
-  const { verifyAuthentication, loading, isAdmin, isPatient, canEditDoctorData, isStaff } =
-    useAuth();
+  const {
+    verifyAuthentication,
+    loading,
+    isAdmin,
+    isPatient,
+    canEditDoctorData,
+    canSeePrescriptions,
+    isStaff,
+  } = useAuth();
   const authenticated = useAuthStore((state) => state.authenticated);
   const fetchFacilities = useFacilityStore((state) => state.fetchFacilities);
   const [authChecked, setAuthChecked] = useState(false);
   const router = useMemo(() => {
     const routes = authenticated
-      ? getAuthRoutes(isAdmin, isPatient, canEditDoctorData, isStaff)
+      ? getAuthRoutes(isAdmin, isPatient, canEditDoctorData, canSeePrescriptions, isStaff)
       : getDefaultRoutes();
     return createBrowserRouter(routes);
   }, [authenticated, isPatient, isAdmin]);
