@@ -2,6 +2,7 @@ package com.documed.backend.visits
 
 import com.documed.backend.auth.AuthService
 import com.documed.backend.exceptions.NotFoundException
+import com.documed.backend.prescriptions.PrescriptionService
 import com.documed.backend.schedules.TimeSlotService
 import com.documed.backend.schedules.model.TimeSlot
 import com.documed.backend.services.ServiceService
@@ -22,9 +23,10 @@ class VisitServiceTest extends Specification {
 	def serviceService = Mock(ServiceService)
 	def subscriptionService = Mock(SubscriptionService)
 	def userService = Mock(UserService)
+	def prescriptionService = Mock(PrescriptionService)
 
 	@Subject
-	def visitService = new VisitService(visitDAO, timeSlotService, authService, serviceService, userService, subscriptionService)
+	def visitService = new VisitService(visitDAO, timeSlotService, authService, serviceService, userService, subscriptionService, prescriptionService)
 
 	def "scheduleVisit should create and reserve needed time slots"() {
 		given:
@@ -104,6 +106,8 @@ class VisitServiceTest extends Specification {
 		visitDAO.getById(id) >> Optional.of(visit)
 		visitDAO.update(_ as Visit) >> { Visit v -> v }
 		visitDAO.updateVisitStatus(id, VisitStatus.CLOSED) >> true
+
+		prescriptionService.getPrescriptionIdForVisitId(id) >> Optional.empty()
 
 		when:
 		def result = visitService.closeVisit(id, updateDto)

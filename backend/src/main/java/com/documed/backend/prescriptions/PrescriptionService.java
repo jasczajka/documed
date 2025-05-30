@@ -32,7 +32,7 @@ public class PrescriptionService {
     return prescriptionDAO.create(new CreatePrescriptionObject(visitId, expirationDate));
   }
 
-  Optional<Prescription> getPrescriptionForVisit(int visitId) {
+  public Optional<Prescription> getPrescriptionForVisit(int visitId) {
     return prescriptionDAO.getPrescriptionForVisit(visitId);
   }
 
@@ -44,7 +44,8 @@ public class PrescriptionService {
     return medicineDAO.getForPrescription(prescriptionId);
   }
 
-  Optional<Medicine> addMedicineToPrescription(int prescriptionId, String medicineId, int amount) {
+  public Optional<Medicine> addMedicineToPrescription(
+      int prescriptionId, String medicineId, int amount) {
     if (amount < 1) {
       throw new WrongAmountException("Amount can't be smaller than 1");
     }
@@ -55,7 +56,7 @@ public class PrescriptionService {
     return prescriptionDAO.removeMedicineFromPrescription(prescriptionId, medicineId);
   }
 
-  int removePrescription(int prescriptionId) {
+  public int removePrescription(int prescriptionId) {
     return prescriptionDAO.delete(prescriptionId);
   }
 
@@ -89,5 +90,13 @@ public class PrescriptionService {
 
   public Integer getUserIdForPrescriptionById(int prescriptionId) {
     return prescriptionDAO.getUserIdForPrescriptionById(prescriptionId);
+  }
+
+  public Optional<Integer> getPrescriptionIdForVisitId(int visitId) {
+    return prescriptionDAO.getPrescriptionIdForVisitId(visitId);
+  }
+
+  public Integer getNumberOfMedicinesOnPrescriptionByVisitId(int visitId) {
+    return prescriptionDAO.getNumberOfMedicinesOnPrescriptionByVisitId(visitId);
   }
 }

@@ -516,6 +516,11 @@ export type GetAvailableFirstTimeSlotsByDoctorParams = {
   neededTimeSlots: number;
 };
 
+export type CalculateVisitCostParams = {
+  patientId: number;
+  serviceId: number;
+};
+
 export type GetAllMedicinesParams = {
   /**
    * Maximum results to return

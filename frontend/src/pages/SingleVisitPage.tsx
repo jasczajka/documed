@@ -351,7 +351,6 @@ const SingleVisitPage: FC = () => {
       handlePrescriptionExpirationDateUpdate,
       refetchVisitInfo,
       refetchVisitAttachments,
-      showNotification,
     ],
   );
 
@@ -386,9 +385,6 @@ const SingleVisitPage: FC = () => {
     if (isVisitInfoError) {
       showNotification('Nie udało się pobrać danych wizyty', 'error');
     }
-    if (visitInfo?.status === VisitStatus.PLANNED && !isPatient) {
-      showNotification('Rozpocznij wizytę, aby edytować jej szczegóły', 'warning');
-    }
   }, [
     isError,
     isUpdateVisitError,
@@ -396,11 +392,14 @@ const SingleVisitPage: FC = () => {
     isStartVisitError,
     isFinishVisitError,
     prescriptionMedicinesError,
-    visitInfo,
     isVisitInfoError,
-    isPatient,
-    showNotification,
   ]);
+
+  useEffect(() => {
+    if (visitPrescription?.expirationDate) {
+      setPrescriptionExpirationDate(new Date(visitPrescription.expirationDate));
+    }
+  }, [visitPrescription?.expirationDate]);
 
   useEffect(() => {
     if (visitInfo) {
@@ -409,6 +408,9 @@ const SingleVisitPage: FC = () => {
         diagnosis: visitInfo.diagnosis ?? '',
         recommendations: visitInfo.recommendations ?? '',
       });
+    }
+    if (visitInfo?.status === VisitStatus.PLANNED && !isPatient) {
+      showNotification('Rozpocznij wizytę, aby edytować jej szczegóły', 'warning');
     }
   }, [visitInfo, reset]);
 

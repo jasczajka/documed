@@ -138,8 +138,25 @@ public class PrescriptionDAO implements FullDAO<Prescription, CreatePrescription
     return jdbcTemplate.update(sql, status, prescriptionId);
   }
 
-  public int updatePrescriptionExpirationDate(int prescriptionId, LocalDate newExpirationDate) {
+  public void updatePrescriptionExpirationDate(int prescriptionId, LocalDate newExpirationDate) {
     String sql = "UPDATE prescription SET expiration_date = ? WHERE id = ?";
-    return jdbcTemplate.update(sql, newExpirationDate, prescriptionId);
+    jdbcTemplate.update(sql, newExpirationDate, prescriptionId);
+  }
+
+  public int getNumberOfMedicinesOnPrescriptionByVisitId(int visitId) {
+    String sql =
+        """
+                  SELECT COUNT(*)
+                  FROM medicine_prescription mp
+                  JOIN prescription p ON mp.prescription_id = p.id
+                  WHERE p.visit_id = ?
+                 """;
+    return jdbcTemplate.queryForObject(sql, Integer.class, visitId);
+  }
+
+  public Optional<Integer> getPrescriptionIdForVisitId(int visitId) {
+    String sql = "SELECT id FROM prescription WHERE visit_id = ?";
+    return jdbcTemplate.query(
+        sql, rs -> rs.next() ? Optional.of(rs.getInt("id")) : Optional.empty(), visitId);
   }
 }
