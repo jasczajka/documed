@@ -1,11 +1,10 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Autocomplete, Box, Button, TextField, Typography } from '@mui/material';
-import { FC, useEffect, useState } from 'react';
+import { FC } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Link } from 'react-router';
-import { getAllFacilities } from 'shared/api/generated/facility-controller/facility-controller';
-import { FacilityLoginReturnDTO } from 'shared/api/generated/generated.schemas';
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
+import { useFacilityStore } from 'shared/hooks/stores/useFacilityStore';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useSitemap } from 'shared/hooks/useSitemap';
 import { DocuMedLogo } from 'shared/icons/DocuMedLogo';
@@ -30,12 +29,8 @@ const validationSchema = Yup.object({
 });
 
 export const LoginPage: FC = () => {
-  const [facilities, setFacilities] = useState<FacilityLoginReturnDTO[] | null>(null);
+  const facilities = useFacilityStore((state) => state.facilities);
   const { login, loading, loginError } = useAuth();
-
-  useEffect(() => {
-    getAllFacilities().then((returnedFacilities) => setFacilities(returnedFacilities));
-  }, []);
 
   const {
     control,

@@ -5,6 +5,7 @@ import { createBrowserRouter, Navigate, RouteObject, RouterProvider } from 'reac
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { ProtectedRoute } from 'shared/components/ProtectedRoute';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
+import { useFacilityStore } from 'shared/hooks/stores/useFacilityStore';
 import { useAuth } from 'shared/hooks/useAuth';
 
 const LoginPage = lazy(() => import('../modules/auth/LoginPage'));
@@ -107,6 +108,7 @@ export const AppRouter = () => {
   const { verifyAuthentication, loading, isAdmin, isPatient, canEditDoctorData, isStaff } =
     useAuth();
   const authenticated = useAuthStore((state) => state.authenticated);
+  const fetchFacilities = useFacilityStore((state) => state.fetchFacilities);
   const [authChecked, setAuthChecked] = useState(false);
   const router = useMemo(() => {
     const routes = authenticated
@@ -116,9 +118,13 @@ export const AppRouter = () => {
   }, [authenticated, isPatient, isAdmin]);
 
   useLayoutEffect(() => {
-    verifyAuthentication().finally(() => {
+    const init = async () => {
+      await fetchFacilities();
+      await verifyAuthentication();
       setAuthChecked(true);
-    });
+    };
+
+    init().catch(console.error);
   }, []);
 
   if (loading || !authChecked) {

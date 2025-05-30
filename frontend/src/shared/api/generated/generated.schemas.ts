@@ -436,42 +436,10 @@ export interface PatientDetailsDTO {
   birthdate: string;
 }
 
-export interface FacilityLoginReturnDTO {
+export interface FacilityInfoReturnDTO {
   id: number;
   address: string;
   city: string;
-}
-
-export interface Facility {
-  id?: number;
-  address?: string;
-  city?: string;
-  visits?: Visit[];
-}
-
-export type VisitStatus = (typeof VisitStatus)[keyof typeof VisitStatus];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const VisitStatus = {
-  PLANNED: 'PLANNED',
-  IN_PROGRESS: 'IN_PROGRESS',
-  CLOSED: 'CLOSED',
-  CANCELLED: 'CANCELLED',
-} as const;
-
-export interface Visit {
-  id?: number;
-  status?: VisitStatus;
-  interview?: string;
-  diagnosis?: string;
-  recommendations?: string;
-  totalCost?: number;
-  facilityId?: number;
-  serviceId?: number;
-  patientInformation?: string;
-  patientId?: number;
-  doctorId?: number;
-  reservedTimeSlots?: TimeSlot[];
 }
 
 export interface DoctorDetailsDTO {
@@ -499,6 +467,7 @@ export interface MeDTO {
   lastName: string;
   email: string;
   role: MeDTORole;
+  facilityId: number;
 }
 
 export type GetAllSubscriptions200 = { [key: string]: unknown };

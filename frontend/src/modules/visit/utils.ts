@@ -1,19 +1,19 @@
-import { VisitStatus } from 'shared/api/generated/generated.schemas';
+import { VisitWithDetailsStatus } from 'shared/api/generated/generated.schemas';
 
 export const getVisitStatusLabel = (
-  status: VisitStatus,
+  status: VisitWithDetailsStatus,
 ): {
   label: string;
   color: 'success' | 'warning' | 'error' | 'default' | 'info' | 'indigo';
 } => {
   switch (status) {
-    case VisitStatus.PLANNED:
+    case VisitWithDetailsStatus.PLANNED:
       return { label: 'Zaplanowana', color: 'info' };
-    case VisitStatus.IN_PROGRESS:
+    case VisitWithDetailsStatus.IN_PROGRESS:
       return { label: 'W trakcie', color: 'warning' };
-    case VisitStatus.CLOSED:
+    case VisitWithDetailsStatus.CLOSED:
       return { label: 'Zakończona', color: 'indigo' };
-    case VisitStatus.CANCELLED:
+    case VisitWithDetailsStatus.CANCELLED:
       return { label: 'Anulowana', color: 'error' };
     default:
       return { label: 'Nieznany status', color: 'default' };
