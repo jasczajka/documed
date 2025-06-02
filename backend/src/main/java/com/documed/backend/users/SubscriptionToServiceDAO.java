@@ -16,7 +16,7 @@ public class SubscriptionToServiceDAO {
   private final RowMapper<SubscriptionToService> rowMapper =
       (rs, rowNum) ->
           new SubscriptionToService(
-              rs.getInt("service_id"), rs.getInt("subscription_id"), rs.getInt("discount"));
+              rs.getInt("subscription_id"), rs.getInt("service_id"), rs.getInt("discount"));
 
   public List<SubscriptionToService> getAll() {
     String sql = "SELECT service_id, subscription_id, discount FROM subscription_service";

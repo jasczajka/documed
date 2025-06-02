@@ -1,7 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Button, FormControl, MenuItem, Select, Typography } from '@mui/material';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { FC, useEffect, useMemo } from 'react';
+import { FC, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useParams } from 'react-router';
 import { Service } from 'shared/api/generated/generated.schemas';
@@ -14,6 +13,7 @@ import {
   useGetAllSubscriptions,
 } from 'shared/api/generated/subscription-controller/subscription-controller';
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
+import { SubscriptionServicesTable } from 'shared/components/SubscriptionServicesTable/SubscriptionServicesTable';
 import { useNotification } from 'shared/hooks/useNotification';
 import * as Yup from 'yup';
 
@@ -28,14 +28,6 @@ interface SubscriptionTabProps {
   patientSubscriptionId: number | null;
   allServices: Service[];
   refetch: () => void;
-}
-
-interface ServiceWithDiscount {
-  id: number;
-  name: string;
-  discount: number;
-  originalPrice: number;
-  discountedPrice: number;
 }
 
 export const SubscriptionTab: FC<SubscriptionTabProps> = ({
@@ -79,54 +71,6 @@ export const SubscriptionTab: FC<SubscriptionTabProps> = ({
 
   const selectedId = watch('subscriptionId');
   const selected = allSubscriptions?.find((s) => s.id === selectedId);
-
-  const servicesWithDiscounts = useMemo(() => {
-    if (!allServices || !allServiceSubscriptionDiscounts || !selectedId) return [];
-
-    return allServices.map((service) => {
-      const discount =
-        allServiceSubscriptionDiscounts.find(
-          (d) => d.subscriptionId === selectedId && d.serviceId === service.id,
-        )?.discount || 0;
-
-      const originalPrice = service.price || 0;
-      const discountedPrice = originalPrice * (1 - discount / 100);
-
-      return {
-        id: service.id,
-        name: service.name || '',
-        discount,
-        originalPrice,
-        discountedPrice,
-      };
-    });
-  }, [allServices, allServiceSubscriptionDiscounts, selectedId]);
-
-  const columns: GridColDef<ServiceWithDiscount>[] = [
-    {
-      field: 'name',
-      headerName: 'Nazwa usługi',
-      flex: 1,
-    },
-    {
-      field: 'discount',
-      headerName: 'Zniżka (%)',
-      width: 150,
-      valueGetter: (_, row) => `${row.discount}%`,
-    },
-    {
-      field: 'originalPrice',
-      headerName: 'Cena oryginalna',
-      width: 150,
-      valueGetter: (_, row) => `${row.originalPrice.toFixed(2)} zł`,
-    },
-    {
-      field: 'discountedPrice',
-      headerName: 'Cena po zniżce',
-      width: 180,
-      valueGetter: (_, row) => `${row.discountedPrice.toFixed(2)} zł`,
-    },
-  ];
 
   const onSubmit = async (data: FormData) => {
     try {
@@ -194,17 +138,7 @@ export const SubscriptionTab: FC<SubscriptionTabProps> = ({
         </Button>
       </Box>
       <Box sx={{ flex: 1, height: 500 }}>
-        <DataGrid
-          rows={servicesWithDiscounts}
-          columns={columns}
-          pageSizeOptions={[10, 25, 50]}
-          initialState={{
-            pagination: {
-              paginationModel: { page: 0, pageSize: 10 },
-            },
-          }}
-          disableRowSelectionOnClick
-        />
+        <SubscriptionServicesTable allServices={allServices} subscriptionId={selectedId} />
       </Box>
 
       <NotificationComponent />

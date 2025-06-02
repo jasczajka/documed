@@ -6,6 +6,8 @@ import com.documed.backend.users.model.Subscription;
 import com.documed.backend.users.model.SubscriptionToService;
 import com.documed.backend.users.services.SubscriptionService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -56,9 +58,14 @@ public class SubscriptionController {
     }
   }
 
+  @StaffOnly
   @PutMapping("{subscriptionId}/services/{serviceId}")
   public ResponseEntity<String> updateServiceDiscount(
-      @PathVariable int subscriptionId, @PathVariable int serviceId, @RequestBody int discount) {
+      @PathVariable int subscriptionId,
+      @PathVariable int serviceId,
+      @RequestBody
+          @Min(value = 0, message = "Discount cannot be negative") @Max(value = 100, message = "Discount cannot exceed 100%") int discount) {
+
     subscriptionService.updateSubscriptionToService(serviceId, subscriptionId, discount);
     return new ResponseEntity<>("Service discount updated", HttpStatus.OK);
   }

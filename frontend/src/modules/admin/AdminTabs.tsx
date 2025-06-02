@@ -1,10 +1,11 @@
-import { Add, Medication, MiscellaneousServices, PersonAdd } from '@mui/icons-material';
+import { Add, Medication, MiscellaneousServices, Percent, PersonAdd } from '@mui/icons-material';
 import { Box, Paper, Tab, Tabs } from '@mui/material';
 import { AddServiceTab } from 'modules/admin/tabs/AddServiceTab';
 import { EditServiceTab } from 'modules/admin/tabs/EditServiceTab';
 import { RegisterDoctorTab } from 'modules/admin/tabs/RegisterDoctorTab';
 import { RegisterStaffTab } from 'modules/admin/tabs/RegisterStaffTab';
 import { FC, useState } from 'react';
+import { DiscountsTab } from './tabs/DiscountsTab';
 
 export const AdminTabs: FC = () => {
   const [index, setIndex] = useState(0);
@@ -38,6 +39,7 @@ export const AdminTabs: FC = () => {
         <Tab icon={<MiscellaneousServices />} iconPosition="start" label="Edytuj usługę" />
         <Tab icon={<PersonAdd />} iconPosition="start" label="Dodaj pracownika" />
         <Tab icon={<Medication />} iconPosition="start" label="Dodaj lekarza" />
+        <Tab icon={<Percent />} iconPosition="start" label="Zniżki abonamentowe" />
       </Tabs>
 
       <Paper sx={{ height: '100%', width: '100%', padding: 8, minHeight: '532px' }} elevation={1}>
@@ -45,6 +47,7 @@ export const AdminTabs: FC = () => {
         {index === 1 && <EditServiceTab />}
         {index === 2 && <RegisterStaffTab />}
         {index === 3 && <RegisterDoctorTab />}
+        {index === 4 && <DiscountsTab />}
       </Paper>
     </Box>
   );
