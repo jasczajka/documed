@@ -50,7 +50,7 @@ public class User {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull private UserRole role;
 
-  @Schema private int subscriptionId;
+  @Schema private Integer subscriptionId;
 
   @Schema private List<Specialization> specializations;
 

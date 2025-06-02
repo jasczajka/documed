@@ -18,6 +18,11 @@ public class SubscriptionToServiceDAO {
           new SubscriptionToService(
               rs.getInt("service_id"), rs.getInt("subscription_id"), rs.getInt("discount"));
 
+  public List<SubscriptionToService> getAll() {
+    String sql = "SELECT service_id, subscription_id, discount FROM subscription_service";
+    return jdbcTemplate.query(sql, rowMapper);
+  }
+
   public List<SubscriptionToService> getForSubscription(int id) {
     String sql =
         "SELECT service_id, subscription_id, discount FROM subscription_service WHERE subscription_id = ?";

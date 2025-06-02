@@ -22,7 +22,6 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import type {
   CreateSubscriptionParams,
-  GetAllSubscriptions200,
   Subscription,
   SubscriptionToService,
 } from '../generated.schemas';
@@ -108,11 +107,7 @@ export const useUpdateServiceDiscount = <TError = ErrorType<unknown>, TContext =
  * @summary Get all subscriptions
  */
 export const getAllSubscriptions = (signal?: AbortSignal) => {
-  return customInstance<GetAllSubscriptions200>({
-    url: `/api/subscriptions`,
-    method: 'GET',
-    signal,
-  });
+  return customInstance<Subscription[]>({ url: `/api/subscriptions`, method: 'GET', signal });
 };
 
 export const getGetAllSubscriptionsQueryKey = () => {
@@ -608,3 +603,120 @@ export const useDeleteSubscription = <TError = ErrorType<unknown>, TContext = un
 
   return useMutation(mutationOptions, queryClient);
 };
+/**
+ * @summary Get all service with subcscription and associated discount
+ */
+export const getAllServiceSubscriptionDiscounts = (signal?: AbortSignal) => {
+  return customInstance<SubscriptionToService[]>({
+    url: `/api/subscriptions/discounts`,
+    method: 'GET',
+    signal,
+  });
+};
+
+export const getGetAllServiceSubscriptionDiscountsQueryKey = () => {
+  return [`/api/subscriptions/discounts`] as const;
+};
+
+export const getGetAllServiceSubscriptionDiscountsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAllServiceSubscriptionDiscounts>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getAllServiceSubscriptionDiscounts>>, TError, TData>
+  >;
+}) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetAllServiceSubscriptionDiscountsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllServiceSubscriptionDiscounts>>> = ({
+    signal,
+  }) => getAllServiceSubscriptionDiscounts(signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAllServiceSubscriptionDiscounts>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAllServiceSubscriptionDiscountsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAllServiceSubscriptionDiscounts>>
+>;
+export type GetAllServiceSubscriptionDiscountsQueryError = ErrorType<unknown>;
+
+export function useGetAllServiceSubscriptionDiscounts<
+  TData = Awaited<ReturnType<typeof getAllServiceSubscriptionDiscounts>>,
+  TError = ErrorType<unknown>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllServiceSubscriptionDiscounts>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllServiceSubscriptionDiscounts>>,
+          TError,
+          Awaited<ReturnType<typeof getAllServiceSubscriptionDiscounts>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAllServiceSubscriptionDiscounts<
+  TData = Awaited<ReturnType<typeof getAllServiceSubscriptionDiscounts>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllServiceSubscriptionDiscounts>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllServiceSubscriptionDiscounts>>,
+          TError,
+          Awaited<ReturnType<typeof getAllServiceSubscriptionDiscounts>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAllServiceSubscriptionDiscounts<
+  TData = Awaited<ReturnType<typeof getAllServiceSubscriptionDiscounts>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllServiceSubscriptionDiscounts>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get all service with subcscription and associated discount
+ */
+
+export function useGetAllServiceSubscriptionDiscounts<
+  TData = Awaited<ReturnType<typeof getAllServiceSubscriptionDiscounts>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllServiceSubscriptionDiscounts>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetAllServiceSubscriptionDiscountsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}

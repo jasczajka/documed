@@ -2,6 +2,7 @@ package com.documed.backend.users;
 
 import com.documed.backend.FullDAO;
 import com.documed.backend.auth.exceptions.UserNotFoundException;
+import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.users.exceptions.SubscriptionAssignmentException;
 import com.documed.backend.users.model.AccountStatus;
 import com.documed.backend.users.model.Specialization;
@@ -45,7 +46,7 @@ public class UserDAO implements FullDAO<User, User> {
               .pesel(rs.getString("pesel"))
               .phoneNumber(rs.getString("phone_number"))
               .pwzNumber(rs.getString("pwz"))
-              .subscriptionId(rs.getInt("subscription_id"))
+              .subscriptionId(rs.getObject("subscription_id", Integer.class))
               .build();
 
   @Override
@@ -295,16 +296,23 @@ public class UserDAO implements FullDAO<User, User> {
     }
   }
 
-  public void updateUserSubscription(int userId, int subscriptionId) {
-    int rowsAffected;
-    String sql = "UPDATE \"User\" SET subscription_id = ? WHERE id = ?";
-
-    if (subscriptionId == 0) {
-      sql = "UPDATE \"User\" SET subscription_id = NULL WHERE id = ?";
-      rowsAffected = jdbcTemplate.update(sql, userId);
-    } else {
-      rowsAffected = jdbcTemplate.update(sql, subscriptionId, userId);
+  public void updateUserSubscription(int userId, Integer subscriptionId) {
+    if (subscriptionId == null) {
+      throw new BadRequestException("Subscription ID cannot be null");
     }
+
+    String sql = "UPDATE \"User\" SET subscription_id = ? WHERE id = ?";
+    int rowsAffected = jdbcTemplate.update(sql, subscriptionId, userId);
+
+    if (rowsAffected != 1) {
+      throw new SubscriptionAssignmentException("Failed to assign subscription");
+    }
+  }
+
+  public void removeUserSubscription(int userId) {
+    int rowsAffected;
+    String sql = "UPDATE \"User\" SET subscription_id = NULL WHERE id = ?";
+    rowsAffected = jdbcTemplate.update(sql, userId);
 
     if (rowsAffected != 1) {
       throw new SubscriptionAssignmentException("Failed to assign subscription");

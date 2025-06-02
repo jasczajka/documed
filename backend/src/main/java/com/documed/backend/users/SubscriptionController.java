@@ -31,9 +31,17 @@ public class SubscriptionController {
   @StaffOnly
   @GetMapping
   @Operation(summary = "Get all subscriptions")
-  public ResponseEntity<Iterable<Subscription>> getAllSubscriptions() {
+  public ResponseEntity<List<Subscription>> getAllSubscriptions() {
     List<Subscription> subscriptions = subscriptionService.getAll();
     return new ResponseEntity<>(subscriptions, HttpStatus.OK);
+  }
+
+  @GetMapping("/discounts")
+  @Operation(summary = "Get all service with subcscription and associated discount")
+  public ResponseEntity<List<SubscriptionToService>> getAllServiceSubscriptionDiscounts() {
+    List<SubscriptionToService> subscriptionsToService =
+        subscriptionService.getAllServiceSubscriptionDiscounts();
+    return new ResponseEntity<>(subscriptionsToService, HttpStatus.OK);
   }
 
   @GetMapping("{subscriptionId}/services")

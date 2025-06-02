@@ -90,4 +90,8 @@ public class SubscriptionService {
     deleteSubscriptionToServiceForSubscription(subscriptionId);
     subscriptionDAO.delete(subscriptionId);
   }
+
+  public List<SubscriptionToService> getAllServiceSubscriptionDiscounts() {
+    return subscriptionToServiceDAO.getAll();
+  }
 }
