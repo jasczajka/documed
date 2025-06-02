@@ -2,7 +2,7 @@ package com.documed.backend.referrals;
 
 import com.documed.backend.FullDAO;
 import com.documed.backend.exceptions.CreationFailException;
-import com.documed.backend.referrals.model.CreateReferralDTO;
+import com.documed.backend.referrals.dtos.CreateReferralDTO;
 import com.documed.backend.referrals.model.Referral;
 import com.documed.backend.referrals.model.ReferralType;
 import java.sql.PreparedStatement;
@@ -103,5 +103,19 @@ public class ReferralDAO implements FullDAO<Referral, CreateReferralDTO> {
             WHERE visit.patient_id = ?;
         """;
     return jdbcTemplate.query(sql, rowMapper, patientId);
+  }
+
+  public Integer getUserIdForReferralById(int id) {
+    String sql =
+        """
+                SELECT v.patient_id
+                      FROM referral r
+                      JOIN visit v on r.visit_id = v.id
+                      WHERE r.id = ?
+                """;
+
+    List<Integer> userIds = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("patient_id"), id);
+
+    return userIds.stream().findFirst().orElse(null);
   }
 }

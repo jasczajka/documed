@@ -1,5 +1,6 @@
-package com.documed.backend.referrals.model;
+package com.documed.backend.referrals.dtos;
 
+import com.documed.backend.referrals.model.ReferralType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;

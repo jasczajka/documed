@@ -6,6 +6,7 @@ import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
 import com.documed.backend.auth.exceptions.UnauthorizedException;
 import com.documed.backend.medicines.model.Medicine;
 import com.documed.backend.medicines.model.MedicineWithAmount;
+import com.documed.backend.referrals.ReferralService;
 import com.documed.backend.users.model.UserRole;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
@@ -22,6 +23,7 @@ public class PrescriptionController {
 
   private final PrescriptionService prescriptionService;
   private final AuthService authService;
+  private final ReferralService referralService;
 
   @StaffOnly
   @PostMapping("/visit/{visit_id}")
@@ -61,11 +63,11 @@ public class PrescriptionController {
       @PathVariable("prescription_id") int prescriptionId) {
 
     int userId = authService.getCurrentUserId();
-    int prescriptionUserId = prescriptionService.getUserIdForPrescriptionById(prescriptionId);
+    int referralUserId = referralService.getUserIdForReferralById(prescriptionId);
     UserRole userRole = authService.getCurrentUserRole();
 
-    if (userRole.equals(UserRole.PATIENT) && userId != prescriptionUserId) {
-      throw new UnauthorizedException("Requesting patient id and prescription id do not match");
+    if (userRole.equals(UserRole.PATIENT) && userId != referralUserId) {
+      throw new UnauthorizedException("Requesting patient id and referral patient do not match");
     }
 
     List<MedicineWithAmount> medicines =

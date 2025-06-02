@@ -1,7 +1,7 @@
 package com.documed.backend.referrals;
 
 import com.documed.backend.exceptions.NotFoundException;
-import com.documed.backend.referrals.model.CreateReferralDTO;
+import com.documed.backend.referrals.dtos.CreateReferralDTO;
 import com.documed.backend.referrals.model.Referral;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -37,5 +37,14 @@ public class ReferralService {
 
   public int deleteReferral(int referralId) {
     return referralDAO.delete(referralId);
+  }
+
+  public Integer getUserIdForReferralById(int referralId) {
+    Integer userId = referralDAO.getUserIdForReferralById(referralId);
+    if (userId == null) {
+      throw new NotFoundException("User or referral not found");
+    } else {
+      return userId;
+    }
   }
 }
