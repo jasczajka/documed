@@ -18,8 +18,13 @@ import {
   Service,
 } from 'shared/api/generated/generated.schemas';
 import { useGetAvailableFirstTimeSlotsByDoctor } from 'shared/api/generated/time-slot-controller/time-slot-controller';
-import { useScheduleVisit } from 'shared/api/generated/visit-controller/visit-controller';
+import {
+  useCalculateVisitCost,
+  useScheduleVisit,
+} from 'shared/api/generated/visit-controller/visit-controller';
 import { appConfig } from 'shared/appConfig';
+import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
+import { useFacilityStore } from 'shared/hooks/stores/useFacilityStore';
 import { useNotification } from 'shared/hooks/useNotification';
 import * as Yup from 'yup';
 import { PatientInfoPanel } from '../PatientInfoPanel';
@@ -29,6 +34,7 @@ import { calculateNeededTimeSlots } from './utils';
 export interface FormData {
   serviceId: number;
   doctorId: number;
+  facilityId: number;
   visitDate: Date;
   firstTimeSlotId: number;
   additionalInfo?: string;
@@ -51,6 +57,7 @@ interface ScheduleVisitModalProps {
 const validationSchema = Yup.object().shape({
   serviceId: Yup.number().required('Wybierz rodzaj usługi'),
   doctorId: Yup.number().required('Wybierz specjalistę'),
+  facilityId: Yup.number().required('Wybierz placówkę'),
   visitDate: Yup.date().required('Wybierz termin wizyty'),
   additionalInfo: Yup.string().max(
     appConfig.maxAdditionalInfoVisitLength,
@@ -71,6 +78,8 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
   onCancel,
   loading,
 }) => {
+  const currentFacilityId = useAuthStore((state) => state.user?.facilityId);
+  const allFacilities = useFacilityStore((state) => state.facilities);
   const {
     control,
     handleSubmit,
@@ -84,6 +93,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
       doctorId: undefined,
       visitDate: undefined,
       additionalInfo: undefined,
+      facilityId: currentFacilityId ? currentFacilityId : undefined,
     },
   });
 
@@ -123,6 +133,11 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
     { query: { enabled: !!selectedDoctorId && !!selectedServiceId && !!neededTimeSlots } },
   );
 
+  const { data: visitCost, refetch: refetchVisitCost } = useCalculateVisitCost(
+    { patientId: patientId, serviceId: selectedServiceId ?? -1 },
+    { query: { enabled: !!selectedServiceId } },
+  );
+
   const possibleStartTimes = useMemo(() => {
     if (!availableTimeSlots) {
       return [];
@@ -150,7 +165,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
   }, [allDoctors, allServices, selectedServiceId]);
 
   const onSubmit = async (data: Partial<FormData>) => {
-    if (data.serviceId && data.doctorId && data.visitDate) {
+    if (data.serviceId && data.doctorId && data.visitDate && data.facilityId) {
       const selectedTimeSlot = availableTimeSlots.find(
         (slot) => new Date(slot.startTime).getTime() === data.visitDate!.getTime(),
       );
@@ -166,6 +181,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
         doctorId: data.doctorId,
         firstTimeSlotId: selectedTimeSlot.id,
         serviceId: data.serviceId,
+        facilityId: data.facilityId,
       });
       await onConfirm();
     }
@@ -180,6 +196,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
           display: 'flex',
           flexDirection: 'column',
           gap: 6,
+          overflow: 'visible',
           minWidth: 600,
         }}
         component="form"
@@ -206,6 +223,9 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
                   field.onChange(newValue?.id);
                   resetField('doctorId');
                   resetField('visitDate');
+                  if (newValue?.id) {
+                    refetchVisitCost();
+                  }
                 }}
                 value={allServices.find((service) => service.id === field.value) ?? null}
                 noOptionsText="Brak opcji spełniających wyszukiwanie"
@@ -251,6 +271,39 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
             )}
           />
         </Stack>
+        <TextField
+          label="Cena wizyty"
+          value={visitCost ? `${visitCost.toFixed(2)} zł` : 'Wybierz usługę, aby poznać cenę'}
+          fullWidth
+          slotProps={{ input: { readOnly: true } }}
+          sx={{
+            pointerEvents: 'none',
+          }}
+        />
+        <Controller
+          name="facilityId"
+          control={control}
+          render={({ field }) => (
+            <Autocomplete
+              options={allFacilities}
+              getOptionLabel={(option) => `${option.city} ${option.address}`}
+              onChange={(_, newValue) => {
+                field.onChange(newValue?.id ?? null);
+              }}
+              value={allFacilities.find((facility) => facility.id === field.value) ?? null}
+              noOptionsText="Brak dostępnych placówek"
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Placówka"
+                  error={!!errors.facilityId}
+                  helperText={errors.facilityId?.message}
+                />
+              )}
+              fullWidth
+            />
+          )}
+        />
         <DialogContent sx={{ p: 0 }}>
           <Controller
             name="visitDate"

@@ -1,14 +1,22 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Button, TextField } from '@mui/material';
-import { format } from 'date-fns';
+import { addDays, format } from 'date-fns';
+import { SinglePrescriptionTable } from 'modules/prescriptions/components/SinglePrescriptionTable/SinglePrescriptionTable';
 import { SingleVisitHeader } from 'modules/visit/components/SingleVisitHeader';
 import { getVisitStatusLabel } from 'modules/visit/utils';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useParams } from 'react-router';
 import { useGetFilesForVisit } from 'shared/api/generated/attachment-controller/attachment-controller';
-import { UpdateVisitDTO, VisitStatus } from 'shared/api/generated/generated.schemas';
-import { useGetPrescriptionForVisit } from 'shared/api/generated/prescription-controller/prescription-controller';
+import { UpdateVisitDTO, VisitWithDetailsStatus } from 'shared/api/generated/generated.schemas';
+import {
+  useAddMedicineToPrescription,
+  useCreatePrescription,
+  useGetMedicinesForPrescription,
+  useGetPrescriptionForVisit,
+  useRemoveMedicineFromPrescription,
+  useUpdatePrescriptionExpirationDate,
+} from 'shared/api/generated/prescription-controller/prescription-controller';
 import {
   useCancelPlannedVisit,
   useFinishVisit,
@@ -61,6 +69,14 @@ const SingleVisitPage: FC = () => {
   const [fileIdsToDeleteOnConfirm, setFileIdsToDeleteOnConfirm] = useState<number[]>([]);
   const [hasUnuploadedFiles, setHasUnuploadedFiles] = useState(false);
 
+  const [medicineOperations, setMedicineOperations] = useState<{
+    toAdd: Map<string, number>;
+    toDelete: Set<string>;
+  }>({ toAdd: new Map(), toDelete: new Set() });
+  const [prescriptionExpirationDate, setPrescriptionExpirationDate] = useState<Date>(
+    addDays(new Date(), 30),
+  );
+
   const {
     data: visitInfo,
     isLoading: isVisitInfoLoading,
@@ -76,11 +92,28 @@ const SingleVisitPage: FC = () => {
   } = useGetFilesForVisit(visitId);
 
   const {
-    // data: visitPrescription,
+    data: visitPrescription,
     isLoading: isVisitPrescriptionLoading,
     isError: isVisitPrescriptionError,
-    // refetch: refetchVisitPrescription,
+    refetch: refetchVisitPrescription,
   } = useGetPrescriptionForVisit(visitId);
+
+  const {
+    data: prescriptionMedicines,
+    isLoading: isPrescriptionMedicinesLoading,
+    isError: prescriptionMedicinesError,
+    refetch: refetchPrescriptionMedicines,
+  } = useGetMedicinesForPrescription(visitPrescription?.id ?? -1, {
+    query: { enabled: !!visitPrescription?.id },
+  });
+
+  const { mutateAsync: addMedicineToPrescription } = useAddMedicineToPrescription();
+
+  const { mutateAsync: removeMedicineFromPrescription } = useRemoveMedicineFromPrescription();
+
+  const { mutateAsync: createPrescription } = useCreatePrescription();
+
+  const { mutateAsync: updatePrescriptionExpirationDate } = useUpdatePrescriptionExpirationDate();
 
   const {
     mutateAsync: updateVisit,
@@ -141,6 +174,103 @@ const SingleVisitPage: FC = () => {
     return true;
   };
 
+  const handleAddMedicine = (medicineId: string, amount: number) => {
+    setMedicineOperations((prev) => {
+      const newToAdd = new Map(prev.toAdd);
+      const newToDelete = new Set(prev.toDelete);
+
+      if (newToDelete.has(medicineId)) {
+        newToDelete.delete(medicineId);
+      }
+
+      newToAdd.set(medicineId, amount);
+      return { toAdd: newToAdd, toDelete: newToDelete };
+    });
+  };
+
+  const handleRemoveMedicine = (medicineId: string) => {
+    setMedicineOperations((prev) => {
+      const newToAdd = new Map(prev.toAdd);
+      const newToDelete = new Set(prev.toDelete);
+
+      if (newToAdd.has(medicineId)) {
+        newToAdd.delete(medicineId);
+      } else {
+        if (prescriptionMedicines?.some((m) => m.id === medicineId)) {
+          newToDelete.add(medicineId);
+        }
+      }
+
+      return { toAdd: newToAdd, toDelete: newToDelete };
+    });
+  };
+
+  const saveMedicinesToPrescription = async () => {
+    let prescriptionId: number;
+    const operations: Promise<any>[] = [];
+
+    if (!visitPrescription) {
+      const createPrescriptionRes = await createPrescription({
+        visitId,
+        data: { expirationDate: prescriptionExpirationDate.toISOString() },
+      });
+      prescriptionId = createPrescriptionRes.id;
+    } else {
+      prescriptionId = visitPrescription.id;
+    }
+
+    medicineOperations.toAdd.forEach((amount, medicineId) => {
+      operations.push(
+        addMedicineToPrescription({
+          prescriptionId,
+          medicineId,
+          params: { amount },
+        }),
+      );
+    });
+
+    medicineOperations.toDelete.forEach((medicineId) => {
+      operations.push(
+        removeMedicineFromPrescription({
+          prescriptionId,
+          medicineId,
+        }),
+      );
+    });
+
+    console.log('medicineOperations: :', medicineOperations);
+
+    if (operations.length > 0) {
+      await Promise.all(operations);
+      setMedicineOperations({ toAdd: new Map(), toDelete: new Set() });
+      await refetchVisitPrescription();
+      await refetchPrescriptionMedicines();
+    }
+  };
+
+  const handlePrescriptionExpirationDateUpdate = async () => {
+    if (!visitPrescription || !prescriptionExpirationDate) {
+      return;
+    }
+
+    const serverDateFormatted = format(
+      new Date(visitPrescription.expirationDate),
+      appConfig.localDateFormat,
+    );
+    const formDateFormatted = format(
+      new Date(prescriptionExpirationDate),
+      appConfig.localDateFormat,
+    );
+
+    if (serverDateFormatted !== formDateFormatted) {
+      await updatePrescriptionExpirationDate({
+        prescriptionId: visitPrescription.id,
+        data: formDateFormatted,
+      });
+      setPrescriptionExpirationDate(new Date(prescriptionExpirationDate));
+    }
+  };
+
   const handleCancelVisitClick = async () => {
     openModal('confirmCancelVisitModal', (close) => (
       <ConfirmationModal
@@ -189,6 +319,8 @@ const SingleVisitPage: FC = () => {
           close();
           await finishVisit({ id: visitId, data: formData });
           await deleteFilesMarkedForDeletion();
+          await saveMedicinesToPrescription();
+          await handlePrescriptionExpirationDateUpdate();
           await refetchVisitInfo();
           await refetchVisitAttachments();
           showNotification('Wizyta została zakończona', 'success');
@@ -206,20 +338,30 @@ const SingleVisitPage: FC = () => {
 
       await updateVisit({ id: visitId, data: updateData });
       await deleteFilesMarkedForDeletion();
+      await saveMedicinesToPrescription();
+      await handlePrescriptionExpirationDateUpdate();
       await refetchVisitInfo();
       await refetchVisitAttachments();
       showNotification('Pomyślnie zaktualizowano wizytę!', 'success');
     },
-    [updateVisit, refetchVisitInfo, showNotification],
+    [
+      updateVisit,
+      deleteFilesMarkedForDeletion,
+      saveMedicinesToPrescription,
+      handlePrescriptionExpirationDateUpdate,
+      refetchVisitInfo,
+      refetchVisitAttachments,
+    ],
   );
 
   const isLoading =
     isVisitInfoLoading ||
     isVisitAttachmentsLoading ||
     isVisitPrescriptionLoading ||
-    isUpdateVisitLoading;
+    isUpdateVisitLoading ||
+    isPrescriptionMedicinesLoading;
 
-  const isError = isVisitInfoError || isVisitAttachmentsError || isVisitPrescriptionError;
+  const isError = isVisitAttachmentsError || isVisitPrescriptionError;
 
   useEffect(() => {
     if (isError) {
@@ -237,8 +379,11 @@ const SingleVisitPage: FC = () => {
     if (isFinishVisitError) {
       showNotification('Nie udało się zakończyć wizyty', 'error');
     }
-    if (visitInfo?.status === VisitStatus.PLANNED && !isPatient) {
-      showNotification('Rozpocznij wizytę, aby edytować jej szczegóły', 'warning');
+    if (prescriptionMedicinesError) {
+      showNotification('Nie udało się pobrać leków recepty', 'error');
+    }
+    if (isVisitInfoError) {
+      showNotification('Nie udało się pobrać danych wizyty', 'error');
     }
   }, [
     isError,
@@ -246,9 +391,15 @@ const SingleVisitPage: FC = () => {
     isCancelVisitError,
     isStartVisitError,
     isFinishVisitError,
-    visitInfo,
-    isPatient,
+    prescriptionMedicinesError,
+    isVisitInfoError,
   ]);
+
+  useEffect(() => {
+    if (visitPrescription?.expirationDate) {
+      setPrescriptionExpirationDate(new Date(visitPrescription.expirationDate));
+    }
+  }, [visitPrescription?.expirationDate]);
 
   useEffect(() => {
     if (visitInfo) {
@@ -258,6 +409,9 @@ const SingleVisitPage: FC = () => {
         recommendations: visitInfo.recommendations ?? '',
       });
     }
+    if (visitInfo?.status === VisitWithDetailsStatus.PLANNED && !isPatient) {
+      showNotification('Rozpocznij wizytę, aby edytować jej szczegóły', 'warning');
+    }
   }, [visitInfo, reset]);
 
   if (isLoading) {
@@ -265,13 +419,13 @@ const SingleVisitPage: FC = () => {
   }
 
   if (!visitInfo) {
-    return null;
+    return <NotificationComponent />;
   }
 
   const { label: visitStatusLabel, color: visitStatusColor } = getVisitStatusLabel(
     visitInfo.status,
   );
-  const inputsDisabled = isPatient || visitInfo.status !== VisitStatus.IN_PROGRESS;
+  const inputsDisabled = isPatient || visitInfo.status !== VisitWithDetailsStatus.IN_PROGRESS;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
@@ -303,7 +457,7 @@ const SingleVisitPage: FC = () => {
         </Box>
         {!isPatient && (
           <Box sx={{ display: 'flex', flexDirection: 'row', gap: 3 }}>
-            {visitInfo.status === VisitStatus.IN_PROGRESS && (
+            {visitInfo.status === VisitWithDetailsStatus.IN_PROGRESS && (
               <Button
                 color="primary"
                 variant="contained"
@@ -314,7 +468,7 @@ const SingleVisitPage: FC = () => {
                 Zakończ wizytę
               </Button>
             )}
-            {visitInfo.status === VisitStatus.PLANNED && (
+            {visitInfo.status === VisitWithDetailsStatus.PLANNED && (
               <Button
                 color="error"
                 variant="contained"
@@ -326,7 +480,7 @@ const SingleVisitPage: FC = () => {
               </Button>
             )}
 
-            {visitInfo.status === VisitStatus.PLANNED && (
+            {visitInfo.status === VisitWithDetailsStatus.PLANNED && (
               <Button
                 color="primary"
                 variant="contained"
@@ -426,7 +580,18 @@ const SingleVisitPage: FC = () => {
         disabled={inputsDisabled}
         uploadFileLoading={fileUploadLoading}
       />
-
+      <Box sx={{ width: '70%' }}>
+        <SinglePrescriptionTable
+          existingMedicines={prescriptionMedicines}
+          onAddMedicineToPrescription={handleAddMedicine}
+          onRemoveMedicineFromPrescription={handleRemoveMedicine}
+          prescriptionExpirationDate={prescriptionExpirationDate}
+          handlePrescriptionExpirationDateChange={(newDate) =>
+            setPrescriptionExpirationDate(newDate)
+          }
+          disabled={inputsDisabled}
+        />
+      </Box>
       <NotificationComponent />
     </form>
   );

@@ -23,4 +23,7 @@ public class MeDTO {
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull private UserRole role;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private int facilityId;
 }

@@ -1,5 +1,6 @@
 export interface AppConfig {
   portalRootId: string;
+  localDateFormat: string;
   dateTimeFormat: string;
   snackBarDuration: number;
   timeSlotLengthInMinutes: number;
@@ -9,6 +10,7 @@ export interface AppConfig {
 
 export const appConfig: AppConfig = {
   portalRootId: 'portal-root',
+  localDateFormat: 'yyyy-MM-dd',
   dateTimeFormat: "yyyy-MM-dd'T'HH:mm",
   snackBarDuration: 10000,
   timeSlotLengthInMinutes: 15,

@@ -3,6 +3,7 @@ package com.documed.backend.visits;
 import com.documed.backend.auth.AuthService;
 import com.documed.backend.auth.exceptions.UnauthorizedException;
 import com.documed.backend.exceptions.NotFoundException;
+import com.documed.backend.prescriptions.PrescriptionService;
 import com.documed.backend.schedules.TimeSlotService;
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.services.ServiceService;
@@ -18,6 +19,7 @@ import com.documed.backend.visits.model.VisitWithDetails;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +34,7 @@ public class VisitService {
   private final ServiceService serviceService;
   private final UserService userService;
   private final SubscriptionService subscriptionService;
+  private final PrescriptionService prescriptionService;
 
   public VisitWithDetails getByIdWithDetails(int id) {
     VisitWithDetails visit =
@@ -105,7 +108,7 @@ public class VisitService {
 
     Visit visit =
         Visit.builder()
-            .facilityId(authService.getCurrentFacilityId())
+            .facilityId(scheduleVisitDTO.getFacilityId())
             .serviceId(scheduleVisitDTO.getServiceId())
             .patientId(scheduleVisitDTO.getPatientId())
             .doctorId(scheduleVisitDTO.getDoctorId())
@@ -128,7 +131,7 @@ public class VisitService {
     if (visitDAO.getVisitStatus(visitId) != VisitStatus.IN_PROGRESS) {
       throw new WrongVisitStatusException("Visit should be in status IN PROGRESS");
     }
-
+    removePrescriptionFromVisitIfEmpty(visitId);
     updateVisit(visitId, updateVisitDTO);
     return visitDAO.updateVisitStatus(visitId, VisitStatus.CLOSED);
   }
@@ -165,7 +168,7 @@ public class VisitService {
     return visitDAO.update(visit);
   }
 
-  BigDecimal calculateTotalCost(int serviceId, int patientId) {
+  public BigDecimal calculateTotalCost(int serviceId, int patientId) {
 
     BigDecimal basicPrice = serviceService.getPriceForService(serviceId);
     int subscriptionId = userService.getSubscriptionIdForPatient(patientId);
@@ -194,5 +197,13 @@ public class VisitService {
     }
     timeSlotService.releaseTimeSlotsForVisit(visitId);
     return visitDAO.updateVisitStatus(visitId, VisitStatus.CANCELLED);
+  }
+
+  private void removePrescriptionFromVisitIfEmpty(int visitId) {
+    Optional<Integer> prescriptionId = prescriptionService.getPrescriptionIdForVisitId(visitId);
+    if (prescriptionId.isPresent()
+        && prescriptionService.getNumberOfMedicinesOnPrescriptionByVisitId(visitId) == 0) {
+      prescriptionService.removePrescription(prescriptionId.get());
+    }
   }
 }

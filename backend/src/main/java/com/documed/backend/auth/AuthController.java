@@ -202,6 +202,7 @@ public class AuthController {
       }
 
       Integer userId = jwtUtil.extractUserId(token);
+      Integer facilityId = jwtUtil.extractFacilityId(token);
       Optional<User> userOpt = userService.getById(userId);
 
       if (userOpt.isEmpty()) {
@@ -219,6 +220,7 @@ public class AuthController {
               .lastName(user.getLastName())
               .email(user.getEmail())
               .role(user.getRole())
+              .facilityId(facilityId)
               .build();
 
       return ResponseEntity.ok(returnDto);

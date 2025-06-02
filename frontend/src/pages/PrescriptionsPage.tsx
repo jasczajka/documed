@@ -1,5 +1,5 @@
 import { CardHeader } from '@mui/material';
-import { PrescriptionsTable } from 'modules/prescriptions/PrescriptionsTable/PrescriptionsTable';
+import { PrescriptionsTable } from 'modules/prescriptions/components/PrescriptionsTable/PrescriptionsTable';
 import { FC, useEffect } from 'react';
 import {
   useGetAllPrescriptions,

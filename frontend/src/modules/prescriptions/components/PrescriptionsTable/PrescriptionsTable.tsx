@@ -124,6 +124,7 @@ export const PrescriptionsTable: FC<PrescriptionsTableProps> = ({ prescriptions 
           paginationMode="client"
           rowHeight={32}
           disableColumnFilter
+          disableRowSelectionOnClick
         />
       </Paper>
     </Box>

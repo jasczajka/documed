@@ -1,5 +1,5 @@
 import { UploadFile } from '@mui/icons-material';
-import { Box, Card, CardHeader, Typography } from '@mui/material';
+import { Box, CardHeader, Paper, Typography } from '@mui/material';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { ErrorCode, FileError, FileRejection, useDropzone } from 'react-dropzone';
 import { FileInfoDTO } from 'shared/api/generated/generated.schemas';
@@ -195,8 +195,8 @@ export const FileUpload: FC<FileUploadProps> = ({
   }, [initialFiles]);
 
   return (
-    <Card className={className} sx={{ width: '100%', maxWidth: 600 }}>
-      <CardHeader title={<Typography variant="body2">{title}</Typography>} />
+    <Paper className={className} sx={{ width: '100%', maxWidth: 600 }}>
+      <CardHeader title={<Typography variant="h6">{title}</Typography>} />
       {!disabled && (
         <Box
           {...getRootProps()}
@@ -257,6 +257,6 @@ export const FileUpload: FC<FileUploadProps> = ({
           />
         ))}
       </Box>
-    </Card>
+    </Paper>
   );
 };

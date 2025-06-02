@@ -6,14 +6,11 @@ import lombok.Data;
 
 @Data
 @Builder
-public class FacilityLoginReturnDTO {
+public class CalculateVisitCostDTO {
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private int id;
+  private int patientId;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private String address;
-
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  private String city;
+  private int serviceId;
 }
