@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class FacilityLoginReturnDTO {
+public class FacilityInfoReturnDTO {
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private int id;

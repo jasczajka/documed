@@ -17,17 +17,13 @@ import type {
 } from '@tanstack/react-query';
 import { useQuery } from '@tanstack/react-query';
 
-import type { Facility, FacilityLoginReturnDTO } from '../generated.schemas';
+import type { FacilityInfoReturnDTO } from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
 
 export const getAllFacilities = (signal?: AbortSignal) => {
-  return customInstance<FacilityLoginReturnDTO[]>({
-    url: `/api/facilities`,
-    method: 'GET',
-    signal,
-  });
+  return customInstance<FacilityInfoReturnDTO[]>({ url: `/api/facilities`, method: 'GET', signal });
 };
 
 export const getGetAllFacilitiesQueryKey = () => {
@@ -111,108 +107,6 @@ export function useGetAllFacilities<
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
   const queryOptions = getGetAllFacilitiesQueryOptions(options);
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-  };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-export const getFacility = (id: number, signal?: AbortSignal) => {
-  return customInstance<Facility>({ url: `/api/facilities/${id}`, method: 'GET', signal });
-};
-
-export const getGetFacilityQueryKey = (id: number) => {
-  return [`/api/facilities/${id}`] as const;
-};
-
-export const getGetFacilityQueryOptions = <
-  TData = Awaited<ReturnType<typeof getFacility>>,
-  TError = ErrorType<unknown>,
->(
-  id: number,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFacility>>, TError, TData>>;
-  },
-) => {
-  const { query: queryOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetFacilityQueryKey(id);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getFacility>>> = ({ signal }) =>
-    getFacility(id, signal);
-
-  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getFacility>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type GetFacilityQueryResult = NonNullable<Awaited<ReturnType<typeof getFacility>>>;
-export type GetFacilityQueryError = ErrorType<unknown>;
-
-export function useGetFacility<
-  TData = Awaited<ReturnType<typeof getFacility>>,
-  TError = ErrorType<unknown>,
->(
-  id: number,
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFacility>>, TError, TData>> &
-      Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getFacility>>,
-          TError,
-          Awaited<ReturnType<typeof getFacility>>
-        >,
-        'initialData'
-      >;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetFacility<
-  TData = Awaited<ReturnType<typeof getFacility>>,
-  TError = ErrorType<unknown>,
->(
-  id: number,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFacility>>, TError, TData>> &
-      Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getFacility>>,
-          TError,
-          Awaited<ReturnType<typeof getFacility>>
-        >,
-        'initialData'
-      >;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetFacility<
-  TData = Awaited<ReturnType<typeof getFacility>>,
-  TError = ErrorType<unknown>,
->(
-  id: number,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFacility>>, TError, TData>>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-export function useGetFacility<
-  TData = Awaited<ReturnType<typeof getFacility>>,
-  TError = ErrorType<unknown>,
->(
-  id: number,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getFacility>>, TError, TData>>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getGetFacilityQueryOptions(id, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;

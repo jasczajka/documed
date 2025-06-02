@@ -23,6 +23,8 @@ import {
   useScheduleVisit,
 } from 'shared/api/generated/visit-controller/visit-controller';
 import { appConfig } from 'shared/appConfig';
+import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
+import { useFacilityStore } from 'shared/hooks/stores/useFacilityStore';
 import { useNotification } from 'shared/hooks/useNotification';
 import * as Yup from 'yup';
 import { PatientInfoPanel } from '../PatientInfoPanel';
@@ -32,6 +34,7 @@ import { calculateNeededTimeSlots } from './utils';
 export interface FormData {
   serviceId: number;
   doctorId: number;
+  facilityId: number;
   visitDate: Date;
   firstTimeSlotId: number;
   additionalInfo?: string;
@@ -54,6 +57,7 @@ interface ScheduleVisitModalProps {
 const validationSchema = Yup.object().shape({
   serviceId: Yup.number().required('Wybierz rodzaj usługi'),
   doctorId: Yup.number().required('Wybierz specjalistę'),
+  facilityId: Yup.number().required('Wybierz placówkę'),
   visitDate: Yup.date().required('Wybierz termin wizyty'),
   additionalInfo: Yup.string().max(
     appConfig.maxAdditionalInfoVisitLength,
@@ -74,6 +78,8 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
   onCancel,
   loading,
 }) => {
+  const currentFacilityId = useAuthStore((state) => state.user?.facilityId);
+  const allFacilities = useFacilityStore((state) => state.facilities);
   const {
     control,
     handleSubmit,
@@ -87,6 +93,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
       doctorId: undefined,
       visitDate: undefined,
       additionalInfo: undefined,
+      facilityId: currentFacilityId ? currentFacilityId : undefined,
     },
   });
 
@@ -158,7 +165,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
   }, [allDoctors, allServices, selectedServiceId]);
 
   const onSubmit = async (data: Partial<FormData>) => {
-    if (data.serviceId && data.doctorId && data.visitDate) {
+    if (data.serviceId && data.doctorId && data.visitDate && data.facilityId) {
       const selectedTimeSlot = availableTimeSlots.find(
         (slot) => new Date(slot.startTime).getTime() === data.visitDate!.getTime(),
       );
@@ -174,6 +181,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
         doctorId: data.doctorId,
         firstTimeSlotId: selectedTimeSlot.id,
         serviceId: data.serviceId,
+        facilityId: data.facilityId,
       });
       await onConfirm();
     }
@@ -271,6 +279,30 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
           sx={{
             pointerEvents: 'none',
           }}
+        />
+        <Controller
+          name="facilityId"
+          control={control}
+          render={({ field }) => (
+            <Autocomplete
+              options={allFacilities}
+              getOptionLabel={(option) => `${option.city} ${option.address}`}
+              onChange={(_, newValue) => {
+                field.onChange(newValue?.id ?? null);
+              }}
+              value={allFacilities.find((facility) => facility.id === field.value) ?? null}
+              noOptionsText="Brak dostępnych placówek"
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Placówka"
+                  error={!!errors.facilityId}
+                  helperText={errors.facilityId?.message}
+                />
+              )}
+              fullWidth
+            />
+          )}
         />
         <DialogContent sx={{ p: 0 }}>
           <Controller

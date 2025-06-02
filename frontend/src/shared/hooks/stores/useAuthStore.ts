@@ -6,6 +6,7 @@ export type AuthUser = {
   lastName: string;
   email: string;
   id: number;
+  facilityId: number;
   role: MeDTORole;
 } | null;
 

@@ -4,10 +4,15 @@ import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 import { endOfDay, format, parse, startOfDay } from 'date-fns';
 import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Service, VisitStatus, VisitWithDetails } from 'shared/api/generated/generated.schemas';
+import {
+  Service,
+  VisitWithDetails,
+  VisitWithDetailsStatus,
+} from 'shared/api/generated/generated.schemas';
 import { appConfig } from 'shared/appConfig';
 import { ReviewModal } from 'shared/components/ReviewModal';
 import { TableFilters } from 'shared/components/TableFilters';
+import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
 import { useSitemap } from 'shared/hooks/useSitemap';
@@ -20,6 +25,7 @@ export type VisitsFilters = {
   specialist: string;
   dateFrom: string;
   dateTo: string;
+  facilityId: string;
 };
 
 interface VisitTableProps {
@@ -159,13 +165,15 @@ export const VisitsTable: FC<VisitTableProps> = ({
   patientId,
   doctorId,
 }) => {
+  const currentFacilityId = useAuthStore((state) => state.user?.facilityId);
   const [filters, setFilters] = useState<VisitsFilters>({
-    status: VisitStatus.PLANNED,
+    status: VisitWithDetailsStatus.PLANNED,
     patientName: '',
     service: '',
     specialist: '',
     dateFrom: '',
     dateTo: '',
+    facilityId: currentFacilityId ? currentFacilityId.toString() : '',
   });
 
   const { isPatient } = useAuth();
@@ -233,6 +241,7 @@ export const VisitsTable: FC<VisitTableProps> = ({
       specialist: '',
       dateFrom: '',
       dateTo: '',
+      facilityId: '',
     });
   }, []);
 

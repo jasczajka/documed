@@ -1,10 +1,17 @@
 import { useMemo } from 'react';
-import { Service, VisitStatus, VisitWithDetails } from 'shared/api/generated/generated.schemas';
+import {
+  FacilityInfoReturnDTO,
+  Service,
+  VisitWithDetails,
+  VisitWithDetailsStatus,
+} from 'shared/api/generated/generated.schemas';
 import { FilterConfig } from 'shared/components/TableFilters';
+import { useFacilityStore } from 'shared/hooks/stores/useFacilityStore';
 import { VisitsFilters } from './VisitsTable';
 
 const generateVisitsFilterConfig = (
   allServices: Service[],
+  allFacilities: FacilityInfoReturnDTO[],
   isPatient: boolean,
   hasPatientId: boolean,
   hasDoctorId: boolean,
@@ -14,10 +21,10 @@ const generateVisitsFilterConfig = (
     label: 'Status wizyty',
     type: 'select',
     options: [
-      { value: VisitStatus.CANCELLED.toString(), label: 'Anulowana' },
-      { value: VisitStatus.CLOSED.toString(), label: 'Zakończona' },
-      { value: VisitStatus.IN_PROGRESS.toString(), label: 'W trakcie' },
-      { value: VisitStatus.PLANNED.toString(), label: 'Zaplanowana' },
+      { value: VisitWithDetailsStatus.CANCELLED.toString(), label: 'Anulowana' },
+      { value: VisitWithDetailsStatus.CLOSED.toString(), label: 'Zakończona' },
+      { value: VisitWithDetailsStatus.IN_PROGRESS.toString(), label: 'W trakcie' },
+      { value: VisitWithDetailsStatus.PLANNED.toString(), label: 'Zaplanowana' },
     ],
   },
   ...(!isPatient && !hasPatientId
@@ -39,6 +46,15 @@ const generateVisitsFilterConfig = (
       label: service.name,
     })),
   },
+  {
+    name: 'facilityId',
+    label: 'Placówka',
+    options: allFacilities.map((facility) => ({
+      value: facility.id.toString(),
+      label: `${facility.city} ${facility.address}`,
+    })),
+    type: 'select',
+  },
   ...(hasDoctorId
     ? []
     : [
@@ -48,6 +64,7 @@ const generateVisitsFilterConfig = (
           type: 'text',
         } as const,
       ]),
+
   {
     name: 'dateFrom',
     label: 'Od',
@@ -75,6 +92,7 @@ export const useVisitsTable = ({
   patientId?: number;
   doctorId?: number;
 }) => {
+  const allFacilities = useFacilityStore((state) => state.facilities);
   const filterByStatus = useMemo(() => {
     if (!filters.status) {
       return null;
@@ -106,6 +124,11 @@ export const useVisitsTable = ({
     };
   }, [filters.specialist]);
 
+  const filterByFacility = useMemo(() => {
+    if (!filters.facilityId) return null;
+    return (visit: VisitWithDetails) => visit.facilityId?.toString() === filters.facilityId;
+  }, [filters.facilityId]);
+
   const filterByDateRange = useMemo(() => {
     if (!filters.dateFrom && !filters.dateTo) {
       return null;
@@ -134,6 +157,7 @@ export const useVisitsTable = ({
       filterByService,
       filterBySpecialist,
       filterByDateRange,
+      filterByFacility,
     ].filter(Boolean) as ((visit: VisitWithDetails) => boolean)[];
 
     if (activeFilters.length === 0) return visits;
@@ -146,10 +170,12 @@ export const useVisitsTable = ({
     filterByService,
     filterBySpecialist,
     filterByDateRange,
+    filterByFacility,
   ]);
 
   const visitsFilterConfig = useMemo(
-    () => generateVisitsFilterConfig(allServices, isPatient, !!patientId, !!doctorId),
+    () =>
+      generateVisitsFilterConfig(allServices, allFacilities, isPatient, !!patientId, !!doctorId),
     [allServices, isPatient, patientId, doctorId],
   );
 

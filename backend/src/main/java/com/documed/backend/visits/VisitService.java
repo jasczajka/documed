@@ -108,7 +108,7 @@ public class VisitService {
 
     Visit visit =
         Visit.builder()
-            .facilityId(authService.getCurrentFacilityId())
+            .facilityId(scheduleVisitDTO.getFacilityId())
             .serviceId(scheduleVisitDTO.getServiceId())
             .patientId(scheduleVisitDTO.getPatientId())
             .doctorId(scheduleVisitDTO.getDoctorId())

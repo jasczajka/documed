@@ -8,7 +8,7 @@ import { FC, useCallback, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useParams } from 'react-router';
 import { useGetFilesForVisit } from 'shared/api/generated/attachment-controller/attachment-controller';
-import { UpdateVisitDTO, VisitStatus } from 'shared/api/generated/generated.schemas';
+import { UpdateVisitDTO, VisitWithDetailsStatus } from 'shared/api/generated/generated.schemas';
 import {
   useAddMedicineToPrescription,
   useCreatePrescription,
@@ -409,7 +409,7 @@ const SingleVisitPage: FC = () => {
         recommendations: visitInfo.recommendations ?? '',
       });
     }
-    if (visitInfo?.status === VisitStatus.PLANNED && !isPatient) {
+    if (visitInfo?.status === VisitWithDetailsStatus.PLANNED && !isPatient) {
       showNotification('Rozpocznij wizytę, aby edytować jej szczegóły', 'warning');
     }
   }, [visitInfo, reset]);
@@ -425,7 +425,7 @@ const SingleVisitPage: FC = () => {
   const { label: visitStatusLabel, color: visitStatusColor } = getVisitStatusLabel(
     visitInfo.status,
   );
-  const inputsDisabled = isPatient || visitInfo.status !== VisitStatus.IN_PROGRESS;
+  const inputsDisabled = isPatient || visitInfo.status !== VisitWithDetailsStatus.IN_PROGRESS;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
@@ -457,7 +457,7 @@ const SingleVisitPage: FC = () => {
         </Box>
         {!isPatient && (
           <Box sx={{ display: 'flex', flexDirection: 'row', gap: 3 }}>
-            {visitInfo.status === VisitStatus.IN_PROGRESS && (
+            {visitInfo.status === VisitWithDetailsStatus.IN_PROGRESS && (
               <Button
                 color="primary"
                 variant="contained"
@@ -468,7 +468,7 @@ const SingleVisitPage: FC = () => {
                 Zakończ wizytę
               </Button>
             )}
-            {visitInfo.status === VisitStatus.PLANNED && (
+            {visitInfo.status === VisitWithDetailsStatus.PLANNED && (
               <Button
                 color="error"
                 variant="contained"
@@ -480,7 +480,7 @@ const SingleVisitPage: FC = () => {
               </Button>
             )}
 
-            {visitInfo.status === VisitStatus.PLANNED && (
+            {visitInfo.status === VisitWithDetailsStatus.PLANNED && (
               <Button
                 color="primary"
                 variant="contained"
