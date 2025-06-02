@@ -1,5 +1,5 @@
 import { Button, Dialog, DialogActions, DialogTitle, TextField } from '@mui/material';
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import { ServiceWithDiscount } from '../SubscriptionServicesTable';
 
 interface DiscountEditModalProps {
@@ -26,10 +26,6 @@ export const DiscountEditModal: FC<DiscountEditModalProps> = ({
       setIsSaving(false);
     }
   };
-
-  useEffect(() => {
-    setDiscount(service.discount);
-  }, [service]);
 
   return (
     <Dialog
