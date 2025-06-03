@@ -162,6 +162,35 @@ export interface Specialization {
   name: string;
 }
 
+export interface CreateReferralDTO {
+  visitId: number;
+  type: ReferralType;
+  /** @minLength 1 */
+  diagnosis: string;
+  expirationDate: string;
+}
+
+export type ReferralType = (typeof ReferralType)[keyof typeof ReferralType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ReferralType = {
+  TO_SPECIALIST: 'TO_SPECIALIST',
+  TO_HOSPITAL: 'TO_HOSPITAL',
+  FOR_DIAGNOSTICS: 'FOR_DIAGNOSTICS',
+  FOR_REHABILITATION: 'FOR_REHABILITATION',
+  TO_SANATORIUM: 'TO_SANATORIUM',
+  FOR_LONG_TERM_CARE: 'FOR_LONG_TERM_CARE',
+  FOR_PSYCHIATRIC_CARE: 'FOR_PSYCHIATRIC_CARE',
+} as const;
+
+export interface ReturnReferralDTO {
+  id: number;
+  diagnosis: string;
+  type: ReferralType;
+  visitId: number;
+  expirationDate: string;
+}
+
 export interface Medicine {
   id: string;
   name: string;
@@ -418,6 +447,11 @@ export interface SubscriptionToService {
   subscriptionId: number;
   serviceId: number;
   discount: number;
+}
+
+export interface ReferralTypeDTO {
+  code?: ReferralType;
+  description?: string;
 }
 
 export interface MedicineWithAmount {
