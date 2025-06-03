@@ -51,6 +51,7 @@ public class TimeSlotService {
               .startTime(workTime.getStartTime().plusMinutes(i * slotDurationInMinutes))
               .endTime(workTime.getStartTime().plusMinutes((i + 1) * slotDurationInMinutes))
               .date(nextWeekDate)
+              .facilityId(workTime.getFacilityId())
               .build();
       timeSlotDAO.create(timeSlot);
     }
@@ -105,8 +106,10 @@ public class TimeSlotService {
     }
   }
 
-  public List<TimeSlot> getAvailableFirstTimeSlotsByDoctor(int doctorId, int neededTimeSlots) {
-    List<TimeSlot> allSlots = timeSlotDAO.getAvailableFutureTimeSlotsByDoctor(doctorId);
+  public List<TimeSlot> getAvailableFirstTimeSlotsByDoctorAndFacility(
+      int doctorId, int neededTimeSlots, int facilityId) {
+    List<TimeSlot> allSlots =
+        timeSlotDAO.getAvailableFutureTimeSlotsByDoctorAndFacility(doctorId, facilityId);
 
     Map<LocalDate, List<TimeSlot>> slotsByDate =
         allSlots.stream()

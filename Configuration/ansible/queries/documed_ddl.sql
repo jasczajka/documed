@@ -154,6 +154,7 @@ CREATE TABLE IF NOT EXISTS Time_slot (
     end_time time  NOT NULL,
     date date  NOT NULL,
     is_busy boolean  NOT NULL,
+    facility_id int NOT NULL,
     CONSTRAINT Time_slot_pk PRIMARY KEY (id)
 );
 
@@ -200,6 +201,7 @@ CREATE TABLE IF NOT EXISTS Worktime (
     day_of_week int  NOT NULL,
     start_time time  NOT NULL,
     end_time time  NOT NULL,
+    facility_id int NOT NULL,
     CONSTRAINT Worktime_pk PRIMARY KEY (id)
 );
 
@@ -243,6 +245,28 @@ DROP CONSTRAINT IF EXISTS Attachment_Additional_service;
 ALTER TABLE Attachment ADD CONSTRAINT Attachment_Additional_service
     FOREIGN KEY (additional_service_id)
     REFERENCES Additional_service (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: Facility_Time_slot (table: Time_slot)
+ALTER TABLE Time_slot
+DROP CONSTRAINT IF EXISTS Facility_Time_slot;
+
+ALTER TABLE Time_slot ADD CONSTRAINT Facility_Time_slot
+    FOREIGN KEY (facility_id)
+    REFERENCES Facility (id)  
+    NOT DEFERRABLE 
+    INITIALLY IMMEDIATE
+;
+
+-- Reference: Facility_Worktime (table: Worktime)
+ALTER TABLE Worktime
+DROP CONSTRAINT IF EXISTS Facility_Worktime;
+
+ALTER TABLE Worktime ADD CONSTRAINT Facility_Worktime
+    FOREIGN KEY (facility_id)
+    REFERENCES Facility (id)  
     NOT DEFERRABLE 
     INITIALLY IMMEDIATE
 ;
@@ -427,7 +451,7 @@ ALTER TABLE Time_slot ADD CONSTRAINT Time_slot_Visit
 ALTER TABLE Referral
 DROP CONSTRAINT IF EXISTS Visist_Referral;
 
-ALTER TABLE Referral ADD CONSTRAINT Visist_Referral
+ALTER TABLE Referral ADD CONSTRAINT Visit_Referral
     FOREIGN KEY (visit_id)
     REFERENCES Visit (id)  
     NOT DEFERRABLE 

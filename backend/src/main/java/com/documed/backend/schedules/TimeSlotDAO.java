@@ -35,11 +35,12 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
               .endTime(rs.getTime("end_time").toLocalTime())
               .date((rs.getDate("date").toLocalDate()))
               .isBusy(rs.getBoolean("is_busy"))
+              .facilityId(rs.getInt("facility_id"))
               .build();
 
   public TimeSlot create(TimeSlot timeSlot) {
     String sql =
-        "INSERT INTO time_slot (doctor_id, start_time, end_time, date, is_busy) VALUES (?, ?, ?, ?, ?) RETURNING id";
+        "INSERT INTO time_slot (doctor_id, start_time, end_time, date, is_busy, facility_id) VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
 
     KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -51,6 +52,7 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
           ps.setTime(3, Time.valueOf(timeSlot.getEndTime()));
           ps.setDate(4, Date.valueOf(timeSlot.getDate()));
           ps.setBoolean(5, timeSlot.isBusy());
+          ps.setInt(6, timeSlot.getFacilityId());
           return ps;
         },
         keyHolder);
@@ -83,7 +85,7 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
   public List<TimeSlot> getAvailableTimeSlotsByDoctorAndDate(int doctorId, LocalDate date) {
     String sql =
         """
-        SELECT id, doctor_id, start_time, end_time, date, is_busy, visit_id
+        SELECT id, doctor_id, start_time, end_time, date, is_busy, visit_id, facility_id
         FROM time_slot
         WHERE doctor_id = ? AND date = ? AND is_busy = false
 """;
@@ -91,24 +93,26 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
     return jdbcTemplate.query(sql, rowMapper, doctorId, Date.valueOf(date));
   }
 
-  public List<TimeSlot> getAvailableFutureTimeSlotsByDoctor(int doctorId) {
+  public List<TimeSlot> getAvailableFutureTimeSlotsByDoctorAndFacility(
+      int doctorId, int facilityId) {
     String sql =
         """
-        SELECT id, doctor_id, start_time, end_time, date, is_busy, visit_id
+        SELECT id, doctor_id, start_time, end_time, date, is_busy, visit_id, facility_id
         FROM time_slot
         WHERE doctor_id = ?
+        AND facility_id = ?
         AND date >= CURRENT_DATE
         AND is_busy = false
         ORDER BY date, start_time
         """;
 
-    return jdbcTemplate.query(sql, rowMapper, doctorId);
+    return jdbcTemplate.query(sql, rowMapper, doctorId, facilityId);
   }
 
   public List<TimeSlot> getSortedTimeSlotsForVisit(int visitId) {
     String sql =
         """
-            SELECT id, doctor_id, start_time, end_time, date, is_busy, visit_id
+            SELECT id, doctor_id, start_time, end_time, date, is_busy, visit_id, facility_id
             FROM time_slot
             WHERE visit_id = ?
             ORDER BY start_time
@@ -121,7 +125,7 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
     String sql =
         """
                 UPDATE time_slot
-                SET doctor_id = ?, start_time = ?, end_time = ?, date = ?, is_busy = ?, visit_id = ?
+                SET doctor_id = ?, start_time = ?, end_time = ?, date = ?, is_busy = ?, visit_id = ?, facility_id = ?
                 WHERE id = ?
                 """;
 
@@ -134,7 +138,8 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
             Date.valueOf(timeSlot.getDate()),
             timeSlot.isBusy(),
             timeSlot.getVisitId(),
-            timeSlot.getId());
+            timeSlot.getId(),
+            timeSlot.getFacilityId());
 
     if (affectedRows == 1) {
       return timeSlot;

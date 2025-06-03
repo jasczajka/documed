@@ -9,11 +9,11 @@ import lombok.Data;
 @Data
 public class WorkTimeDTO {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  @NotNull(message = "Należy podać dzień tygodnia") private DayOfWeek dayOfWeek;
+  @NotNull(message = "Day of week is required") private DayOfWeek dayOfWeek;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  @NotNull(message = "Czas rozpoczęcia jest wymagany") private LocalTime startTime;
+  @NotNull(message = " Start Time is required") private LocalTime startTime;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-  @NotNull(message = "Czas zakończenia jest wymagany") private LocalTime endTime;
+  @NotNull(message = "End Time is required") private LocalTime endTime;
 }

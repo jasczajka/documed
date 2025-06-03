@@ -17,6 +17,7 @@ public class TimeSlotMapper {
         .doctorId(timeSlot.getDoctorId())
         .startTime(convertToLocalDateTime(timeSlot.getDate(), timeSlot.getStartTime()))
         .isBusy(timeSlot.isBusy())
+        .facilityId(timeSlot.getFacilityId())
         .build();
   }
 

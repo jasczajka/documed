@@ -28,13 +28,16 @@ public class TimeSlotController {
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
-  @GetMapping("/doctors/{id}/available-timeslots")
+  @GetMapping("/doctors/{doctor_id}/available-timeslots")
   @Operation(summary = "Get available timeslots for doctor by id and required visit length")
-  public ResponseEntity<List<AvailableTimeSlotDTO>> getAvailableFirstTimeSlotsByDoctor(
-      @PathVariable("id") int id, @RequestParam("neededTimeSlots") int neededTimeSlots) {
+  public ResponseEntity<List<AvailableTimeSlotDTO>> getAvailableFirstTimeSlotsByDoctorAndFacility(
+      @PathVariable("doctor_id") int doctorId,
+      @RequestParam("neededTimeSlots") int neededTimeSlots,
+      @RequestParam("facilityId") int facilityId) {
 
     List<TimeSlot> timeSlots =
-        timeSlotService.getAvailableFirstTimeSlotsByDoctor(id, neededTimeSlots);
+        timeSlotService.getAvailableFirstTimeSlotsByDoctorAndFacility(
+            doctorId, neededTimeSlots, facilityId);
 
     List<AvailableTimeSlotDTO> dtos = timeSlots.stream().map(TimeSlotMapper::toDto).toList();
 

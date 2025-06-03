@@ -19,6 +19,8 @@ public class WorkTime {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private final int userId;
 
+  private final int facilityId;
+
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private final DayOfWeek dayOfWeek;
 

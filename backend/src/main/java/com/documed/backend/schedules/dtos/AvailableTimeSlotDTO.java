@@ -15,6 +15,9 @@ public class AvailableTimeSlotDTO {
   private final int doctorId;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private final int facilityId;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private final LocalDateTime startTime;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)

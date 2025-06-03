@@ -1,9 +1,12 @@
 package com.documed.backend.schedules;
 
+import com.documed.backend.auth.AuthService;
+import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.schedules.dtos.WorkTimeDTO;
 import com.documed.backend.schedules.exceptions.WrongTimesGivenException;
 import com.documed.backend.schedules.model.WorkTime;
 import com.documed.backend.users.model.UserRole;
+import com.documed.backend.users.services.UserService;
 import java.time.DayOfWeek;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -21,13 +24,31 @@ public class WorkTimeService {
   private int slotDurationInMinutes;
 
   private final WorkTimeDAO workTimeDAO;
+  private final AuthService authService;
+  private final UserService userService;
 
-  WorkTime createWorkTime(WorkTime workTime) {
+  WorkTime createWorkTime(int userId, WorkTimeDTO dto) {
+
+    if (!userService.isUserAssignedToRole(userId, UserRole.DOCTOR)) {
+      throw new BadRequestException("User is not a doctor");
+    }
+
+    int facilityId = authService.getCurrentFacilityId();
+
+    WorkTime workTime =
+        WorkTime.builder()
+            .userId(userId)
+            .dayOfWeek(dto.getDayOfWeek())
+            .startTime(dto.getStartTime())
+            .endTime(dto.getEndTime())
+            .facilityId(facilityId)
+            .build();
+
     long duration = Duration.between(workTime.getStartTime(), workTime.getEndTime()).toMinutes();
-    if (duration < slotDurationInMinutes) {
+    if (duration < slotDurationInMinutes && duration != 0) {
       throw new WrongTimesGivenException(
           "Różnica pomiędzy godzinami nie może być krótsza niż slot czasowy.");
-    } else if (!workTime.getStartTime().isBefore(workTime.getEndTime())) {
+    } else if (!workTime.getStartTime().isBefore(workTime.getEndTime()) && duration != 0) {
       throw new WrongTimesGivenException(
           "Czas rozpoczęcia musi być wcześniejszy niż czas zakończenia.");
     } else {
@@ -56,14 +77,21 @@ public class WorkTimeService {
 
   @Transactional
   public List<WorkTime> updateWorkTimes(List<WorkTimeDTO> updatedWorkTimes, int userId) {
+
+    if (!userService.isUserAssignedToRole(userId, UserRole.DOCTOR)) {
+      throw new BadRequestException("User is not a doctor");
+    }
+
+    int facilityId = authService.getCurrentFacilityId();
+
     List<WorkTime> workTimes = new ArrayList<>();
     for (WorkTimeDTO workTime : updatedWorkTimes) {
 
       long duration = Duration.between(workTime.getStartTime(), workTime.getEndTime()).toMinutes();
-      if (duration < slotDurationInMinutes) {
+      if (duration < slotDurationInMinutes && duration != 0) {
         throw new WrongTimesGivenException(
             "Różnica pomiędzy godzinami nie może być krótsza niż slot czasowy.");
-      } else if (!workTime.getStartTime().isBefore(workTime.getEndTime())) {
+      } else if (!workTime.getStartTime().isBefore(workTime.getEndTime()) && duration != 0) {
         throw new WrongTimesGivenException(
             "Czas rozpoczęcia musi być wcześniejszy niż czas zakończenia.");
       } else {
@@ -73,6 +101,7 @@ public class WorkTimeService {
                 .dayOfWeek(workTime.getDayOfWeek())
                 .startTime(workTime.getStartTime())
                 .endTime(workTime.getEndTime())
+                .facilityId(facilityId)
                 .build());
         workTimeDAO.updateWorkTime(workTimes.getLast());
       }

@@ -24,14 +24,7 @@ public class WorkTimeController {
   @Operation(summary = "Create worktime for user")
   public ResponseEntity<WorkTime> createWorkTime(
       @PathVariable("user_id") int userId, @Valid @RequestBody WorkTimeDTO dto) {
-    WorkTime createdWorkTime =
-        workTimeService.createWorkTime(
-            WorkTime.builder()
-                .userId(userId)
-                .dayOfWeek(dto.getDayOfWeek())
-                .startTime(dto.getStartTime())
-                .endTime(dto.getEndTime())
-                .build());
+    WorkTime createdWorkTime = workTimeService.createWorkTime(userId, dto);
     return ResponseEntity.ok(createdWorkTime);
   }
 

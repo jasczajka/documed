@@ -13,6 +13,7 @@ public class TimeSlot {
   private int id;
   private int visitId;
   private final int doctorId;
+  private final int facilityId;
   private final LocalTime startTime;
   private final LocalTime endTime;
   private final LocalDate date;
