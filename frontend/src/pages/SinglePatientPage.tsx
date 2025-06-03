@@ -190,6 +190,7 @@ const SinglePatientPage: FC = () => {
           patientFullName,
           patientAge: getAgeFromBirthDate(new Date(patientInfo.birthdate)),
         }}
+        patientSubscriptionId={patientInfo.subscriptionId ?? null}
         tabIndex={tabIndex}
         onTabChange={onTabChange}
         patientAttachments={patientAttachments ?? []}

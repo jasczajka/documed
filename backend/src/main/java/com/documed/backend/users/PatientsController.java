@@ -38,11 +38,13 @@ public class PatientsController {
             .email(user.getEmail())
             .birthdate(user.getBirthDate())
             .pesel(user.getPesel())
+            .subscriptionId(user.getSubscriptionId())
             .build();
 
     return new ResponseEntity<>(value, HttpStatus.OK);
   }
 
+  @StaffOnly
   @Operation(summary = "Set patient subscription")
   @PatchMapping("/{id}/subscription")
   public ResponseEntity<String> updateUserSubscription(
@@ -51,10 +53,11 @@ public class PatientsController {
     return new ResponseEntity<>("Subscription updated", HttpStatus.OK);
   }
 
+  @StaffOnly
   @Operation(summary = "Cancel patient subscription")
   @PatchMapping("/{id}/subscription/cancel")
-  public ResponseEntity<String> updateUserSubscription(@PathVariable("id") int userId) {
-    userService.updateUserSubscription(userId, 0);
+  public ResponseEntity<String> removeUserSubscription(@PathVariable("id") int userId) {
+    userService.removeUserSubscription(userId);
     return new ResponseEntity<>("Subscription cancelled", HttpStatus.OK);
   }
 

@@ -26,4 +26,6 @@ public class PatientDetailsDTO {
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull LocalDate birthdate;
+
+  private Integer subscriptionId;
 }

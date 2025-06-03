@@ -117,9 +117,9 @@ export interface VisitWithDetails {
 }
 
 export interface Subscription {
-  id?: number;
-  name?: string;
-  price?: number;
+  id: number;
+  name: string;
+  price: number;
 }
 
 export type CreateServiceDTOType = (typeof CreateServiceDTOType)[keyof typeof CreateServiceDTOType];
@@ -415,9 +415,9 @@ export interface AvailableTimeSlotDTO {
 }
 
 export interface SubscriptionToService {
-  subscriptionId?: number;
-  serviceId?: number;
-  discount?: number;
+  subscriptionId: number;
+  serviceId: number;
+  discount: number;
 }
 
 export interface MedicineWithAmount {
@@ -435,6 +435,7 @@ export interface PatientDetailsDTO {
   email: string;
   pesel: string;
   birthdate: string;
+  subscriptionId?: number;
 }
 
 export interface FacilityInfoReturnDTO {
@@ -470,8 +471,6 @@ export interface MeDTO {
   role: MeDTORole;
   facilityId: number;
 }
-
-export type GetAllSubscriptions200 = { [key: string]: unknown };
 
 export type CreateSubscriptionParams = {
   name: string;

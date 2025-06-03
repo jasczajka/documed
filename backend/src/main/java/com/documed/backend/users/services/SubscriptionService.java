@@ -1,5 +1,6 @@
 package com.documed.backend.users.services;
 
+import com.documed.backend.auth.exceptions.UserNotFoundException;
 import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.services.ServiceDAO;
@@ -57,7 +58,14 @@ public class SubscriptionService {
     if (discount < 0 || discount > 100) {
       throw new BadRequestException("Discount must be between 0 and 100");
     }
-    subscriptionToServiceDAO.update(new SubscriptionToService(serviceId, subscriptionId, discount));
+    int rowsAffected =
+        subscriptionToServiceDAO.update(
+            new SubscriptionToService(subscriptionId, serviceId, discount));
+
+    if (rowsAffected == 0) {
+      throw new UserNotFoundException(
+          "No subscription id " + subscriptionId + " and service id " + serviceId + " found");
+    }
   }
 
   public void createSubscriptionToServiceForNewService(int serviceId) {
@@ -89,5 +97,9 @@ public class SubscriptionService {
   public void deleteSubscription(int subscriptionId) {
     deleteSubscriptionToServiceForSubscription(subscriptionId);
     subscriptionDAO.delete(subscriptionId);
+  }
+
+  public List<SubscriptionToService> getAllServiceSubscriptionDiscounts() {
+    return subscriptionToServiceDAO.getAll();
   }
 }

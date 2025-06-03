@@ -22,9 +22,11 @@ import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
 import { AttachmentsTab } from './tabs/AttachmentsTab';
 import { PersonalDataTab } from './tabs/PersonalDataTab';
+import { SubscriptionTab } from './tabs/SubscriptionTab';
 
 interface PatientTabsProps {
   patientInfo: PatientInfoPanelProps;
+  patientSubscriptionId: number | null;
   tabIndex: number;
   onTabChange: (index: number) => void;
   patientAttachments: FileInfoDTO[];
@@ -36,8 +38,10 @@ interface PatientTabsProps {
   refetchAdditionalServices: () => Promise<void>;
   refetchPatientInfo: () => Promise<void>;
 }
+
 export const PatientTabs: FC<PatientTabsProps> = ({
   patientInfo,
+  patientSubscriptionId,
   tabIndex,
   onTabChange,
   patientAttachments,
@@ -51,6 +55,7 @@ export const PatientTabs: FC<PatientTabsProps> = ({
 }) => {
   const { showNotification, NotificationComponent } = useNotification();
   const { openModal } = useModal();
+
   const { isPending: isCancelVisitLoading, isError: isCancelVisitError } = useCancelPlannedVisit();
 
   const handleCancelVisitClick = (visitId: number) => {
@@ -117,7 +122,13 @@ export const PatientTabs: FC<PatientTabsProps> = ({
         {tabIndex === 3 && (
           <PersonalDataTab patientInfo={patientInfo} onSuccessfulDeactivate={refetchPatientInfo} />
         )}
-        {tabIndex === 4 && <div>Abonament</div>}
+        {tabIndex === 4 && (
+          <SubscriptionTab
+            patientSubscriptionId={patientSubscriptionId}
+            allServices={allServices}
+            refetch={refetchPatientInfo}
+          />
+        )}
       </Paper>
       <NotificationComponent />
     </Box>

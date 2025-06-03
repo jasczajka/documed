@@ -104,30 +104,30 @@ export const useUpdateUserSubscription = <TError = ErrorType<unknown>, TContext 
 /**
  * @summary Cancel patient subscription
  */
-export const updateUserSubscription1 = (id: number) => {
+export const removeUserSubscription = (id: number) => {
   return customInstance<string>({
     url: `/api/patients/${id}/subscription/cancel`,
     method: 'PATCH',
   });
 };
 
-export const getUpdateUserSubscription1MutationOptions = <
+export const getRemoveUserSubscriptionMutationOptions = <
   TError = ErrorType<unknown>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof updateUserSubscription1>>,
+    Awaited<ReturnType<typeof removeUserSubscription>>,
     TError,
     { id: number },
     TContext
   >;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof updateUserSubscription1>>,
+  Awaited<ReturnType<typeof removeUserSubscription>>,
   TError,
   { id: number },
   TContext
 > => {
-  const mutationKey = ['updateUserSubscription1'];
+  const mutationKey = ['removeUserSubscription'];
   const { mutation: mutationOptions } = options
     ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
       ? options
@@ -135,30 +135,30 @@ export const getUpdateUserSubscription1MutationOptions = <
     : { mutation: { mutationKey } };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof updateUserSubscription1>>,
+    Awaited<ReturnType<typeof removeUserSubscription>>,
     { id: number }
   > = (props) => {
     const { id } = props ?? {};
 
-    return updateUserSubscription1(id);
+    return removeUserSubscription(id);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type UpdateUserSubscription1MutationResult = NonNullable<
-  Awaited<ReturnType<typeof updateUserSubscription1>>
+export type RemoveUserSubscriptionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof removeUserSubscription>>
 >;
 
-export type UpdateUserSubscription1MutationError = ErrorType<unknown>;
+export type RemoveUserSubscriptionMutationError = ErrorType<unknown>;
 
 /**
  * @summary Cancel patient subscription
  */
-export const useUpdateUserSubscription1 = <TError = ErrorType<unknown>, TContext = unknown>(
+export const useRemoveUserSubscription = <TError = ErrorType<unknown>, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof updateUserSubscription1>>,
+      Awaited<ReturnType<typeof removeUserSubscription>>,
       TError,
       { id: number },
       TContext
@@ -166,12 +166,12 @@ export const useUpdateUserSubscription1 = <TError = ErrorType<unknown>, TContext
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof updateUserSubscription1>>,
+  Awaited<ReturnType<typeof removeUserSubscription>>,
   TError,
   { id: number },
   TContext
 > => {
-  const mutationOptions = getUpdateUserSubscription1MutationOptions(options);
+  const mutationOptions = getRemoveUserSubscriptionMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
