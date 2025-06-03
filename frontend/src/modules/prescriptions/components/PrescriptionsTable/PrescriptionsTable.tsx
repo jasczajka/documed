@@ -81,7 +81,8 @@ export const PrescriptionsTable: FC<PrescriptionsTableProps> = ({ prescriptions 
     }));
   };
 
-  const { openModal, closeModal } = useModal();
+  const { openModal } = useModal();
+
   const handleShowPrescriptionClick = useCallback(
     async (id: number) => {
       setIsLoading(true);
@@ -90,16 +91,15 @@ export const PrescriptionsTable: FC<PrescriptionsTableProps> = ({ prescriptions 
 
       setIsLoading(false);
 
-      openModal(
-        'prescriptionMedicinesModal',
+      openModal('prescriptionMedicinesModal', (close) => (
         <PrescriptionMedicinesModal
           prescriptionId={id.toString()}
           medicines={medicines ?? []}
-          onCancel={() => closeModal('prescriptionMedicinesModal')}
-        />,
-      );
+          onCancel={close}
+        />
+      ));
     },
-    [openModal, closeModal],
+    [openModal],
   );
 
   return (

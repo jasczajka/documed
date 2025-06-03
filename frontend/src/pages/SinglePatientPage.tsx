@@ -28,7 +28,7 @@ const SinglePatientPage: FC = () => {
     setTabIndex(index);
   }, []);
 
-  const { openModal, closeModal } = useModal();
+  const { openModal } = useModal();
   const { showNotification, NotificationComponent } = useNotification();
 
   const {
@@ -100,8 +100,7 @@ const SinglePatientPage: FC = () => {
 
   const handleAdditionalServiceClick = useCallback(async () => {
     if (fulfillerId !== undefined && patientId !== undefined && allServices !== undefined) {
-      openModal(
-        'createAdditionalServiceModal',
+      openModal('createAdditionalServiceModal', (close) => (
         <AdditionalServiceModal
           allAdditionalServices={allAdditionalServices}
           patientPesel={patientInfo?.pesel}
@@ -109,44 +108,59 @@ const SinglePatientPage: FC = () => {
           fulfillerId={fulfillerId}
           patientFullName={`${patientInfo?.firstName} ${patientInfo?.lastName}`}
           patientAge={
-            patientInfo?.birthdate ? getAgeFromBirthDate(new Date(patientInfo?.birthdate)) : null
+            patientInfo?.birthdate ? getAgeFromBirthDate(new Date(patientInfo.birthdate)) : null
           }
           onConfirm={async () => {
-            closeModal('additionalServiceModal');
+            close();
             showNotification('Zapisano dane usługi dodatkowej', 'success');
-
             await refetchPatientAttachments();
             await refetchPatientAdditionalServices();
           }}
-          onCancel={() => closeModal('createAdditionalServiceModal')}
+          onCancel={close}
           mode="create"
-        />,
-      );
+        />
+      ));
     }
-  }, [openModal, closeModal, isInitialLoading, allServices, patientInfo, patientId]);
+  }, [
+    openModal,
+    allServices,
+    allAdditionalServices,
+    patientInfo,
+    patientId,
+    fulfillerId,
+    refetchPatientAttachments,
+    refetchPatientAdditionalServices,
+  ]);
 
   const handleScheduleVisitClick = useCallback(async () => {
     if (allDoctors !== undefined && allServices !== undefined) {
-      openModal(
-        'scheduleVisitModal',
+      openModal('scheduleVisitModal', (close) => (
         <ScheduleVisitModal
           allDoctors={allDoctors}
           allServices={allServices}
           patientId={patientId}
           patientFullName={patientFullName}
           patientAge={
-            patientInfo?.birthdate ? getAgeFromBirthDate(new Date(patientInfo?.birthdate)) : null
+            patientInfo?.birthdate ? getAgeFromBirthDate(new Date(patientInfo.birthdate)) : null
           }
           onConfirm={async () => {
             await refetchPatientVisits();
-            closeModal('scheduleVisitModal');
+            close();
             showNotification('Umówiono wizytę', 'success');
           }}
-          onCancel={() => closeModal('scheduleVisitModal')}
-        />,
-      );
+          onCancel={close}
+        />
+      ));
     }
-  }, [openModal, closeModal, allDoctors, allServices, patientInfo, patientId]);
+  }, [
+    openModal,
+    allDoctors,
+    allServices,
+    patientId,
+    patientInfo,
+    patientFullName,
+    refetchPatientVisits,
+  ]);
 
   useEffect(() => {
     if (isInitialError) {

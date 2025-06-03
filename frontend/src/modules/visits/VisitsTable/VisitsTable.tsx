@@ -200,23 +200,23 @@ export const VisitsTable: FC<VisitTableProps> = ({
     handleFilterChange('dateTo', todayEnd);
   }, [handleFilterChange]);
 
-  const { openModal, closeModal } = useModal();
+  const { openModal } = useModal();
+
   const handleAddReviewClick = useCallback(
     (visitId: number, specialistFullName: string) => {
-      openModal(
-        'reviewModal',
+      openModal('reviewModal', (close) => (
         <ReviewModal
           visitId={visitId.toString()}
           specialistFullName={specialistFullName}
           onConfirm={(rating, visitId, additionalInfo) => {
             console.log('Review Submitted:', { rating, visitId, additionalInfo });
-            closeModal('reviewModal');
+            close();
           }}
-          onCancel={() => closeModal('reviewModal')}
-        />,
-      );
+          onCancel={close}
+        />
+      ));
     },
-    [openModal, closeModal],
+    [openModal],
   );
 
   const onNavigateToVisit = useCallback(
