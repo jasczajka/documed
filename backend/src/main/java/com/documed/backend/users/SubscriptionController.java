@@ -39,7 +39,7 @@ public class SubscriptionController {
   }
 
   @GetMapping("/discounts")
-  @Operation(summary = "Get all service with subcscription and associated discount")
+  @Operation(summary = "Get all service with subscription and associated discount")
   public ResponseEntity<List<SubscriptionToService>> getAllServiceSubscriptionDiscounts() {
     List<SubscriptionToService> subscriptionsToService =
         subscriptionService.getAllServiceSubscriptionDiscounts();
