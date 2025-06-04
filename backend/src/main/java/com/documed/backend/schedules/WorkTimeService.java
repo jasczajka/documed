@@ -1,16 +1,19 @@
 package com.documed.backend.schedules;
 
-import com.documed.backend.auth.AuthService;
 import com.documed.backend.exceptions.BadRequestException;
-import com.documed.backend.schedules.dtos.WorkTimeDTO;
+import com.documed.backend.schedules.dtos.UploadWorkTimeDTO;
 import com.documed.backend.schedules.exceptions.WrongTimesGivenException;
 import com.documed.backend.schedules.model.WorkTime;
 import com.documed.backend.users.model.UserRole;
 import com.documed.backend.users.services.UserService;
 import java.time.DayOfWeek;
 import java.time.Duration;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,24 +27,21 @@ public class WorkTimeService {
   private int slotDurationInMinutes;
 
   private final WorkTimeDAO workTimeDAO;
-  private final AuthService authService;
   private final UserService userService;
 
-  WorkTime createWorkTime(int userId, WorkTimeDTO dto) {
+  WorkTime createWorkTime(int userId, UploadWorkTimeDTO dto) {
 
     if (!userService.isUserAssignedToRole(userId, UserRole.DOCTOR)) {
       throw new BadRequestException("User is not a doctor");
     }
 
-    int facilityId = authService.getCurrentFacilityId();
-
     WorkTime workTime =
         WorkTime.builder()
             .userId(userId)
-            .dayOfWeek(dto.getDayOfWeek())
+            .dayOfWeek(dto.getDayOfWeek().toJavaDayOfWeek())
             .startTime(dto.getStartTime())
             .endTime(dto.getEndTime())
-            .facilityId(facilityId)
+            .facilityId(dto.getFacilityId())
             .build();
 
     long duration = Duration.between(workTime.getStartTime(), workTime.getEndTime()).toMinutes();
@@ -56,19 +56,26 @@ public class WorkTimeService {
     }
   }
 
-  // TODO will be invoked when creating new employee
-  List<WorkTime> createWorkTimeForNewUser(int userId, UserRole role) {
-
-    if (role == UserRole.DOCTOR) {
-      List<WorkTime> workTimes = new ArrayList<>();
-      for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
-        workTimes.add(WorkTime.builder().userId(userId).dayOfWeek(dayOfWeek).build());
-        workTimeDAO.create(workTimes.getLast());
-      }
-      return workTimes;
-    } else {
-      return new ArrayList<>();
+  public List<WorkTime> createWorkTimeForNewUser(int userId, UserRole role, int facilityId) {
+    if (role != UserRole.DOCTOR) {
+      return Collections.emptyList();
     }
+
+    return Arrays.stream(DayOfWeek.values())
+        .map(
+            day -> {
+              WorkTime workTime =
+                  WorkTime.builder()
+                      .userId(userId)
+                      .facilityId(facilityId)
+                      .dayOfWeek(day)
+                      .startTime(LocalTime.MIDNIGHT)
+                      .endTime(LocalTime.MIDNIGHT)
+                      .build();
+              workTimeDAO.create(workTime);
+              return workTime;
+            })
+        .collect(Collectors.toList());
   }
 
   List<WorkTime> getWorkTimesForUser(int userId) {
@@ -76,16 +83,14 @@ public class WorkTimeService {
   }
 
   @Transactional
-  public List<WorkTime> updateWorkTimes(List<WorkTimeDTO> updatedWorkTimes, int userId) {
+  public List<WorkTime> updateWorkTimes(List<UploadWorkTimeDTO> updatedWorkTimes, int userId) {
 
     if (!userService.isUserAssignedToRole(userId, UserRole.DOCTOR)) {
       throw new BadRequestException("User is not a doctor");
     }
 
-    int facilityId = authService.getCurrentFacilityId();
-
     List<WorkTime> workTimes = new ArrayList<>();
-    for (WorkTimeDTO workTime : updatedWorkTimes) {
+    for (UploadWorkTimeDTO workTime : updatedWorkTimes) {
 
       long duration = Duration.between(workTime.getStartTime(), workTime.getEndTime()).toMinutes();
       if (duration < slotDurationInMinutes && duration != 0) {
@@ -98,10 +103,10 @@ public class WorkTimeService {
         workTimes.add(
             WorkTime.builder()
                 .userId(userId)
-                .dayOfWeek(workTime.getDayOfWeek())
+                .dayOfWeek(workTime.getDayOfWeek().toJavaDayOfWeek())
                 .startTime(workTime.getStartTime())
                 .endTime(workTime.getEndTime())
-                .facilityId(facilityId)
+                .facilityId(workTime.getFacilityId())
                 .build());
         workTimeDAO.updateWorkTime(workTimes.getLast());
       }

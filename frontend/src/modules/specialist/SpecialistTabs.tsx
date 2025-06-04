@@ -1,18 +1,17 @@
 import { BeachAccess, CalendarMonth, Person2, QueryBuilder } from '@mui/icons-material';
 import { Box, Paper, Tab, Tabs } from '@mui/material';
 import { FC } from 'react';
-import { Specialization } from 'shared/api/generated/generated.schemas';
-import { WorkTimeWithoutIdAndUser } from 'src/pages/SingleSpecialistPage';
+import { Specialization, UploadWorkTimeDTO } from 'shared/api/generated/generated.schemas';
 import { EditSpecializationsTab } from './tabs/EditSpecializationsTab';
 import { EditWorkTimeTab } from './tabs/EditWorkTimeTab';
 
 interface SpecialistTabsProps {
   doctorId: number;
   currentSpecializations: Specialization[];
-  currentWorkTimes: WorkTimeWithoutIdAndUser[];
+  currentWorkTimes: UploadWorkTimeDTO[];
   allSpecializations: Specialization[];
   handleUpdateSpecialistSpecializations: (selected: Specialization[]) => void;
-  handleUpdateSpecialistWorkTimes: (selected: WorkTimeWithoutIdAndUser[]) => void;
+  handleUpdateSpecialistWorkTimes: (selected: UploadWorkTimeDTO[]) => void;
   tabIndex: number;
   onTabChange: (index: number) => void;
   loading?: boolean;

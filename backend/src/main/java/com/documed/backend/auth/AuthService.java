@@ -5,6 +5,7 @@ import com.documed.backend.auth.exceptions.*;
 import com.documed.backend.auth.model.CurrentUser;
 import com.documed.backend.auth.model.OtpPurpose;
 import com.documed.backend.exceptions.NotFoundException;
+import com.documed.backend.schedules.WorkTimeService;
 import com.documed.backend.users.*;
 import com.documed.backend.users.model.AccountStatus;
 import com.documed.backend.users.model.User;
@@ -34,6 +35,7 @@ public class AuthService {
   private final EmailService emailService;
 
   private final FacilityService facilityService;
+  private final WorkTimeService workTimeService;
 
   private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
@@ -44,7 +46,8 @@ public class AuthService {
       UserService userService,
       OtpService otpService,
       EmailService emailService,
-      FacilityService facilityService) {
+      FacilityService facilityService,
+      WorkTimeService workTimeService) {
     this.userDAO = userDAO;
     this.passwordEncoder = passwordEncoder;
     this.jwtUtil = jwtUtil;
@@ -52,6 +55,7 @@ public class AuthService {
     this.otpService = otpService;
     this.emailService = emailService;
     this.facilityService = facilityService;
+    this.workTimeService = workTimeService;
   }
 
   @Transactional
@@ -160,6 +164,9 @@ public class AuthService {
       User createdUser = userDAO.createAndReturn(user);
 
       userService.addSpecializationsToUser(createdUser.getId(), specializationIds);
+
+      workTimeService.createWorkTimeForNewUser(
+          createdUser.getId(), UserRole.DOCTOR, getCurrentFacilityId());
 
       return AuthResponseDTO.builder()
           .userId(createdUser.getId())

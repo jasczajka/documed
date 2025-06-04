@@ -4,6 +4,7 @@ import com.documed.backend.auth.exceptions.*
 import com.documed.backend.auth.model.CurrentUser
 import com.documed.backend.auth.model.OtpPurpose
 import com.documed.backend.exceptions.NotFoundException
+import com.documed.backend.schedules.WorkTimeService
 import com.documed.backend.users.UserDAO
 import com.documed.backend.users.model.AccountStatus
 import com.documed.backend.users.model.User
@@ -27,10 +28,11 @@ class AuthServiceTest extends Specification {
 	def otpService = Mock(OtpService)
 	def emailService = Mock(EmailService)
 	def facilityService = Mock(FacilityService)
+	def workTimeService = Mock(WorkTimeService)
 
 	@Subject
 	AuthService authService = new AuthService(
-	userDAO, passwordEncoder, jwtUtil, userService, otpService, emailService, facilityService
+	userDAO, passwordEncoder, jwtUtil, userService, otpService, emailService, facilityService, workTimeService
 	)
 
 	private User buildPatient(Map overrides = [:]) {
@@ -162,13 +164,19 @@ class AuthServiceTest extends Specification {
 
 	def "registerDoctor creates and returns DTO"() {
 		given:
+		def authServiceSpy = Spy(authService)
+		authServiceSpy.getCurrentFacilityId() >> 1
+
 		userDAO.getByEmail('e') >> Optional.empty()
 		passwordEncoder.encode('pw') >> 'enc'
 		def doc = buildDoctor(id:1, email:'e', password:'enc', pwzNumber:'pwz')
 		userDAO.createAndReturn(_ as User) >> doc
 		userService.addSpecializationsToUser(1, [1, 2]) >> null
+		workTimeService.createWorkTimeForNewUser(1, UserRole.DOCTOR, 1) >> []
+
 		when:
-		def dto = authService.registerDoctor('fn','ln','e','pwz','pw','ph',[1, 2])
+		def dto = authServiceSpy.registerDoctor('fn', 'ln', 'e', 'pwz', 'pw', 'ph', [1, 2])
+
 		then:
 		dto.userId == 1
 		dto.role == UserRole.DOCTOR

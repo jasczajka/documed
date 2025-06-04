@@ -4,10 +4,10 @@
  * OpenAPI definition
  * OpenAPI spec version: v0
  */
-export type WorkTimeDTODayOfWeek = (typeof WorkTimeDTODayOfWeek)[keyof typeof WorkTimeDTODayOfWeek];
+export type DayOfWeekEnum = (typeof DayOfWeekEnum)[keyof typeof DayOfWeekEnum];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-export const WorkTimeDTODayOfWeek = {
+export const DayOfWeekEnum = {
   MONDAY: 'MONDAY',
   TUESDAY: 'TUESDAY',
   WEDNESDAY: 'WEDNESDAY',
@@ -17,30 +17,18 @@ export const WorkTimeDTODayOfWeek = {
   SUNDAY: 'SUNDAY',
 } as const;
 
-export interface WorkTimeDTO {
-  dayOfWeek: WorkTimeDTODayOfWeek;
+export interface UploadWorkTimeDTO {
+  dayOfWeek: DayOfWeekEnum;
   startTime: string;
   endTime: string;
+  facilityId: number;
 }
 
-export type WorkTimeDayOfWeek = (typeof WorkTimeDayOfWeek)[keyof typeof WorkTimeDayOfWeek];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const WorkTimeDayOfWeek = {
-  MONDAY: 'MONDAY',
-  TUESDAY: 'TUESDAY',
-  WEDNESDAY: 'WEDNESDAY',
-  THURSDAY: 'THURSDAY',
-  FRIDAY: 'FRIDAY',
-  SATURDAY: 'SATURDAY',
-  SUNDAY: 'SUNDAY',
-} as const;
-
-export interface WorkTime {
+export interface WorkTimeReturnDTO {
   id: number;
   userId: number;
-  facilityId?: number;
-  dayOfWeek: WorkTimeDayOfWeek;
+  facilityId: number;
+  dayOfWeek: DayOfWeekEnum;
   startTime: string;
   endTime: string;
 }

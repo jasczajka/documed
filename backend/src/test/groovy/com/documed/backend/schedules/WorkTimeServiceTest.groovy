@@ -1,8 +1,8 @@
 package com.documed.backend.schedules
 
-import com.documed.backend.auth.AuthService
-import com.documed.backend.schedules.dtos.WorkTimeDTO
+import com.documed.backend.schedules.dtos.UploadWorkTimeDTO
 import com.documed.backend.schedules.exceptions.WrongTimesGivenException
+import com.documed.backend.schedules.model.DayOfWeekEnum
 import com.documed.backend.schedules.model.WorkTime
 import com.documed.backend.users.model.UserRole
 import com.documed.backend.users.services.UserService
@@ -14,11 +14,10 @@ import spock.lang.Subject
 class WorkTimeServiceTest extends Specification{
 
 	def workTimeDAO = Mock(WorkTimeDAO)
-	def authService = Mock(AuthService)
 	def userService = Mock(UserService)
 
 	@Subject
-	def workTimeService = new WorkTimeService(workTimeDAO, authService, userService)
+	def workTimeService = new WorkTimeService(workTimeDAO, userService)
 
 	def setup() {
 		workTimeService.slotDurationInMinutes = 15
@@ -29,24 +28,24 @@ class WorkTimeServiceTest extends Specification{
 
 		def userId = 997
 		def facilityId = 10
-		def dto = new WorkTimeDTO(
-				dayOfWeek: DayOfWeek.MONDAY,
+		def dto = new UploadWorkTimeDTO(
+				dayOfWeek: DayOfWeekEnum.MONDAY,
 				startTime: LocalTime.of(9, 0),
-				endTime: LocalTime.of(10, 0)
+				endTime: LocalTime.of(10, 0),
+				facilityId: facilityId
 				)
 
 
 
 		def workTime = WorkTime.builder()
 				.userId(userId)
-				.dayOfWeek(dto.dayOfWeek)
+				.dayOfWeek(dto.dayOfWeek.toJavaDayOfWeek())
 				.startTime(dto.startTime)
 				.endTime(dto.endTime)
 				.facilityId(facilityId)
 				.build()
 
 		when:
-		authService.getCurrentFacilityId() >> facilityId
 		userService.isUserAssignedToRole(userId, UserRole.DOCTOR) >> true
 		workTimeDAO.create(_ as WorkTime) >> workTime
 
@@ -61,21 +60,21 @@ class WorkTimeServiceTest extends Specification{
 
 		def userId = 997
 		def facilityId = 10
-		def dto = new WorkTimeDTO(
-				dayOfWeek: DayOfWeek.MONDAY,
+		def dto = new UploadWorkTimeDTO(
+				dayOfWeek: DayOfWeekEnum.MONDAY,
 				startTime: LocalTime.of(9, 0),
-				endTime: LocalTime.of(10, 0)
+				endTime: LocalTime.of(10, 0),
+				facilityId: facilityId
 				)
 
 		def workTime = WorkTime.builder()
 				.userId(userId)
-				.dayOfWeek(dto.dayOfWeek)
+				.dayOfWeek(dto.dayOfWeek.toJavaDayOfWeek())
 				.startTime(dto.startTime)
 				.endTime(dto.endTime)
 				.facilityId(facilityId)
 				.build()
 
-		authService.getCurrentFacilityId() >> facilityId
 		userService.isUserAssignedToRole(userId, UserRole.DOCTOR) >> true
 		workTimeDAO.updateWorkTime(_ as WorkTime) >> workTime
 
@@ -96,13 +95,13 @@ class WorkTimeServiceTest extends Specification{
 		given:
 		def userId = 997
 		def facilityId = 10
-		def dto = new WorkTimeDTO(
-				dayOfWeek: DayOfWeek.MONDAY,
+		def dto = new UploadWorkTimeDTO(
+				dayOfWeek: DayOfWeekEnum.MONDAY,
 				startTime: LocalTime.of(9, 0),
-				endTime: LocalTime.of(9, 5)
+				endTime: LocalTime.of(9, 5),
+				facilityId: facilityId
 				)
 
-		authService.getCurrentFacilityId() >> facilityId
 		userService.isUserAssignedToRole(userId, UserRole.DOCTOR) >> true
 
 		when:
@@ -116,13 +115,13 @@ class WorkTimeServiceTest extends Specification{
 		given:
 		def userId = 997
 		def facilityId = 10
-		def dto = new WorkTimeDTO(
-				dayOfWeek: DayOfWeek.MONDAY,
+		def dto = new UploadWorkTimeDTO(
+				dayOfWeek: DayOfWeekEnum.MONDAY,
 				startTime: LocalTime.of(10, 0),
-				endTime: LocalTime.of(9, 0)
+				endTime: LocalTime.of(9, 0),
+				facilityId: facilityId
 				)
 
-		authService.getCurrentFacilityId() >> facilityId
 		userService.isUserAssignedToRole(userId, UserRole.DOCTOR) >> true
 
 		when:
