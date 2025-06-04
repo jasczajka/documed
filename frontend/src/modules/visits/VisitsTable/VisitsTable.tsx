@@ -256,7 +256,7 @@ export const VisitsTable: FC<VisitTableProps> = ({
         />,
       );
     },
-    [openModal, closeModal],
+    [openModal],
   );
 
   const onNavigateToVisit = useCallback(

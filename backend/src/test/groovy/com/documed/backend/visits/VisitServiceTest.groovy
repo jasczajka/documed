@@ -5,6 +5,8 @@ import com.documed.backend.auth.exceptions.UnauthorizedException
 import com.documed.backend.exceptions.BadRequestException
 import com.documed.backend.exceptions.NotFoundException
 import com.documed.backend.prescriptions.PrescriptionService
+import com.documed.backend.referrals.ReferralService
+import com.documed.backend.referrals.model.Referral
 import com.documed.backend.schedules.TimeSlotService
 import com.documed.backend.schedules.model.TimeSlot
 import com.documed.backend.services.ServiceService
@@ -29,9 +31,10 @@ class VisitServiceTest extends Specification {
 	def subscriptionService = Mock(SubscriptionService)
 	def userService = Mock(UserService)
 	def prescriptionService = Mock(PrescriptionService)
+	def referralService = Mock(ReferralService)
 
 	@Subject
-	def visitService = new VisitService(visitDAO, feedbackDAO, timeSlotService, authService, serviceService, userService, subscriptionService, prescriptionService)
+	def visitService = new VisitService(visitDAO, feedbackDAO, timeSlotService, authService, serviceService, userService, subscriptionService, prescriptionService, referralService)
 
 	private VisitWithDetails buildVisitWithDetails(Map overrides = [:]) {
 		return VisitWithDetails.builder()
@@ -139,6 +142,7 @@ class VisitServiceTest extends Specification {
 		visitDAO.getById(id) >> Optional.of(visit)
 		visitDAO.update(_ as Visit) >> { Visit v -> v }
 		visitDAO.updateVisitStatus(id, VisitStatus.CLOSED) >> true
+		referralService.getReferralsForVisit(id) >> []
 
 		prescriptionService.getPrescriptionIdForVisitId(id) >> Optional.empty()
 
@@ -535,6 +539,7 @@ class VisitServiceTest extends Specification {
 
 		prescriptionService.getPrescriptionIdForVisitId(visitId) >> Optional.of(prescriptionId)
 		prescriptionService.getNumberOfMedicinesOnPrescriptionByVisitId(visitId) >> 0
+		referralService.getReferralsForVisit(visitId) >> []
 
 		when:
 		def result = visitService.closeVisit(visitId, updateDto)
@@ -555,6 +560,7 @@ class VisitServiceTest extends Specification {
 		visitDAO.getById(visitId) >> Optional.of(visit)
 		visitDAO.update(_ as Visit) >> { Visit v -> v }
 		visitDAO.updateVisitStatus(visitId, VisitStatus.CLOSED) >> true
+		referralService.getReferralsForVisit(visitId) >> []
 
 		prescriptionService.getPrescriptionIdForVisitId(visitId) >> Optional.of(prescriptionId)
 		prescriptionService.getNumberOfMedicinesOnPrescriptionByVisitId(visitId) >> 2

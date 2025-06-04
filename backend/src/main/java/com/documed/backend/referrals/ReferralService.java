@@ -3,6 +3,7 @@ package com.documed.backend.referrals;
 import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.referrals.dtos.CreateReferralDTO;
 import com.documed.backend.referrals.model.Referral;
+import com.documed.backend.referrals.model.ReferralStatus;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,5 +47,9 @@ public class ReferralService {
     } else {
       return userId;
     }
+  }
+
+  public void issueReferral(int referralId) {
+    referralDAO.updateReferralStatus(referralId, ReferralStatus.ISSUED);
   }
 }

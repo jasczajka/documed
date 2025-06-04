@@ -11,13 +11,13 @@ import {
 import { FC } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useRegisterStaff } from 'shared/api/generated/auth-controller/auth-controller';
-import { MeDTORole } from 'shared/api/generated/generated.schemas';
+import { UserRole } from 'shared/api/generated/generated.schemas';
 import { useNotification } from 'shared/hooks/useNotification';
 import { mapAuthError } from 'shared/utils/mapAuthError';
 import * as Yup from 'yup';
 
 type FormData = {
-  role: MeDTORole;
+  role: UserRole;
   email: string;
   firstName: string;
   lastName: string;
@@ -25,8 +25,8 @@ type FormData = {
 };
 
 const validationSchema = Yup.object({
-  role: Yup.mixed<MeDTORole>()
-    .oneOf(Object.values(MeDTORole))
+  role: Yup.mixed<UserRole>()
+    .oneOf(Object.values(UserRole))
     .required('Typ użytkownika jest wymagany'),
   email: Yup.string().email('Nieprawidłowy adres email').required('Adres email jest wymagany'),
   firstName: Yup.string().required('Imię jest wymagane'),
@@ -42,7 +42,7 @@ export const RegisterStaffTab: FC = () => {
   const methods = useForm({
     resolver: yupResolver(validationSchema),
     defaultValues: {
-      role: MeDTORole.WARD_CLERK,
+      role: UserRole.WARD_CLERK,
       email: '',
       firstName: '',
       lastName: '',
@@ -95,18 +95,14 @@ export const RegisterStaffTab: FC = () => {
           render={({ field }) => (
             <FormControl component="fieldset" error={!!errors.role}>
               <RadioGroup {...field} row>
+                <FormControlLabel value={UserRole.NURSE} control={<Radio />} label="Pielęgniarka" />
                 <FormControlLabel
-                  value={MeDTORole.NURSE}
-                  control={<Radio />}
-                  label="Pielęgniarka"
-                />
-                <FormControlLabel
-                  value={MeDTORole.WARD_CLERK}
+                  value={UserRole.WARD_CLERK}
                   control={<Radio color="secondary" />}
                   label="Rejestrator"
                 />
                 <FormControlLabel
-                  value={MeDTORole.ADMINISTRATOR}
+                  value={UserRole.ADMINISTRATOR}
                   control={<Radio />}
                   label="Administrator"
                 />

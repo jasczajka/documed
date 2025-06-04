@@ -1,9 +1,11 @@
 package com.documed.backend.referrals;
 
 import com.documed.backend.FullDAO;
+import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.exceptions.CreationFailException;
 import com.documed.backend.referrals.dtos.CreateReferralDTO;
 import com.documed.backend.referrals.model.Referral;
+import com.documed.backend.referrals.model.ReferralStatus;
 import com.documed.backend.referrals.model.ReferralType;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -31,6 +33,7 @@ public class ReferralDAO implements FullDAO<Referral, CreateReferralDTO> {
               .type(ReferralType.valueOf(rs.getString("type")))
               .expirationDate(rs.getDate("expiration_date").toLocalDate())
               .visitId(rs.getInt("visit_id"))
+              .status(ReferralStatus.valueOf(rs.getString("status")))
               .build();
 
   @Override
@@ -117,5 +120,18 @@ public class ReferralDAO implements FullDAO<Referral, CreateReferralDTO> {
     List<Integer> userIds = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("patient_id"), id);
 
     return userIds.stream().findFirst().orElse(null);
+  }
+
+  public void updateReferralStatus(int referralId, ReferralStatus status) {
+    String sql =
+        """
+            UPDATE referral
+            SET status = ?
+            WHERE id = ?;
+        """;
+    int affectedRows = jdbcTemplate.update(sql, status.name(), referralId);
+    if (affectedRows == 0) {
+      throw new BadRequestException("Failed to update referral");
+    }
   }
 }

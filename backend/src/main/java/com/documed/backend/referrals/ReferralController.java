@@ -5,6 +5,7 @@ import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
 import com.documed.backend.auth.exceptions.UnauthorizedException;
 import com.documed.backend.referrals.dtos.CreateReferralDTO;
+import com.documed.backend.referrals.dtos.ReferralTypeDTO;
 import com.documed.backend.referrals.dtos.ReturnReferralDTO;
 import com.documed.backend.referrals.model.Referral;
 import com.documed.backend.referrals.model.ReferralMapper;
@@ -12,6 +13,7 @@ import com.documed.backend.referrals.model.ReferralType;
 import com.documed.backend.users.model.UserRole;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -84,7 +86,10 @@ public class ReferralController {
   @StaffOnly
   @GetMapping("/types")
   @Operation(summary = "Get all referral types")
-  public ResponseEntity<ReferralType[]> getAllReferralTypes() {
-    return ResponseEntity.ok(ReferralType.values());
+  public ResponseEntity<List<ReferralTypeDTO>> getAllReferralTypes() {
+    return ResponseEntity.ok(
+        Arrays.stream(ReferralType.values())
+            .map(rt -> new ReferralTypeDTO(rt, rt.getDescription()))
+            .toList());
   }
 }

@@ -5,6 +5,8 @@ import com.documed.backend.auth.exceptions.UnauthorizedException;
 import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.prescriptions.PrescriptionService;
+import com.documed.backend.referrals.ReferralService;
+import com.documed.backend.referrals.model.Referral;
 import com.documed.backend.schedules.TimeSlotService;
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.services.ServiceService;
@@ -38,6 +40,7 @@ public class VisitService {
   private final UserService userService;
   private final SubscriptionService subscriptionService;
   private final PrescriptionService prescriptionService;
+  private final ReferralService referralService;
 
   public VisitWithDetails getByIdWithDetails(int id) {
     VisitWithDetails visit =
@@ -136,6 +139,10 @@ public class VisitService {
     }
     removePrescriptionFromVisitIfEmpty(visitId);
     updateVisit(visitId, updateVisitDTO);
+    List<Referral> referrals = referralService.getReferralsForVisit(visitId);
+    if (!referrals.isEmpty()) {
+      referrals.forEach(referral -> referralService.issueReferral(referral.getId()));
+    }
     return visitDAO.updateVisitStatus(visitId, VisitStatus.CLOSED);
   }
 

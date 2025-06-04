@@ -129,20 +129,17 @@ export const SinglePrescriptionTable: FC<SinglePrescriptionTableProps> = ({
             disabled={disabled}
           />
         </Box>
-
-        {medicines.length > 0 && (
-          <DataGrid
-            rows={medicines}
-            columns={columns}
-            getRowId={(row) => row.id}
-            pageSizeOptions={[5, 10]}
-            disableRowSelectionOnClick
-            disableColumnFilter
-            sx={{
-              width: '100%',
-            }}
-          />
-        )}
+        <DataGrid
+          rows={medicines}
+          columns={columns}
+          getRowId={(row) => row.id}
+          pageSizeOptions={[5, 10]}
+          disableRowSelectionOnClick
+          disableColumnFilter
+          sx={{
+            width: '100%',
+          }}
+        />
       </Box>
     </Paper>
   );

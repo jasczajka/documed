@@ -123,8 +123,10 @@ public class PrescriptionController {
   @PatchMapping("/{prescription_id}/issue")
   @Operation(summary = "Issue prescription")
   public ResponseEntity<Prescription> issuePrescription(
-      @PathVariable("prescription_id") int prescriptionId) {
-    return ResponseEntity.ok(prescriptionService.issuePrescription(prescriptionId));
+      @PathVariable("prescription_id") int prescriptionId,
+      @RequestBody LocalDate newExpirationDate) {
+    return ResponseEntity.ok(
+        prescriptionService.issuePrescription(prescriptionId, newExpirationDate));
   }
 
   @StaffOnly
