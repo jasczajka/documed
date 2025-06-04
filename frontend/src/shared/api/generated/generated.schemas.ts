@@ -108,8 +108,12 @@ export interface VisitWithDetails {
 }
 
 export interface GiveFeedbackDTO {
+  /**
+   * @minimum 1
+   * @maximum 5
+   */
   rating: number;
-  text: string;
+  text?: string;
 }
 
 export interface Subscription {
@@ -163,20 +167,20 @@ export type CreateReferralDTOType =
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const CreateReferralDTOType = {
-  '{code=TO_SPECIALIST,_description=Skierowanie_do_specjalisty}':
-    '{code=TO_SPECIALIST, description=Skierowanie do specjalisty}',
-  '{code=TO_HOSPITAL,_description=Skierowanie_do_szpitala}':
-    '{code=TO_HOSPITAL, description=Skierowanie do szpitala}',
-  '{code=FOR_DIAGNOSTICS,_description=Skierowanie_na_badania_diagnostyczne}':
-    '{code=FOR_DIAGNOSTICS, description=Skierowanie na badania diagnostyczne}',
-  '{code=FOR_REHABILITATION,_description=Skierowanie_na_rehabilitację}':
-    '{code=FOR_REHABILITATION, description=Skierowanie na rehabilitację}',
-  '{code=TO_SANATORIUM,_description=Skierowanie_do_sanatorium}':
-    '{code=TO_SANATORIUM, description=Skierowanie do sanatorium}',
-  '{code=FOR_LONG_TERM_CARE,_description=Skierowanie_do_opieki_długoterminowej}':
-    '{code=FOR_LONG_TERM_CARE, description=Skierowanie do opieki długoterminowej}',
-  '{code=FOR_PSYCHIATRIC_CARE,_description=Skierowanie_psychiatryczne_lub_uzależnienia}':
-    '{code=FOR_PSYCHIATRIC_CARE, description=Skierowanie psychiatryczne lub uzależnienia}',
+  '{description=Skierowanie_do_specjalisty,_code=TO_SPECIALIST}':
+    '{description=Skierowanie do specjalisty, code=TO_SPECIALIST}',
+  '{description=Skierowanie_do_szpitala,_code=TO_HOSPITAL}':
+    '{description=Skierowanie do szpitala, code=TO_HOSPITAL}',
+  '{description=Skierowanie_na_badania_diagnostyczne,_code=FOR_DIAGNOSTICS}':
+    '{description=Skierowanie na badania diagnostyczne, code=FOR_DIAGNOSTICS}',
+  '{description=Skierowanie_na_rehabilitację,_code=FOR_REHABILITATION}':
+    '{description=Skierowanie na rehabilitację, code=FOR_REHABILITATION}',
+  '{description=Skierowanie_do_sanatorium,_code=TO_SANATORIUM}':
+    '{description=Skierowanie do sanatorium, code=TO_SANATORIUM}',
+  '{description=Skierowanie_do_opieki_długoterminowej,_code=FOR_LONG_TERM_CARE}':
+    '{description=Skierowanie do opieki długoterminowej, code=FOR_LONG_TERM_CARE}',
+  '{description=Skierowanie_psychiatryczne_lub_uzależnienia,_code=FOR_PSYCHIATRIC_CARE}':
+    '{description=Skierowanie psychiatryczne lub uzależnienia, code=FOR_PSYCHIATRIC_CARE}',
 } as const;
 
 export interface CreateReferralDTO {
@@ -192,20 +196,20 @@ export type ReturnReferralDTOType =
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ReturnReferralDTOType = {
-  '{code=TO_SPECIALIST,_description=Skierowanie_do_specjalisty}':
-    '{code=TO_SPECIALIST, description=Skierowanie do specjalisty}',
-  '{code=TO_HOSPITAL,_description=Skierowanie_do_szpitala}':
-    '{code=TO_HOSPITAL, description=Skierowanie do szpitala}',
-  '{code=FOR_DIAGNOSTICS,_description=Skierowanie_na_badania_diagnostyczne}':
-    '{code=FOR_DIAGNOSTICS, description=Skierowanie na badania diagnostyczne}',
-  '{code=FOR_REHABILITATION,_description=Skierowanie_na_rehabilitację}':
-    '{code=FOR_REHABILITATION, description=Skierowanie na rehabilitację}',
-  '{code=TO_SANATORIUM,_description=Skierowanie_do_sanatorium}':
-    '{code=TO_SANATORIUM, description=Skierowanie do sanatorium}',
-  '{code=FOR_LONG_TERM_CARE,_description=Skierowanie_do_opieki_długoterminowej}':
-    '{code=FOR_LONG_TERM_CARE, description=Skierowanie do opieki długoterminowej}',
-  '{code=FOR_PSYCHIATRIC_CARE,_description=Skierowanie_psychiatryczne_lub_uzależnienia}':
-    '{code=FOR_PSYCHIATRIC_CARE, description=Skierowanie psychiatryczne lub uzależnienia}',
+  '{description=Skierowanie_do_specjalisty,_code=TO_SPECIALIST}':
+    '{description=Skierowanie do specjalisty, code=TO_SPECIALIST}',
+  '{description=Skierowanie_do_szpitala,_code=TO_HOSPITAL}':
+    '{description=Skierowanie do szpitala, code=TO_HOSPITAL}',
+  '{description=Skierowanie_na_badania_diagnostyczne,_code=FOR_DIAGNOSTICS}':
+    '{description=Skierowanie na badania diagnostyczne, code=FOR_DIAGNOSTICS}',
+  '{description=Skierowanie_na_rehabilitację,_code=FOR_REHABILITATION}':
+    '{description=Skierowanie na rehabilitację, code=FOR_REHABILITATION}',
+  '{description=Skierowanie_do_sanatorium,_code=TO_SANATORIUM}':
+    '{description=Skierowanie do sanatorium, code=TO_SANATORIUM}',
+  '{description=Skierowanie_do_opieki_długoterminowej,_code=FOR_LONG_TERM_CARE}':
+    '{description=Skierowanie do opieki długoterminowej, code=FOR_LONG_TERM_CARE}',
+  '{description=Skierowanie_psychiatryczne_lub_uzależnienia,_code=FOR_PSYCHIATRIC_CARE}':
+    '{description=Skierowanie psychiatryczne lub uzależnienia, code=FOR_PSYCHIATRIC_CARE}',
 } as const;
 
 export interface ReturnReferralDTO {
@@ -552,20 +556,20 @@ export type GetAllReferralTypes200Item =
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const GetAllReferralTypes200Item = {
-  '{code=TO_SPECIALIST,_description=Skierowanie_do_specjalisty}':
-    '{code=TO_SPECIALIST, description=Skierowanie do specjalisty}',
-  '{code=TO_HOSPITAL,_description=Skierowanie_do_szpitala}':
-    '{code=TO_HOSPITAL, description=Skierowanie do szpitala}',
-  '{code=FOR_DIAGNOSTICS,_description=Skierowanie_na_badania_diagnostyczne}':
-    '{code=FOR_DIAGNOSTICS, description=Skierowanie na badania diagnostyczne}',
-  '{code=FOR_REHABILITATION,_description=Skierowanie_na_rehabilitację}':
-    '{code=FOR_REHABILITATION, description=Skierowanie na rehabilitację}',
-  '{code=TO_SANATORIUM,_description=Skierowanie_do_sanatorium}':
-    '{code=TO_SANATORIUM, description=Skierowanie do sanatorium}',
-  '{code=FOR_LONG_TERM_CARE,_description=Skierowanie_do_opieki_długoterminowej}':
-    '{code=FOR_LONG_TERM_CARE, description=Skierowanie do opieki długoterminowej}',
-  '{code=FOR_PSYCHIATRIC_CARE,_description=Skierowanie_psychiatryczne_lub_uzależnienia}':
-    '{code=FOR_PSYCHIATRIC_CARE, description=Skierowanie psychiatryczne lub uzależnienia}',
+  '{description=Skierowanie_do_specjalisty,_code=TO_SPECIALIST}':
+    '{description=Skierowanie do specjalisty, code=TO_SPECIALIST}',
+  '{description=Skierowanie_do_szpitala,_code=TO_HOSPITAL}':
+    '{description=Skierowanie do szpitala, code=TO_HOSPITAL}',
+  '{description=Skierowanie_na_badania_diagnostyczne,_code=FOR_DIAGNOSTICS}':
+    '{description=Skierowanie na badania diagnostyczne, code=FOR_DIAGNOSTICS}',
+  '{description=Skierowanie_na_rehabilitację,_code=FOR_REHABILITATION}':
+    '{description=Skierowanie na rehabilitację, code=FOR_REHABILITATION}',
+  '{description=Skierowanie_do_sanatorium,_code=TO_SANATORIUM}':
+    '{description=Skierowanie do sanatorium, code=TO_SANATORIUM}',
+  '{description=Skierowanie_do_opieki_długoterminowej,_code=FOR_LONG_TERM_CARE}':
+    '{description=Skierowanie do opieki długoterminowej, code=FOR_LONG_TERM_CARE}',
+  '{description=Skierowanie_psychiatryczne_lub_uzależnienia,_code=FOR_PSYCHIATRIC_CARE}':
+    '{description=Skierowanie psychiatryczne lub uzależnienia, code=FOR_PSYCHIATRIC_CARE}',
 } as const;
 
 export type GetAllMedicinesParams = {

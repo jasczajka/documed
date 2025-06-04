@@ -586,13 +586,14 @@ class VisitServiceTest extends Specification {
 
 	def "giveFeedback should create feedback for closed visit when valid"() {
 		given:
+		1 * authService.getCurrentUserId() >> 1
 		def visitId = 1
 		def feedback = Feedback.builder()
 				.rating(3)
 				.text("Good service")
 				.visitId(visitId)
 				.build()
-		def visit = buildVisit(id: visitId, status: VisitStatus.CLOSED)
+		def visit = buildVisit(id: visitId, status: VisitStatus.CLOSED, patientId: 1)
 
 		when:
 		visitService.giveFeedback(feedback)
@@ -601,6 +602,26 @@ class VisitServiceTest extends Specification {
 		1 * visitDAO.getById(visitId) >> Optional.of(visit)
 		1 * feedbackDAO.getByVisitId(visitId) >> Optional.empty()
 		1 * feedbackDAO.create(feedback)
+	}
+
+	def "giveFeedback should throw UnathorizedException when patient not assigned to visit tries to give feedback"() {
+		given:
+		1 * authService.getCurrentUserId() >> 3
+		def visitId = 1
+		def feedback = Feedback.builder()
+				.rating(3)
+				.text("Good service")
+				.visitId(visitId)
+				.build()
+		def visit = buildVisit(id: visitId, status: VisitStatus.CLOSED, patientId: 1)
+
+		when:
+		visitService.giveFeedback(feedback)
+
+		then:
+		1 * visitDAO.getById(visitId) >> Optional.of(visit)
+		1 * feedbackDAO.getByVisitId(visitId) >> Optional.empty()
+		thrown(UnauthorizedException)
 	}
 
 	def "giveFeedback should throw NotFoundException when visit not found"() {

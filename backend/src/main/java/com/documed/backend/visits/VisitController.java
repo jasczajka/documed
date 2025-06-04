@@ -140,7 +140,7 @@ public class VisitController {
   public ResponseEntity<Void> giveFeedbackForVisit(
       @PathVariable("id") int visitId, @RequestBody @Valid GiveFeedbackDTO dto) {
     Feedback feedback =
-        Feedback.builder().rating(dto.getRating()).text(dto.getText()).visitId(visitId).build();
+        Feedback.builder().rating(dto.getRating()).text(dto.getMessage()).visitId(visitId).build();
 
     visitService.giveFeedback(feedback);
     return ResponseEntity.ok().build();

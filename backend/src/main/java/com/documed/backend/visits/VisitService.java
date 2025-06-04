@@ -216,6 +216,7 @@ public class VisitService {
     if (feedback.getRating() < 1 || feedback.getRating() > 5) {
       throw new BadRequestException("Rating must be between 1 and 5");
     }
+
     Visit visit =
         visitDAO
             .getById(feedback.getVisitId())
@@ -225,9 +226,12 @@ public class VisitService {
       throw new BadRequestException("Feedback can only be given for a closed visit");
     }
 
-    boolean feedbackAlreadyExists = feedbackDAO.getByVisitId(feedback.getVisitId()).isPresent();
-    if (feedbackAlreadyExists) {
+    if (feedbackDAO.getByVisitId(feedback.getVisitId()).isPresent()) {
       throw new BadRequestException("Feedback has already been given for this visit");
+    }
+
+    if (visit.getPatientId() != authService.getCurrentUserId()) {
+      throw new UnauthorizedException("You can only give feedback for your visit");
     }
 
     feedbackDAO.create(feedback);
