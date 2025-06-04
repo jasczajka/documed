@@ -102,6 +102,7 @@ CREATE TABLE IF NOT EXISTS Referral (
     diagnosis text  NOT NULL,
     type varchar(255)  NOT NULL,
     expiration_date date  NOT NULL,
+    status varchar(255)  NOT NULL,
     CONSTRAINT Referral_pk PRIMARY KEY (id)
 );
 
