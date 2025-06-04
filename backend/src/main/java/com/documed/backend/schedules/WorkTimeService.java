@@ -54,7 +54,7 @@ public class WorkTimeService {
     }
   }
 
-  public List<WorkTime> createWorkTimeForNewUser(int userId, int facilityId) {
+  public List<WorkTime> createWorkTimeForNewDoctor(int userId, int facilityId) {
     return Arrays.stream(DayOfWeek.values())
         .map(
             day -> {

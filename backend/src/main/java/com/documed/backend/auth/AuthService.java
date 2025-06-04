@@ -165,7 +165,7 @@ public class AuthService {
 
       userService.addSpecializationsToUser(createdUser.getId(), specializationIds);
 
-      workTimeService.createWorkTimeForNewUser(createdUser.getId(), getCurrentFacilityId());
+      workTimeService.createWorkTimeForNewDoctor(createdUser.getId(), getCurrentFacilityId());
 
       return AuthResponseDTO.builder()
           .userId(createdUser.getId())
