@@ -60,7 +60,7 @@ public class PrescriptionService {
     return prescriptionDAO.delete(prescriptionId);
   }
 
-  public Prescription issuePrescription(int prescriptionId) {
+  public Prescription issuePrescription(int prescriptionId, LocalDate newExpirationDate) {
     Optional<Prescription> existingPrescription = prescriptionDAO.getById(prescriptionId);
 
     if (existingPrescription.isPresent()
@@ -69,7 +69,8 @@ public class PrescriptionService {
     }
 
     int rowsAffected =
-        prescriptionDAO.updatePrescriptionStatus(prescriptionId, PrescriptionStatus.ISSUED);
+        prescriptionDAO.updatePrescriptionStatus(
+            prescriptionId, PrescriptionStatus.ISSUED, newExpirationDate);
 
     if (rowsAffected > 0) {
       return prescriptionDAO

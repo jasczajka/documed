@@ -2,6 +2,10 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Box, Button, TextField } from '@mui/material';
 import { addDays, format } from 'date-fns';
 import { SinglePrescriptionTable } from 'modules/prescriptions/components/SinglePrescriptionTable/SinglePrescriptionTable';
+import {
+  ReferralWithTempId,
+  VisitReferralsTable,
+} from 'modules/referrals/components/VisitReferralsTable';
 import { SingleVisitHeader } from 'modules/visit/components/SingleVisitHeader';
 import { getVisitStatusLabel } from 'modules/visit/utils';
 import { FC, useCallback, useEffect, useState } from 'react';
@@ -17,6 +21,12 @@ import {
   useRemoveMedicineFromPrescription,
   useUpdatePrescriptionExpirationDate,
 } from 'shared/api/generated/prescription-controller/prescription-controller';
+import {
+  useCreateReferral,
+  useGetAllReferralsForVisit,
+  useGetAllReferralTypes,
+  useRemoveReferral,
+} from 'shared/api/generated/referral-controller/referral-controller';
 import {
   useCancelPlannedVisit,
   useFinishVisit,
@@ -69,10 +79,16 @@ const SingleVisitPage: FC = () => {
   const [fileIdsToDeleteOnConfirm, setFileIdsToDeleteOnConfirm] = useState<number[]>([]);
   const [hasUnuploadedFiles, setHasUnuploadedFiles] = useState(false);
 
+  const [referralOperations, setReferralOperations] = useState<{
+    toAdd: Set<ReferralWithTempId>;
+    toDelete: Set<number>;
+  }>({ toAdd: new Set(), toDelete: new Set() });
+
   const [medicineOperations, setMedicineOperations] = useState<{
     toAdd: Map<string, number>;
     toDelete: Set<string>;
   }>({ toAdd: new Map(), toDelete: new Set() });
+
   const [prescriptionExpirationDate, setPrescriptionExpirationDate] = useState<Date>(
     addDays(new Date(), 30),
   );
@@ -107,6 +123,19 @@ const SingleVisitPage: FC = () => {
     query: { enabled: !!visitPrescription?.id },
   });
 
+  const {
+    data: referralTypes,
+    isLoading: isReferralTypesLoading,
+    isError: isReferralTypesError,
+  } = useGetAllReferralTypes();
+
+  const {
+    data: visitReferrals,
+    isLoading: isVisitReferralsLoading,
+    isError: isVisitReferralsError,
+    refetch: refetchVisitReferrals,
+  } = useGetAllReferralsForVisit(visitId);
+
   const { mutateAsync: addMedicineToPrescription } = useAddMedicineToPrescription();
 
   const { mutateAsync: removeMedicineFromPrescription } = useRemoveMedicineFromPrescription();
@@ -114,6 +143,10 @@ const SingleVisitPage: FC = () => {
   const { mutateAsync: createPrescription } = useCreatePrescription();
 
   const { mutateAsync: updatePrescriptionExpirationDate } = useUpdatePrescriptionExpirationDate();
+
+  const { mutateAsync: createReferral } = useCreateReferral();
+
+  const { mutateAsync: removeReferral } = useRemoveReferral();
 
   const {
     mutateAsync: updateVisit,
@@ -238,13 +271,89 @@ const SingleVisitPage: FC = () => {
       );
     });
 
-    console.log('medicineOperations: :', medicineOperations);
-
     if (operations.length > 0) {
       await Promise.all(operations);
       setMedicineOperations({ toAdd: new Map(), toDelete: new Set() });
       await refetchVisitPrescription();
       await refetchPrescriptionMedicines();
+    }
+  };
+
+  const handleRemoveReferral = (referralId: number) => {
+    setReferralOperations((prev) => {
+      const newToAdd = new Set(prev.toAdd);
+      const newToDelete = new Set(prev.toDelete);
+
+      const referralToAdd = Array.from(newToAdd).find(
+        (r) => r.id === referralId || r.tempId === referralId.toString(),
+      );
+
+      if (referralToAdd) {
+        newToAdd.delete(referralToAdd);
+      } else {
+        newToDelete.add(referralId);
+      }
+
+      return { toAdd: newToAdd, toDelete: newToDelete };
+    });
+  };
+
+  const handlePendingRemoveReferral = (tempId: string) => {
+    setReferralOperations((prev) => {
+      const newToAdd = new Set(prev.toAdd);
+      const newToDelete = new Set(prev.toDelete);
+
+      Array.from(newToAdd).forEach((referral) => {
+        if (referral.tempId === tempId) {
+          newToAdd.delete(referral);
+        }
+      });
+
+      return { toAdd: newToAdd, toDelete: newToDelete };
+    });
+  };
+
+  const handleAddReferral = (newReferral: ReferralWithTempId) => {
+    setReferralOperations((prev) => {
+      const newToAdd = new Set(prev.toAdd);
+      const newToDelete = new Set(prev.toDelete);
+
+      if (newReferral.id && newToDelete.has(newReferral.id)) {
+        newToDelete.delete(newReferral.id);
+      }
+
+      newToAdd.add(newReferral);
+
+      return { toAdd: newToAdd, toDelete: newToDelete };
+    });
+  };
+
+  const saveReferrals = async () => {
+    const operations: Promise<any>[] = [];
+
+    referralOperations.toAdd.forEach((referralToCreate) => {
+      operations.push(
+        createReferral({
+          data: {
+            visitId,
+            type: referralToCreate.type,
+            diagnosis: referralToCreate.diagnosis,
+            expirationDate: referralToCreate.expirationDate,
+          },
+        }),
+      );
+    });
+
+    referralOperations.toDelete.forEach((referralIdToDelete) => {
+      if (referralIdToDelete) {
+        operations.push(removeReferral({ referralId: referralIdToDelete }));
+      }
+    });
+
+    if (operations.length > 0) {
+      await Promise.all(operations);
+      setReferralOperations({ toAdd: new Set(), toDelete: new Set() });
+      await refetchVisitReferrals();
     }
   };
 
@@ -320,6 +429,7 @@ const SingleVisitPage: FC = () => {
           await finishVisit({ id: visitId, data: formData });
           await deleteFilesMarkedForDeletion();
           await saveMedicinesToPrescription();
+          await saveReferrals();
           await handlePrescriptionExpirationDateUpdate();
           await refetchVisitInfo();
           await refetchVisitAttachments();
@@ -339,6 +449,7 @@ const SingleVisitPage: FC = () => {
       await updateVisit({ id: visitId, data: updateData });
       await deleteFilesMarkedForDeletion();
       await saveMedicinesToPrescription();
+      await saveReferrals();
       await handlePrescriptionExpirationDateUpdate();
       await refetchVisitInfo();
       await refetchVisitAttachments();
@@ -348,6 +459,7 @@ const SingleVisitPage: FC = () => {
       updateVisit,
       deleteFilesMarkedForDeletion,
       saveMedicinesToPrescription,
+      saveReferrals,
       handlePrescriptionExpirationDateUpdate,
       refetchVisitInfo,
       refetchVisitAttachments,
@@ -359,9 +471,11 @@ const SingleVisitPage: FC = () => {
     isVisitAttachmentsLoading ||
     isVisitPrescriptionLoading ||
     isUpdateVisitLoading ||
-    isPrescriptionMedicinesLoading;
+    isPrescriptionMedicinesLoading ||
+    isReferralTypesLoading ||
+    isVisitReferralsLoading;
 
-  const isError = isVisitAttachmentsError || isVisitPrescriptionError;
+  const isError = isVisitAttachmentsError || isVisitPrescriptionError || isReferralTypesError;
 
   useEffect(() => {
     if (isError) {
@@ -385,6 +499,9 @@ const SingleVisitPage: FC = () => {
     if (isVisitInfoError) {
       showNotification('Nie udało się pobrać danych wizyty', 'error');
     }
+    if (isVisitReferralsError) {
+      showNotification('Nie udało się pobrać skierowań wizyty', 'error');
+    }
   }, [
     isError,
     isUpdateVisitError,
@@ -392,6 +509,7 @@ const SingleVisitPage: FC = () => {
     isStartVisitError,
     isFinishVisitError,
     prescriptionMedicinesError,
+    isVisitInfoError,
     isVisitInfoError,
   ]);
 
@@ -418,7 +536,7 @@ const SingleVisitPage: FC = () => {
     return <FullPageLoadingSpinner />;
   }
 
-  if (!visitInfo) {
+  if (!visitInfo || !referralTypes) {
     return <NotificationComponent />;
   }
 
@@ -589,6 +707,17 @@ const SingleVisitPage: FC = () => {
           handlePrescriptionExpirationDateChange={(newDate) =>
             setPrescriptionExpirationDate(newDate)
           }
+          disabled={inputsDisabled}
+        />
+      </Box>
+      <Box sx={{ width: '70%' }}>
+        <VisitReferralsTable
+          referralTypes={referralTypes}
+          visitId={visitId}
+          existingReferrals={visitReferrals}
+          onRemoveReferral={handleRemoveReferral}
+          onPendingRemoveReferral={handlePendingRemoveReferral}
+          onAddReferral={handleAddReferral}
           disabled={inputsDisabled}
         />
       </Box>

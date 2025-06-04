@@ -1,4 +1,4 @@
-import { MeDTORole } from 'shared/api/generated/generated.schemas';
+import { UserRole } from 'shared/api/generated/generated.schemas';
 import { create } from 'zustand';
 
 export type AuthUser = {
@@ -7,7 +7,7 @@ export type AuthUser = {
   email: string;
   id: number;
   facilityId: number;
-  role: MeDTORole;
+  role: UserRole;
 } | null;
 
 interface AuthStoreType {

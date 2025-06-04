@@ -20,11 +20,7 @@ import type {
 } from '@tanstack/react-query';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import type {
-  CreateReferralDTO,
-  GetAllReferralTypes200Item,
-  ReturnReferralDTO,
-} from '../generated.schemas';
+import type { CreateReferralDTO, ReferralTypeDTO, ReturnReferralDTO } from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
@@ -414,11 +410,7 @@ export function useGetAllReferralsForVisit<
  * @summary Get all referral types
  */
 export const getAllReferralTypes = (signal?: AbortSignal) => {
-  return customInstance<GetAllReferralTypes200Item[]>({
-    url: `/api/referrals/types`,
-    method: 'GET',
-    signal,
-  });
+  return customInstance<ReferralTypeDTO[]>({ url: `/api/referrals/types`, method: 'GET', signal });
 };
 
 export const getGetAllReferralTypesQueryKey = () => {

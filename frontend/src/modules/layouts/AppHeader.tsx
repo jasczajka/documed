@@ -1,4 +1,4 @@
-import { Logout, Settings } from '@mui/icons-material';
+import { Logout, Mail, Place, Settings } from '@mui/icons-material';
 import {
   Avatar,
   Box,
@@ -17,6 +17,7 @@ import PopupState, { bindPopper, bindToggle } from 'material-ui-popup-state';
 import { memo, useCallback, useMemo } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
+import { useFacilityStore } from 'shared/hooks/stores/useFacilityStore';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useSitemap } from 'shared/hooks/useSitemap';
 import { DocuMedLogo } from 'shared/icons/DocuMedLogo';
@@ -26,10 +27,18 @@ export const AppHeader = memo(() => {
   const sitemap = useSitemap();
   const navigate = useNavigate();
   const { logout, loading, isAdmin, isPatient, canSeePrescriptions } = useAuth();
-  const { firstName, lastName, email } = useAuthStore(
-    useShallow((state) => state.user ?? { firstName: '', lastName: '', email: '' }),
+  const { firstName, lastName, email, facilityId } = useAuthStore(
+    useShallow(
+      (state) => state.user ?? { firstName: '', lastName: '', email: '', facilityId: undefined },
+    ),
   );
+  const facilities = useFacilityStore((store) => store.facilities);
   const userName = `${firstName} ${lastName}`;
+  const facilityName = useMemo(() => {
+    const currentFacility = facilities.find((facility) => facility.id === facilityId);
+    return `${currentFacility?.city} ${currentFacility?.address}`;
+  }, [facilityId, facilities]);
+
   const handleLogout = useCallback(async () => {
     await logout();
   }, []);
@@ -100,12 +109,16 @@ export const AppHeader = memo(() => {
                   {({ TransitionProps }) => (
                     <Fade {...TransitionProps} timeout={350}>
                       <Paper className="shadow-lg">
-                        <ListItem sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <ListItem sx={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                           <Avatar />
                           <Box>
                             <Typography variant="body1">{userName}</Typography>
                             <Typography variant="body2" color="secondary">
-                              {email}
+                              <Mail fontSize="small" /> {email}
+                            </Typography>
+                            <Typography variant="body2" color="secondary">
+                              <Place fontSize="small" />
+                              {facilityName}
                             </Typography>
                           </Box>
                         </ListItem>
@@ -116,7 +129,6 @@ export const AppHeader = memo(() => {
                           >
                             <Settings /> Ustawienia
                           </MenuItem>
-
                           <MenuItem className="flex gap-2" onClick={handleLogout}>
                             {loading ? <CircularProgress size={24} /> : <Logout />}Wyloguj się
                           </MenuItem>

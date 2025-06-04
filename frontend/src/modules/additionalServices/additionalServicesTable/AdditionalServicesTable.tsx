@@ -143,7 +143,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
   const { isPatient } = useAuth();
   const navigate = useNavigate();
   const sitemap = useSitemap();
-  const { openModal, closeModal } = useModal();
+  const { openModal } = useModal();
   const { showNotification, NotificationComponent } = useNotification();
   const [filters, setFilters] = useState<AdditionalServiceFilters>({
     patientName: '',
@@ -175,8 +175,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
       },
       patientPesel?: string,
     ) => {
-      openModal(
-        'editAdditionalServiceModal',
+      openModal('editAdditionalServiceModal', (close) => (
         <AdditionalServiceModal
           allAdditionalServices={allAdditionalServices}
           patientId={patientId}
@@ -186,18 +185,18 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
           patientAge={patientAge}
           onConfirm={async () => {
             await refetch();
-            closeModal('editAdditionalServiceModal');
+            close();
             showNotification('Zaktualizowano dane usługi dodatkowej', 'success');
           }}
-          onCancel={() => closeModal('editAdditionalServiceModal')}
+          onCancel={close}
           mode="edit"
           existingServiceData={existingServiceData}
           refetch={refetch}
           readOnly={isPatient}
-        />,
-      );
+        />
+      ));
     },
-    [openModal, closeModal, allAdditionalServices],
+    [openModal, allAdditionalServices],
   );
 
   const setFilterDateToToday = useCallback(() => {

@@ -128,14 +128,15 @@ public class PrescriptionDAO implements FullDAO<Prescription, CreatePrescription
     return jdbcTemplate.query(sql, rowMapper, userId);
   }
 
-  public int updatePrescriptionStatus(int prescriptionId, PrescriptionStatus status) {
+  public int updatePrescriptionStatus(
+      int prescriptionId, PrescriptionStatus status, LocalDate newExpirationDate) {
     String sql =
         """
         UPDATE prescription
-        SET status = ?, date = current_date, expiration_date = current_date
+        SET status = ?, date = current_date, expiration_date = ?
         WHERE id = ?;
     """;
-    return jdbcTemplate.update(sql, status, prescriptionId);
+    return jdbcTemplate.update(sql, status, newExpirationDate, prescriptionId);
   }
 
   public void updatePrescriptionExpirationDate(int prescriptionId, LocalDate newExpirationDate) {
