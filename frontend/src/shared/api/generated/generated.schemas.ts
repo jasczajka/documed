@@ -113,7 +113,7 @@ export interface GiveFeedbackDTO {
    * @maximum 5
    */
   rating: number;
-  text?: string;
+  message?: string;
 }
 
 export interface Subscription {
@@ -165,7 +165,6 @@ export interface CreateReferralDTO {
 export type ReferralType = (typeof ReferralType)[keyof typeof ReferralType];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
-
 export const ReferralType = {
   TO_SPECIALIST: 'TO_SPECIALIST',
   TO_HOSPITAL: 'TO_HOSPITAL',
@@ -176,12 +175,22 @@ export const ReferralType = {
   FOR_PSYCHIATRIC_CARE: 'FOR_PSYCHIATRIC_CARE',
 } as const;
 
+export type ReturnReferralDTOStatus =
+  (typeof ReturnReferralDTOStatus)[keyof typeof ReturnReferralDTOStatus];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ReturnReferralDTOStatus = {
+  NEW: 'NEW',
+  ISSUED: 'ISSUED',
+} as const;
+
 export interface ReturnReferralDTO {
   id: number;
   diagnosis: string;
   type: ReferralType;
   visitId: number;
   expirationDate: string;
+  status: ReturnReferralDTOStatus;
 }
 
 export interface Medicine {
