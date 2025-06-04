@@ -138,8 +138,8 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
             Date.valueOf(timeSlot.getDate()),
             timeSlot.isBusy(),
             timeSlot.getVisitId(),
-            timeSlot.getId(),
-            timeSlot.getFacilityId());
+            timeSlot.getFacilityId(),
+            timeSlot.getId());
 
     if (affectedRows == 1) {
       return timeSlot;

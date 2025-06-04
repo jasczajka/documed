@@ -11,9 +11,7 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -56,11 +54,7 @@ public class WorkTimeService {
     }
   }
 
-  public List<WorkTime> createWorkTimeForNewUser(int userId, UserRole role, int facilityId) {
-    if (role != UserRole.DOCTOR) {
-      return Collections.emptyList();
-    }
-
+  public List<WorkTime> createWorkTimeForNewUser(int userId, int facilityId) {
     return Arrays.stream(DayOfWeek.values())
         .map(
             day -> {
@@ -75,7 +69,7 @@ public class WorkTimeService {
               workTimeDAO.create(workTime);
               return workTime;
             })
-        .collect(Collectors.toList());
+        .toList();
   }
 
   List<WorkTime> getWorkTimesForUser(int userId) {

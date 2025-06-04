@@ -114,7 +114,7 @@ public class UserService {
     userDAO.removeUserSubscription(userId);
   }
 
-  public int getSubscriptionIdForPatient(int userId) {
+  public Integer getSubscriptionIdForPatient(int userId) {
     User patient =
         userDAO.getById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
 

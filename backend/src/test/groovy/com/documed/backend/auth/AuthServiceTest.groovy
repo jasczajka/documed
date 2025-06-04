@@ -172,7 +172,7 @@ class AuthServiceTest extends Specification {
 		def doc = buildDoctor(id:1, email:'e', password:'enc', pwzNumber:'pwz')
 		userDAO.createAndReturn(_ as User) >> doc
 		userService.addSpecializationsToUser(1, [1, 2]) >> null
-		workTimeService.createWorkTimeForNewUser(1, UserRole.DOCTOR, 1) >> []
+		workTimeService.createWorkTimeForNewUser(1, 1) >> []
 
 		when:
 		def dto = authServiceSpy.registerDoctor('fn', 'ln', 'e', 'pwz', 'pw', 'ph', [1, 2])
