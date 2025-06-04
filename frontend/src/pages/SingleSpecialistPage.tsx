@@ -1,12 +1,13 @@
 import { CardHeader } from '@mui/material';
 import { SpecialistTabs } from 'modules/specialist/SpecialistTabs';
+import { mapFromReturnWorkTimes } from 'modules/specialist/utils';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import {
   useGetDoctorDetails,
   useUpdateDoctorSpecializations,
 } from 'shared/api/generated/doctors-controller/doctors-controller';
-import { Specialization, WorkTime } from 'shared/api/generated/generated.schemas';
+import { Specialization, UploadWorkTimeDTO } from 'shared/api/generated/generated.schemas';
 import { useGetAllSpecializations } from 'shared/api/generated/specialization-controller/specialization-controller';
 
 import {
@@ -16,12 +17,10 @@ import {
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { useNotification } from 'shared/hooks/useNotification';
 
-export type WorkTimeWithoutIdAndUser = Omit<WorkTime, 'id' | 'userId'>;
 const SingleSpecialistPage: FC = () => {
   const { id } = useParams();
   const doctorId = Number(id);
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
-  const [workTimes, setWorkTimes] = useState<WorkTimeWithoutIdAndUser[]>([]);
   const [tabIndex, setTabIndex] = useState(0);
   const { showNotification, NotificationComponent } = useNotification();
 
@@ -45,6 +44,7 @@ const SingleSpecialistPage: FC = () => {
     data: doctorWorkTimes,
     isLoading: isDoctorWorkTimesLoading,
     isError: isDoctorWorkTimesError,
+    refetch: refetchDoctorWorkTimes,
   } = useGetWorkTimesForUser(doctorId);
 
   const {
@@ -59,29 +59,21 @@ const SingleSpecialistPage: FC = () => {
     isError: isUpdateDoctorWorkTimesError,
   } = useUpdateWorkTimesForUser();
 
-  const handleUpdateSpecialistSpecializations = useCallback(
-    async (updatedSpecializations: Specialization[]) => {
-      const specializationIds = updatedSpecializations.map((spec) => spec.id);
-      await updateDoctorSpecializations({ id: doctorId, data: { specializationIds } });
-      showNotification('Pomyślnie zaktualizowano specjalizacje!', 'success');
-      setSpecializations(updatedSpecializations);
-    },
-    [updateDoctorSpecializations],
-  );
+  const handleUpdateSpecialistSpecializations = async (
+    updatedSpecializations: Specialization[],
+  ) => {
+    const specializationIds = updatedSpecializations.map((spec) => spec.id);
+    await updateDoctorSpecializations({ id: doctorId, data: { specializationIds } });
+    showNotification('Pomyślnie zaktualizowano specjalizacje!', 'success');
+    setSpecializations(updatedSpecializations);
+  };
 
-  const handleUpdateSpecialistWorkTimes = useCallback(
-    async (updatedWorkTimes: WorkTimeWithoutIdAndUser[]) => {
-      const workTimesMappedToDto = updatedWorkTimes.map((wo) => ({
-        dayOfWeek: wo.dayOfWeek,
-        startTime: wo.startTime,
-        endTime: wo.endTime,
-      }));
-      await updateDoctorWorkTimes({ userId: doctorId, data: workTimesMappedToDto });
-      showNotification('Pomyślnie zaktualizowano godziny pracy!', 'success');
-      setWorkTimes(updatedWorkTimes);
-    },
-    [updateDoctorWorkTimes],
-  );
+  const handleUpdateSpecialistWorkTimes = async (updatedWorkTimes: UploadWorkTimeDTO[]) => {
+    console.log('work times in handler: ', updatedWorkTimes);
+    await updateDoctorWorkTimes({ userId: doctorId, data: updatedWorkTimes });
+    await refetchDoctorWorkTimes();
+    showNotification('Pomyślnie zaktualizowano godziny pracy!', 'success');
+  };
 
   const isInitialLoading =
     isSpecializationsLoading || isDoctorInfoLoading || isDoctorWorkTimesLoading;
@@ -106,9 +98,6 @@ const SingleSpecialistPage: FC = () => {
     if (doctorInfo) {
       setSpecializations(doctorInfo.specializations);
     }
-    if (doctorWorkTimes) {
-      setWorkTimes(doctorWorkTimes);
-    }
   }, [
     isInitialError,
     doctorInfo,
@@ -132,7 +121,7 @@ const SingleSpecialistPage: FC = () => {
         <SpecialistTabs
           doctorId={doctorId}
           currentSpecializations={specializations}
-          currentWorkTimes={workTimes}
+          currentWorkTimes={mapFromReturnWorkTimes(doctorWorkTimes ?? [])}
           allSpecializations={allSpecializations}
           handleUpdateSpecialistSpecializations={handleUpdateSpecialistSpecializations}
           handleUpdateSpecialistWorkTimes={handleUpdateSpecialistWorkTimes}

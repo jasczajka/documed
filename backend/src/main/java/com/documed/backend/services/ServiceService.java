@@ -1,5 +1,6 @@
 package com.documed.backend.services;
 
+import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.services.model.ServiceType;
 import com.documed.backend.users.model.Specialization;
 import com.documed.backend.users.services.SubscriptionService;
@@ -93,6 +94,6 @@ public class ServiceService {
     return serviceDAO
         .getById(serviceId)
         .map(com.documed.backend.services.model.Service::getPrice)
-        .orElseThrow(RuntimeException::new);
+        .orElseThrow(() -> new NotFoundException("Service not found"));
   }
 }

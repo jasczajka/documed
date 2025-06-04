@@ -20,7 +20,7 @@ import type {
 } from '@tanstack/react-query';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import type { WorkTime, WorkTimeDTO } from '../generated.schemas';
+import type { UploadWorkTimeDTO, WorkTimeReturnDTO } from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
@@ -29,7 +29,11 @@ import { customInstance } from '../../axios-instance';
  * @summary Get all worktimes for user
  */
 export const getWorkTimesForUser = (userId: number, signal?: AbortSignal) => {
-  return customInstance<WorkTime[]>({ url: `/api/worktime/${userId}`, method: 'GET', signal });
+  return customInstance<WorkTimeReturnDTO[]>({
+    url: `/api/worktime/${userId}`,
+    method: 'GET',
+    signal,
+  });
 };
 
 export const getGetWorkTimesForUserQueryKey = (userId: number) => {
@@ -148,12 +152,12 @@ export function useGetWorkTimesForUser<
 /**
  * @summary Update worktimes for user
  */
-export const updateWorkTimesForUser = (userId: number, workTimeDTO: WorkTimeDTO[]) => {
-  return customInstance<WorkTime[]>({
+export const updateWorkTimesForUser = (userId: number, uploadWorkTimeDTO: UploadWorkTimeDTO[]) => {
+  return customInstance<WorkTimeReturnDTO[]>({
     url: `/api/worktime/${userId}`,
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    data: workTimeDTO,
+    data: uploadWorkTimeDTO,
   });
 };
 
@@ -164,13 +168,13 @@ export const getUpdateWorkTimesForUserMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof updateWorkTimesForUser>>,
     TError,
-    { userId: number; data: WorkTimeDTO[] },
+    { userId: number; data: UploadWorkTimeDTO[] },
     TContext
   >;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof updateWorkTimesForUser>>,
   TError,
-  { userId: number; data: WorkTimeDTO[] },
+  { userId: number; data: UploadWorkTimeDTO[] },
   TContext
 > => {
   const mutationKey = ['updateWorkTimesForUser'];
@@ -182,7 +186,7 @@ export const getUpdateWorkTimesForUserMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof updateWorkTimesForUser>>,
-    { userId: number; data: WorkTimeDTO[] }
+    { userId: number; data: UploadWorkTimeDTO[] }
   > = (props) => {
     const { userId, data } = props ?? {};
 
@@ -195,7 +199,7 @@ export const getUpdateWorkTimesForUserMutationOptions = <
 export type UpdateWorkTimesForUserMutationResult = NonNullable<
   Awaited<ReturnType<typeof updateWorkTimesForUser>>
 >;
-export type UpdateWorkTimesForUserMutationBody = WorkTimeDTO[];
+export type UpdateWorkTimesForUserMutationBody = UploadWorkTimeDTO[];
 export type UpdateWorkTimesForUserMutationError = ErrorType<unknown>;
 
 /**
@@ -206,7 +210,7 @@ export const useUpdateWorkTimesForUser = <TError = ErrorType<unknown>, TContext 
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof updateWorkTimesForUser>>,
       TError,
-      { userId: number; data: WorkTimeDTO[] },
+      { userId: number; data: UploadWorkTimeDTO[] },
       TContext
     >;
   },
@@ -214,85 +218,10 @@ export const useUpdateWorkTimesForUser = <TError = ErrorType<unknown>, TContext 
 ): UseMutationResult<
   Awaited<ReturnType<typeof updateWorkTimesForUser>>,
   TError,
-  { userId: number; data: WorkTimeDTO[] },
+  { userId: number; data: UploadWorkTimeDTO[] },
   TContext
 > => {
   const mutationOptions = getUpdateWorkTimesForUserMutationOptions(options);
-
-  return useMutation(mutationOptions, queryClient);
-};
-/**
- * @summary Create worktime for user
- */
-export const createWorkTime = (userId: number, workTimeDTO: WorkTimeDTO, signal?: AbortSignal) => {
-  return customInstance<WorkTime>({
-    url: `/api/worktime/${userId}`,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    data: workTimeDTO,
-    signal,
-  });
-};
-
-export const getCreateWorkTimeMutationOptions = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createWorkTime>>,
-    TError,
-    { userId: number; data: WorkTimeDTO },
-    TContext
-  >;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createWorkTime>>,
-  TError,
-  { userId: number; data: WorkTimeDTO },
-  TContext
-> => {
-  const mutationKey = ['createWorkTime'];
-  const { mutation: mutationOptions } = options
-    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey } };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createWorkTime>>,
-    { userId: number; data: WorkTimeDTO }
-  > = (props) => {
-    const { userId, data } = props ?? {};
-
-    return createWorkTime(userId, data);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type CreateWorkTimeMutationResult = NonNullable<Awaited<ReturnType<typeof createWorkTime>>>;
-export type CreateWorkTimeMutationBody = WorkTimeDTO;
-export type CreateWorkTimeMutationError = ErrorType<unknown>;
-
-/**
- * @summary Create worktime for user
- */
-export const useCreateWorkTime = <TError = ErrorType<unknown>, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createWorkTime>>,
-      TError,
-      { userId: number; data: WorkTimeDTO },
-      TContext
-    >;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<
-  Awaited<ReturnType<typeof createWorkTime>>,
-  TError,
-  { userId: number; data: WorkTimeDTO },
-  TContext
-> => {
-  const mutationOptions = getCreateWorkTimeMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

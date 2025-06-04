@@ -1,35 +1,44 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Button, Pagination, PaginationItem, TextField, Typography } from '@mui/material';
+import {
+  Autocomplete,
+  Box,
+  Button,
+  Pagination,
+  PaginationItem,
+  TextField,
+  Typography,
+} from '@mui/material';
 import { FC, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { WorkTimeDayOfWeek } from 'shared/api/generated/generated.schemas';
-import { WorkTimeWithoutIdAndUser } from 'src/pages/SingleSpecialistPage';
+import { DayOfWeekEnum, UploadWorkTimeDTO } from 'shared/api/generated/generated.schemas';
+import { useFacilityStore } from 'shared/hooks/stores/useFacilityStore';
 import * as Yup from 'yup';
 import { isValid15MinuteTime, mapFromWorkTimes, mapToWorkTimes } from '../utils';
 
 interface EditWorkTimeTabProps {
-  currentWorkTimes: WorkTimeWithoutIdAndUser[];
-  onSave: (updatedWorkTimes: WorkTimeWithoutIdAndUser[]) => void;
+  currentWorkTimes: UploadWorkTimeDTO[];
+  onSave: (updatedWorkTimes: UploadWorkTimeDTO[]) => void;
   loading?: boolean;
 }
 
-const polishDayAbbreviations: Record<WorkTimeDayOfWeek, string> = {
-  [WorkTimeDayOfWeek.MONDAY]: 'Pon.',
-  [WorkTimeDayOfWeek.TUESDAY]: 'Wt.',
-  [WorkTimeDayOfWeek.WEDNESDAY]: 'Śr.',
-  [WorkTimeDayOfWeek.THURSDAY]: 'Czw.',
-  [WorkTimeDayOfWeek.FRIDAY]: 'Pt.',
-  [WorkTimeDayOfWeek.SATURDAY]: 'Sob.',
-  [WorkTimeDayOfWeek.SUNDAY]: 'Niedz.',
+const polishDayAbbreviations: Record<DayOfWeekEnum, string> = {
+  [DayOfWeekEnum.MONDAY]: 'Pon.',
+  [DayOfWeekEnum.TUESDAY]: 'Wt.',
+  [DayOfWeekEnum.WEDNESDAY]: 'Śr.',
+  [DayOfWeekEnum.THURSDAY]: 'Czw.',
+  [DayOfWeekEnum.FRIDAY]: 'Pt.',
+  [DayOfWeekEnum.SATURDAY]: 'Sob.',
+  [DayOfWeekEnum.SUNDAY]: 'Niedz.',
 };
 
 export type WorkTimeFormValues = {
-  workTimes: Record<WorkTimeDayOfWeek, TimePair>;
+  workTimes: Record<DayOfWeekEnum, TimePairWithFacilityId>;
 };
 
-export type TimePair = {
+export type TimePairWithFacilityId = {
   startTime: string;
   endTime: string;
+  facilityId: number;
 };
 
 const timePairSchema = Yup.object()
@@ -40,6 +49,13 @@ const timePairSchema = Yup.object()
     endTime: Yup.string()
       .default('')
       .test('15-min-step', 'Minuty muszą być podzielne przez 15', isValid15MinuteTime),
+    facilityId: Yup.number()
+      .default(-1)
+      .when(['startTime', 'endTime'], {
+        is: (startTime: string, endTime: string) => startTime && endTime,
+        then: (schema) => schema.required('Placówka jest wymagana, gdy podane są godziny pracy'),
+        otherwise: (schema) => schema.nullable().notRequired(),
+      }),
   })
   .test(
     'time-validation',
@@ -56,19 +72,19 @@ const timePairSchema = Yup.object()
     },
   );
 
-const workTimesShape = Object.values(WorkTimeDayOfWeek).reduce(
+const workTimesShape = Object.values(DayOfWeekEnum).reduce(
   (acc, day) => {
     acc[day] = timePairSchema;
     return acc;
   },
-  {} as Record<WorkTimeDayOfWeek, Yup.ObjectSchema<TimePair>>,
+  {} as Record<DayOfWeekEnum, Yup.ObjectSchema<TimePairWithFacilityId>>,
 );
 
 const validationSchema: Yup.ObjectSchema<WorkTimeFormValues> = Yup.object().shape({
   workTimes: Yup.object().shape(workTimesShape),
 });
 
-const days = Object.values(WorkTimeDayOfWeek);
+const days = Object.values(DayOfWeekEnum);
 
 export const EditWorkTimeTab: FC<EditWorkTimeTabProps> = ({
   currentWorkTimes,
@@ -76,6 +92,7 @@ export const EditWorkTimeTab: FC<EditWorkTimeTabProps> = ({
   loading,
 }) => {
   const defaultValues = mapFromWorkTimes(currentWorkTimes);
+  const allFacilities = useFacilityStore((state) => state.facilities);
   console.log('defaultValues: ', defaultValues);
   const {
     control,
@@ -122,7 +139,7 @@ export const EditWorkTimeTab: FC<EditWorkTimeTabProps> = ({
           );
         }}
       />
-      <Box sx={{ display: 'flex', gap: 10, width: '60%' }}>
+      <Box sx={{ display: 'flex', gap: 10, width: '60%', paddingBottom: 4 }}>
         <Controller
           key={`start-${selectedDay}`}
           control={control}
@@ -167,6 +184,35 @@ export const EditWorkTimeTab: FC<EditWorkTimeTabProps> = ({
           )}
         />
       </Box>
+      <Box sx={{ display: 'flex', gap: 10, width: '60%' }}>
+        {' '}
+        <Controller
+          key={`facility-${selectedDay}`}
+          control={control}
+          name={`workTimes.${selectedDay}.facilityId`}
+          render={({ field: { onChange, value }, fieldState: { error } }) => (
+            <Autocomplete
+              options={allFacilities}
+              getOptionLabel={(option) => `${option.city} ${option.address}`}
+              onChange={(_, newValue) => {
+                onChange(newValue?.id ?? null);
+              }}
+              value={allFacilities.find((facility) => facility.id === value) ?? null}
+              noOptionsText="Brak dostępnych placówek"
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  label="Placówka"
+                  error={!!error}
+                  helperText={error?.message}
+                />
+              )}
+              sx={{ width: '100%' }}
+            />
+          )}
+        />
+      </Box>
+
       {Object.keys(errors).length > 0 && (
         <Typography
           color="error"

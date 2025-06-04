@@ -1,6 +1,7 @@
 package com.documed.backend.schedules;
 
 import com.documed.backend.FullDAO;
+import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.schedules.model.WorkTime;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
@@ -31,12 +32,13 @@ public class WorkTimeDAO implements FullDAO<WorkTime, WorkTime> {
               .dayOfWeek(DayOfWeek.of(rs.getInt("day_of_week")))
               .startTime(rs.getTime("start_time").toLocalTime())
               .endTime(rs.getTime("end_time").toLocalTime())
+              .facilityId(rs.getInt("facility_id"))
               .build();
 
   @Override
   public WorkTime create(WorkTime creationObject) {
     String sql =
-        "INSERT INTO worktime (user_id, day_of_week, start_time, end_time) VALUES (?, ?, ?, ?) RETURNING id";
+        "INSERT INTO worktime (user_id, day_of_week, start_time, end_time, facility_id) VALUES (?, ?, ?, ?, ?) RETURNING id";
 
     KeyHolder keyHolder = new GeneratedKeyHolder();
 
@@ -47,6 +49,7 @@ public class WorkTimeDAO implements FullDAO<WorkTime, WorkTime> {
           ps.setInt(2, creationObject.getDayOfWeek().getValue());
           ps.setTime(3, Time.valueOf(creationObject.getStartTime()));
           ps.setTime(4, Time.valueOf(creationObject.getEndTime()));
+          ps.setInt(5, creationObject.getFacilityId());
           return ps;
         },
         keyHolder);
@@ -63,36 +66,37 @@ public class WorkTimeDAO implements FullDAO<WorkTime, WorkTime> {
 
   public List<WorkTime> getWorkTimesForUser(int userId) {
     String sql =
-        "SELECT id, user_id, day_of_week, start_time, end_time FROM worktime WHERE user_id = ?";
+        "SELECT id, user_id, day_of_week, start_time, end_time, facility_id FROM worktime WHERE user_id = ?";
 
     return jdbcTemplate.query(sql, rowMapper, userId);
   }
 
   public WorkTime updateWorkTime(WorkTime workTime) {
     String sql =
-        "INSERT INTO worktime (user_id, day_of_week, start_time, end_time) "
-            + "VALUES (?, ?, ?, ?) "
+        "INSERT INTO worktime (user_id, day_of_week, start_time, end_time, facility_id) "
+            + "VALUES (?, ?, ?, ?, ?) "
             + "ON CONFLICT (user_id, day_of_week) DO UPDATE "
-            + "SET start_time = EXCLUDED.start_time, end_time = EXCLUDED.end_time";
+            + "SET start_time = EXCLUDED.start_time, end_time = EXCLUDED.end_time, facility_id = EXCLUDED.facility_id";
     int affectedRows =
         jdbcTemplate.update(
             sql,
             workTime.getUserId(),
             workTime.getDayOfWeek().getValue(),
             Time.valueOf(workTime.getStartTime()),
-            Time.valueOf(workTime.getEndTime()));
+            Time.valueOf(workTime.getEndTime()),
+            workTime.getFacilityId());
 
     if (affectedRows == 1) {
       return getByUserIdAndDayOfWeek(workTime.getUserId(), workTime.getDayOfWeek().getValue())
           .orElseThrow(RuntimeException::new);
     } else {
-      throw new RuntimeException("Failed to upsert worktime");
+      throw new BadRequestException("Failed to upsert worktime");
     }
   }
 
   public Optional<WorkTime> getByUserIdAndDayOfWeek(int userId, int dayOfWeek) {
     String sql =
-        "SELECT id, user_id, day_of_week, start_time, end_time FROM worktime WHERE user_id = ? AND day_of_week = ?";
+        "SELECT id, user_id, day_of_week, start_time, end_time, facility_id FROM worktime WHERE user_id = ? AND day_of_week = ?";
     return jdbcTemplate.query(sql, rowMapper, userId, dayOfWeek).stream().findFirst();
   }
 
@@ -108,7 +112,7 @@ public class WorkTimeDAO implements FullDAO<WorkTime, WorkTime> {
 
   @Override
   public List<WorkTime> getAll() {
-    String sql = "SELECT id, user_id, day_of_week, start_time, end_time FROM worktime";
+    String sql = "SELECT id, user_id, day_of_week, start_time, end_time, facility_id FROM worktime";
     return jdbcTemplate.query(sql, rowMapper);
   }
 }

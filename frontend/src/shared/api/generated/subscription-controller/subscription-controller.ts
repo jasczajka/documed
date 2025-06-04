@@ -604,7 +604,7 @@ export const useDeleteSubscription = <TError = ErrorType<unknown>, TContext = un
   return useMutation(mutationOptions, queryClient);
 };
 /**
- * @summary Get all service with subcscription and associated discount
+ * @summary Get all service with subscription and associated discount
  */
 export const getAllServiceSubscriptionDiscounts = (signal?: AbortSignal) => {
   return customInstance<SubscriptionToService[]>({
@@ -696,7 +696,7 @@ export function useGetAllServiceSubscriptionDiscounts<
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
- * @summary Get all service with subcscription and associated discount
+ * @summary Get all service with subscription and associated discount
  */
 
 export function useGetAllServiceSubscriptionDiscounts<

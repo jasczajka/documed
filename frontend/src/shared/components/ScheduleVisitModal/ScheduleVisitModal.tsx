@@ -17,7 +17,7 @@ import {
   ScheduleVisitDTO,
   Service,
 } from 'shared/api/generated/generated.schemas';
-import { useGetAvailableFirstTimeSlotsByDoctor } from 'shared/api/generated/time-slot-controller/time-slot-controller';
+import { useGetAvailableFirstTimeSlotsByDoctorAndFacility } from 'shared/api/generated/time-slot-controller/time-slot-controller';
 import {
   useCalculateVisitCost,
   useScheduleVisit,
@@ -99,6 +99,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
 
   const selectedServiceId = watch('serviceId');
   const selectedDoctorId = watch('doctorId');
+  const selectedFacilityId = watch('facilityId');
 
   const { showNotification, NotificationComponent } = useNotification();
 
@@ -125,12 +126,18 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
     data: availableTimeSlots = [],
     isLoading: isPossibleStartTimesLoading,
     refetch: refetchTimeSlots,
-  } = useGetAvailableFirstTimeSlotsByDoctor(
+  } = useGetAvailableFirstTimeSlotsByDoctorAndFacility(
     selectedDoctorId ?? -1,
     {
       neededTimeSlots,
+      facilityId: selectedFacilityId ?? -1,
     },
-    { query: { enabled: !!selectedDoctorId && !!selectedServiceId && !!neededTimeSlots } },
+    {
+      query: {
+        enabled:
+          !!selectedDoctorId && !!selectedServiceId && !!selectedFacilityId && !!neededTimeSlots,
+      },
+    },
   );
 
   const { data: visitCost, refetch: refetchVisitCost } = useCalculateVisitCost(
@@ -289,6 +296,9 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
               getOptionLabel={(option) => `${option.city} ${option.address}`}
               onChange={(_, newValue) => {
                 field.onChange(newValue?.id ?? null);
+                if (newValue?.id) {
+                  refetchTimeSlots();
+                }
               }}
               value={allFacilities.find((facility) => facility.id === field.value) ?? null}
               noOptionsText="Brak dostępnych placówek"
@@ -316,7 +326,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
                 onConfirmSelectedStartTime={(selectedStartDate) => {
                   field.onChange(selectedStartDate);
                 }}
-                disabled={!selectedDoctorId || !selectedServiceId || loading}
+                disabled={!selectedDoctorId || !selectedServiceId || !selectedFacilityId || loading}
                 error={errors.visitDate?.message}
               />
             )}

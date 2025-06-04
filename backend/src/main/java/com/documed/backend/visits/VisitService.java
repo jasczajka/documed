@@ -171,9 +171,9 @@ public class VisitService {
   public BigDecimal calculateTotalCost(int serviceId, int patientId) {
 
     BigDecimal basicPrice = serviceService.getPriceForService(serviceId);
-    int subscriptionId = userService.getSubscriptionIdForPatient(patientId);
+    Integer subscriptionId = userService.getSubscriptionIdForPatient(patientId);
 
-    if (subscriptionId == 0) {
+    if (subscriptionId == null) {
       return basicPrice;
     } else {
       BigDecimal discount =

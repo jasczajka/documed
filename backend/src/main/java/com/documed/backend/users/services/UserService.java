@@ -100,7 +100,7 @@ public class UserService {
     return userDAO.getAllByRole(role);
   }
 
-  private boolean isUserAssignedToRole(int userId, UserRole role) {
+  public boolean isUserAssignedToRole(int userId, UserRole role) {
     User user = getById(userId).orElseThrow(() -> new NotFoundException("User not found"));
 
     return user.getRole() == role;
@@ -114,7 +114,7 @@ public class UserService {
     userDAO.removeUserSubscription(userId);
   }
 
-  public int getSubscriptionIdForPatient(int userId) {
+  public Integer getSubscriptionIdForPatient(int userId) {
     User patient =
         userDAO.getById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
 

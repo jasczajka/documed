@@ -1,7 +1,7 @@
 package com.documed.backend.schedules;
 
 import com.documed.backend.auth.annotations.StaffOnly;
-import com.documed.backend.schedules.dtos.WorkTimeDTO;
+import com.documed.backend.schedules.dtos.*;
 import com.documed.backend.schedules.model.WorkTime;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -20,35 +20,20 @@ public class WorkTimeController {
   private final WorkTimeService workTimeService;
 
   @StaffOnly
-  @PostMapping("/{user_id}")
-  @Operation(summary = "Create worktime for user")
-  public ResponseEntity<WorkTime> createWorkTime(
-      @PathVariable("user_id") int userId, @Valid @RequestBody WorkTimeDTO dto) {
-    WorkTime createdWorkTime =
-        workTimeService.createWorkTime(
-            WorkTime.builder()
-                .userId(userId)
-                .dayOfWeek(dto.getDayOfWeek())
-                .startTime(dto.getStartTime())
-                .endTime(dto.getEndTime())
-                .build());
-    return ResponseEntity.ok(createdWorkTime);
-  }
-
-  @StaffOnly
   @GetMapping("/{user_id}")
   @Operation(summary = "Get all worktimes for user")
-  public ResponseEntity<List<WorkTime>> getWorkTimesForUser(@PathVariable("user_id") int userId) {
+  public ResponseEntity<List<WorkTimeReturnDTO>> getWorkTimesForUser(
+      @PathVariable("user_id") int userId) {
     List<WorkTime> workTimes = workTimeService.getWorkTimesForUser(userId);
-    return ResponseEntity.ok(workTimes);
+    return ResponseEntity.ok(workTimes.stream().map(WorkTimeMapper::toDto).toList());
   }
 
   @StaffOnly
   @PutMapping("/{user_id}")
   @Operation(summary = "Update worktimes for user")
-  public ResponseEntity<List<WorkTime>> updateWorkTimesForUser(
-      @PathVariable("user_id") int userId, @RequestBody List<@Valid WorkTimeDTO> workTimes) {
+  public ResponseEntity<List<WorkTimeReturnDTO>> updateWorkTimesForUser(
+      @PathVariable("user_id") int userId, @RequestBody List<@Valid UploadWorkTimeDTO> workTimes) {
     List<WorkTime> updatedWorkTimes = workTimeService.updateWorkTimes(workTimes, userId);
-    return ResponseEntity.ok(updatedWorkTimes);
+    return ResponseEntity.ok(updatedWorkTimes.stream().map(WorkTimeMapper::toDto).toList());
   }
 }
