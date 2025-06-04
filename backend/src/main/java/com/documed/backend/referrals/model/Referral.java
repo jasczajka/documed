@@ -13,4 +13,5 @@ public class Referral {
   @NonNull private ReferralType type;
   private final int visitId;
   private LocalDate expirationDate;
+  private ReferralStatus status;
 }

@@ -1,5 +1,6 @@
 package com.documed.backend.referrals.dtos;
 
+import com.documed.backend.referrals.model.ReferralStatus;
 import com.documed.backend.referrals.model.ReferralType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
@@ -24,4 +25,7 @@ public class ReturnReferralDTO {
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private LocalDate expirationDate;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private ReferralStatus status;
 }

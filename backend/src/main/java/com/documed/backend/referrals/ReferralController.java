@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -91,6 +90,6 @@ public class ReferralController {
     return ResponseEntity.ok(
         Arrays.stream(ReferralType.values())
             .map(rt -> new ReferralTypeDTO(rt, rt.getDescription()))
-            .collect(Collectors.toList()));
+            .toList());
   }
 }
