@@ -9,6 +9,7 @@ import com.documed.backend.visits.model.Feedback;
 import com.documed.backend.visits.model.Visit;
 import com.documed.backend.visits.model.VisitWithDetails;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -137,7 +138,7 @@ public class VisitController {
   @Secured("PATIENT")
   @PostMapping("/{id}/feedback")
   public ResponseEntity<Void> giveFeedbackForVisit(
-      @PathVariable("id") int visitId, @RequestBody GiveFeedbackDTO dto) {
+      @PathVariable("id") int visitId, @RequestBody @Valid GiveFeedbackDTO dto) {
     Feedback feedback =
         Feedback.builder().rating(dto.getRating()).text(dto.getText()).visitId(visitId).build();
 
