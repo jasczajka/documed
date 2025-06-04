@@ -39,6 +39,7 @@ export const WorkTimeDayOfWeek = {
 export interface WorkTime {
   id: number;
   userId: number;
+  facilityId?: number;
   dayOfWeek: WorkTimeDayOfWeek;
   startTime: string;
   endTime: string;
@@ -160,6 +161,64 @@ export interface Service {
 export interface Specialization {
   id: number;
   name: string;
+}
+
+export type CreateReferralDTOType =
+  (typeof CreateReferralDTOType)[keyof typeof CreateReferralDTOType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const CreateReferralDTOType = {
+  '{code=TO_SPECIALIST,_description=Skierowanie_do_specjalisty}':
+    '{code=TO_SPECIALIST, description=Skierowanie do specjalisty}',
+  '{code=TO_HOSPITAL,_description=Skierowanie_do_szpitala}':
+    '{code=TO_HOSPITAL, description=Skierowanie do szpitala}',
+  '{code=FOR_DIAGNOSTICS,_description=Skierowanie_na_badania_diagnostyczne}':
+    '{code=FOR_DIAGNOSTICS, description=Skierowanie na badania diagnostyczne}',
+  '{code=FOR_REHABILITATION,_description=Skierowanie_na_rehabilitację}':
+    '{code=FOR_REHABILITATION, description=Skierowanie na rehabilitację}',
+  '{code=TO_SANATORIUM,_description=Skierowanie_do_sanatorium}':
+    '{code=TO_SANATORIUM, description=Skierowanie do sanatorium}',
+  '{code=FOR_LONG_TERM_CARE,_description=Skierowanie_do_opieki_długoterminowej}':
+    '{code=FOR_LONG_TERM_CARE, description=Skierowanie do opieki długoterminowej}',
+  '{code=FOR_PSYCHIATRIC_CARE,_description=Skierowanie_psychiatryczne_lub_uzależnienia}':
+    '{code=FOR_PSYCHIATRIC_CARE, description=Skierowanie psychiatryczne lub uzależnienia}',
+} as const;
+
+export interface CreateReferralDTO {
+  visitId: number;
+  type: CreateReferralDTOType;
+  /** @minLength 1 */
+  diagnosis: string;
+  expirationDate: string;
+}
+
+export type ReturnReferralDTOType =
+  (typeof ReturnReferralDTOType)[keyof typeof ReturnReferralDTOType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const ReturnReferralDTOType = {
+  '{code=TO_SPECIALIST,_description=Skierowanie_do_specjalisty}':
+    '{code=TO_SPECIALIST, description=Skierowanie do specjalisty}',
+  '{code=TO_HOSPITAL,_description=Skierowanie_do_szpitala}':
+    '{code=TO_HOSPITAL, description=Skierowanie do szpitala}',
+  '{code=FOR_DIAGNOSTICS,_description=Skierowanie_na_badania_diagnostyczne}':
+    '{code=FOR_DIAGNOSTICS, description=Skierowanie na badania diagnostyczne}',
+  '{code=FOR_REHABILITATION,_description=Skierowanie_na_rehabilitację}':
+    '{code=FOR_REHABILITATION, description=Skierowanie na rehabilitację}',
+  '{code=TO_SANATORIUM,_description=Skierowanie_do_sanatorium}':
+    '{code=TO_SANATORIUM, description=Skierowanie do sanatorium}',
+  '{code=FOR_LONG_TERM_CARE,_description=Skierowanie_do_opieki_długoterminowej}':
+    '{code=FOR_LONG_TERM_CARE, description=Skierowanie do opieki długoterminowej}',
+  '{code=FOR_PSYCHIATRIC_CARE,_description=Skierowanie_psychiatryczne_lub_uzależnienia}':
+    '{code=FOR_PSYCHIATRIC_CARE, description=Skierowanie psychiatryczne lub uzależnienia}',
+} as const;
+
+export interface ReturnReferralDTO {
+  id?: number;
+  diagnosis?: string;
+  type?: ReturnReferralDTOType;
+  visitId?: number;
+  expirationDate?: string;
 }
 
 export interface Medicine {
@@ -401,6 +460,7 @@ export interface TimeSlot {
   id?: number;
   visitId?: number;
   doctorId?: number;
+  facilityId?: number;
   startTime?: string;
   endTime?: string;
   date?: string;
@@ -410,6 +470,7 @@ export interface TimeSlot {
 export interface AvailableTimeSlotDTO {
   id: number;
   doctorId: number;
+  facilityId: number;
   startTime: string;
   busy?: boolean;
 }
@@ -481,14 +542,36 @@ export type AddMedicineToPrescriptionParams = {
   amount?: number;
 };
 
-export type GetAvailableFirstTimeSlotsByDoctorParams = {
+export type GetAvailableFirstTimeSlotsByDoctorAndFacilityParams = {
   neededTimeSlots: number;
+  facilityId: number;
 };
 
 export type CalculateVisitCostParams = {
   patientId: number;
   serviceId: number;
 };
+
+export type GetAllReferralTypes200Item =
+  (typeof GetAllReferralTypes200Item)[keyof typeof GetAllReferralTypes200Item];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const GetAllReferralTypes200Item = {
+  '{code=TO_SPECIALIST,_description=Skierowanie_do_specjalisty}':
+    '{code=TO_SPECIALIST, description=Skierowanie do specjalisty}',
+  '{code=TO_HOSPITAL,_description=Skierowanie_do_szpitala}':
+    '{code=TO_HOSPITAL, description=Skierowanie do szpitala}',
+  '{code=FOR_DIAGNOSTICS,_description=Skierowanie_na_badania_diagnostyczne}':
+    '{code=FOR_DIAGNOSTICS, description=Skierowanie na badania diagnostyczne}',
+  '{code=FOR_REHABILITATION,_description=Skierowanie_na_rehabilitację}':
+    '{code=FOR_REHABILITATION, description=Skierowanie na rehabilitację}',
+  '{code=TO_SANATORIUM,_description=Skierowanie_do_sanatorium}':
+    '{code=TO_SANATORIUM, description=Skierowanie do sanatorium}',
+  '{code=FOR_LONG_TERM_CARE,_description=Skierowanie_do_opieki_długoterminowej}':
+    '{code=FOR_LONG_TERM_CARE, description=Skierowanie do opieki długoterminowej}',
+  '{code=FOR_PSYCHIATRIC_CARE,_description=Skierowanie_psychiatryczne_lub_uzależnienia}':
+    '{code=FOR_PSYCHIATRIC_CARE, description=Skierowanie psychiatryczne lub uzależnienia}',
+} as const;
 
 export type GetAllMedicinesParams = {
   /**
