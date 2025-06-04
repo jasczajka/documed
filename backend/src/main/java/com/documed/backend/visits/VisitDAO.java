@@ -230,11 +230,14 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
                s.name AS service_name,
                first_ts.start_time AS timeslot_start,
                last_ts.end_time AS timeslot_end,
-               first_ts.date AS timeslot_date
+               first_ts.date AS timeslot_date,
+               f.rating AS feedback_rating,
+               f.text AS feedback_message
            FROM visit v
            JOIN "User" p ON v.patient_id = p.id
            JOIN "User" d ON v.doctor_id = d.id
            JOIN service s ON v.service_id = s.id
+           LEFT JOIN feedback f ON f.visit_id = v.id
            LEFT JOIN LATERAL (
                SELECT ts.start_time, ts.date
                FROM time_slot ts

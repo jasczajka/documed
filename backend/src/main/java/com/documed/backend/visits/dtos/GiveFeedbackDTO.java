@@ -1,0 +1,13 @@
+package com.documed.backend.visits.dtos;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Data;
+
+@Data
+public class GiveFeedbackDTO {
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private final int rating;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private final String text;
+}

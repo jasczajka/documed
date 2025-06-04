@@ -34,6 +34,8 @@ public class VisitWithDetailsRowMapper implements RowMapper<VisitWithDetails> {
         .startTime(getLocalTimeOrNull(rs, "timeslot_start"))
         .endTime(getLocalTimeOrNull(rs, "timeslot_end"))
         .date(getLocalDateOrNull(rs, "timeslot_date"))
+        .feedbackRating(rs.getObject("feedback_rating", Integer.class))
+        .feedbackMessage(rs.getString("feedback_message"))
         .build();
   }
 

@@ -22,5 +22,5 @@ public class Visit {
   private int patientId;
   private int doctorId;
   private List<TimeSlot> reservedTimeSlots;
-  // @TODO feedback
+  private Integer feedbackId;
 }

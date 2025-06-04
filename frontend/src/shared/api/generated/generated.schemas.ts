@@ -103,6 +103,13 @@ export interface VisitWithDetails {
   date?: string;
   startTime?: string;
   endTime?: string;
+  feedbackRating?: number;
+  feedbackMessage?: string;
+}
+
+export interface GiveFeedbackDTO {
+  rating: number;
+  text: string;
 }
 
 export interface Subscription {
