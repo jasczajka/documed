@@ -1,8 +1,11 @@
 package com.documed.backend.schedules
 
-import com.documed.backend.schedules.dtos.WorkTimeDTO
+import com.documed.backend.schedules.dtos.UploadWorkTimeDTO
 import com.documed.backend.schedules.exceptions.WrongTimesGivenException
+import com.documed.backend.schedules.model.DayOfWeekEnum
 import com.documed.backend.schedules.model.WorkTime
+import com.documed.backend.users.model.UserRole
+import com.documed.backend.users.services.UserService
 import java.time.DayOfWeek
 import java.time.LocalTime
 import spock.lang.Specification
@@ -11,9 +14,10 @@ import spock.lang.Subject
 class WorkTimeServiceTest extends Specification{
 
 	def workTimeDAO = Mock(WorkTimeDAO)
+	def userService = Mock(UserService)
 
 	@Subject
-	def workTimeService = new WorkTimeService(workTimeDAO)
+	def workTimeService = new WorkTimeService(workTimeDAO, userService)
 
 	def setup() {
 		workTimeService.slotDurationInMinutes = 15
@@ -21,28 +25,58 @@ class WorkTimeServiceTest extends Specification{
 
 	def "should create work time"() {
 		given:
+
+		def userId = 997
+		def facilityId = 10
+		def dto = new UploadWorkTimeDTO(
+				dayOfWeek: DayOfWeekEnum.MONDAY,
+				startTime: LocalTime.of(9, 0),
+				endTime: LocalTime.of(10, 0),
+				facilityId: facilityId
+				)
+
+
+
 		def workTime = WorkTime.builder()
-				.userId(997)
-				.dayOfWeek(DayOfWeek.FRIDAY)
-				.startTime(LocalTime.of(10, 00))
-				.endTime(LocalTime.of(15, 00))
+				.userId(userId)
+				.dayOfWeek(dto.dayOfWeek.toJavaDayOfWeek())
+				.startTime(dto.startTime)
+				.endTime(dto.endTime)
+				.facilityId(facilityId)
 				.build()
 
 		when:
-		def result = workTimeService.createWorkTime(workTime)
+		userService.isUserAssignedToRole(userId, UserRole.DOCTOR) >> true
+		workTimeDAO.create(_ as WorkTime) >> workTime
+
+		def result = workTimeService.createWorkTime(userId, dto)
 
 		then:
-		1 * workTimeDAO.create(workTime) >> workTime
 		result == workTime
 	}
 
 	def "should update work times"() {
 		given:
-		def dto = new WorkTimeDTO(
-				dayOfWeek: DayOfWeek.MONDAY,
+
+		def userId = 997
+		def facilityId = 10
+		def dto = new UploadWorkTimeDTO(
+				dayOfWeek: DayOfWeekEnum.MONDAY,
 				startTime: LocalTime.of(9, 0),
-				endTime: LocalTime.of(10, 0)
+				endTime: LocalTime.of(10, 0),
+				facilityId: facilityId
 				)
+
+		def workTime = WorkTime.builder()
+				.userId(userId)
+				.dayOfWeek(dto.dayOfWeek.toJavaDayOfWeek())
+				.startTime(dto.startTime)
+				.endTime(dto.endTime)
+				.facilityId(facilityId)
+				.build()
+
+		userService.isUserAssignedToRole(userId, UserRole.DOCTOR) >> true
+		workTimeDAO.updateWorkTime(_ as WorkTime) >> workTime
 
 		when:
 		def result = workTimeService.updateWorkTimes([dto], 997)
@@ -52,15 +86,23 @@ class WorkTimeServiceTest extends Specification{
 		result.size() == 1
 		result[0].dayOfWeek == DayOfWeek.MONDAY
 		result[0].userId == 997
+		result[0].facilityId == facilityId
+		result[0].startTime == LocalTime.of(9, 0)
+		result[0].endTime == LocalTime.of(10, 0)
 	}
 
 	def "should throw exception when duration is too short"() {
 		given:
-		def dto = new WorkTimeDTO(
-				dayOfWeek: DayOfWeek.MONDAY,
+		def userId = 997
+		def facilityId = 10
+		def dto = new UploadWorkTimeDTO(
+				dayOfWeek: DayOfWeekEnum.MONDAY,
 				startTime: LocalTime.of(9, 0),
-				endTime: LocalTime.of(9, 5)
+				endTime: LocalTime.of(9, 5),
+				facilityId: facilityId
 				)
+
+		userService.isUserAssignedToRole(userId, UserRole.DOCTOR) >> true
 
 		when:
 		workTimeService.updateWorkTimes([dto], 997)
@@ -71,11 +113,16 @@ class WorkTimeServiceTest extends Specification{
 
 	def "should throw exception when startTime is not before endTime"() {
 		given:
-		def dto = new WorkTimeDTO(
-				dayOfWeek: DayOfWeek.MONDAY,
+		def userId = 997
+		def facilityId = 10
+		def dto = new UploadWorkTimeDTO(
+				dayOfWeek: DayOfWeekEnum.MONDAY,
 				startTime: LocalTime.of(10, 0),
-				endTime: LocalTime.of(9, 0)
+				endTime: LocalTime.of(9, 0),
+				facilityId: facilityId
 				)
+
+		userService.isUserAssignedToRole(userId, UserRole.DOCTOR) >> true
 
 		when:
 		workTimeService.updateWorkTimes([dto], 997)

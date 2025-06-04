@@ -32,6 +32,7 @@ class TimeSlotServiceTest extends Specification {
 				.dayOfWeek(DayOfWeek.WEDNESDAY)
 				.startTime(LocalTime.of(11, 0))
 				.endTime(LocalTime.of(12, 0))
+				.facilityId(1)
 				.build()
 
 		when:
@@ -77,7 +78,7 @@ class TimeSlotServiceTest extends Specification {
 
 	def "should reserve timeSlots for visit"() {
 		given:
-		def service = Mock(com.documed.backend.services.model.Service) {
+		def service = Mock(Service) {
 			getEstimatedTime() >> 25
 		}
 		def visit = Mock(Visit) {
@@ -93,12 +94,14 @@ class TimeSlotServiceTest extends Specification {
 				.date(date)
 				.startTime(LocalTime.of(9, 0))
 				.endTime(LocalTime.of(9, 15))
+				.facilityId(1)
 				.build()
 		def timeSlot2 = TimeSlot.builder()
 				.doctorId(997)
 				.date(date)
 				.startTime(LocalTime.of(9, 15))
 				.endTime(LocalTime.of(9, 30))
+				.facilityId(1)
 				.build()
 
 		and:
@@ -114,18 +117,20 @@ class TimeSlotServiceTest extends Specification {
 	def "should return empty list when no available slots exist"() {
 		given:
 		def doctorId = 1
+		def facilityId = 1
 		def neededTimeSlots = 2
 
 		when:
-		timeSlotDAO.getAvailableFutureTimeSlotsByDoctor(doctorId) >> []
+		timeSlotDAO.getAvailableFutureTimeSlotsByDoctorAndFacility(doctorId, facilityId) >> []
 
 		then:
-		timeSlotService.getAvailableFirstTimeSlotsByDoctor(doctorId, neededTimeSlots) == []
+		timeSlotService.getAvailableFirstTimeSlotsByDoctorAndFacility(doctorId, neededTimeSlots, facilityId) == []
 	}
 
 	def "should return first available slot when continuous slots exist"() {
 		given:
 		def doctorId = 1
+		def facilityId = 1
 		def neededTimeSlots = 2
 		def date = LocalDate.now()
 
@@ -135,6 +140,7 @@ class TimeSlotServiceTest extends Specification {
 				.date(date)
 				.startTime(LocalTime.of(9, 0))
 				.endTime(LocalTime.of(9, 15))
+				.facilityId(1)
 				.build()
 
 		def slot2 = TimeSlot.builder()
@@ -143,6 +149,7 @@ class TimeSlotServiceTest extends Specification {
 				.date(date)
 				.startTime(LocalTime.of(9, 15))
 				.endTime(LocalTime.of(9, 30))
+				.facilityId(1)
 				.build()
 
 		def slot3 = TimeSlot.builder()
@@ -151,18 +158,20 @@ class TimeSlotServiceTest extends Specification {
 				.date(date)
 				.startTime(LocalTime.of(10, 0))
 				.endTime(LocalTime.of(10, 15))
+				.facilityId(1)
 				.build()
 
 		when:
-		timeSlotDAO.getAvailableFutureTimeSlotsByDoctor(doctorId) >> [slot1, slot2, slot3]
+		timeSlotDAO.getAvailableFutureTimeSlotsByDoctorAndFacility(doctorId, facilityId) >> [slot1, slot2, slot3]
 
 		then:
-		timeSlotService.getAvailableFirstTimeSlotsByDoctor(doctorId, neededTimeSlots) == [slot1]
+		timeSlotService.getAvailableFirstTimeSlotsByDoctorAndFacility(doctorId, neededTimeSlots, facilityId) == [slot1]
 	}
 
 	def "should handle multiple dates correctly"() {
 		given:
 		def doctorId = 1
+		def facilityId = 1
 		def neededTimeSlots = 3
 		def today = LocalDate.now()
 		def tomorrow = today.plusDays(1)
@@ -173,6 +182,7 @@ class TimeSlotServiceTest extends Specification {
 				.date(today)
 				.startTime(LocalTime.of(9, 0))
 				.endTime(LocalTime.of(9, 15))
+				.facilityId(facilityId)
 				.build()
 
 		def todaySlot2 = TimeSlot.builder()
@@ -181,6 +191,7 @@ class TimeSlotServiceTest extends Specification {
 				.date(today)
 				.startTime(LocalTime.of(9, 15))
 				.endTime(LocalTime.of(9, 30))
+				.facilityId(facilityId)
 				.build()
 
 		def tomorrowSlot1 = TimeSlot.builder()
@@ -189,6 +200,7 @@ class TimeSlotServiceTest extends Specification {
 				.date(tomorrow)
 				.startTime(LocalTime.of(10, 0))
 				.endTime(LocalTime.of(10, 15))
+				.facilityId(facilityId)
 				.build()
 
 		def tomorrowSlot2 = TimeSlot.builder()
@@ -197,6 +209,7 @@ class TimeSlotServiceTest extends Specification {
 				.date(tomorrow)
 				.startTime(LocalTime.of(10, 15))
 				.endTime(LocalTime.of(10, 30))
+				.facilityId(facilityId)
 				.build()
 
 		def tomorrowSlot3 = TimeSlot.builder()
@@ -205,10 +218,11 @@ class TimeSlotServiceTest extends Specification {
 				.date(tomorrow)
 				.startTime(LocalTime.of(10, 30))
 				.endTime(LocalTime.of(10, 45))
+				.facilityId(facilityId)
 				.build()
 
 		when:
-		timeSlotDAO.getAvailableFutureTimeSlotsByDoctor(doctorId) >> [
+		timeSlotDAO.getAvailableFutureTimeSlotsByDoctorAndFacility(doctorId, facilityId) >> [
 			todaySlot1,
 			todaySlot2,
 			tomorrowSlot1,
@@ -217,12 +231,13 @@ class TimeSlotServiceTest extends Specification {
 		]
 
 		then:
-		timeSlotService.getAvailableFirstTimeSlotsByDoctor(doctorId, neededTimeSlots) == [tomorrowSlot1]
+		timeSlotService.getAvailableFirstTimeSlotsByDoctorAndFacility(doctorId, neededTimeSlots, facilityId) == [tomorrowSlot1]
 	}
 
 	def "should skip non-continuous slots"() {
 		given:
 		def doctorId = 1
+		def facilityId = 1
 		def neededTimeSlots = 2
 		def date = LocalDate.now()
 
@@ -232,6 +247,7 @@ class TimeSlotServiceTest extends Specification {
 				.date(date)
 				.startTime(LocalTime.of(9, 0))
 				.endTime(LocalTime.of(9, 15))
+				.facilityId(facilityId)
 				.build()
 
 		def slot2 = TimeSlot.builder()
@@ -240,18 +256,20 @@ class TimeSlotServiceTest extends Specification {
 				.date(date)
 				.startTime(LocalTime.of(9, 30)) // Gap between slots
 				.endTime(LocalTime.of(9, 45))
+				.facilityId(facilityId)
 				.build()
 
 		when:
-		timeSlotDAO.getAvailableFutureTimeSlotsByDoctor(doctorId) >> [slot1, slot2]
+		timeSlotDAO.getAvailableFutureTimeSlotsByDoctorAndFacility(doctorId, facilityId) >> [slot1, slot2]
 
 		then:
-		timeSlotService.getAvailableFirstTimeSlotsByDoctor(doctorId, neededTimeSlots) == []
+		timeSlotService.getAvailableFirstTimeSlotsByDoctorAndFacility(doctorId, neededTimeSlots, facilityId) == []
 	}
 
 	def "should return first slot of multiple blocks when multiple continuous blocks exist"() {
 		given:
 		def doctorId = 1
+		def facilityId = 1
 		def neededTimeSlots = 2
 		def date = LocalDate.now()
 
@@ -261,6 +279,7 @@ class TimeSlotServiceTest extends Specification {
 				.date(date)
 				.startTime(LocalTime.of(9, 0))
 				.endTime(LocalTime.of(9, 15))
+				.facilityId(facilityId)
 				.build()
 
 		def slot2 = TimeSlot.builder()
@@ -269,6 +288,7 @@ class TimeSlotServiceTest extends Specification {
 				.date(date)
 				.startTime(LocalTime.of(9, 15))
 				.endTime(LocalTime.of(9, 30))
+				.facilityId(facilityId)
 				.build()
 
 		def slot3 = TimeSlot.builder()
@@ -277,6 +297,7 @@ class TimeSlotServiceTest extends Specification {
 				.date(date)
 				.startTime(LocalTime.of(10, 0))
 				.endTime(LocalTime.of(10, 15))
+				.facilityId(facilityId)
 				.build()
 
 		def slot4 = TimeSlot.builder()
@@ -285,18 +306,20 @@ class TimeSlotServiceTest extends Specification {
 				.date(date)
 				.startTime(LocalTime.of(10, 15))
 				.endTime(LocalTime.of(10, 30))
+				.facilityId(facilityId)
 				.build()
 
 		when:
-		timeSlotDAO.getAvailableFutureTimeSlotsByDoctor(doctorId) >> [slot1, slot2, slot3, slot4]
+		timeSlotDAO.getAvailableFutureTimeSlotsByDoctorAndFacility(doctorId, facilityId) >> [slot1, slot2, slot3, slot4]
 
 		then:
-		timeSlotService.getAvailableFirstTimeSlotsByDoctor(doctorId, neededTimeSlots) == [slot1, slot3]
+		timeSlotService.getAvailableFirstTimeSlotsByDoctorAndFacility(doctorId, neededTimeSlots, facilityId) == [slot1, slot3]
 	}
 
 	def "should handle minimum neededTimeSlots value (1)"() {
 		given:
 		def doctorId = 1
+		def facilityId = 1
 		def neededTimeSlots = 1
 		def date = LocalDate.now()
 
@@ -306,6 +329,7 @@ class TimeSlotServiceTest extends Specification {
 				.date(date)
 				.startTime(LocalTime.of(9, 0))
 				.endTime(LocalTime.of(9, 15))
+				.facilityId(facilityId)
 				.build()
 
 		def slot2 = TimeSlot.builder()
@@ -314,18 +338,20 @@ class TimeSlotServiceTest extends Specification {
 				.date(date)
 				.startTime(LocalTime.of(10, 0))
 				.endTime(LocalTime.of(10, 15))
+				.facilityId(facilityId)
 				.build()
 
 		when:
-		timeSlotDAO.getAvailableFutureTimeSlotsByDoctor(doctorId) >> [slot1, slot2]
+		timeSlotDAO.getAvailableFutureTimeSlotsByDoctorAndFacility(doctorId, facilityId) >> [slot1, slot2]
 
 		then:
-		timeSlotService.getAvailableFirstTimeSlotsByDoctor(doctorId, neededTimeSlots) == [slot1, slot2]
+		timeSlotService.getAvailableFirstTimeSlotsByDoctorAndFacility(doctorId, neededTimeSlots, facilityId) == [slot1, slot2]
 	}
 
 	def "should handle overlapping continuous blocks correctly"() {
 		given:
 		def doctorId = 1
+		def facilityId = 1
 		def neededTimeSlots = 2
 		def date = LocalDate.now()
 
@@ -335,6 +361,7 @@ class TimeSlotServiceTest extends Specification {
 				.date(date)
 				.startTime(LocalTime.of(9, 0))
 				.endTime(LocalTime.of(9, 15))
+				.facilityId(facilityId)
 				.build()
 
 		def slot2 = TimeSlot.builder()
@@ -343,6 +370,7 @@ class TimeSlotServiceTest extends Specification {
 				.date(date)
 				.startTime(LocalTime.of(9, 15))
 				.endTime(LocalTime.of(9, 30))
+				.facilityId(facilityId)
 				.build()
 
 		def slot3 = TimeSlot.builder()
@@ -351,6 +379,7 @@ class TimeSlotServiceTest extends Specification {
 				.date(date)
 				.startTime(LocalTime.of(9, 30))
 				.endTime(LocalTime.of(9, 45))
+				.facilityId(facilityId)
 				.build()
 
 		def slot4 = TimeSlot.builder()
@@ -359,12 +388,13 @@ class TimeSlotServiceTest extends Specification {
 				.date(date)
 				.startTime(LocalTime.of(9, 45))
 				.endTime(LocalTime.of(10, 0))
+				.facilityId(facilityId)
 				.build()
 
 		when:
-		timeSlotDAO.getAvailableFutureTimeSlotsByDoctor(doctorId) >> [slot1, slot2, slot3, slot4]
+		timeSlotDAO.getAvailableFutureTimeSlotsByDoctorAndFacility(doctorId, facilityId) >> [slot1, slot2, slot3, slot4]
 
 		then:
-		timeSlotService.getAvailableFirstTimeSlotsByDoctor(doctorId, neededTimeSlots) == [slot1, slot2, slot3]
+		timeSlotService.getAvailableFirstTimeSlotsByDoctorAndFacility(doctorId, neededTimeSlots, facilityId) == [slot1, slot2, slot3]
 	}
 }

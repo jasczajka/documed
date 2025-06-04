@@ -10,12 +10,14 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -27,14 +29,6 @@ public class AuthController {
   private final OtpService otpService;
 
   private final JwtUtil jwtUtil;
-
-  public AuthController(
-      AuthService authService, UserService userService, OtpService otpService, JwtUtil jwtUtil) {
-    this.authService = authService;
-    this.userService = userService;
-    this.otpService = otpService;
-    this.jwtUtil = jwtUtil;
-  }
 
   @PostMapping("/request-registration")
   public ResponseEntity<PendingUserDTO> requestRegistration(

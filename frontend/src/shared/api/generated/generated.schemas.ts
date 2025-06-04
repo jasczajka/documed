@@ -4,10 +4,9 @@
  * OpenAPI definition
  * OpenAPI spec version: v0
  */
-export type WorkTimeDTODayOfWeek = (typeof WorkTimeDTODayOfWeek)[keyof typeof WorkTimeDTODayOfWeek];
+export type DayOfWeekEnum = (typeof DayOfWeekEnum)[keyof typeof DayOfWeekEnum];
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const WorkTimeDTODayOfWeek = {
+export const DayOfWeekEnum = {
   MONDAY: 'MONDAY',
   TUESDAY: 'TUESDAY',
   WEDNESDAY: 'WEDNESDAY',
@@ -17,29 +16,18 @@ export const WorkTimeDTODayOfWeek = {
   SUNDAY: 'SUNDAY',
 } as const;
 
-export interface WorkTimeDTO {
-  dayOfWeek: WorkTimeDTODayOfWeek;
+export interface UploadWorkTimeDTO {
+  dayOfWeek: DayOfWeekEnum;
   startTime: string;
   endTime: string;
+  facilityId: number;
 }
 
-export type WorkTimeDayOfWeek = (typeof WorkTimeDayOfWeek)[keyof typeof WorkTimeDayOfWeek];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const WorkTimeDayOfWeek = {
-  MONDAY: 'MONDAY',
-  TUESDAY: 'TUESDAY',
-  WEDNESDAY: 'WEDNESDAY',
-  THURSDAY: 'THURSDAY',
-  FRIDAY: 'FRIDAY',
-  SATURDAY: 'SATURDAY',
-  SUNDAY: 'SUNDAY',
-} as const;
-
-export interface WorkTime {
+export interface WorkTimeReturnDTO {
   id: number;
   userId: number;
-  dayOfWeek: WorkTimeDayOfWeek;
+  facilityId: number;
+  dayOfWeek: DayOfWeekEnum;
   startTime: string;
   endTime: string;
 }
@@ -86,7 +74,6 @@ export interface ScheduleVisitDTO {
 export type VisitWithDetailsStatus =
   (typeof VisitWithDetailsStatus)[keyof typeof VisitWithDetailsStatus];
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const VisitWithDetailsStatus = {
   PLANNED: 'PLANNED',
   IN_PROGRESS: 'IN_PROGRESS',
@@ -133,7 +120,6 @@ export interface CreateServiceDTO {
 
 export type ServiceType = (typeof ServiceType)[keyof typeof ServiceType];
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ServiceType = {
   REGULAR_SERVICE: 'REGULAR_SERVICE',
   ADDITIONAL_SERVICE: 'ADDITIONAL_SERVICE',
@@ -157,14 +143,10 @@ export interface Specialization {
 export interface CreateReferralDTO {
   visitId: number;
   type: ReferralType;
-  /** @minLength 1 */
-  diagnosis: string;
-  expirationDate: string;
 }
 
 export type ReferralType = (typeof ReferralType)[keyof typeof ReferralType];
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ReferralType = {
   TO_SPECIALIST: 'TO_SPECIALIST',
   TO_HOSPITAL: 'TO_HOSPITAL',
@@ -196,7 +178,6 @@ export interface CreatePrescriptionDTO {
 
 export type PrescriptionStatus = (typeof PrescriptionStatus)[keyof typeof PrescriptionStatus];
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const PrescriptionStatus = {
   NEW: 'NEW',
   ISSUED: 'ISSUED',
@@ -248,7 +229,6 @@ export interface PatientRegisterRequestDTO {
 
 export type AccountStatus = (typeof AccountStatus)[keyof typeof AccountStatus];
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const AccountStatus = {
   ACTIVE: 'ACTIVE',
   PENDING_CONFIRMATION: 'PENDING_CONFIRMATION',
@@ -270,7 +250,6 @@ export interface PendingUserDTO {
 
 export type UserRole = (typeof UserRole)[keyof typeof UserRole];
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
 export const UserRole = {
   PATIENT: 'PATIENT',
   DOCTOR: 'DOCTOR',
@@ -398,6 +377,7 @@ export interface TimeSlot {
   id?: number;
   visitId?: number;
   doctorId?: number;
+  facilityId?: number;
   startTime?: string;
   endTime?: string;
   date?: string;
@@ -407,6 +387,7 @@ export interface TimeSlot {
 export interface AvailableTimeSlotDTO {
   id: number;
   doctorId: number;
+  facilityId: number;
   startTime: string;
   busy?: boolean;
 }
@@ -472,14 +453,35 @@ export type AddMedicineToPrescriptionParams = {
   amount?: number;
 };
 
-export type GetAvailableFirstTimeSlotsByDoctorParams = {
+export type GetAvailableFirstTimeSlotsByDoctorAndFacilityParams = {
   neededTimeSlots: number;
+  facilityId: number;
 };
 
 export type CalculateVisitCostParams = {
   patientId: number;
   serviceId: number;
 };
+
+export type GetAllReferralTypes200Item =
+  (typeof GetAllReferralTypes200Item)[keyof typeof GetAllReferralTypes200Item];
+
+export const GetAllReferralTypes200Item = {
+  '{code=TO_SPECIALIST,_description=Skierowanie_do_specjalisty}':
+    '{code=TO_SPECIALIST, description=Skierowanie do specjalisty}',
+  '{code=TO_HOSPITAL,_description=Skierowanie_do_szpitala}':
+    '{code=TO_HOSPITAL, description=Skierowanie do szpitala}',
+  '{code=FOR_DIAGNOSTICS,_description=Skierowanie_na_badania_diagnostyczne}':
+    '{code=FOR_DIAGNOSTICS, description=Skierowanie na badania diagnostyczne}',
+  '{code=FOR_REHABILITATION,_description=Skierowanie_na_rehabilitację}':
+    '{code=FOR_REHABILITATION, description=Skierowanie na rehabilitację}',
+  '{code=TO_SANATORIUM,_description=Skierowanie_do_sanatorium}':
+    '{code=TO_SANATORIUM, description=Skierowanie do sanatorium}',
+  '{code=FOR_LONG_TERM_CARE,_description=Skierowanie_do_opieki_długoterminowej}':
+    '{code=FOR_LONG_TERM_CARE, description=Skierowanie do opieki długoterminowej}',
+  '{code=FOR_PSYCHIATRIC_CARE,_description=Skierowanie_psychiatryczne_lub_uzależnienia}':
+    '{code=FOR_PSYCHIATRIC_CARE, description=Skierowanie psychiatryczne lub uzależnienia}',
+} as const;
 
 export type GetAllMedicinesParams = {
   /**
