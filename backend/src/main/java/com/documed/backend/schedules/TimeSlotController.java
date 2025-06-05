@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class TimeSlotController {
 
   private final TimeSlotService timeSlotService;
+  private final FreeDaysService freeDaysService;
 
   @StaffOnly
   @GetMapping("/{id}")
@@ -53,7 +54,7 @@ public class TimeSlotController {
   public ResponseEntity<String> createFreeDay(
           @RequestBody @Valid FreeDaysDTO freeDaysDTO
   ){
-    timeSlotService.createFreeDay(freeDaysDTO);
+    freeDaysService.createFreeDay(freeDaysDTO);
     return new ResponseEntity<>("FreeDay created", HttpStatus.CREATED);
   }
 }

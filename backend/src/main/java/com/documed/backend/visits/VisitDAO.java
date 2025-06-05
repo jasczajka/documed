@@ -9,7 +9,6 @@ import com.documed.backend.visits.model.VisitWithDetailsRowMapper;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;

@@ -11,7 +11,6 @@ import com.documed.backend.referrals.model.Referral;
 import com.documed.backend.schedules.TimeSlotService;
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.services.ServiceService;
-import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
 import com.documed.backend.users.services.SubscriptionService;
 import com.documed.backend.users.services.UserService;
@@ -24,13 +23,11 @@ import com.documed.backend.visits.model.VisitStatus;
 import com.documed.backend.visits.model.VisitWithDetails;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 @RequiredArgsConstructor
 @Service

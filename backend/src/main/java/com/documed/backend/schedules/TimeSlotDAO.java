@@ -168,7 +168,7 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
   public List<Integer> getVisitIdsByDoctorAndDateRange(int doctorId, LocalDate fromDate, LocalDate toDate){
     String sql =
             """
-            SELECT visit_id FROM time_slot WHERE doctor_id = ? AND date BETWEEN ? AND ?
+            SELECT visit_id FROM time_slot WHERE doctor_id = ? AND date BETWEEN ? AND ? AND visit_id IS NOT NULL
             """;
     return jdbcTemplate.queryForList(sql, Integer.class, doctorId, fromDate, toDate);
   }

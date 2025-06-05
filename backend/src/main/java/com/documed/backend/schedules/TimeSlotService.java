@@ -8,8 +8,6 @@ import com.documed.backend.schedules.model.FreeDays;
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.schedules.model.WorkTime;
 import com.documed.backend.services.ServiceService;
-import com.documed.backend.visits.VisitDAO;
-import com.documed.backend.visits.VisitService;
 import com.documed.backend.visits.exceptions.CancelVisitException;
 import com.documed.backend.visits.model.Visit;
 import java.time.DayOfWeek;
@@ -33,7 +31,6 @@ public class TimeSlotService {
 
   private final TimeSlotDAO timeSlotDAO;
   private final ServiceService serviceService;
-  private final FreeDaysDAO freeDaysDAO;
 
   @Transactional
   public void createTimeSlotsForWorkTimes(List<WorkTime> workTimes) {
@@ -152,22 +149,7 @@ public class TimeSlotService {
     }
   }
 
-  @Transactional
-  public void createFreeDay(FreeDaysDTO freeDaysDTO) {
-
-    if (freeDaysDTO.getStartDate().isAfter(freeDaysDTO.getEndDate())){
-      throw new BadRequestException("Start date cannot be after end date");
-    }
-
-    FreeDays freeDays = FreeDays
-            .builder()
-            .userId(freeDaysDTO.getUserId())
-            .startDate(freeDaysDTO.getStartDate())
-            .endDate(freeDaysDTO.getEndDate())
-            .build();
-
-    freeDaysDAO.create(freeDays);
-
-    timeSlotDAO.reserveTimeSlotsForFreeDays(freeDays);
+  public List<Integer> getVisitIdsByDoctorAndDateRange(int doctorId, LocalDate fromDate, LocalDate toDate){
+    return timeSlotDAO.getVisitIdsByDoctorAndDateRange(doctorId, fromDate, toDate);
   }
 }
