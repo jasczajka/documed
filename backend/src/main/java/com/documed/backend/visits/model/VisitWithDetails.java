@@ -56,4 +56,7 @@ public class VisitWithDetails {
   LocalTime startTime;
 
   LocalTime endTime;
+
+  private Integer feedbackRating;
+  private String feedbackMessage;
 }

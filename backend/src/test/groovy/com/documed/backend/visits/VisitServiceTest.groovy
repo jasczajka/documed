@@ -2,6 +2,7 @@ package com.documed.backend.visits
 
 import com.documed.backend.auth.AuthService
 import com.documed.backend.auth.exceptions.UnauthorizedException
+import com.documed.backend.exceptions.BadRequestException
 import com.documed.backend.exceptions.NotFoundException
 import com.documed.backend.prescriptions.PrescriptionService
 import com.documed.backend.referrals.ReferralService
@@ -23,6 +24,7 @@ import spock.lang.Subject
 class VisitServiceTest extends Specification {
 
 	def visitDAO = Mock(VisitDAO)
+	def feedbackDAO = Mock(FeedbackDAO)
 	def timeSlotService = Mock(TimeSlotService)
 	def authService = Mock(AuthService)
 	def serviceService = Mock(ServiceService)
@@ -32,7 +34,7 @@ class VisitServiceTest extends Specification {
 	def referralService = Mock(ReferralService)
 
 	@Subject
-	def visitService = new VisitService(visitDAO, timeSlotService, authService, serviceService, userService, subscriptionService, prescriptionService, referralService)
+	def visitService = new VisitService(visitDAO, feedbackDAO, timeSlotService, authService, serviceService, userService, subscriptionService, prescriptionService, referralService)
 
 	private VisitWithDetails buildVisitWithDetails(Map overrides = [:]) {
 		return VisitWithDetails.builder()
@@ -586,5 +588,142 @@ class VisitServiceTest extends Specification {
 
 		then:
 		thrown(UnauthorizedException)
+	}
+
+	def "giveFeedback should create feedback for closed visit when valid"() {
+		given:
+		1 * authService.getCurrentUserId() >> 1
+		def visitId = 1
+		def feedback = Feedback.builder()
+				.rating(3)
+				.text("Good service")
+				.visitId(visitId)
+				.build()
+		def visit = buildVisit(id: visitId, status: VisitStatus.CLOSED, patientId: 1)
+
+		when:
+		visitService.giveFeedback(feedback)
+
+		then:
+		1 * visitDAO.getById(visitId) >> Optional.of(visit)
+		1 * feedbackDAO.getByVisitId(visitId) >> Optional.empty()
+		1 * feedbackDAO.create(feedback)
+	}
+
+	def "giveFeedback should throw UnathorizedException when patient not assigned to visit tries to give feedback"() {
+		given:
+		1 * authService.getCurrentUserId() >> 3
+		def visitId = 1
+		def feedback = Feedback.builder()
+				.rating(3)
+				.text("Good service")
+				.visitId(visitId)
+				.build()
+		def visit = buildVisit(id: visitId, status: VisitStatus.CLOSED, patientId: 1)
+
+		when:
+		visitService.giveFeedback(feedback)
+
+		then:
+		1 * visitDAO.getById(visitId) >> Optional.of(visit)
+		1 * feedbackDAO.getByVisitId(visitId) >> Optional.empty()
+		thrown(UnauthorizedException)
+	}
+
+	def "giveFeedback should throw NotFoundException when visit not found"() {
+		given:
+		def visitId = 99
+		def feedback = Feedback.builder()
+				.rating(5)
+				.text("Great service")
+				.visitId(visitId)
+				.build()
+
+		when:
+		visitService.giveFeedback(feedback)
+
+		then:
+		1 * visitDAO.getById(visitId) >> Optional.empty()
+		thrown(NotFoundException)
+	}
+
+	def "giveFeedback should throw BadRequestException when visit is not closed"() {
+		given:
+		def visitId = 2
+		def feedback = Feedback.builder()
+				.rating(4)
+				.text("Good service")
+				.visitId(visitId)
+				.build()
+		def visit = buildVisit(id: visitId, status: VisitStatus.IN_PROGRESS)
+
+		when:
+		visitService.giveFeedback(feedback)
+
+		then:
+		1 * visitDAO.getById(visitId) >> Optional.of(visit)
+		def e = thrown(BadRequestException)
+		e.message == "Feedback can only be given for a closed visit"
+	}
+
+	def "giveFeedback should throw BadRequestException when feedback already exists"() {
+		given:
+		def visitId = 3
+		def feedback = Feedback.builder()
+				.rating(5)
+				.text("Great service")
+				.visitId(visitId)
+				.build()
+		def visit = buildVisit(id: visitId, status: VisitStatus.CLOSED)
+		def existingFeedback = Feedback.builder()
+				.rating(4)
+				.text("Previous feedback")
+				.visitId(visitId)
+				.build()
+
+		when:
+		visitService.giveFeedback(feedback)
+
+		then:
+		1 * visitDAO.getById(visitId) >> Optional.of(visit)
+		1 * feedbackDAO.getByVisitId(visitId) >> Optional.of(existingFeedback)
+		def e = thrown(BadRequestException)
+		e.message == "Feedback has already been given for this visit"
+	}
+
+	def "giveFeedback should throw BadRequestException when rating is below 1"() {
+		given:
+		def invalidFeedback = Feedback.builder()
+				.rating(0)
+				.text("Too low rating")
+				.visitId(4)
+				.build()
+
+		when:
+		visitService.giveFeedback(invalidFeedback)
+
+		then:
+		thrown(BadRequestException)
+		0 * visitDAO.getById(_)
+		0 * feedbackDAO.getByVisitId(_)
+		0 * feedbackDAO.create(_)
+	}
+
+	def "giveFeedback should throw BadRequestException when rating is above 5"() {
+		given:
+		def invalidFeedback = Feedback.builder()
+				.rating(6)
+				.text("Too high rating")
+				.visitId(5)
+				.build()
+
+		when:
+		visitService.giveFeedback(invalidFeedback)
+
+		then:
+		thrown(BadRequestException)
+		0 * visitDAO.getById(_)
+		0 * feedbackDAO.getByVisitId(_)
+		0 * feedbackDAO.create(_)
 	}
 }

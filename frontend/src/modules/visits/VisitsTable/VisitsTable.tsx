@@ -10,12 +10,13 @@ import {
   VisitWithDetailsStatus,
 } from 'shared/api/generated/generated.schemas';
 import { appConfig } from 'shared/appConfig';
-import { ReviewModal } from 'shared/components/ReviewModal';
 import { TableFilters } from 'shared/components/TableFilters';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
+import { useNotification } from 'shared/hooks/useNotification';
 import { useSitemap } from 'shared/hooks/useSitemap';
+import { FeedbackModal } from './components/FeedbackModal';
 import { useVisitsTable } from './useVisitsTable';
 
 export type VisitsFilters = {
@@ -36,6 +37,7 @@ interface VisitTableProps {
   patientPesel?: string;
   doctorId?: number;
   loading?: boolean;
+  refetchVisits: () => Promise<void>;
 }
 
 const columns = (
@@ -43,8 +45,9 @@ const columns = (
   onNavigateToVisit: (id: number) => void,
   onNavigateToPatient: (id: number) => void,
   isPatient: boolean,
-  onAddReview?: (id: number, doctorFullName: string) => void,
-  showReviewOption?: boolean,
+  allowAddReview: boolean,
+  onViewReview?: (id: number, rating: number, message?: string) => void,
+  onAddReview?: (id: number) => void,
   loading?: boolean,
 ): GridColDef<VisitWithDetails>[] => [
   {
@@ -127,7 +130,7 @@ const columns = (
     getActions: (params: { row: VisitWithDetails }) => {
       if (params.row.status === 'CANCELLED') return [];
 
-      return [
+      const actions = [
         <GridActionsCellItem
           key={`begin-${params.row.id}`}
           label="Przejdź do wizyty"
@@ -142,17 +145,39 @@ const columns = (
           showInMenu
           sx={{ color: 'error.main' }}
         />,
-        ...(showReviewOption
-          ? [
-              <GridActionsCellItem
-                key={`review-${params.row.id}`}
-                label="Dodaj opinię"
-                onClick={() => onAddReview?.(params.row.id, params.row.doctorFullName)}
-                showInMenu
-              />,
-            ]
-          : []),
       ];
+
+      if (
+        params.row.status === VisitWithDetailsStatus.CLOSED &&
+        allowAddReview &&
+        !params.row.feedbackRating
+      ) {
+        actions.push(
+          <GridActionsCellItem
+            key={`add-review-${params.row.id}`}
+            label="Dodaj opinię"
+            onClick={() => onAddReview?.(params.row.id)}
+            showInMenu
+          />,
+        );
+      }
+      if (params.row.status === VisitWithDetailsStatus.CLOSED && params.row.feedbackRating) {
+        actions.push(
+          <GridActionsCellItem
+            key={`view-review-${params.row.id}`}
+            label="Zobacz opinię"
+            onClick={() =>
+              onViewReview?.(
+                params.row.id,
+                params.row.feedbackRating ?? 0,
+                params.row.feedbackMessage,
+              )
+            }
+            showInMenu
+          />,
+        );
+      }
+      return actions;
     },
   },
 ];
@@ -164,6 +189,7 @@ export const VisitsTable: FC<VisitTableProps> = ({
   loading,
   patientId,
   doctorId,
+  refetchVisits,
 }) => {
   const currentFacilityId = useAuthStore((state) => state.user?.facilityId);
   const [filters, setFilters] = useState<VisitsFilters>({
@@ -179,6 +205,7 @@ export const VisitsTable: FC<VisitTableProps> = ({
   const { isPatient } = useAuth();
   const navigate = useNavigate();
   const sitemap = useSitemap();
+  const { showNotification, NotificationComponent } = useNotification();
   const { visitsFilterConfig, filteredVisits } = useVisitsTable({
     visits,
     filters,
@@ -200,21 +227,40 @@ export const VisitsTable: FC<VisitTableProps> = ({
     handleFilterChange('dateTo', todayEnd);
   }, [handleFilterChange]);
 
-  const { openModal } = useModal();
+  const { openModal, closeModal } = useModal();
+  const handleViewReview = useCallback(
+    (visitId: number, rating: number, message?: string) => {
+      openModal(
+        'reviewModal',
+        <FeedbackModal
+          visitId={visitId}
+          onCancel={() => closeModal('reviewModal')}
+          existingValues={{ rating, message }}
+          disabled
+          title="Twoja opinia"
+        />,
+      );
+    },
+    [openModal, closeModal],
+  );
 
-  const handleAddReviewClick = useCallback(
-    (visitId: number, specialistFullName: string) => {
-      openModal('reviewModal', (close) => (
-        <ReviewModal
-          visitId={visitId.toString()}
-          specialistFullName={specialistFullName}
-          onConfirm={(rating, visitId, additionalInfo) => {
-            console.log('Review Submitted:', { rating, visitId, additionalInfo });
-            close();
+  const handleAddReview = useCallback(
+    (visitId: number) => {
+      openModal(
+        'reviewModal',
+        <FeedbackModal
+          visitId={visitId}
+          onCancel={() => closeModal('reviewModal')}
+          title="Wystaw opinię"
+          onSubmitSuccess={() => {
+            refetchVisits();
+            showNotification('Dziękujemy za opinię!', 'success');
           }}
-          onCancel={close}
-        />
-      ));
+          onSubmitError={() => {
+            showNotification('Coś poszło nie tak przy dodawaniu opinii...', 'error');
+          }}
+        />,
+      );
     },
     [openModal],
   );
@@ -267,8 +313,9 @@ export const VisitsTable: FC<VisitTableProps> = ({
             onNavigateToVisit,
             onNavigateToPatient,
             isPatient,
-            handleAddReviewClick,
             isPatient,
+            handleViewReview,
+            handleAddReview,
             loading,
           )}
           initialState={{
@@ -288,6 +335,7 @@ export const VisitsTable: FC<VisitTableProps> = ({
           }}
         />
       </Paper>
+      <NotificationComponent />
     </Box>
   );
 };

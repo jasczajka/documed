@@ -1,17 +1,21 @@
 package com.documed.backend.visits;
 
 import com.documed.backend.auth.annotations.StaffOnly;
+import com.documed.backend.visits.dtos.GiveFeedbackDTO;
 import com.documed.backend.visits.dtos.ScheduleVisitDTO;
 import com.documed.backend.visits.dtos.UpdateVisitDTO;
 import com.documed.backend.visits.exceptions.CancelVisitException;
+import com.documed.backend.visits.model.Feedback;
 import com.documed.backend.visits.model.Visit;
 import com.documed.backend.visits.model.VisitWithDetails;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
@@ -129,5 +133,16 @@ public class VisitController {
       @RequestParam int patientId, @RequestParam int serviceId) {
     return new ResponseEntity<>(
         visitService.calculateTotalCost(serviceId, patientId), HttpStatus.OK);
+  }
+
+  @Secured("PATIENT")
+  @PostMapping("/{id}/feedback")
+  public ResponseEntity<Void> giveFeedbackForVisit(
+      @PathVariable("id") int visitId, @RequestBody @Valid GiveFeedbackDTO dto) {
+    Feedback feedback =
+        Feedback.builder().rating(dto.getRating()).text(dto.getMessage()).visitId(visitId).build();
+
+    visitService.giveFeedback(feedback);
+    return ResponseEntity.ok().build();
   }
 }

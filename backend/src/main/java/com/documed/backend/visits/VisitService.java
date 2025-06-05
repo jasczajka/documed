@@ -2,6 +2,7 @@ package com.documed.backend.visits;
 
 import com.documed.backend.auth.AuthService;
 import com.documed.backend.auth.exceptions.UnauthorizedException;
+import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.prescriptions.PrescriptionService;
 import com.documed.backend.referrals.ReferralService;
@@ -15,6 +16,7 @@ import com.documed.backend.users.services.UserService;
 import com.documed.backend.visits.dtos.ScheduleVisitDTO;
 import com.documed.backend.visits.dtos.UpdateVisitDTO;
 import com.documed.backend.visits.exceptions.WrongVisitStatusException;
+import com.documed.backend.visits.model.Feedback;
 import com.documed.backend.visits.model.Visit;
 import com.documed.backend.visits.model.VisitStatus;
 import com.documed.backend.visits.model.VisitWithDetails;
@@ -31,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class VisitService {
 
   private final VisitDAO visitDAO;
+  private final FeedbackDAO feedbackDAO;
   private final TimeSlotService timeSlotService;
   private final AuthService authService;
   private final ServiceService serviceService;
@@ -212,5 +215,31 @@ public class VisitService {
         && prescriptionService.getNumberOfMedicinesOnPrescriptionByVisitId(visitId) == 0) {
       prescriptionService.removePrescription(prescriptionId.get());
     }
+  }
+
+  public void giveFeedback(Feedback feedback) {
+
+    if (feedback.getRating() < 1 || feedback.getRating() > 5) {
+      throw new BadRequestException("Rating must be between 1 and 5");
+    }
+
+    Visit visit =
+        visitDAO
+            .getById(feedback.getVisitId())
+            .orElseThrow(() -> new NotFoundException("Visit not found"));
+
+    if (visit.getStatus() != VisitStatus.CLOSED) {
+      throw new BadRequestException("Feedback can only be given for a closed visit");
+    }
+
+    if (feedbackDAO.getByVisitId(feedback.getVisitId()).isPresent()) {
+      throw new BadRequestException("Feedback has already been given for this visit");
+    }
+
+    if (visit.getPatientId() != authService.getCurrentUserId()) {
+      throw new UnauthorizedException("You can only give feedback for your visit");
+    }
+
+    feedbackDAO.create(feedback);
   }
 }

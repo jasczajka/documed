@@ -25,6 +25,7 @@ const VisitsPage: FC = () => {
     data: patientVisits,
     isLoading: isPatientVisitsLoading,
     isError: isPatientVisitsError,
+    refetch: refetchPatientVisits,
   } = useGetVisitsForCurrentPatient({ query: { enabled: isPatient } });
 
   const {
@@ -39,6 +40,14 @@ const VisitsPage: FC = () => {
     isLoading: isServicesLoading,
     isError: isServicesError,
   } = useGetAllServices();
+
+  const refetchVisits = async () => {
+    if (isPatient) {
+      await refetchPatientVisits();
+    } else {
+      await refetchAllVisits();
+    }
+  };
 
   const visits = isPatient ? patientVisits : allVisits;
   const isLoading = isPatientVisitsLoading || isAllVisitsLoading || isServicesLoading;
@@ -73,6 +82,7 @@ const VisitsPage: FC = () => {
           patientId={isPatient ? user.id : undefined}
           doctorId={isDoctor ? user.id : undefined}
           onCancel={handleCancelVisitClick}
+          refetchVisits={refetchVisits}
         />
       </div>
     );

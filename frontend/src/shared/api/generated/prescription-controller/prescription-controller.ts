@@ -395,10 +395,12 @@ export const useCreatePrescription = <TError = ErrorType<unknown>, TContext = un
 /**
  * @summary Issue prescription
  */
-export const issuePrescription = (prescriptionId: number) => {
+export const issuePrescription = (prescriptionId: number, issuePrescriptionBody: string) => {
   return customInstance<Prescription>({
     url: `/api/prescriptions/${prescriptionId}/issue`,
     method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    data: issuePrescriptionBody,
   });
 };
 
@@ -409,13 +411,13 @@ export const getIssuePrescriptionMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof issuePrescription>>,
     TError,
-    { prescriptionId: number },
+    { prescriptionId: number; data: string },
     TContext
   >;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof issuePrescription>>,
   TError,
-  { prescriptionId: number },
+  { prescriptionId: number; data: string },
   TContext
 > => {
   const mutationKey = ['issuePrescription'];
@@ -427,11 +429,11 @@ export const getIssuePrescriptionMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof issuePrescription>>,
-    { prescriptionId: number }
+    { prescriptionId: number; data: string }
   > = (props) => {
-    const { prescriptionId } = props ?? {};
+    const { prescriptionId, data } = props ?? {};
 
-    return issuePrescription(prescriptionId);
+    return issuePrescription(prescriptionId, data);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -440,7 +442,7 @@ export const getIssuePrescriptionMutationOptions = <
 export type IssuePrescriptionMutationResult = NonNullable<
   Awaited<ReturnType<typeof issuePrescription>>
 >;
-
+export type IssuePrescriptionMutationBody = string;
 export type IssuePrescriptionMutationError = ErrorType<unknown>;
 
 /**
@@ -451,7 +453,7 @@ export const useIssuePrescription = <TError = ErrorType<unknown>, TContext = unk
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof issuePrescription>>,
       TError,
-      { prescriptionId: number },
+      { prescriptionId: number; data: string },
       TContext
     >;
   },
@@ -459,7 +461,7 @@ export const useIssuePrescription = <TError = ErrorType<unknown>, TContext = unk
 ): UseMutationResult<
   Awaited<ReturnType<typeof issuePrescription>>,
   TError,
-  { prescriptionId: number },
+  { prescriptionId: number; data: string },
   TContext
 > => {
   const mutationOptions = getIssuePrescriptionMutationOptions(options);

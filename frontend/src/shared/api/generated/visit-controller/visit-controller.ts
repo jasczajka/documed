@@ -22,6 +22,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import type {
   CalculateVisitCostParams,
+  GiveFeedbackDTO,
   ScheduleVisitDTO,
   UpdateVisitDTO,
   VisitWithDetails,
@@ -203,6 +204,81 @@ export const useScheduleVisit = <TError = ErrorType<unknown>, TContext = unknown
   TContext
 > => {
   const mutationOptions = getScheduleVisitMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+export const giveFeedbackForVisit = (
+  id: number,
+  giveFeedbackDTO: GiveFeedbackDTO,
+  signal?: AbortSignal,
+) => {
+  return customInstance<void>({
+    url: `/api/visits/${id}/feedback`,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: giveFeedbackDTO,
+    signal,
+  });
+};
+
+export const getGiveFeedbackForVisitMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof giveFeedbackForVisit>>,
+    TError,
+    { id: number; data: GiveFeedbackDTO },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof giveFeedbackForVisit>>,
+  TError,
+  { id: number; data: GiveFeedbackDTO },
+  TContext
+> => {
+  const mutationKey = ['giveFeedbackForVisit'];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof giveFeedbackForVisit>>,
+    { id: number; data: GiveFeedbackDTO }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return giveFeedbackForVisit(id, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GiveFeedbackForVisitMutationResult = NonNullable<
+  Awaited<ReturnType<typeof giveFeedbackForVisit>>
+>;
+export type GiveFeedbackForVisitMutationBody = GiveFeedbackDTO;
+export type GiveFeedbackForVisitMutationError = ErrorType<unknown>;
+
+export const useGiveFeedbackForVisit = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof giveFeedbackForVisit>>,
+      TError,
+      { id: number; data: GiveFeedbackDTO },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof giveFeedbackForVisit>>,
+  TError,
+  { id: number; data: GiveFeedbackDTO },
+  TContext
+> => {
+  const mutationOptions = getGiveFeedbackForVisitMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

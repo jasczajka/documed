@@ -109,6 +109,9 @@ export const PatientTabs: FC<PatientTabsProps> = ({
             allServices={allServices}
             onCancel={handleCancelVisitClick}
             loading={isCancelVisitLoading}
+            refetchVisits={async () => {
+              await refetchVisits();
+            }}
           />
         )}
         {tabIndex === 2 && (
