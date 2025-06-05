@@ -51,7 +51,7 @@ public class UserDAO implements FullDAO<User, User> {
 
   @Override
   public Optional<User> getById(int id) {
-    String sql = "SELECT * FROM \"User\" WHERE id = ?";
+    String sql = "SELECT * FROM \"User\" WHERE id = ? AND account_status != 'DEACTIVATED'";
     try {
       return Optional.of(jdbcTemplate.queryForObject(sql, userRowMapper, id));
     } catch (EmptyResultDataAccessException e) {
@@ -61,7 +61,7 @@ public class UserDAO implements FullDAO<User, User> {
 
   @Override
   public List<User> getAll() {
-    String sql = "SELECT * FROM \"User\"";
+    String sql = "SELECT * FROM \"User\" WHERE account_status != 'DEACTIVATED'";
     return jdbcTemplate.query(sql, userRowMapper);
   }
 
@@ -131,7 +131,7 @@ public class UserDAO implements FullDAO<User, User> {
   }
 
   public Optional<User> getByEmail(String email) {
-    String sql = "SELECT * FROM \"User\" WHERE email = ?";
+    String sql = "SELECT * FROM \"User\" WHERE email = ? AND account_status != 'DEACTIVATED'";
     try {
       return Optional.of(jdbcTemplate.queryForObject(sql, userRowMapper, email));
     } catch (EmptyResultDataAccessException e) {
@@ -140,7 +140,7 @@ public class UserDAO implements FullDAO<User, User> {
   }
 
   public Optional<User> getByPesel(String pesel) {
-    String sql = "SELECT * FROM \"User\" WHERE pesel = ?";
+    String sql = "SELECT * FROM \"User\" WHERE pesel = ? AND account_status != 'DEACTIVATED'";
     try {
       return Optional.of(jdbcTemplate.queryForObject(sql, userRowMapper, pesel));
     } catch (EmptyResultDataAccessException e) {
@@ -149,7 +149,7 @@ public class UserDAO implements FullDAO<User, User> {
   }
 
   public List<User> getAllByRole(UserRole role) {
-    String sql = "SELECT * FROM \"User\" WHERE role = ?";
+    String sql = "SELECT * FROM \"User\" WHERE role = ? AND account_status != 'DEACTIVATED'";
     return jdbcTemplate.query(sql, userRowMapper, role.toString());
   }
 
@@ -270,7 +270,8 @@ public class UserDAO implements FullDAO<User, User> {
   }
 
   public void updatePasswordByEmail(String email, String encodedPassword) {
-    String sql = "UPDATE \"User\" SET password = ? WHERE email = ?";
+    String sql =
+        "UPDATE \"User\" SET password = ? WHERE email = ? AND account_status != 'DEACTIVATED'";
     int rowsAffected = jdbcTemplate.update(sql, encodedPassword, email);
 
     if (rowsAffected == 0) {
@@ -288,7 +289,8 @@ public class UserDAO implements FullDAO<User, User> {
   }
 
   public void toggleEmailNotificationsById(int userId) {
-    String sql = "UPDATE \"User\" SET email_notifications = NOT email_notifications WHERE id = ?";
+    String sql =
+        "UPDATE \"User\" SET email_notifications = NOT email_notifications WHERE id = ? AND account_status != 'DEACTIVATED'";
     int rowsAffected = jdbcTemplate.update(sql, userId);
 
     if (rowsAffected == 0) {
