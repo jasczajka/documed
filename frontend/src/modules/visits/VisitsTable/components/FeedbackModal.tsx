@@ -14,7 +14,6 @@ import { FC, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useGiveFeedbackForVisit } from 'shared/api/generated/visit-controller/visit-controller';
 import { appConfig } from 'shared/appConfig';
-import { useNotification } from 'shared/hooks/useNotification';
 import * as Yup from 'yup';
 
 interface FormData {
@@ -38,6 +37,7 @@ interface FeedbackModalProps {
   visitId: number;
   onCancel: () => void;
   onSubmitSuccess?: () => void;
+  onSubmitError?: () => void;
   disabled?: boolean;
   existingValues?: {
     rating: number;
@@ -50,10 +50,10 @@ export const FeedbackModal: FC<FeedbackModalProps> = ({
   visitId,
   onCancel,
   onSubmitSuccess,
+  onSubmitError,
   disabled = false,
   existingValues,
 }) => {
-  const { showNotification, NotificationComponent } = useNotification();
   const {
     control,
     handleSubmit,
@@ -81,8 +81,8 @@ export const FeedbackModal: FC<FeedbackModalProps> = ({
   };
 
   useEffect(() => {
-    if (isError) {
-      showNotification('Coś poszło nie tak przy wystawianiu opinii', 'error');
+    if (isError && onSubmitError) {
+      onSubmitError();
     }
   }, [isError]);
 
@@ -167,7 +167,6 @@ export const FeedbackModal: FC<FeedbackModalProps> = ({
           </Button>
         </DialogActions>
       )}
-      <NotificationComponent />
     </Dialog>
   );
 };

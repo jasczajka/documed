@@ -217,7 +217,6 @@ public class VisitService {
     }
   }
 
-  @Transactional
   public void giveFeedback(Feedback feedback) {
 
     if (feedback.getRating() < 1 || feedback.getRating() > 5) {

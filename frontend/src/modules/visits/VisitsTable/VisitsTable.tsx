@@ -14,6 +14,7 @@ import { TableFilters } from 'shared/components/TableFilters';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
+import { useNotification } from 'shared/hooks/useNotification';
 import { useSitemap } from 'shared/hooks/useSitemap';
 import { FeedbackModal } from './components/FeedbackModal';
 import { useVisitsTable } from './useVisitsTable';
@@ -204,6 +205,7 @@ export const VisitsTable: FC<VisitTableProps> = ({
   const { isPatient } = useAuth();
   const navigate = useNavigate();
   const sitemap = useSitemap();
+  const { showNotification, NotificationComponent } = useNotification();
   const { visitsFilterConfig, filteredVisits } = useVisitsTable({
     visits,
     filters,
@@ -252,6 +254,10 @@ export const VisitsTable: FC<VisitTableProps> = ({
           title="Wystaw opinię"
           onSubmitSuccess={() => {
             refetchVisits();
+            showNotification('Dziękujemy za opinię!', 'success');
+          }}
+          onSubmitError={() => {
+            showNotification('Coś poszło nie tak przy dodawaniu opinii...', 'error');
           }}
         />,
       );
@@ -329,6 +335,7 @@ export const VisitsTable: FC<VisitTableProps> = ({
           }}
         />
       </Paper>
+      <NotificationComponent />
     </Box>
   );
 };
