@@ -11,8 +11,8 @@ import com.documed.backend.schedules.TimeSlotService
 import com.documed.backend.schedules.model.TimeSlot
 import com.documed.backend.services.ServiceService
 import com.documed.backend.users.model.AccountStatus
-import com.documed.backend.users.model.UserRole
 import com.documed.backend.users.model.User
+import com.documed.backend.users.model.UserRole
 import com.documed.backend.users.services.SubscriptionService
 import com.documed.backend.users.services.UserService
 import com.documed.backend.visits.dtos.ScheduleVisitDTO
