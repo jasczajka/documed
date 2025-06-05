@@ -234,7 +234,7 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
                f.rating AS feedback_rating,
                f.text AS feedback_message
            FROM visit v
-           JOIN "User" p ON v.patient_id = p.id
+           JOIN "User" p ON a.patient_id = p.id AND p.account_status != 'DEACTIVATED'
            JOIN "User" d ON v.doctor_id = d.id
            JOIN service s ON v.service_id = s.id
            LEFT JOIN feedback f ON f.visit_id = v.id
