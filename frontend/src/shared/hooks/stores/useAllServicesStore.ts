@@ -7,13 +7,9 @@ interface AllServicesStoreType {
   fetchAllServices: () => Promise<void>;
 }
 
-export const useAllServicesStore = create<AllServicesStoreType>((set, get) => ({
+export const useAllServicesStore = create<AllServicesStoreType>((set) => ({
   allServices: [],
   fetchAllServices: async () => {
-    const { allServices } = get();
-    if (allServices.length > 0) {
-      return;
-    }
     const fetchedAllServices = await getAllServices();
     set({ allServices: fetchedAllServices });
   },

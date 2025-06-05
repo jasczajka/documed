@@ -4,8 +4,8 @@ import { FC } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { ServiceType } from 'shared/api/generated/generated.schemas';
 import { useCreateService } from 'shared/api/generated/service-controller/service-controller';
-import { useGetAllSpecializations } from 'shared/api/generated/specialization-controller/specialization-controller';
 import { SpecializationSelect } from 'shared/components/SpecializationSelect';
+import { useSpecializationsStore } from 'shared/hooks/stores/useSpecializationsStore';
 import { useNotification } from 'shared/hooks/useNotification';
 import { mapApiError } from 'shared/utils/mapApiError';
 import * as Yup from 'yup';
@@ -34,8 +34,7 @@ const validationSchema = Yup.object({
 });
 
 export const AddServiceTab: FC = () => {
-  const { data: specializations } = useGetAllSpecializations();
-
+  const specializations = useSpecializationsStore((state) => state.specializations);
   const { showNotification, NotificationComponent } = useNotification();
 
   const methods = useForm({

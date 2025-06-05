@@ -7,13 +7,9 @@ interface FacilityStoreType {
   fetchFacilities: () => Promise<void>;
 }
 
-export const useFacilityStore = create<FacilityStoreType>((set, get) => ({
+export const useFacilityStore = create<FacilityStoreType>((set) => ({
   facilities: [],
   fetchFacilities: async () => {
-    const { facilities } = get();
-    if (facilities.length > 0) {
-      return;
-    }
     const fetchedFacilities = await getAllFacilities();
     set({ facilities: fetchedFacilities });
   },

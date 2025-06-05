@@ -8,18 +8,21 @@ import {
   useUpdateDoctorSpecializations,
 } from 'shared/api/generated/doctors-controller/doctors-controller';
 import { Specialization, UploadWorkTimeDTO } from 'shared/api/generated/generated.schemas';
-import { useGetAllSpecializations } from 'shared/api/generated/specialization-controller/specialization-controller';
 
 import {
   useGetWorkTimesForUser,
   useUpdateWorkTimesForUser,
 } from 'shared/api/generated/work-time-controller/work-time-controller';
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
+import { useDoctorsStore } from 'shared/hooks/stores/useDoctorsStore';
+import { useSpecializationsStore } from 'shared/hooks/stores/useSpecializationsStore';
 import { useNotification } from 'shared/hooks/useNotification';
 
 const SingleSpecialistPage: FC = () => {
   const { id } = useParams();
   const doctorId = Number(id);
+  const allSpecializations = useSpecializationsStore((state) => state.specializations);
+  const refetchDoctors = useDoctorsStore((state) => state.fetchDoctors);
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
   const [tabIndex, setTabIndex] = useState(0);
   const { showNotification, NotificationComponent } = useNotification();
@@ -27,12 +30,6 @@ const SingleSpecialistPage: FC = () => {
   const onTabChange = useCallback((index: number) => {
     setTabIndex(index);
   }, []);
-
-  const {
-    data: allSpecializations,
-    isLoading: isSpecializationsLoading,
-    isError: isSpecializationsError,
-  } = useGetAllSpecializations();
 
   const {
     data: doctorInfo,
@@ -64,6 +61,7 @@ const SingleSpecialistPage: FC = () => {
   ) => {
     const specializationIds = updatedSpecializations.map((spec) => spec.id);
     await updateDoctorSpecializations({ id: doctorId, data: { specializationIds } });
+    await refetchDoctors();
     showNotification('Pomyślnie zaktualizowano specjalizacje!', 'success');
     setSpecializations(updatedSpecializations);
   };
@@ -75,15 +73,13 @@ const SingleSpecialistPage: FC = () => {
     showNotification('Pomyślnie zaktualizowano godziny pracy!', 'success');
   };
 
-  const isInitialLoading =
-    isSpecializationsLoading || isDoctorInfoLoading || isDoctorWorkTimesLoading;
+  const isInitialLoading = isDoctorInfoLoading || isDoctorWorkTimesLoading;
   const isLoading =
-    isSpecializationsLoading ||
     isDoctorInfoLoading ||
     isDoctorWorkTimesLoading ||
     isUpdateDoctorSpecializationsLoading ||
     isUpdateDoctorWorkTimesLoading;
-  const isInitialError = isSpecializationsError || isDoctorInfoError || isDoctorWorkTimesError;
+  const isInitialError = isDoctorInfoError || isDoctorWorkTimesError;
 
   useEffect(() => {
     if (isInitialError) {

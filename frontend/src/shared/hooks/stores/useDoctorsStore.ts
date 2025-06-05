@@ -7,13 +7,9 @@ interface DoctorsStoreType {
   fetchDoctors: () => Promise<void>;
 }
 
-export const useDoctorsStore = create<DoctorsStoreType>((set, get) => ({
+export const useDoctorsStore = create<DoctorsStoreType>((set) => ({
   doctors: [],
   fetchDoctors: async () => {
-    const { doctors } = get();
-    if (doctors.length > 0) {
-      return;
-    }
     const fetchedDoctors = await getAllDoctors();
     set({ doctors: fetchedDoctors });
   },

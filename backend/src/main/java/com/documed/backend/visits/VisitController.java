@@ -49,7 +49,7 @@ public class VisitController {
     return new ResponseEntity<>(visitService.getByIdWithDetails(visit.getId()), HttpStatus.CREATED);
   }
 
-  @StaffOnly
+  @Secured("DOCTOR")
   @PatchMapping("/{id}/start")
   @Operation(summary = "start visit")
   public ResponseEntity<Void> startVisit(@PathVariable("id") int id) {

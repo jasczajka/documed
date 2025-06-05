@@ -36,7 +36,7 @@ const columns = (
   },
   {
     field: 'patientName',
-    headerName: 'Pacjent',
+    headerName: 'Imię i nazwisko',
     minWidth: 200,
     flex: 1,
     renderCell: ({ row }) => (

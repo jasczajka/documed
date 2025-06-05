@@ -8,6 +8,7 @@ import { useAllServicesStore } from 'shared/hooks/stores/useAllServicesStore';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { useDoctorsStore } from 'shared/hooks/stores/useDoctorsStore';
 import { useFacilityStore } from 'shared/hooks/stores/useFacilityStore';
+import { useSpecializationsStore } from 'shared/hooks/stores/useSpecializationsStore';
 import { useSubscriptionStore } from 'shared/hooks/stores/useSubscriptionStore';
 import { useAuth } from 'shared/hooks/useAuth';
 
@@ -132,6 +133,7 @@ export const AppRouter = () => {
   const fetchSubscriptions = useSubscriptionStore((state) => state.fetchSubscriptions);
   const fetchDoctors = useDoctorsStore((state) => state.fetchDoctors);
   const fetchAllServices = useAllServicesStore((state) => state.fetchAllServices);
+  const fetchSpecializations = useSpecializationsStore((state) => state.fetchSpecializations);
   const [authChecked, setAuthChecked] = useState(false);
   const router = useMemo(() => {
     const routes = authenticated
@@ -148,6 +150,7 @@ export const AppRouter = () => {
           fetchSubscriptions(),
           fetchDoctors(),
           fetchAllServices(),
+          fetchSpecializations(),
           verifyAuthentication(),
         ]);
         setAuthChecked(true);

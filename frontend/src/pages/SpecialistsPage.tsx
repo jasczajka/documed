@@ -1,8 +1,14 @@
-import { Typography } from '@mui/material';
+import { CardHeader } from '@mui/material';
+import SpecialistsTable from 'modules/specialists/SpecialistsTable/SpecialistsTable';
 import { FC } from 'react';
 
 const SpecialistsPage: FC = () => {
-  return <Typography>Specjaliści</Typography>;
+  return (
+    <div className="flex flex-col">
+      <CardHeader title={'Specjaliści'} />
+      <SpecialistsTable />
+    </div>
+  );
 };
 
 export default SpecialistsPage;

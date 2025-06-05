@@ -11,6 +11,7 @@ import com.documed.backend.referrals.model.Referral;
 import com.documed.backend.referrals.model.ReferralMapper;
 import com.documed.backend.referrals.model.ReferralType;
 import com.documed.backend.users.model.UserRole;
+import com.documed.backend.visits.VisitService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.util.Arrays;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 public class ReferralController {
 
   private final ReferralService referralService;
+  private final VisitService visitService;
   private final AuthService authService;
 
   @StaffOnly
@@ -65,11 +67,20 @@ public class ReferralController {
     return new ResponseEntity<>(dtos, HttpStatus.OK);
   }
 
-  @StaffOnlyOrSelf
   @GetMapping("/visit/{visitId}")
   @Operation(summary = "Get all referrals for visit")
   public ResponseEntity<List<ReturnReferralDTO>> getAllReferralsForVisit(
       @PathVariable int visitId) {
+
+    int userId = authService.getCurrentUserId();
+
+    int visitPatientId = visitService.getById(visitId).getPatientId();
+    UserRole userRole = authService.getCurrentUserRole();
+
+    if (userRole.equals(UserRole.PATIENT) && userId != visitPatientId) {
+      throw new UnauthorizedException("Requesting patient id and visit id do not match");
+    }
+
     List<Referral> referrals = referralService.getReferralsForVisit(visitId);
     List<ReturnReferralDTO> dtos = referrals.stream().map(ReferralMapper::toDTO).toList();
     return new ResponseEntity<>(dtos, HttpStatus.OK);
@@ -83,7 +94,6 @@ public class ReferralController {
     return new ResponseEntity<>(result, HttpStatus.OK);
   }
 
-  @StaffOnly
   @GetMapping("/types")
   @Operation(summary = "Get all referral types")
   public ResponseEntity<List<ReferralTypeDTO>> getAllReferralTypes() {

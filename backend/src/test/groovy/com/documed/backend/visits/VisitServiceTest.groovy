@@ -105,8 +105,11 @@ class VisitServiceTest extends Specification {
 	def "startVisit should update status when planned"() {
 		given:
 		def id = 5
+		def visit = buildVisit([id: id, status: VisitStatus.PLANNED, doctorId: 123])
 		visitDAO.getVisitStatus(id) >> VisitStatus.PLANNED
+		visitDAO.getById(id) >> Optional.of(visit)
 		visitDAO.updateVisitStatus(id, VisitStatus.IN_PROGRESS) >> true
+		authService.getCurrentUserId() >> 123
 
 		when:
 		def result = visitService.startVisit(id)
@@ -117,13 +120,32 @@ class VisitServiceTest extends Specification {
 
 	def "startVisit should throw WrongVisitStatusException when status is not planned"() {
 		given:
-		visitDAO.getVisitStatus(7) >> VisitStatus.CLOSED
+		def id = 7
+		def visit = buildVisit([id: id, status: VisitStatus.CLOSED, doctorId: 123])
+		visitDAO.getVisitStatus(id) >> VisitStatus.CLOSED
+		visitDAO.getById(id) >> Optional.of(visit)
+		authService.getCurrentUserId() >> 123
 
 		when:
-		visitService.startVisit(7)
+		visitService.startVisit(id)
 
 		then:
 		thrown(WrongVisitStatusException)
+	}
+
+	def "startVisit should throw UnauthorizedException when current user is not the doctor"() {
+		given:
+		def id = 10
+		def visit = buildVisit([id: id, status: VisitStatus.PLANNED, doctorId: 999])
+		visitDAO.getVisitStatus(id) >> VisitStatus.PLANNED
+		visitDAO.getById(id) >> Optional.of(visit)
+		authService.getCurrentUserId() >> 123 // different than 999
+
+		when:
+		visitService.startVisit(id)
+
+		then:
+		thrown(UnauthorizedException)
 	}
 
 	def "closeVisit should update and close when in progress"() {
