@@ -148,7 +148,7 @@ export const SpecialistsTable = () => {
   const sitemap = useSitemap();
   const { showNotification, NotificationComponent } = useNotification();
   const { openModal } = useModal();
-  const { isPatient } = useAuth();
+  const { isPatient, isWardClerk } = useAuth();
   const userId = useAuthStore((state) => state.user!.id);
 
   const specialists = useDoctorsStore((state) => state.doctors);
@@ -215,7 +215,7 @@ export const SpecialistsTable = () => {
           rows={filteredSpecialists}
           columns={columns(
             onNavigateToSpecialist,
-            isPatient
+            isPatient || isWardClerk
               ? (specialistId: number) => handleScheduleVisitClick(specialistId)
               : undefined,
           )}
