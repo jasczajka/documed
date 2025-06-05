@@ -12,18 +12,16 @@ import {
 } from '@mui/material';
 import { FC, useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import {
-  DoctorDetailsDTO,
-  ScheduleVisitDTO,
-  Service,
-} from 'shared/api/generated/generated.schemas';
+import { ScheduleVisitDTO } from 'shared/api/generated/generated.schemas';
 import { useGetAvailableFirstTimeSlotsByDoctorAndFacility } from 'shared/api/generated/time-slot-controller/time-slot-controller';
 import {
   useCalculateVisitCost,
   useScheduleVisit,
 } from 'shared/api/generated/visit-controller/visit-controller';
 import { appConfig } from 'shared/appConfig';
+import { useAllServicesStore } from 'shared/hooks/stores/useAllServicesStore';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
+import { useDoctorsStore } from 'shared/hooks/stores/useDoctorsStore';
 import { useFacilityStore } from 'shared/hooks/stores/useFacilityStore';
 import { useNotification } from 'shared/hooks/useNotification';
 import * as Yup from 'yup';
@@ -45,8 +43,6 @@ interface ScheduleVisitModalProps {
   patientId: number;
   patientFullName: string;
   patientAge: number | null;
-  allDoctors: DoctorDetailsDTO[];
-  allServices: Service[];
   confirmText?: string;
   cancelText?: string;
   onConfirm: () => Promise<void>;
@@ -70,8 +66,6 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
   patientId,
   patientFullName,
   patientAge,
-  allDoctors,
-  allServices,
   confirmText = 'Potwierdź',
   cancelText = 'Anuluj',
   onConfirm,
@@ -80,6 +74,8 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
 }) => {
   const currentFacilityId = useAuthStore((state) => state.user?.facilityId);
   const allFacilities = useFacilityStore((state) => state.facilities);
+  const allDoctors = useDoctorsStore((state) => state.doctors);
+  const allServices = useAllServicesStore((state) => state.allServices);
   const {
     control,
     handleSubmit,

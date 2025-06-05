@@ -4,14 +4,13 @@ import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 import { useGetAdditionalServicesByPatient } from 'shared/api/generated/additional-service-controller/additional-service-controller';
 import { useGetFilesForPatient } from 'shared/api/generated/attachment-controller/attachment-controller';
-import { useGetAllDoctors } from 'shared/api/generated/doctors-controller/doctors-controller';
 import { ServiceType } from 'shared/api/generated/generated.schemas';
 import { useGetPatientDetails } from 'shared/api/generated/patients-controller/patients-controller';
-import { useGetAllServices } from 'shared/api/generated/service-controller/service-controller';
 import { useGetVisitsByPatientId } from 'shared/api/generated/visit-controller/visit-controller';
 import { AdditionalServiceModal } from 'shared/components/AdditionalServiceModal';
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { ScheduleVisitModal } from 'shared/components/ScheduleVisitModal/ScheduleVisitModal';
+import { useAllServicesStore } from 'shared/hooks/stores/useAllServicesStore';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
@@ -21,6 +20,11 @@ const SinglePatientPage: FC = () => {
   const { id } = useParams();
   const patientId = Number(id);
   const fulfillerId = useAuthStore((state) => state.user?.id);
+  const allServices = useAllServicesStore((state) => state.allServices);
+
+  const allAdditionalServices = allServices.filter(
+    (service) => service.type === ServiceType.ADDITIONAL_SERVICE,
+  );
 
   const [tabIndex, setTabIndex] = useState(0);
 
@@ -30,18 +34,6 @@ const SinglePatientPage: FC = () => {
 
   const { openModal } = useModal();
   const { showNotification, NotificationComponent } = useNotification();
-
-  const {
-    data: allServices,
-    isLoading: isServicesLoading,
-    isError: isServicesError,
-  } = useGetAllServices();
-
-  const {
-    data: allDoctors,
-    isLoading: isDoctorsLoading,
-    isError: isDoctorsError,
-  } = useGetAllDoctors();
 
   const {
     data: patientInfo,
@@ -72,31 +64,20 @@ const SinglePatientPage: FC = () => {
   } = useGetAdditionalServicesByPatient(patientId);
 
   const isInitialLoading =
-    isServicesLoading ||
     isPatientInfoLoading ||
     isPatientAttachmentsLoading ||
     isPatientVisitsLoading ||
-    isDoctorsLoading ||
     isPatientAdditionalServicesLoading;
   const isInitialError =
-    isServicesError ||
     isPatientInfoError ||
     isPatientAttachmentsError ||
     isPatientVisitsError ||
-    isDoctorsError ||
     isPatientAdditionalServicesError;
 
   const patientFullName = useMemo(
     () => `${patientInfo?.firstName} ${patientInfo?.lastName}`,
     [patientInfo],
   );
-
-  const allAdditionalServices = useMemo(() => {
-    if (!allServices) {
-      return [];
-    }
-    return allServices.filter((service) => service.type === ServiceType.ADDITIONAL_SERVICE);
-  }, [allServices]);
 
   const handleAdditionalServiceClick = useCallback(async () => {
     if (fulfillerId !== undefined && patientId !== undefined && allServices !== undefined) {
@@ -133,34 +114,22 @@ const SinglePatientPage: FC = () => {
   ]);
 
   const handleScheduleVisitClick = useCallback(async () => {
-    if (allDoctors !== undefined && allServices !== undefined) {
-      openModal('scheduleVisitModal', (close) => (
-        <ScheduleVisitModal
-          allDoctors={allDoctors}
-          allServices={allServices}
-          patientId={patientId}
-          patientFullName={patientFullName}
-          patientAge={
-            patientInfo?.birthdate ? getAgeFromBirthDate(new Date(patientInfo.birthdate)) : null
-          }
-          onConfirm={async () => {
-            await refetchPatientVisits();
-            close();
-            showNotification('Umówiono wizytę', 'success');
-          }}
-          onCancel={close}
-        />
-      ));
-    }
-  }, [
-    openModal,
-    allDoctors,
-    allServices,
-    patientId,
-    patientInfo,
-    patientFullName,
-    refetchPatientVisits,
-  ]);
+    openModal('scheduleVisitModal', (close) => (
+      <ScheduleVisitModal
+        patientId={patientId}
+        patientFullName={patientFullName}
+        patientAge={
+          patientInfo?.birthdate ? getAgeFromBirthDate(new Date(patientInfo.birthdate)) : null
+        }
+        onConfirm={async () => {
+          await refetchPatientVisits();
+          close();
+          showNotification('Umówiono wizytę', 'success');
+        }}
+        onCancel={close}
+      />
+    ));
+  }, [openModal, patientId, patientInfo, patientFullName, refetchPatientVisits]);
 
   useEffect(() => {
     if (isInitialError) {

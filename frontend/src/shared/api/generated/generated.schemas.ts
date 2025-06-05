@@ -447,7 +447,7 @@ export interface PatientDetailsDTO {
   firstName: string;
   lastName: string;
   email: string;
-  pesel: string;
+  pesel?: string;
   birthdate: string;
   subscriptionId?: number;
 }
