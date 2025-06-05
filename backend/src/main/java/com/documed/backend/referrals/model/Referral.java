@@ -14,4 +14,5 @@ public class Referral {
   private final int visitId;
   private LocalDate expirationDate;
   private ReferralStatus status;
+  @NonNull private String issuingDoctorFullName;
 }

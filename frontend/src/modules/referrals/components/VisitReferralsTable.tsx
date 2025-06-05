@@ -2,21 +2,16 @@ import { Delete } from '@mui/icons-material';
 import { Box, Button, IconButton, Paper, Typography } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { FC, useEffect, useMemo, useState } from 'react';
-import {
-  CreateReferralDTO,
-  ReferralType,
-  ReferralTypeDTO,
-  ReturnReferralDTO,
-} from 'shared/api/generated/generated.schemas';
+import { CreateReferralDTO, ReturnReferralDTO } from 'shared/api/generated/generated.schemas';
+import { useReferralTypesStore } from 'shared/hooks/stores/useReferralTypesStore';
 import { useModal } from 'shared/hooks/useModal';
-import { AddReferralToVisitModal } from './AddReferralToVisitModal';
+import { ReferralModal } from './ReferralModal/ReferralModal';
 
 export type ReferralWithTempId = (ReturnReferralDTO | CreateReferralDTO) & {
   tempId?: string;
   id?: number;
 };
 interface VisitReferralsTableProps {
-  referralTypes: ReferralTypeDTO[];
   visitId: number;
   existingReferrals?: ReturnReferralDTO[];
   onRemoveReferral: (referralId: number) => void;
@@ -26,7 +21,6 @@ interface VisitReferralsTableProps {
 }
 
 export const VisitReferralsTable: FC<VisitReferralsTableProps> = ({
-  referralTypes,
   visitId,
   existingReferrals = [],
   onRemoveReferral,
@@ -35,24 +29,14 @@ export const VisitReferralsTable: FC<VisitReferralsTableProps> = ({
   disabled = false,
 }) => {
   const [referrals, setReferrals] = useState<ReferralWithTempId[]>(existingReferrals);
+  const referralTypeMap = useReferralTypesStore((state) => state.referralTypeMap);
 
   console.log('referrals: ', referrals);
   const { openModal } = useModal();
 
-  const referralTypeMap = useMemo(() => {
-    const map = new Map<ReferralType, string>();
-    referralTypes.forEach((type) => {
-      if (type.code) {
-        map.set(type.code, type.description || type.code.toString());
-      }
-    });
-    return map;
-  }, [referralTypes]);
-
   const handleAddReferralClick = () => {
     openModal('addReferralModal', (close) => (
-      <AddReferralToVisitModal
-        referralTypes={referralTypes}
+      <ReferralModal
         onSubmit={(data) => {
           const tempId = `temp-${Date.now()}`;
           const newReferral: ReferralWithTempId = {

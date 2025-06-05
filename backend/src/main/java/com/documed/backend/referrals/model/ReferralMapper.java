@@ -12,6 +12,7 @@ public class ReferralMapper {
         .visitId(referral.getVisitId())
         .expirationDate(referral.getExpirationDate())
         .status(referral.getStatus())
+        .issuingDoctorFullName(referral.getIssuingDoctorFullName())
         .build();
   }
 }

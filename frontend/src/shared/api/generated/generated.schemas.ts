@@ -186,6 +186,7 @@ export const ReturnReferralDTOStatus = {
 
 export interface ReturnReferralDTO {
   id: number;
+  issuingDoctorFullName: string;
   diagnosis: string;
   type: ReferralType;
   visitId: number;
@@ -218,6 +219,7 @@ export interface Prescription {
   date: string;
   expirationDate: string;
   status: PrescriptionStatus;
+  issuingDoctorFullName: string;
 }
 
 export interface ResetPasswordConfirmDTO {

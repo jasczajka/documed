@@ -34,6 +34,8 @@ public class ReferralDAO implements FullDAO<Referral, CreateReferralDTO> {
               .expirationDate(rs.getDate("expiration_date").toLocalDate())
               .visitId(rs.getInt("visit_id"))
               .status(ReferralStatus.valueOf(rs.getString("status")))
+              .issuingDoctorFullName(
+                  rs.getString("doctor_first_name") + " " + rs.getString("doctor_last_name"))
               .build();
 
   @Override
@@ -82,43 +84,63 @@ public class ReferralDAO implements FullDAO<Referral, CreateReferralDTO> {
 
   @Override
   public Optional<Referral> getById(int id) {
-    String sql = "SELECT * FROM referral WHERE id = ?";
+    String sql =
+        """
+            SELECT r.*, d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
+            FROM referral r
+            JOIN visit v ON r.visit_id = v.id
+            JOIN "User" d ON v.doctor_id = d.id
+            WHERE r.id = ?
+            """;
     List<Referral> referrals = jdbcTemplate.query(sql, rowMapper, id);
     return referrals.stream().findFirst();
   }
 
   @Override
   public List<Referral> getAll() {
-    String sql = "SELECT * FROM referral";
+    String sql =
+        """
+            SELECT r.*, d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
+            FROM referral r
+            JOIN visit v ON r.visit_id = v.id
+            JOIN "User" d ON v.doctor_id = d.id
+            """;
     return jdbcTemplate.query(sql, rowMapper);
   }
 
   public List<Referral> getReferralsForVisit(int visitId) {
-    String sql = "SELECT * FROM referral WHERE visit_id = ?";
+    String sql =
+        """
+            SELECT r.*, d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
+            FROM referral r
+            JOIN visit v ON r.visit_id = v.id
+            JOIN "User" d ON v.doctor_id = d.id
+            WHERE r.visit_id = ?
+            """;
     return jdbcTemplate.query(sql, rowMapper, visitId);
   }
 
   public List<Referral> getReferralsForPatient(int patientId) {
     String sql =
         """
-            SELECT * FROM referral
-            JOIN visit ON referral.visit_id = visit.id
-            WHERE visit.patient_id = ?;
-        """;
+            SELECT r.*, d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
+            FROM referral r
+            JOIN visit v ON r.visit_id = v.id
+            JOIN "User" d ON v.doctor_id = d.id
+            WHERE v.patient_id = ?
+            """;
     return jdbcTemplate.query(sql, rowMapper, patientId);
   }
 
   public Integer getUserIdForReferralById(int id) {
     String sql =
         """
-                SELECT v.patient_id
-                      FROM referral r
-                      JOIN visit v on r.visit_id = v.id
-                      WHERE r.id = ?
-                """;
-
+            SELECT v.patient_id
+            FROM referral r
+            JOIN visit v ON r.visit_id = v.id
+            WHERE r.id = ?
+            """;
     List<Integer> userIds = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("patient_id"), id);
-
     return userIds.stream().findFirst().orElse(null);
   }
 

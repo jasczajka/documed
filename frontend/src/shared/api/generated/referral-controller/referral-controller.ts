@@ -26,6 +26,107 @@ import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
 
 /**
+ * @summary Get all referrals
+ */
+export const getAllReferrals = (signal?: AbortSignal) => {
+  return customInstance<ReturnReferralDTO[]>({ url: `/api/referrals`, method: 'GET', signal });
+};
+
+export const getGetAllReferralsQueryKey = () => {
+  return [`/api/referrals`] as const;
+};
+
+export const getGetAllReferralsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAllReferrals>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllReferrals>>, TError, TData>>;
+}) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetAllReferralsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllReferrals>>> = ({ signal }) =>
+    getAllReferrals(signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAllReferrals>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAllReferralsQueryResult = NonNullable<Awaited<ReturnType<typeof getAllReferrals>>>;
+export type GetAllReferralsQueryError = ErrorType<unknown>;
+
+export function useGetAllReferrals<
+  TData = Awaited<ReturnType<typeof getAllReferrals>>,
+  TError = ErrorType<unknown>,
+>(
+  options: {
+    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllReferrals>>, TError, TData>> &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllReferrals>>,
+          TError,
+          Awaited<ReturnType<typeof getAllReferrals>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAllReferrals<
+  TData = Awaited<ReturnType<typeof getAllReferrals>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllReferrals>>, TError, TData>> &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllReferrals>>,
+          TError,
+          Awaited<ReturnType<typeof getAllReferrals>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAllReferrals<
+  TData = Awaited<ReturnType<typeof getAllReferrals>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllReferrals>>, TError, TData>>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get all referrals
+ */
+
+export function useGetAllReferrals<
+  TData = Awaited<ReturnType<typeof getAllReferrals>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllReferrals>>, TError, TData>>;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetAllReferralsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
  * @summary Create referral
  */
 export const createReferral = (createReferralDTO: CreateReferralDTO, signal?: AbortSignal) => {

@@ -14,8 +14,9 @@ import {
 import dayjs from 'dayjs';
 import { FC } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { ReferralType, ReferralTypeDTO } from 'shared/api/generated/generated.schemas';
+import { ReferralType } from 'shared/api/generated/generated.schemas';
 import { appConfig } from 'shared/appConfig';
+import { useReferralTypesStore } from 'shared/hooks/stores/useReferralTypesStore';
 import * as Yup from 'yup';
 
 interface FormData {
@@ -38,18 +39,20 @@ const validationSchema = Yup.object().shape({
     ),
 });
 
-interface AddReferralToVisitModalProps {
-  referralTypes: ReferralTypeDTO[];
+interface ReferralModalProps {
   onSubmit: (data: FormData) => void;
   onCancel: () => void;
   disabled?: boolean;
+  readOnly?: boolean;
+  initialData?: FormData;
 }
 
-export const AddReferralToVisitModal: FC<AddReferralToVisitModalProps> = ({
-  referralTypes,
+export const ReferralModal: FC<ReferralModalProps> = ({
   onSubmit,
   onCancel,
   disabled = false,
+  readOnly = false,
+  initialData,
 }) => {
   const {
     control,
@@ -57,11 +60,13 @@ export const AddReferralToVisitModal: FC<AddReferralToVisitModalProps> = ({
     formState: { errors },
   } = useForm<FormData>({
     resolver: yupResolver(validationSchema),
-    defaultValues: {
+    defaultValues: initialData || {
       expirationDate: dayjs().add(7, 'day').toDate(),
       diagnosis: '',
     },
   });
+
+  const referralTypeMap = useReferralTypesStore((state) => state.referralTypeMap);
 
   return (
     <Dialog
@@ -76,10 +81,13 @@ export const AddReferralToVisitModal: FC<AddReferralToVisitModalProps> = ({
           },
         },
       }}
-      component="form"
-      onSubmit={handleSubmit(onSubmit)}
+      component={!readOnly ? 'form' : 'div'}
+      onSubmit={!readOnly ? handleSubmit(onSubmit!) : undefined}
     >
-      <DialogTitle>Dodaj skierowanie do wizyty</DialogTitle>
+      <DialogTitle>
+        {readOnly ? 'Szczegóły skierowania' : 'Dodaj skierowanie do wizyty'}
+      </DialogTitle>
+
       <Controller
         name="expirationDate"
         control={control}
@@ -103,7 +111,7 @@ export const AddReferralToVisitModal: FC<AddReferralToVisitModalProps> = ({
               const date = new Date(e.target.value);
               field.onChange(isNaN(date.getTime()) ? e.target.value : date);
             }}
-            disabled={disabled}
+            disabled={disabled || readOnly}
           />
         )}
       />
@@ -119,11 +127,11 @@ export const AddReferralToVisitModal: FC<AddReferralToVisitModalProps> = ({
               labelId="referral-type-label"
               label="Typ skierowania"
               error={!!errors.type}
-              disabled={disabled}
+              disabled={disabled || readOnly}
             >
-              {referralTypes.map((type) => (
-                <MenuItem key={type.code} value={type.code}>
-                  {type.description}
+              {Array.from(referralTypeMap.entries()).map(([code, description]) => (
+                <MenuItem key={code} value={code}>
+                  {description}
                 </MenuItem>
               ))}
             </Select>
@@ -144,18 +152,20 @@ export const AddReferralToVisitModal: FC<AddReferralToVisitModalProps> = ({
             rows={4}
             error={!!errors.diagnosis}
             helperText={errors.diagnosis?.message}
-            disabled={disabled}
+            disabled={disabled || readOnly}
           />
         )}
       />
-      <DialogActions sx={{ mt: 2, justifyContent: 'flex-end', gap: 1 }}>
-        <Button onClick={onCancel} color="error" variant="outlined" sx={{ minWidth: 100 }}>
-          Anuluj
-        </Button>
-        <Button type="submit" color="success" variant="contained" sx={{ minWidth: 100 }}>
-          Potwierdź
-        </Button>
-      </DialogActions>
+      {!readOnly && (
+        <DialogActions sx={{ mt: 2, justifyContent: 'flex-end', gap: 1 }}>
+          <Button onClick={onCancel} color="error" variant="outlined" sx={{ minWidth: 100 }}>
+            Anuluj
+          </Button>
+          <Button type="submit" color="success" variant="contained" sx={{ minWidth: 100 }}>
+            Potwierdź
+          </Button>
+        </DialogActions>
+      )}
     </Dialog>
   );
 };

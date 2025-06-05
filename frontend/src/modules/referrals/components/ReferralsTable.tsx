@@ -3,36 +3,27 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 import { format, subDays } from 'date-fns';
 import { FC, useCallback, useMemo, useState } from 'react';
-import { Prescription } from 'shared/api/generated/generated.schemas';
-import { getMedicinesForPrescription } from 'shared/api/generated/prescription-controller/prescription-controller';
-import { PrescriptionMedicinesModal } from 'shared/components/PrescriptionMedicinesModal';
+import { ReturnReferralDTO } from 'shared/api/generated/generated.schemas';
 import { useModal } from 'shared/hooks/useModal';
+import { ReferralModal } from './ReferralModal/ReferralModal';
 
-export type PrescriptionFilters = {
+export type ReferralFilters = {
   showOnlyNotExpired: boolean;
 };
 
-interface PrescriptionsTableProps {
-  prescriptions: Prescription[];
+interface ReferralsTableProps {
+  referrals: ReturnReferralDTO[];
 }
 
 const columns = (
-  onShowPrescription: (id: number) => void,
-  loading?: boolean,
-): GridColDef<Prescription>[] => [
+  onShowReferral: (referral: ReturnReferralDTO) => void,
+): GridColDef<ReturnReferralDTO>[] => [
   {
     field: 'doctorName',
     headerName: 'Wystawione przez',
     minWidth: 200,
     flex: 1,
     valueGetter: (_, row) => row.issuingDoctorFullName,
-  },
-  {
-    field: 'issueDate',
-    headerName: 'Wystawione',
-    minWidth: 200,
-    flex: 1,
-    valueGetter: (_, row) => format(new Date(row.date), 'dd.MM.yyyy'),
   },
   {
     field: 'expirationDate',
@@ -48,31 +39,26 @@ const columns = (
     minWidth: 160,
     flex: 0.7,
     renderCell: ({ row }) => (
-      <Button
-        variant="text"
-        size="small"
-        onClick={() => onShowPrescription(row.id)}
-        loading={loading}
-        disabled={loading}
-      >
-        Wyświetl receptę
+      <Button variant="text" size="small" onClick={() => onShowReferral(row)}>
+        Wyświetl szczegóły
       </Button>
     ),
   },
 ];
 
-export const PrescriptionsTable: FC<PrescriptionsTableProps> = ({ prescriptions }) => {
-  const [filters, setFilters] = useState<PrescriptionFilters>({
+export const ReferralsTable: FC<ReferralsTableProps> = ({ referrals }) => {
+  const [filters, setFilters] = useState<ReferralFilters>({
     showOnlyNotExpired: true,
   });
-  const [isLoading, setIsLoading] = useState(false);
 
   const filteredPrescriptions = useMemo(() => {
-    if (!filters.showOnlyNotExpired) return prescriptions;
+    if (!filters.showOnlyNotExpired) {
+      return referrals;
+    }
 
     const yesterday = subDays(new Date(), 1);
-    return prescriptions.filter((p) => new Date(p.expirationDate) > yesterday);
-  }, [prescriptions, filters]);
+    return referrals.filter((r) => new Date(r.expirationDate) > yesterday);
+  }, [referrals, filters]);
 
   const handleToggleFilter = () => {
     setFilters((prev) => ({
@@ -83,19 +69,18 @@ export const PrescriptionsTable: FC<PrescriptionsTableProps> = ({ prescriptions 
 
   const { openModal } = useModal();
 
-  const handleShowPrescriptionClick = useCallback(
-    async (id: number) => {
-      setIsLoading(true);
-
-      const medicines = await getMedicinesForPrescription(id);
-
-      setIsLoading(false);
-
-      openModal('prescriptionMedicinesModal', (close) => (
-        <PrescriptionMedicinesModal
-          prescriptionId={id.toString()}
-          medicines={medicines ?? []}
+  const handleShowReferralClick = useCallback(
+    async (referral: ReturnReferralDTO) => {
+      openModal('referralModal', (close) => (
+        <ReferralModal
+          initialData={{
+            expirationDate: new Date(referral.expirationDate),
+            diagnosis: referral.diagnosis,
+            type: referral.type,
+          }}
+          onSubmit={() => {}}
           onCancel={close}
+          readOnly
         />
       ));
     },
@@ -107,14 +92,14 @@ export const PrescriptionsTable: FC<PrescriptionsTableProps> = ({ prescriptions 
       <Box sx={{ pb: 2 }}>
         <FormControlLabel
           control={<Switch checked={filters.showOnlyNotExpired} onChange={handleToggleFilter} />}
-          label="Pokaż tylko ważne recepty"
+          label="Pokaż tylko ważne skierowania"
         />
       </Box>
 
       <Paper sx={{ flexGrow: 1 }}>
         <DataGrid
           rows={filteredPrescriptions}
-          columns={columns(handleShowPrescriptionClick, isLoading)}
+          columns={columns(handleShowReferralClick)}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },

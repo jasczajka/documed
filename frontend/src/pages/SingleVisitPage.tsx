@@ -712,7 +712,6 @@ const SingleVisitPage: FC = () => {
       </Box>
       <Box sx={{ width: '70%' }}>
         <VisitReferralsTable
-          referralTypes={referralTypes}
           visitId={visitId}
           existingReferrals={visitReferrals}
           onRemoveReferral={handleRemoveReferral}
