@@ -1,56 +1,39 @@
 import { CardHeader } from '@mui/material';
 import { PrescriptionsTable } from 'modules/prescriptions/components/PrescriptionsTable/PrescriptionsTable';
 import { FC, useEffect } from 'react';
-import {
-  useGetAllPrescriptions,
-  useGetPrescriptionsForUser,
-} from 'shared/api/generated/prescription-controller/prescription-controller';
+import { useGetPrescriptionsForUser } from 'shared/api/generated/prescription-controller/prescription-controller';
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
-import { useAuth } from 'shared/hooks/useAuth';
+import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { useNotification } from 'shared/hooks/useNotification';
 
 const PrescriptionsPage: FC = () => {
-  const { user, isPatient } = useAuth();
+  const userId = useAuthStore((state) => state.user!.id);
   const { showNotification, NotificationComponent } = useNotification();
-
-  if (!user || !user.id) {
-    return null;
-  }
 
   const {
     data: patientPrescriptions,
-    isLoading: isPatientLoading,
-    isError: isPatientError,
-  } = useGetPrescriptionsForUser(user.id, { query: { enabled: isPatient } });
-
-  const {
-    data: allPrescriptions,
-    isLoading: isAllLoading,
-    isError: isAllError,
-  } = useGetAllPrescriptions({ query: { enabled: !isPatient } });
-
-  const prescriptions = isPatient ? patientPrescriptions : allPrescriptions;
-  const isLoading = isPatient ? isPatientLoading : isAllLoading;
-  const isError = isPatientError || isAllError;
+    isLoading: isPatientPrescriptionsLoading,
+    isError: isPatientPrescriptionsError,
+  } = useGetPrescriptionsForUser(userId);
 
   useEffect(() => {
-    if (isError) {
+    if (isPatientPrescriptionsError) {
       showNotification('Coś poszło nie tak', 'error');
     }
-  }, [isError]);
+  }, [isPatientPrescriptionsError]);
 
-  if (isLoading) {
+  if (isPatientPrescriptionsLoading) {
     return <FullPageLoadingSpinner />;
   }
 
-  if (isError) {
+  if (isPatientPrescriptionsError) {
     return <NotificationComponent />;
   }
-  if (prescriptions) {
+  if (patientPrescriptions) {
     return (
       <div className="flex flex-col">
         <CardHeader title={'Recepty'} />
-        <PrescriptionsTable prescriptions={prescriptions} />
+        <PrescriptionsTable prescriptions={patientPrescriptions} />
         <NotificationComponent />
       </div>
     );

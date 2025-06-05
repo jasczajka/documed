@@ -6,6 +6,8 @@ import { useGetAdditionalServicesByPatient } from 'shared/api/generated/addition
 import { useGetFilesForPatient } from 'shared/api/generated/attachment-controller/attachment-controller';
 import { ServiceType } from 'shared/api/generated/generated.schemas';
 import { useGetPatientDetails } from 'shared/api/generated/patients-controller/patients-controller';
+import { useGetPrescriptionsForUser } from 'shared/api/generated/prescription-controller/prescription-controller';
+import { useGetAllReferralsForPatient } from 'shared/api/generated/referral-controller/referral-controller';
 import { useGetVisitsByPatientId } from 'shared/api/generated/visit-controller/visit-controller';
 import { AdditionalServiceModal } from 'shared/components/AdditionalServiceModal';
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
@@ -63,16 +65,32 @@ const SinglePatientPage: FC = () => {
     refetch: refetchPatientAdditionalServices,
   } = useGetAdditionalServicesByPatient(patientId);
 
+  const {
+    data: patientReferrals,
+    isLoading: isPatientReferralsLoading,
+    isError: isPatientReferralsError,
+  } = useGetAllReferralsForPatient(patientId);
+
+  const {
+    data: patientPrescriptions,
+    isLoading: isPatientPrescriptionsLoading,
+    isError: isPatientPrescriptionsError,
+  } = useGetPrescriptionsForUser(patientId);
+
   const isInitialLoading =
     isPatientInfoLoading ||
     isPatientAttachmentsLoading ||
     isPatientVisitsLoading ||
-    isPatientAdditionalServicesLoading;
+    isPatientAdditionalServicesLoading ||
+    isPatientReferralsLoading ||
+    isPatientPrescriptionsLoading;
   const isInitialError =
     isPatientInfoError ||
     isPatientAttachmentsError ||
     isPatientVisitsError ||
-    isPatientAdditionalServicesError;
+    isPatientAdditionalServicesError ||
+    isPatientReferralsError ||
+    isPatientPrescriptionsError;
 
   const patientFullName = useMemo(
     () => `${patientInfo?.firstName} ${patientInfo?.lastName}`,
@@ -149,7 +167,9 @@ const SinglePatientPage: FC = () => {
     !fulfillerId ||
     patientVisits === undefined ||
     allServices === undefined ||
-    patientAdditionalServices === undefined
+    patientAdditionalServices === undefined ||
+    patientPrescriptions === undefined ||
+    patientReferrals === undefined
   ) {
     return <NotificationComponent />;
   }
@@ -179,6 +199,8 @@ const SinglePatientPage: FC = () => {
         patientAttachments={patientAttachments ?? []}
         patientVisits={patientVisits}
         patientAdditionalServices={patientAdditionalServices}
+        patientPrescriptions={patientPrescriptions}
+        patientReferrals={patientReferrals}
         allServices={allServices}
         allAdditionalServices={allAdditionalServices}
         refetchVisits={async () => {

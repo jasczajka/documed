@@ -57,15 +57,6 @@ public class ReferralController {
     return new ResponseEntity<>(dto, HttpStatus.OK);
   }
 
-  @StaffOnly
-  @GetMapping()
-  @Operation(summary = "Get all referrals")
-  public ResponseEntity<List<ReturnReferralDTO>> getAllReferrals() {
-    List<Referral> referrals = referralService.getAllReferrals();
-    List<ReturnReferralDTO> dtos = referrals.stream().map(ReferralMapper::toDTO).toList();
-    return new ResponseEntity<>(dtos, HttpStatus.OK);
-  }
-
   @StaffOnlyOrSelf
   @GetMapping("/patient/{userId}")
   @Operation(summary = "Get all referrals for patient")

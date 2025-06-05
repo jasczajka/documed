@@ -86,7 +86,8 @@ public class ReferralDAO implements FullDAO<Referral, CreateReferralDTO> {
   public Optional<Referral> getById(int id) {
     String sql =
         """
-            SELECT r.*, d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
+            SELECT r.id, r.diagnosis, r.type, r.expiration_date, r.visit_id, r.status,
+              d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
             FROM referral r
             JOIN visit v ON r.visit_id = v.id
             JOIN "User" d ON v.doctor_id = d.id
@@ -100,7 +101,8 @@ public class ReferralDAO implements FullDAO<Referral, CreateReferralDTO> {
   public List<Referral> getAll() {
     String sql =
         """
-            SELECT r.*, d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
+            SELECT r.id, r.diagnosis, r.type, r.expiration_date, r.visit_id, r.status,
+              d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
             FROM referral r
             JOIN visit v ON r.visit_id = v.id
             JOIN "User" d ON v.doctor_id = d.id
@@ -111,7 +113,8 @@ public class ReferralDAO implements FullDAO<Referral, CreateReferralDTO> {
   public List<Referral> getReferralsForVisit(int visitId) {
     String sql =
         """
-            SELECT r.*, d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
+            SELECT r.id, r.diagnosis, r.type, r.expiration_date, r.visit_id, r.status,
+              d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
             FROM referral r
             JOIN visit v ON r.visit_id = v.id
             JOIN "User" d ON v.doctor_id = d.id
@@ -123,7 +126,8 @@ public class ReferralDAO implements FullDAO<Referral, CreateReferralDTO> {
   public List<Referral> getReferralsForPatient(int patientId) {
     String sql =
         """
-            SELECT r.*, d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
+            SELECT r.id, r.diagnosis, r.type, r.expiration_date, r.visit_id, r.status,
+              d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
             FROM referral r
             JOIN visit v ON r.visit_id = v.id
             JOIN "User" d ON v.doctor_id = d.id

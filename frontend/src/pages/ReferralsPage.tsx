@@ -1,56 +1,39 @@
 import { CardHeader } from '@mui/material';
 import { ReferralsTable } from 'modules/referrals/components/ReferralsTable';
 import { FC, useEffect } from 'react';
-import {
-  useGetAllReferrals,
-  useGetAllReferralsForPatient,
-} from 'shared/api/generated/referral-controller/referral-controller';
+import { useGetAllReferralsForPatient } from 'shared/api/generated/referral-controller/referral-controller';
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
-import { useAuth } from 'shared/hooks/useAuth';
+import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { useNotification } from 'shared/hooks/useNotification';
 
 const ReferralsPage: FC = () => {
-  const { user, isPatient } = useAuth();
+  const userId = useAuthStore((state) => state.user!.id);
   const { showNotification, NotificationComponent } = useNotification();
-
-  if (!user || !user.id) {
-    return null;
-  }
 
   const {
     data: patientReferrals,
     isLoading: isPatientReferralsLoading,
     isError: isPatientReferralsError,
-  } = useGetAllReferralsForPatient(user.id, { query: { enabled: isPatient } });
-
-  const {
-    data: allReferrals,
-    isLoading: isAllLoading,
-    isError: isAllError,
-  } = useGetAllReferrals({ query: { enabled: !isPatient } });
-
-  const referrals = isPatient ? patientReferrals : allReferrals;
-  const isLoading = isPatient ? isPatientReferralsLoading : isAllLoading;
-  const isError = isPatientReferralsError || isAllError;
+  } = useGetAllReferralsForPatient(userId);
 
   useEffect(() => {
-    if (isError) {
+    if (isPatientReferralsError) {
       showNotification('Coś poszło nie tak', 'error');
     }
-  }, [isError]);
+  }, [isPatientReferralsError]);
 
-  if (isLoading) {
+  if (isPatientReferralsLoading) {
     return <FullPageLoadingSpinner />;
   }
 
-  if (isError) {
+  if (isPatientReferralsError) {
     return <NotificationComponent />;
   }
-  if (referrals) {
+  if (patientReferrals) {
     return (
       <div className="flex flex-col">
         <CardHeader title={'Skierowania'} />
-        <ReferralsTable referrals={referrals} />
+        <ReferralsTable referrals={patientReferrals} />
         <NotificationComponent />
       </div>
     );

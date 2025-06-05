@@ -8,17 +8,21 @@ import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 import type {
   AvailableTimeSlotDTO,
+  FreeDaysDTO,
   GetAvailableFirstTimeSlotsByDoctorAndFacilityParams,
   TimeSlot,
 } from '../generated.schemas';
@@ -26,6 +30,81 @@ import type {
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
 
+/**
+ * @summary Create new FreeDay for doctor
+ */
+export const createFreeDay = (freeDaysDTO: FreeDaysDTO, signal?: AbortSignal) => {
+  return customInstance<string>({
+    url: `/timeslots/freeDay`,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: freeDaysDTO,
+    signal,
+  });
+};
+
+export const getCreateFreeDayMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createFreeDay>>,
+    TError,
+    { data: FreeDaysDTO },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createFreeDay>>,
+  TError,
+  { data: FreeDaysDTO },
+  TContext
+> => {
+  const mutationKey = ['createFreeDay'];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createFreeDay>>,
+    { data: FreeDaysDTO }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createFreeDay(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateFreeDayMutationResult = NonNullable<Awaited<ReturnType<typeof createFreeDay>>>;
+export type CreateFreeDayMutationBody = FreeDaysDTO;
+export type CreateFreeDayMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Create new FreeDay for doctor
+ */
+export const useCreateFreeDay = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createFreeDay>>,
+      TError,
+      { data: FreeDaysDTO },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createFreeDay>>,
+  TError,
+  { data: FreeDaysDTO },
+  TContext
+> => {
+  const mutationOptions = getCreateFreeDayMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
 /**
  * @summary Get timeslot by id
  */

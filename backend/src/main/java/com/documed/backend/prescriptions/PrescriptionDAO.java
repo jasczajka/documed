@@ -56,7 +56,8 @@ public class PrescriptionDAO implements FullDAO<Prescription, CreatePrescription
     if (key != null) {
       String selectSql =
           """
-                SELECT p.*, d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
+                SELECT p.id, p.access_code, p.date, p.expiration_date, p.status,
+                  d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
                 FROM prescription p
                 JOIN visit v ON p.visit_id = v.id
                 JOIN "User" d ON v.doctor_id = d.id
@@ -81,7 +82,8 @@ public class PrescriptionDAO implements FullDAO<Prescription, CreatePrescription
   public Optional<Prescription> getById(int id) {
     String sql =
         """
-            SELECT p.*, d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
+            SELECT p.id, p.access_code, p.date, p.expiration_date, p.status,
+              d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
             FROM prescription p
             JOIN visit v ON p.visit_id = v.id
             JOIN "User" d ON v.doctor_id = d.id
@@ -109,7 +111,8 @@ public class PrescriptionDAO implements FullDAO<Prescription, CreatePrescription
   public List<Prescription> getAll() {
     String sql =
         """
-            SELECT p.*, d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
+            SELECT SELECT p.id, p.access_code, p.date, p.expiration_date, p.status,
+              d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
             FROM prescription p
             JOIN visit v ON p.visit_id = v.id
             JOIN "User" d ON v.doctor_id = d.id
@@ -120,7 +123,8 @@ public class PrescriptionDAO implements FullDAO<Prescription, CreatePrescription
   public Optional<Prescription> getPrescriptionForVisit(int visitId) {
     String sql =
         """
-            SELECT p.*, d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
+            SELECT p.id, p.access_code, p.date, p.expiration_date, p.status,
+              d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
             FROM prescription p
             JOIN visit v ON p.visit_id = v.id
             JOIN "User" d ON v.doctor_id = d.id

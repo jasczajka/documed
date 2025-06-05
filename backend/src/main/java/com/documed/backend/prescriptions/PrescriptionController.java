@@ -82,12 +82,6 @@ public class PrescriptionController {
   }
 
   @StaffOnly
-  @GetMapping
-  public List<Prescription> getAllPrescriptions() {
-    return prescriptionService.getAll();
-  }
-
-  @StaffOnly
   @DeleteMapping("/{prescription_id}")
   @Operation(summary = "Remove prescription")
   public ResponseEntity<Integer> removePrescription(

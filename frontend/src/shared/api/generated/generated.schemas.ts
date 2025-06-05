@@ -63,6 +63,12 @@ export interface FileInfoDTO {
   sizeBytes: number;
 }
 
+export interface FreeDaysDTO {
+  userId: number;
+  startDate: string;
+  endDate: string;
+}
+
 export interface ScheduleVisitDTO {
   patientInformation?: string;
   patientId: number;
