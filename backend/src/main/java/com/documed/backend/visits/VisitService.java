@@ -4,12 +4,14 @@ import com.documed.backend.auth.AuthService;
 import com.documed.backend.auth.exceptions.UnauthorizedException;
 import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.exceptions.NotFoundException;
+import com.documed.backend.others.EmailService;
 import com.documed.backend.prescriptions.PrescriptionService;
 import com.documed.backend.referrals.ReferralService;
 import com.documed.backend.referrals.model.Referral;
 import com.documed.backend.schedules.TimeSlotService;
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.services.ServiceService;
+import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
 import com.documed.backend.users.services.SubscriptionService;
 import com.documed.backend.users.services.UserService;
@@ -22,11 +24,13 @@ import com.documed.backend.visits.model.VisitStatus;
 import com.documed.backend.visits.model.VisitWithDetails;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value;
 
 @RequiredArgsConstructor
 @Service
@@ -41,6 +45,7 @@ public class VisitService {
   private final SubscriptionService subscriptionService;
   private final PrescriptionService prescriptionService;
   private final ReferralService referralService;
+  private final EmailService emailService;
 
   public VisitWithDetails getByIdWithDetails(int id) {
     VisitWithDetails visit =
@@ -200,12 +205,20 @@ public class VisitService {
 
   @Transactional
   public boolean cancelVisit(int visitId) {
-    int patientId = visitDAO.getVisitPatientId(visitId);
+    VisitWithDetails visit = getByIdWithDetails(visitId);
+    int patientId = visit.getPatientId();
     if (authService.getCurrentUserRole() == UserRole.PATIENT
         && patientId != authService.getCurrentUserId()) {
       throw new UnauthorizedException("Patient can only cancel their own visit");
     }
     timeSlotService.releaseTimeSlotsForVisit(visitId);
+
+    String email = userService.getById(patientId)
+            .orElseThrow(()->new NotFoundException("User not found"))
+            .getEmail();
+
+    emailService.sendCancelVisitEmail(email, visit.getDate());
+
     return visitDAO.updateVisitStatus(visitId, VisitStatus.CANCELLED);
   }
 

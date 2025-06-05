@@ -1,10 +1,15 @@
 package com.documed.backend.schedules;
 
+import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.exceptions.NotFoundException;
+import com.documed.backend.schedules.dtos.FreeDaysDTO;
 import com.documed.backend.schedules.exceptions.NotEnoughTimeInTimeSlotException;
+import com.documed.backend.schedules.model.FreeDays;
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.schedules.model.WorkTime;
 import com.documed.backend.services.ServiceService;
+import com.documed.backend.visits.VisitDAO;
+import com.documed.backend.visits.VisitService;
 import com.documed.backend.visits.exceptions.CancelVisitException;
 import com.documed.backend.visits.model.Visit;
 import java.time.DayOfWeek;
@@ -28,6 +33,7 @@ public class TimeSlotService {
 
   private final TimeSlotDAO timeSlotDAO;
   private final ServiceService serviceService;
+  private final FreeDaysDAO freeDaysDAO;
 
   @Transactional
   public void createTimeSlotsForWorkTimes(List<WorkTime> workTimes) {
@@ -59,10 +65,6 @@ public class TimeSlotService {
 
   public Optional<TimeSlot> getTimeSlotById(int id) {
     return timeSlotDAO.getById(id);
-  }
-
-  public List<TimeSlot> getTimeSlotsForVisit(int visitId) {
-    return timeSlotDAO.getSortedTimeSlotsForVisit(visitId);
   }
 
   @Transactional
@@ -148,5 +150,24 @@ public class TimeSlotService {
     if (!timeSlotDAO.releaseTimeSlotsForVisit(visitId)) {
       throw new CancelVisitException("Failed to release time slots for visit");
     }
+  }
+
+  @Transactional
+  public void createFreeDay(FreeDaysDTO freeDaysDTO) {
+
+    if (freeDaysDTO.getStartDate().isAfter(freeDaysDTO.getEndDate())){
+      throw new BadRequestException("Start date cannot be after end date");
+    }
+
+    FreeDays freeDays = FreeDays
+            .builder()
+            .userId(freeDaysDTO.getUserId())
+            .startDate(freeDaysDTO.getStartDate())
+            .endDate(freeDaysDTO.getEndDate())
+            .build();
+
+    freeDaysDAO.create(freeDays);
+
+    timeSlotDAO.reserveTimeSlotsForFreeDays(freeDays);
   }
 }
