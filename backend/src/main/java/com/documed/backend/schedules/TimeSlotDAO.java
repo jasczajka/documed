@@ -2,6 +2,7 @@ package com.documed.backend.schedules;
 
 import com.documed.backend.FullDAO;
 import com.documed.backend.exceptions.NotFoundException;
+import com.documed.backend.schedules.model.FreeDays;
 import com.documed.backend.schedules.model.TimeSlot;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -152,5 +153,25 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
     String sql = "UPDATE time_slot SET is_busy = false, visit_id = null WHERE visit_id = ?";
 
     return jdbcTemplate.update(sql, visitId) > 0;
+  }
+
+  public void reserveTimeSlotsForFreeDays(FreeDays freeDays) {
+    String sql =
+        """
+            UPDATE time_slot
+            SET is_busy = true
+            WHERE date BETWEEN ? AND ?
+            """;
+
+    jdbcTemplate.update(sql, freeDays.getStartDate(), freeDays.getEndDate());
+  }
+
+  public List<Integer> getVisitIdsByDoctorAndDateRange(
+      int doctorId, LocalDate fromDate, LocalDate toDate) {
+    String sql =
+        """
+            SELECT visit_id FROM time_slot WHERE doctor_id = ? AND date BETWEEN ? AND ? AND visit_id IS NOT NULL
+            """;
+    return jdbcTemplate.queryForList(sql, Integer.class, doctorId, fromDate, toDate);
   }
 }

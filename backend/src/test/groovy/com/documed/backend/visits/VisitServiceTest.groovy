@@ -4,12 +4,14 @@ import com.documed.backend.auth.AuthService
 import com.documed.backend.auth.exceptions.UnauthorizedException
 import com.documed.backend.exceptions.BadRequestException
 import com.documed.backend.exceptions.NotFoundException
+import com.documed.backend.others.EmailService
 import com.documed.backend.prescriptions.PrescriptionService
 import com.documed.backend.referrals.ReferralService
-import com.documed.backend.referrals.model.Referral
 import com.documed.backend.schedules.TimeSlotService
 import com.documed.backend.schedules.model.TimeSlot
 import com.documed.backend.services.ServiceService
+import com.documed.backend.users.model.AccountStatus
+import com.documed.backend.users.model.User
 import com.documed.backend.users.model.UserRole
 import com.documed.backend.users.services.SubscriptionService
 import com.documed.backend.users.services.UserService
@@ -32,9 +34,10 @@ class VisitServiceTest extends Specification {
 	def userService = Mock(UserService)
 	def prescriptionService = Mock(PrescriptionService)
 	def referralService = Mock(ReferralService)
+	def emailService = Mock(EmailService)
 
 	@Subject
-	def visitService = new VisitService(visitDAO, feedbackDAO, timeSlotService, authService, serviceService, userService, subscriptionService, prescriptionService, referralService)
+	def visitService = new VisitService(visitDAO, feedbackDAO, timeSlotService, authService, serviceService, userService, subscriptionService, prescriptionService, referralService, emailService)
 
 	private VisitWithDetails buildVisitWithDetails(Map overrides = [:]) {
 		return VisitWithDetails.builder()
@@ -196,6 +199,27 @@ class VisitServiceTest extends Specification {
 	def "cancelVisit should release slot and cancel"() {
 		given:
 		def id = 12
+		def patientId = 100
+		def date = LocalDate.now()
+
+		def visit = VisitWithDetails.builder()
+				.id(id)
+				.patientId(patientId)
+				.status(VisitStatus.PLANNED)
+				.date(date)
+				.build()
+
+		def user = User.builder()
+				.id(patientId)
+				.firstName("name")
+				.lastName("name2")
+				.accountStatus(AccountStatus.ACTIVE)
+				.role(UserRole.PATIENT)
+				.email("test@example.com")
+				.build()
+
+		visitDAO.findByIdWithDetails(id) >> Optional.of(visit)
+		userService.getById(patientId) >> Optional.of(user)
 
 		when:
 		def result = visitService.cancelVisit(id)
@@ -579,7 +603,14 @@ class VisitServiceTest extends Specification {
 		def currentUserId = 10
 		def visitPatientId = 20
 
-		visitDAO.getVisitPatientId(visitId) >> visitPatientId
+		def visit = VisitWithDetails.builder()
+				.id(visitId)
+				.patientId(visitPatientId)
+				.status(VisitStatus.PLANNED)
+				.date(LocalDate.now())
+				.build()
+
+		visitDAO.findByIdWithDetails(visitId) >> Optional.of(visit)
 		authService.getCurrentUserRole() >> UserRole.PATIENT
 		authService.getCurrentUserId() >> currentUserId
 

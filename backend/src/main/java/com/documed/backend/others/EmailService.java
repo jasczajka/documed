@@ -1,6 +1,7 @@
-package com.documed.backend.auth;
+package com.documed.backend.others;
 
 import com.documed.backend.auth.model.OtpPurpose;
+import java.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -81,6 +82,40 @@ public class EmailService {
             Zespół %s
             """,
         purpose.getActionDescription(), otpCode, OTP_EXPIRY_MINUTES, senderName);
+  }
+
+  public void sendCancelVisitEmail(String toEmail, LocalDate visitDate) {
+    if (!isValidEmail(toEmail)) {
+      logger.warn("Trying to send mail to: {}", toEmail);
+    }
+
+    SimpleMailMessage message = buildCancelVisitMessage(toEmail, visitDate.toString());
+    mailSender.send(message);
+    logger.debug("Cancel visit notification sent to {}", toEmail);
+  }
+
+  private SimpleMailMessage buildCancelVisitMessage(String toEmail, String visitDate) {
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setTo(toEmail.trim());
+    message.setFrom(buildFromAddress());
+    message.setSubject("Twoja wizyta została anulowana.");
+    message.setText(buildCancelVisitEmailBody(visitDate));
+    return message;
+  }
+
+  private String buildCancelVisitEmailBody(String visitDate) {
+    return String.format(
+        """
+                Szanowny Użytkowniku,
+
+                Informujemy, że wizyta na dzień %s została anulowana.
+
+                W razie wątpliwości prosimy o kontakt z placówką.
+
+                Z poważaniem,
+                Zespół %s
+                """,
+        visitDate, senderName);
   }
 
   private boolean isValidEmail(String email) {
