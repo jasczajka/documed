@@ -1,6 +1,7 @@
 package com.documed.backend.auth
 
 import com.documed.backend.auth.model.OtpPurpose
+import com.documed.backend.others.EmailService
 import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
 import spock.lang.Specification

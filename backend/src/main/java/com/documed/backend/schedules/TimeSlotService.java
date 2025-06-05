@@ -61,10 +61,6 @@ public class TimeSlotService {
     return timeSlotDAO.getById(id);
   }
 
-  public List<TimeSlot> getTimeSlotsForVisit(int visitId) {
-    return timeSlotDAO.getSortedTimeSlotsForVisit(visitId);
-  }
-
   @Transactional
   public void reserveTimeSlotsForVisit(Visit visit, TimeSlot firstTimeSlot) {
     int serviceId = visit.getServiceId();
@@ -148,5 +144,10 @@ public class TimeSlotService {
     if (!timeSlotDAO.releaseTimeSlotsForVisit(visitId)) {
       throw new CancelVisitException("Failed to release time slots for visit");
     }
+  }
+
+  public List<Integer> getVisitIdsByDoctorAndDateRange(
+      int doctorId, LocalDate fromDate, LocalDate toDate) {
+    return timeSlotDAO.getVisitIdsByDoctorAndDateRange(doctorId, fromDate, toDate);
   }
 }

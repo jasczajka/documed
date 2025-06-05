@@ -4,6 +4,7 @@ import com.documed.backend.auth.dtos.OtpGenerationResponse;
 import com.documed.backend.auth.exceptions.*;
 import com.documed.backend.auth.model.Otp;
 import com.documed.backend.auth.model.OtpPurpose;
+import com.documed.backend.others.EmailService;
 import com.documed.backend.users.services.UserService;
 import java.time.LocalDateTime;
 import java.util.Optional;

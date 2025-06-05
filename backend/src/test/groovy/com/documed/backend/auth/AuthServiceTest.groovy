@@ -4,6 +4,7 @@ import com.documed.backend.auth.exceptions.*
 import com.documed.backend.auth.model.CurrentUser
 import com.documed.backend.auth.model.OtpPurpose
 import com.documed.backend.exceptions.NotFoundException
+import com.documed.backend.others.EmailService
 import com.documed.backend.schedules.WorkTimeService
 import com.documed.backend.users.UserDAO
 import com.documed.backend.users.model.AccountStatus
@@ -12,7 +13,6 @@ import com.documed.backend.users.model.UserRole
 import com.documed.backend.users.services.UserService
 import com.documed.backend.visits.FacilityService
 import com.documed.backend.visits.model.Facility
-import java.sql.Date
 import java.time.LocalDate
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder

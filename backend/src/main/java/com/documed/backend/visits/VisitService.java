@@ -4,6 +4,7 @@ import com.documed.backend.auth.AuthService;
 import com.documed.backend.auth.exceptions.UnauthorizedException;
 import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.exceptions.NotFoundException;
+import com.documed.backend.others.EmailService;
 import com.documed.backend.prescriptions.PrescriptionService;
 import com.documed.backend.referrals.ReferralService;
 import com.documed.backend.referrals.model.Referral;
@@ -41,6 +42,7 @@ public class VisitService {
   private final SubscriptionService subscriptionService;
   private final PrescriptionService prescriptionService;
   private final ReferralService referralService;
+  private final EmailService emailService;
 
   public VisitWithDetails getByIdWithDetails(int id) {
     VisitWithDetails visit =
@@ -205,12 +207,22 @@ public class VisitService {
 
   @Transactional
   public boolean cancelVisit(int visitId) {
-    int patientId = visitDAO.getVisitPatientId(visitId);
+    VisitWithDetails visit = getByIdWithDetails(visitId);
+    int patientId = visit.getPatientId();
     if (authService.getCurrentUserRole() == UserRole.PATIENT
         && patientId != authService.getCurrentUserId()) {
       throw new UnauthorizedException("Patient can only cancel their own visit");
     }
     timeSlotService.releaseTimeSlotsForVisit(visitId);
+
+    String email =
+        userService
+            .getById(patientId)
+            .orElseThrow(() -> new NotFoundException("User not found"))
+            .getEmail();
+
+    emailService.sendCancelVisitEmail(email, visit.getDate());
+
     return visitDAO.updateVisitStatus(visitId, VisitStatus.CANCELLED);
   }
 

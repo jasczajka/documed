@@ -5,6 +5,7 @@ import com.documed.backend.auth.exceptions.*;
 import com.documed.backend.auth.model.CurrentUser;
 import com.documed.backend.auth.model.OtpPurpose;
 import com.documed.backend.exceptions.NotFoundException;
+import com.documed.backend.others.EmailService;
 import com.documed.backend.schedules.WorkTimeService;
 import com.documed.backend.users.*;
 import com.documed.backend.users.model.AccountStatus;

@@ -1,7 +1,7 @@
 package com.documed.backend.users.model;
 
 import com.documed.backend.additionalservices.model.AdditionalService;
-import com.documed.backend.schedules.model.FreeDay;
+import com.documed.backend.schedules.model.FreeDays;
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.schedules.model.WorkTime;
 import com.documed.backend.visits.model.Visit;
@@ -58,7 +58,7 @@ public class User {
 
   @Schema private List<WorkTime> workTimes;
 
-  @Schema private List<FreeDay> freeDays;
+  @Schema private List<FreeDays> freeDays;
 
   @Schema private List<Visit> visits;
 
