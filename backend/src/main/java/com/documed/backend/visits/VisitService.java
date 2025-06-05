@@ -210,8 +210,10 @@ public class VisitService {
     }
     timeSlotService.releaseTimeSlotsForVisit(visitId);
 
-    String email = userService.getById(patientId)
-            .orElseThrow(()->new NotFoundException("User not found"))
+    String email =
+        userService
+            .getById(patientId)
+            .orElseThrow(() -> new NotFoundException("User not found"))
             .getEmail();
 
     emailService.sendCancelVisitEmail(email, visit.getDate());

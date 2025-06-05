@@ -1,6 +1,7 @@
 package com.documed.backend.others;
 
 import com.documed.backend.auth.model.OtpPurpose;
+import java.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,8 +9,6 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import java.time.LocalDate;
 
 @Service
 public class EmailService {
@@ -106,17 +105,17 @@ public class EmailService {
 
   private String buildCancelVisitEmailBody(String visitDate) {
     return String.format(
-            """
+        """
                 Szanowny Użytkowniku,
-    
+
                 Informujemy, że wizyta na dzień %s została anulowana.
-    
+
                 W razie wątpliwości prosimy o kontakt z placówką.
-    
+
                 Z poważaniem,
                 Zespół %s
                 """,
-            visitDate, senderName);
+        visitDate, senderName);
   }
 
   private boolean isValidEmail(String email) {

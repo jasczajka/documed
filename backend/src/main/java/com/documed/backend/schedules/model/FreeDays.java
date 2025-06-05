@@ -1,7 +1,6 @@
 package com.documed.backend.schedules.model;
 
 import java.time.LocalDate;
-
 import lombok.Builder;
 import lombok.Data;
 

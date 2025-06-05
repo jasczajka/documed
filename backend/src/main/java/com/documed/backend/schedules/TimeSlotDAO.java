@@ -155,8 +155,9 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
     return jdbcTemplate.update(sql, visitId) > 0;
   }
 
-  public void reserveTimeSlotsForFreeDays(FreeDays freeDays){
-    String sql = """
+  public void reserveTimeSlotsForFreeDays(FreeDays freeDays) {
+    String sql =
+        """
             UPDATE time_slot
             SET is_busy = true
             WHERE date BETWEEN ? AND ?
@@ -165,9 +166,10 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
     jdbcTemplate.update(sql, freeDays.getStartDate(), freeDays.getEndDate());
   }
 
-  public List<Integer> getVisitIdsByDoctorAndDateRange(int doctorId, LocalDate fromDate, LocalDate toDate){
+  public List<Integer> getVisitIdsByDoctorAndDateRange(
+      int doctorId, LocalDate fromDate, LocalDate toDate) {
     String sql =
-            """
+        """
             SELECT visit_id FROM time_slot WHERE doctor_id = ? AND date BETWEEN ? AND ? AND visit_id IS NOT NULL
             """;
     return jdbcTemplate.queryForList(sql, Integer.class, doctorId, fromDate, toDate);

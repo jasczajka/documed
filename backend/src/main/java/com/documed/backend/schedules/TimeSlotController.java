@@ -6,9 +6,8 @@ import com.documed.backend.schedules.dtos.FreeDaysDTO;
 import com.documed.backend.schedules.dtos.TimeSlotMapper;
 import com.documed.backend.schedules.model.TimeSlot;
 import io.swagger.v3.oas.annotations.Operation;
-import java.util.List;
-
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,9 +50,7 @@ public class TimeSlotController {
 
   @PostMapping("/freeDay")
   @Operation(summary = "Create new FreeDay for doctor")
-  public ResponseEntity<String> createFreeDay(
-          @RequestBody @Valid FreeDaysDTO freeDaysDTO
-  ){
+  public ResponseEntity<String> createFreeDay(@RequestBody @Valid FreeDaysDTO freeDaysDTO) {
     freeDaysService.createFreeDay(freeDaysDTO);
     return new ResponseEntity<>("FreeDay created", HttpStatus.CREATED);
   }

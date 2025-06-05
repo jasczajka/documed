@@ -13,7 +13,6 @@ import com.documed.backend.users.model.UserRole
 import com.documed.backend.users.services.UserService
 import com.documed.backend.visits.FacilityService
 import com.documed.backend.visits.model.Facility
-
 import java.time.LocalDate
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder

@@ -1,10 +1,7 @@
 package com.documed.backend.schedules;
 
-import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.exceptions.NotFoundException;
-import com.documed.backend.schedules.dtos.FreeDaysDTO;
 import com.documed.backend.schedules.exceptions.NotEnoughTimeInTimeSlotException;
-import com.documed.backend.schedules.model.FreeDays;
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.schedules.model.WorkTime;
 import com.documed.backend.services.ServiceService;
@@ -149,7 +146,8 @@ public class TimeSlotService {
     }
   }
 
-  public List<Integer> getVisitIdsByDoctorAndDateRange(int doctorId, LocalDate fromDate, LocalDate toDate){
+  public List<Integer> getVisitIdsByDoctorAndDateRange(
+      int doctorId, LocalDate fromDate, LocalDate toDate) {
     return timeSlotDAO.getVisitIdsByDoctorAndDateRange(doctorId, fromDate, toDate);
   }
 }
