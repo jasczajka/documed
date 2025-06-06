@@ -1,6 +1,7 @@
 package com.documed.backend.prescriptions;
 
 import com.documed.backend.auth.AuthService;
+import com.documed.backend.auth.annotations.DoctorOnly;
 import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
 import com.documed.backend.auth.exceptions.UnauthorizedException;
@@ -27,7 +28,7 @@ public class PrescriptionController {
   private final PrescriptionService prescriptionService;
   private final AuthService authService;
 
-  @StaffOnly
+  @DoctorOnly
   @PostMapping("/visit/{visit_id}")
   @Operation(summary = "Create Prescription")
   public ResponseEntity<Prescription> createPrescription(
@@ -38,6 +39,7 @@ public class PrescriptionController {
         HttpStatus.OK);
   }
 
+  //TODO annotation
   @GetMapping("/visit/{visit_id}")
   @Operation(summary = "Get Prescription For Visit")
   public ResponseEntity<Optional<Prescription>> getPrescriptionForVisit(
@@ -64,6 +66,7 @@ public class PrescriptionController {
     return ResponseEntity.ok(prescriptions);
   }
 
+  //TODO annotation
   @GetMapping("/{prescription_id}/medicines")
   public ResponseEntity<List<MedicineWithAmount>> getMedicinesForPrescription(
       @PathVariable("prescription_id") int prescriptionId) {
@@ -81,7 +84,7 @@ public class PrescriptionController {
     return ResponseEntity.ok(medicines);
   }
 
-  @StaffOnly
+  @DoctorOnly
   @DeleteMapping("/{prescription_id}")
   @Operation(summary = "Remove prescription")
   public ResponseEntity<Integer> removePrescription(
@@ -90,7 +93,7 @@ public class PrescriptionController {
     return ResponseEntity.ok(result);
   }
 
-  @StaffOnly
+  @DoctorOnly
   @PostMapping("/{prescription_id}/medicine/{medicine_id}")
   @Operation(summary = "Add Medicine To Prescription")
   public ResponseEntity<Medicine> addMedicineToPrescription(
@@ -103,7 +106,7 @@ public class PrescriptionController {
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
-  @StaffOnly
+  @DoctorOnly
   @DeleteMapping("/{prescription_id}/medicine/{medicine_id}")
   @Operation(summary = "Remove Medicine From Prescription")
   public ResponseEntity<Integer> removeMedicineFromPrescription(
@@ -113,7 +116,8 @@ public class PrescriptionController {
     return ResponseEntity.ok(result);
   }
 
-  @StaffOnly
+  //TODO do we need it, the prescription is issued when closing visit
+  @DoctorOnly
   @PatchMapping("/{prescription_id}/issue")
   @Operation(summary = "Issue prescription")
   public ResponseEntity<Prescription> issuePrescription(
@@ -123,7 +127,7 @@ public class PrescriptionController {
         prescriptionService.issuePrescription(prescriptionId, newExpirationDate));
   }
 
-  @StaffOnly
+  @DoctorOnly
   @PatchMapping("/{prescription_id}/expiration-date")
   @Operation(summary = "Update prescription expiration Date")
   public ResponseEntity<Prescription> updatePrescriptionExpirationDate(

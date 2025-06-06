@@ -24,6 +24,7 @@ public class SpecializationController {
     return new ResponseEntity<>(specializations, HttpStatus.OK);
   }
 
+  //TODO check if it's used
   @GetMapping("/{id}")
   public ResponseEntity<Specialization> getSpecialization(@PathVariable int id) {
     return specializationService

@@ -19,6 +19,7 @@ public class WorkTimeController {
 
   private final WorkTimeService workTimeService;
 
+  //TODO annotation
   @StaffOnly
   @GetMapping("/{user_id}")
   @Operation(summary = "Get all worktimes for user")
@@ -28,6 +29,7 @@ public class WorkTimeController {
     return ResponseEntity.ok(workTimes.stream().map(WorkTimeMapper::toDto).toList());
   }
 
+  //TODO annotation ward clerk only
   @StaffOnly
   @PutMapping("/{user_id}")
   @Operation(summary = "Update worktimes for user")

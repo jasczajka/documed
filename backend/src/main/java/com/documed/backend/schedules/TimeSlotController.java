@@ -22,6 +22,7 @@ public class TimeSlotController {
   private final TimeSlotService timeSlotService;
   private final FreeDaysService freeDaysService;
 
+  //TODO annotation
   @StaffOnly
   @GetMapping("/{id}")
   @Operation(summary = "Get timeslot by id")
@@ -48,6 +49,7 @@ public class TimeSlotController {
     return ResponseEntity.ok(dtos);
   }
 
+  //TODO annotation ward clerk only
   @PostMapping("/freeDay")
   @Operation(summary = "Create new FreeDay for doctor")
   public ResponseEntity<String> createFreeDay(@RequestBody @Valid FreeDaysDTO freeDaysDTO) {

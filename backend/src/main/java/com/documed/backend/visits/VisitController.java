@@ -1,5 +1,6 @@
 package com.documed.backend.visits;
 
+import com.documed.backend.auth.annotations.DoctorOnly;
 import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.visits.dtos.GiveFeedbackDTO;
 import com.documed.backend.visits.dtos.ScheduleVisitDTO;
@@ -25,8 +26,9 @@ public class VisitController {
 
   private final VisitService visitService;
 
+  //TODO discuss if needed
   @StaffOnly
-  @GetMapping()
+  @GetMapping
   @Operation(summary = "Get all visits")
   public ResponseEntity<List<VisitWithDetails>> getAllVisits() {
 
@@ -40,6 +42,7 @@ public class VisitController {
     return new ResponseEntity<>(visit, HttpStatus.OK);
   }
 
+  //TODO annotatnion
   @PostMapping
   @Operation(summary = "schedule/create visit")
   public ResponseEntity<VisitWithDetails> scheduleVisit(
@@ -49,7 +52,7 @@ public class VisitController {
     return new ResponseEntity<>(visitService.getByIdWithDetails(visit.getId()), HttpStatus.CREATED);
   }
 
-  @Secured("DOCTOR")
+  @DoctorOnly
   @PatchMapping("/{id}/start")
   @Operation(summary = "start visit")
   public ResponseEntity<Void> startVisit(@PathVariable("id") int id) {
@@ -58,6 +61,7 @@ public class VisitController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
+  //TODO annotation patient and clerk
   @PatchMapping("/{id}/cancel")
   @Operation(summary = "cancel visit")
   public ResponseEntity<Void> cancelPlannedVisit(@PathVariable("id") int id) {
@@ -87,6 +91,7 @@ public class VisitController {
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
+  //TODO annoatation clerk
   @StaffOnly
   @Operation(summary = "get all visits assigned for selected doctor")
   @GetMapping("/doctor/{id}")
@@ -97,6 +102,7 @@ public class VisitController {
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
+  @DoctorOnly
   @Operation(summary = "get all visits assigned for logged in doctor")
   @GetMapping("/doctor")
   public ResponseEntity<List<VisitWithDetails>> getVisitsForCurrentDoctor() {
@@ -105,7 +111,7 @@ public class VisitController {
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
-  @StaffOnly
+  @DoctorOnly
   @PatchMapping("/{id}")
   @Operation(summary = "update visit data")
   public ResponseEntity<VisitWithDetails> updateVisit(
@@ -115,7 +121,7 @@ public class VisitController {
         visitService.getByIdWithDetails(updatedVisit.getId()), HttpStatus.OK);
   }
 
-  @StaffOnly
+  @DoctorOnly
   @PatchMapping("/{id}/close")
   @Operation(summary = "finish visit")
   public ResponseEntity<Void> finishVisit(
