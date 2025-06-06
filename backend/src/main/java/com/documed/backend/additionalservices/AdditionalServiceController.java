@@ -5,6 +5,7 @@ import com.documed.backend.additionalservices.model.AdditionalService;
 import com.documed.backend.additionalservices.model.AdditionalServiceWithDetails;
 import com.documed.backend.attachments.S3Service;
 import com.documed.backend.attachments.dtos.FileInfoDTO;
+import com.documed.backend.auth.annotations.MedicalStaffOnly;
 import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
 import jakarta.validation.Valid;
@@ -22,7 +23,7 @@ public class AdditionalServiceController {
   private final AdditionalServiceService additionalServiceService;
   private final S3Service s3service;
 
-  @StaffOnly
+  @MedicalStaffOnly
   @PostMapping
   public ResponseEntity<AdditionalServiceWithDetails> createAdditionalService(
       @RequestBody @Valid CreateAdditionalServiceDTO createDto) {
@@ -50,7 +51,7 @@ public class AdditionalServiceController {
                     additionalServiceWithAttachments.getId())));
   }
 
-  @StaffOnly
+  @MedicalStaffOnly
   @GetMapping("/{id}")
   public ResponseEntity<AdditionalServiceWithDetails> getAdditionalService(@PathVariable int id) {
     AdditionalServiceWithDetails additionalService =
@@ -60,7 +61,7 @@ public class AdditionalServiceController {
         .body(this.enrichAdditionalServiceToDto(additionalService));
   }
 
-  @StaffOnly
+  @MedicalStaffOnly
   @GetMapping("/fulfillers/{userId}")
   public ResponseEntity<List<AdditionalServiceWithDetails>> getAdditionalServicesByFulfiller(
       @PathVariable int userId) {
@@ -71,7 +72,7 @@ public class AdditionalServiceController {
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
-  @StaffOnly
+  @MedicalStaffOnly
   @GetMapping("/services/{serviceId}")
   public ResponseEntity<List<AdditionalServiceWithDetails>> getAdditionalServicesByService(
       @PathVariable int serviceId) {
@@ -93,7 +94,7 @@ public class AdditionalServiceController {
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
-  @StaffOnly
+  @MedicalStaffOnly
   @GetMapping
   public ResponseEntity<List<AdditionalServiceWithDetails>> getAllAdditionalServices() {
     List<AdditionalServiceWithDetails> services = additionalServiceService.getAllWithDetails();
@@ -102,7 +103,7 @@ public class AdditionalServiceController {
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
-  @StaffOnly
+  @MedicalStaffOnly
   @PutMapping("/{id}/description")
   public ResponseEntity<Void> updateAdditionalServiceDescription(
       @PathVariable int id, @RequestBody @Valid UpdateDescriptionDTO createDto) {
@@ -110,7 +111,7 @@ public class AdditionalServiceController {
     return ResponseEntity.status(HttpStatus.OK).build();
   }
 
-  @StaffOnly
+  @MedicalStaffOnly
   @PutMapping("/{id}/attachments")
   public ResponseEntity<AdditionalServiceWithDetails> updateAdditionalServiceAttachments(
       @PathVariable int id, @RequestBody @Valid UpdateAttachmentsDTO updateDto) {
