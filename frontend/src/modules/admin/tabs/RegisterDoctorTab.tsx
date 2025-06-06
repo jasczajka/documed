@@ -3,9 +3,8 @@ import { Box, Button, TextField } from '@mui/material';
 import { FC } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { useRegisterDoctor } from 'shared/api/generated/auth-controller/auth-controller';
-import { useGetAllSpecializations } from 'shared/api/generated/specialization-controller/specialization-controller';
-import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { SpecializationSelect } from 'shared/components/SpecializationSelect';
+import { useSpecializationsStore } from 'shared/hooks/stores/useSpecializationsStore';
 import { useNotification } from 'shared/hooks/useNotification';
 import { mapAuthError } from 'shared/utils/mapAuthError';
 import * as Yup from 'yup';
@@ -41,7 +40,7 @@ const validationSchema = Yup.object({
 
 export const RegisterDoctorTab: FC = () => {
   const { showNotification, NotificationComponent } = useNotification();
-  const { data: specializations, isLoading: isSpecializationsLoading } = useGetAllSpecializations();
+  const specializations = useSpecializationsStore((state) => state.specializations);
 
   const methods = useForm({
     resolver: yupResolver(validationSchema),
@@ -94,10 +93,6 @@ export const RegisterDoctorTab: FC = () => {
       },
     });
   };
-
-  if (!specializations || isSpecializationsLoading) {
-    return <FullPageLoadingSpinner />;
-  }
 
   return (
     <FormProvider {...methods}>

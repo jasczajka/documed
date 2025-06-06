@@ -4,8 +4,13 @@ import { lazy, useLayoutEffect, useMemo, useState } from 'react';
 import { createBrowserRouter, Navigate, RouteObject, RouterProvider } from 'react-router';
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { ProtectedRoute } from 'shared/components/ProtectedRoute';
+import { useAllServicesStore } from 'shared/hooks/stores/useAllServicesStore';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
+import { useDoctorsStore } from 'shared/hooks/stores/useDoctorsStore';
 import { useFacilityStore } from 'shared/hooks/stores/useFacilityStore';
+import { useReferralTypesStore } from 'shared/hooks/stores/useReferralTypesStore';
+import { useSpecializationsStore } from 'shared/hooks/stores/useSpecializationsStore';
+import { useSubscriptionStore } from 'shared/hooks/stores/useSubscriptionStore';
 import { useAuth } from 'shared/hooks/useAuth';
 
 const LoginPage = lazy(() => import('../modules/auth/LoginPage'));
@@ -49,7 +54,6 @@ const getAuthRoutes = (
   isAdmin: boolean,
   isPatient: boolean,
   canEditDoctorData: boolean,
-  canSeePrescriptions: boolean,
   isStaff: boolean,
 ): RouteObject[] => [
   {
@@ -67,13 +71,22 @@ const getAuthRoutes = (
         ),
       },
       { path: '/specialists', element: <SpecialistsPage /> },
-      { path: '/referrals', element: <ReferralsPage /> },
+      {
+        path: '/referrals',
+        element: (
+          <ProtectedRoute
+            element={<ReferralsPage />}
+            isAllowed={isPatient}
+            redirectTo="/referrals"
+          />
+        ),
+      },
       {
         path: '/prescriptions',
         element: (
           <ProtectedRoute
             element={<PrescriptionsPage />}
-            isAllowed={canSeePrescriptions}
+            isAllowed={isPatient}
             redirectTo="/visits"
           />
         ),
@@ -115,33 +128,42 @@ const getAuthRoutes = (
 ];
 
 export const AppRouter = () => {
-  const {
-    verifyAuthentication,
-    loading,
-    isAdmin,
-    isPatient,
-    canEditDoctorData,
-    canSeePrescriptions,
-    isStaff,
-  } = useAuth();
+  const { verifyAuthentication, loading, isAdmin, isPatient, canEditDoctorData, isStaff } =
+    useAuth();
   const authenticated = useAuthStore((state) => state.authenticated);
   const fetchFacilities = useFacilityStore((state) => state.fetchFacilities);
+  const fetchSubscriptions = useSubscriptionStore((state) => state.fetchSubscriptions);
+  const fetchDoctors = useDoctorsStore((state) => state.fetchDoctors);
+  const fetchAllServices = useAllServicesStore((state) => state.fetchAllServices);
+  const fetchSpecializations = useSpecializationsStore((state) => state.fetchSpecializations);
+  const fetchReferralTypes = useReferralTypesStore((state) => state.fetchReferralTypes);
   const [authChecked, setAuthChecked] = useState(false);
   const router = useMemo(() => {
     const routes = authenticated
-      ? getAuthRoutes(isAdmin, isPatient, canEditDoctorData, canSeePrescriptions, isStaff)
+      ? getAuthRoutes(isAdmin, isPatient, canEditDoctorData, isStaff)
       : getDefaultRoutes();
     return createBrowserRouter(routes);
   }, [authenticated, isPatient, isAdmin]);
 
   useLayoutEffect(() => {
     const init = async () => {
-      await fetchFacilities();
-      await verifyAuthentication();
-      setAuthChecked(true);
+      try {
+        await Promise.all([
+          fetchFacilities(),
+          fetchSubscriptions(),
+          fetchDoctors(),
+          fetchAllServices(),
+          fetchSpecializations(),
+          fetchReferralTypes(),
+          verifyAuthentication(),
+        ]);
+        setAuthChecked(true);
+      } catch (error) {
+        console.error(error);
+      }
     };
 
-    init().catch(console.error);
+    init();
   }, []);
 
   if (loading || !authChecked) {

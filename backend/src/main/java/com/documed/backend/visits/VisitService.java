@@ -128,8 +128,13 @@ public class VisitService {
   }
 
   boolean startVisit(int visitId) {
-    if (visitDAO.getVisitStatus(visitId) != VisitStatus.PLANNED) {
+    Visit visit =
+        visitDAO.getById(visitId).orElseThrow(() -> new NotFoundException("Visit not found"));
+    if (visit.getStatus() != VisitStatus.PLANNED) {
       throw new WrongVisitStatusException("Visit should be in status PLANNED");
+    }
+    if (authService.getCurrentUserId() != visit.getDoctorId()) {
+      throw new UnauthorizedException("Only the doctor assigned to the visit can begin it");
     }
     return visitDAO.updateVisitStatus(visitId, VisitStatus.IN_PROGRESS);
   }

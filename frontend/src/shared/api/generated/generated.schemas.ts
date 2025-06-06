@@ -63,6 +63,12 @@ export interface FileInfoDTO {
   sizeBytes: number;
 }
 
+export interface FreeDaysDTO {
+  userId: number;
+  startDate: string;
+  endDate: string;
+}
+
 export interface ScheduleVisitDTO {
   patientInformation?: string;
   patientId: number;
@@ -186,6 +192,7 @@ export const ReturnReferralDTOStatus = {
 
 export interface ReturnReferralDTO {
   id: number;
+  issuingDoctorFullName: string;
   diagnosis: string;
   type: ReferralType;
   visitId: number;
@@ -218,6 +225,7 @@ export interface Prescription {
   date: string;
   expirationDate: string;
   status: PrescriptionStatus;
+  issuingDoctorFullName: string;
 }
 
 export interface ResetPasswordConfirmDTO {
@@ -447,7 +455,7 @@ export interface PatientDetailsDTO {
   firstName: string;
   lastName: string;
   email: string;
-  pesel: string;
+  pesel?: string;
   birthdate: string;
   subscriptionId?: number;
 }

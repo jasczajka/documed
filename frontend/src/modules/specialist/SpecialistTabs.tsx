@@ -1,31 +1,45 @@
 import { BeachAccess, CalendarMonth, Person2, QueryBuilder } from '@mui/icons-material';
 import { Box, Paper, Tab, Tabs } from '@mui/material';
+import VisitsTable from 'modules/visits/VisitsTable/VisitsTable';
 import { FC } from 'react';
-import { Specialization, UploadWorkTimeDTO } from 'shared/api/generated/generated.schemas';
+import {
+  Specialization,
+  UploadWorkTimeDTO,
+  VisitWithDetails,
+} from 'shared/api/generated/generated.schemas';
+import { useAllServicesStore } from 'shared/hooks/stores/useAllServicesStore';
 import { EditSpecializationsTab } from './tabs/EditSpecializationsTab';
 import { EditWorkTimeTab } from './tabs/EditWorkTimeTab';
 
 interface SpecialistTabsProps {
   doctorId: number;
+  doctorVisits: VisitWithDetails[];
+  refetchDoctorVisits: () => Promise<void>;
   currentSpecializations: Specialization[];
   currentWorkTimes: UploadWorkTimeDTO[];
   allSpecializations: Specialization[];
   handleUpdateSpecialistSpecializations: (selected: Specialization[]) => void;
   handleUpdateSpecialistWorkTimes: (selected: UploadWorkTimeDTO[]) => void;
+  handleCancelVisit: (visitId: number) => void;
   tabIndex: number;
   onTabChange: (index: number) => void;
   loading?: boolean;
 }
 export const SpecialistTabs: FC<SpecialistTabsProps> = ({
+  doctorId,
+  doctorVisits,
+  refetchDoctorVisits,
   currentSpecializations,
   currentWorkTimes,
   allSpecializations,
   handleUpdateSpecialistSpecializations,
   handleUpdateSpecialistWorkTimes,
+  handleCancelVisit,
   tabIndex,
   onTabChange,
   loading,
 }) => {
+  const allServices = useAllServicesStore((state) => state.allServices);
   return (
     <Box
       sx={{
@@ -59,7 +73,15 @@ export const SpecialistTabs: FC<SpecialistTabsProps> = ({
 
       <Paper sx={{ height: '100%', width: '100%', padding: 8, minHeight: '532px' }} elevation={1}>
         {tabIndex === 0 && <div>Urlopy</div>}
-        {tabIndex === 1 && <div>wizyty</div>}
+        {tabIndex === 1 && (
+          <VisitsTable
+            doctorId={doctorId}
+            visits={doctorVisits}
+            allServices={allServices}
+            onCancel={handleCancelVisit}
+            refetchVisits={refetchDoctorVisits}
+          />
+        )}
         {tabIndex === 2 && (
           <EditSpecializationsTab
             currentSpecializations={currentSpecializations}

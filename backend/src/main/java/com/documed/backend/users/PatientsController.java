@@ -4,11 +4,13 @@ import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
 import com.documed.backend.auth.exceptions.UserNotFoundException;
 import com.documed.backend.users.dtos.PatientDetailsDTO;
+import com.documed.backend.users.dtos.UserMapper;
 import com.documed.backend.users.exceptions.UserNotPatientException;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
 import com.documed.backend.users.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,15 @@ public class PatientsController {
 
   private final UserService userService;
 
+  @StaffOnly
+  @GetMapping()
+  public ResponseEntity<List<PatientDetailsDTO>> getAllPatientsDetails() {
+    List<User> patients = userService.getAllByRole(UserRole.PATIENT);
+
+    return new ResponseEntity<>(
+        patients.stream().map(UserMapper::toPatientDetailsDTO).toList(), HttpStatus.OK);
+  }
+
   @StaffOnlyOrSelf
   @GetMapping("/{id}")
   public ResponseEntity<PatientDetailsDTO> getPatientDetails(@PathVariable("id") int userId) {
@@ -30,18 +41,7 @@ public class PatientsController {
       throw new UserNotPatientException("User is not a patient");
     }
 
-    PatientDetailsDTO value =
-        PatientDetailsDTO.builder()
-            .id(user.getId())
-            .firstName(user.getFirstName())
-            .lastName(user.getLastName())
-            .email(user.getEmail())
-            .birthdate(user.getBirthDate())
-            .pesel(user.getPesel())
-            .subscriptionId(user.getSubscriptionId())
-            .build();
-
-    return new ResponseEntity<>(value, HttpStatus.OK);
+    return new ResponseEntity<>(UserMapper.toPatientDetailsDTO(user), HttpStatus.OK);
   }
 
   @StaffOnly

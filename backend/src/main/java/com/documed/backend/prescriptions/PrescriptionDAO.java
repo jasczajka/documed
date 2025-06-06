@@ -32,6 +32,8 @@ public class PrescriptionDAO implements FullDAO<Prescription, CreatePrescription
               .date(rs.getDate("date").toLocalDate())
               .expirationDate(rs.getDate("expiration_date").toLocalDate())
               .status(PrescriptionStatus.valueOf(rs.getString("status")))
+              .issuingDoctorFullName(
+                  rs.getString("doctor_first_name") + " " + rs.getString("doctor_last_name"))
               .build();
 
   @Override
@@ -52,7 +54,15 @@ public class PrescriptionDAO implements FullDAO<Prescription, CreatePrescription
     Number key = keyHolder.getKey();
 
     if (key != null) {
-      String selectSql = "SELECT * FROM prescription WHERE id = ?";
+      String selectSql =
+          """
+                SELECT p.id, p.access_code, p.date, p.expiration_date, p.status,
+                  d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
+                FROM prescription p
+                JOIN visit v ON p.visit_id = v.id
+                JOIN "User" d ON v.doctor_id = d.id
+                WHERE p.id = ?
+                """;
       return jdbcTemplate.queryForObject(selectSql, rowMapper, key.intValue());
     } else {
       throw new IllegalStateException("Failed to retrieve generated ID for prescription");
@@ -70,37 +80,56 @@ public class PrescriptionDAO implements FullDAO<Prescription, CreatePrescription
 
   @Override
   public Optional<Prescription> getById(int id) {
-    String sql = "SELECT * FROM prescription WHERE id = ?";
+    String sql =
+        """
+            SELECT p.id, p.access_code, p.date, p.expiration_date, p.status,
+              d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
+            FROM prescription p
+            JOIN visit v ON p.visit_id = v.id
+            JOIN "User" d ON v.doctor_id = d.id
+            WHERE p.id = ?
+            """;
 
     List<Prescription> prescriptions = jdbcTemplate.query(sql, rowMapper, id);
-
     return prescriptions.stream().findFirst();
   }
 
   public Integer getUserIdForPrescriptionById(int id) {
     String sql =
-        "SELECT \"User\".id "
-            + "FROM \"User\" "
-            + "JOIN visit ON \"User\".id = visit.patient_id "
-            + "JOIN prescription ON visit.id = prescription.visit_id "
-            + "WHERE prescription.id = ?";
+        """
+            SELECT u.id
+            FROM "User" u
+            JOIN visit v ON u.id = v.patient_id
+            JOIN prescription p ON v.id = p.visit_id
+            WHERE p.id = ?
+            """;
 
     List<Integer> userIds = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("id"), id);
-
     return userIds.stream().findFirst().orElse(null);
   }
 
   public List<Prescription> getAll() {
     String sql =
         """
-                SELECT *
-                FROM prescription
-                 """;
+            SELECT SELECT p.id, p.access_code, p.date, p.expiration_date, p.status,
+              d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
+            FROM prescription p
+            JOIN visit v ON p.visit_id = v.id
+            JOIN "User" d ON v.doctor_id = d.id
+            """;
     return jdbcTemplate.query(sql, rowMapper);
   }
 
   public Optional<Prescription> getPrescriptionForVisit(int visitId) {
-    String sql = "SELECT * FROM prescription WHERE visit_id = ?";
+    String sql =
+        """
+            SELECT p.id, p.access_code, p.date, p.expiration_date, p.status,
+              d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
+            FROM prescription p
+            JOIN visit v ON p.visit_id = v.id
+            JOIN "User" d ON v.doctor_id = d.id
+            WHERE p.visit_id = ?
+            """;
     return jdbcTemplate.query(sql, rowMapper, visitId).stream().findFirst();
   }
 
@@ -120,11 +149,12 @@ public class PrescriptionDAO implements FullDAO<Prescription, CreatePrescription
   public List<Prescription> getPrescriptionsForUser(int userId) {
     String sql =
         """
-            SELECT *
-            FROM prescription
-            JOIN visit ON prescription.visit_id = visit.id
-            WHERE patient_id = ?
-        """;
+            SELECT p.*, d.first_name AS doctor_first_name, d.last_name AS doctor_last_name
+            FROM prescription p
+            JOIN visit v ON p.visit_id = v.id
+            JOIN "User" d ON v.doctor_id = d.id
+            WHERE v.patient_id = ?
+            """;
     return jdbcTemplate.query(sql, rowMapper, userId);
   }
 

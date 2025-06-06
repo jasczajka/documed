@@ -6,9 +6,6 @@ import java.time.LocalDate;
 import lombok.Builder;
 import lombok.Data;
 
-// @TODO prescription return DTO, needs to include issuing doctor
-//  https://dokumentacjamedyczna.atlassian.net/browse/MED-109
-
 @Data
 @Builder
 public class Prescription {
@@ -26,4 +23,7 @@ public class Prescription {
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private PrescriptionStatus status;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private String issuingDoctorFullName;
 }

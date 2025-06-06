@@ -142,7 +142,7 @@ public class AdditionalServiceDAO implements FullDAO<AdditionalService, Addition
                f.last_name AS fulfiller_last_name,
                s.name AS service_name
            FROM Additional_service a
-           JOIN "User" p ON a.patient_id = p.id
+           JOIN "User" p ON a.patient_id = p.id AND p.account_status != 'DEACTIVATED'
            JOIN "User" f ON a.fulfiller_id = f.id
            JOIN service s ON a.service_id = s.id
            """;

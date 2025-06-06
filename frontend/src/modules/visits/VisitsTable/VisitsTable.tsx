@@ -2,6 +2,7 @@ import { Box, Button, Link, Paper, Typography } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 
 import { endOfDay, format, parse, startOfDay } from 'date-fns';
+import { getVisitStatusLabel } from 'modules/visit/utils';
 import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 import {
@@ -80,11 +81,21 @@ const columns = (
   {
     field: 'date',
     headerName: 'Data',
-    minWidth: 200,
     flex: 1,
     valueGetter: (_, row) => {
-      if (row.status === 'CANCELLED') return 'Anulowana';
+      if (row.status === 'CANCELLED') {
+        return 'Anulowana';
+      }
       return row.date ? format(new Date(row.date), 'dd.MM.yyyy') : 'Brak daty';
+    },
+  },
+  {
+    field: 'status',
+    headerName: 'Status',
+    flex: 1,
+    renderCell: (params) => {
+      const { label, color } = getVisitStatusLabel(params.row.status);
+      return <span style={{ color }}>{label}</span>;
     },
   },
   {
@@ -128,24 +139,35 @@ const columns = (
     width: 70,
     flex: 0.5,
     getActions: (params: { row: VisitWithDetails }) => {
-      if (params.row.status === 'CANCELLED') return [];
+      if (params.row.status === 'CANCELLED') {
+        return [];
+      }
 
-      const actions = [
-        <GridActionsCellItem
-          key={`begin-${params.row.id}`}
-          label="Przejdź do wizyty"
-          onClick={() => onNavigateToVisit(params.row.id)}
-          showInMenu
-        />,
-        <GridActionsCellItem
-          key={`cancel-${params.row.id}`}
-          label="Anuluj wizytę"
-          disabled={loading}
-          onClick={() => onCancel(params.row.id)}
-          showInMenu
-          sx={{ color: 'error.main' }}
-        />,
-      ];
+      const actions = [];
+
+      if (params.row.status === VisitWithDetailsStatus.PLANNED) {
+        actions.push(
+          <GridActionsCellItem
+            key={`cancel-${params.row.id}`}
+            label="Anuluj wizytę"
+            disabled={loading}
+            onClick={() => onCancel(params.row.id)}
+            showInMenu
+            sx={{ color: 'error.main' }}
+          />,
+        );
+      }
+
+      if (!isPatient || params.row.status === VisitWithDetailsStatus.CLOSED) {
+        actions.push(
+          <GridActionsCellItem
+            key={`begin-${params.row.id}`}
+            label="Przejdź do wizyty"
+            onClick={() => onNavigateToVisit(params.row.id)}
+            showInMenu
+          />,
+        );
+      }
 
       if (
         params.row.status === VisitWithDetailsStatus.CLOSED &&
@@ -192,6 +214,11 @@ export const VisitsTable: FC<VisitTableProps> = ({
   refetchVisits,
 }) => {
   const currentFacilityId = useAuthStore((state) => state.user?.facilityId);
+  const { isPatient } = useAuth();
+  const navigate = useNavigate();
+  const sitemap = useSitemap();
+  const { showNotification, NotificationComponent } = useNotification();
+
   const [filters, setFilters] = useState<VisitsFilters>({
     status: VisitWithDetailsStatus.PLANNED,
     patientName: '',
@@ -202,10 +229,6 @@ export const VisitsTable: FC<VisitTableProps> = ({
     facilityId: currentFacilityId ? currentFacilityId.toString() : '',
   });
 
-  const { isPatient } = useAuth();
-  const navigate = useNavigate();
-  const sitemap = useSitemap();
-  const { showNotification, NotificationComponent } = useNotification();
   const { visitsFilterConfig, filteredVisits } = useVisitsTable({
     visits,
     filters,

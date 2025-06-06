@@ -1,17 +1,23 @@
 import {
+  ArrowForwardIosOutlined,
   CalendarMonth,
   CalendarMonthOutlined,
   Cloud,
   CreditCard,
+  MedicationOutlined,
   Person2,
 } from '@mui/icons-material';
 import { Box, Paper, Tab, Tabs } from '@mui/material';
 import AdditionalServicesTable from 'modules/additionalServices/additionalServicesTable/AdditionalServicesTable';
+import { PrescriptionsTable } from 'modules/prescriptions/components/PrescriptionsTable/PrescriptionsTable';
+import { ReferralsTable } from 'modules/referrals/components/ReferralsTable';
 import VisitsTable from 'modules/visits/VisitsTable/VisitsTable';
 import { FC, useEffect } from 'react';
 import {
   AdditionalServiceWithDetails,
   FileInfoDTO,
+  Prescription,
+  ReturnReferralDTO,
   Service,
   VisitWithDetails,
 } from 'shared/api/generated/generated.schemas';
@@ -32,6 +38,8 @@ interface PatientTabsProps {
   patientAttachments: FileInfoDTO[];
   patientVisits: VisitWithDetails[];
   patientAdditionalServices: AdditionalServiceWithDetails[];
+  patientPrescriptions: Prescription[];
+  patientReferrals: ReturnReferralDTO[];
   allServices: Service[];
   allAdditionalServices: Service[];
   refetchVisits: () => Promise<void>;
@@ -47,6 +55,8 @@ export const PatientTabs: FC<PatientTabsProps> = ({
   patientAttachments,
   patientVisits,
   patientAdditionalServices,
+  patientPrescriptions,
+  patientReferrals,
   allServices,
   allAdditionalServices,
   refetchVisits,
@@ -99,6 +109,8 @@ export const PatientTabs: FC<PatientTabsProps> = ({
         <Tab icon={<CalendarMonthOutlined />} iconPosition="start" label="Usługi dodatkowe" />
         <Tab icon={<Person2 />} iconPosition="start" label="Dane osobowe" />
         <Tab icon={<CreditCard />} iconPosition="start" label="Abonament" />
+        <Tab icon={<MedicationOutlined />} iconPosition="start" label="Recepty" />
+        <Tab icon={<ArrowForwardIosOutlined />} iconPosition="start" label="Skierowania" />
       </Tabs>
 
       <Paper sx={{ height: '100%', width: '100%', padding: 8, minHeight: '532px' }} elevation={1}>
@@ -132,6 +144,8 @@ export const PatientTabs: FC<PatientTabsProps> = ({
             refetch={refetchPatientInfo}
           />
         )}
+        {tabIndex === 5 && <PrescriptionsTable prescriptions={patientPrescriptions} />}
+        {tabIndex === 6 && <ReferralsTable referrals={patientReferrals} />}
       </Paper>
       <NotificationComponent />
     </Box>

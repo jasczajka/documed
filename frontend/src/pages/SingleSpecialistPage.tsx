@@ -8,31 +8,32 @@ import {
   useUpdateDoctorSpecializations,
 } from 'shared/api/generated/doctors-controller/doctors-controller';
 import { Specialization, UploadWorkTimeDTO } from 'shared/api/generated/generated.schemas';
-import { useGetAllSpecializations } from 'shared/api/generated/specialization-controller/specialization-controller';
+import { useGetVisitsByDoctorId } from 'shared/api/generated/visit-controller/visit-controller';
 
 import {
   useGetWorkTimesForUser,
   useUpdateWorkTimesForUser,
 } from 'shared/api/generated/work-time-controller/work-time-controller';
+import CancelVisitModal from 'shared/components/ConfirmationModal/CancelVisitModal';
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
+import { useDoctorsStore } from 'shared/hooks/stores/useDoctorsStore';
+import { useSpecializationsStore } from 'shared/hooks/stores/useSpecializationsStore';
+import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
 
 const SingleSpecialistPage: FC = () => {
   const { id } = useParams();
   const doctorId = Number(id);
+  const allSpecializations = useSpecializationsStore((state) => state.specializations);
+  const refetchDoctors = useDoctorsStore((state) => state.fetchDoctors);
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
   const [tabIndex, setTabIndex] = useState(0);
   const { showNotification, NotificationComponent } = useNotification();
+  const { openModal } = useModal();
 
   const onTabChange = useCallback((index: number) => {
     setTabIndex(index);
   }, []);
-
-  const {
-    data: allSpecializations,
-    isLoading: isSpecializationsLoading,
-    isError: isSpecializationsError,
-  } = useGetAllSpecializations();
 
   const {
     data: doctorInfo,
@@ -46,6 +47,13 @@ const SingleSpecialistPage: FC = () => {
     isError: isDoctorWorkTimesError,
     refetch: refetchDoctorWorkTimes,
   } = useGetWorkTimesForUser(doctorId);
+
+  const {
+    data: doctorVisits,
+    isLoading: isDoctorVisitsLoading,
+    isError: isDoctorVisitsError,
+    refetch: refetchDoctorVisits,
+  } = useGetVisitsByDoctorId(doctorId);
 
   const {
     mutateAsync: updateDoctorSpecializations,
@@ -64,6 +72,7 @@ const SingleSpecialistPage: FC = () => {
   ) => {
     const specializationIds = updatedSpecializations.map((spec) => spec.id);
     await updateDoctorSpecializations({ id: doctorId, data: { specializationIds } });
+    await refetchDoctors();
     showNotification('Pomyślnie zaktualizowano specjalizacje!', 'success');
     setSpecializations(updatedSpecializations);
   };
@@ -75,15 +84,15 @@ const SingleSpecialistPage: FC = () => {
     showNotification('Pomyślnie zaktualizowano godziny pracy!', 'success');
   };
 
-  const isInitialLoading =
-    isSpecializationsLoading || isDoctorInfoLoading || isDoctorWorkTimesLoading;
-  const isLoading =
-    isSpecializationsLoading ||
-    isDoctorInfoLoading ||
-    isDoctorWorkTimesLoading ||
-    isUpdateDoctorSpecializationsLoading ||
-    isUpdateDoctorWorkTimesLoading;
-  const isInitialError = isSpecializationsError || isDoctorInfoError || isDoctorWorkTimesError;
+  const handleCancelVisitClick = (visitId: number) => {
+    openModal('cancelVisitModal', (close) => (
+      <CancelVisitModal visitId={visitId} onClose={close} onSuccess={refetchDoctorVisits} />
+    ));
+  };
+
+  const isInitialLoading = isDoctorInfoLoading || isDoctorWorkTimesLoading || isDoctorVisitsLoading;
+  const isLoading = isUpdateDoctorSpecializationsLoading || isUpdateDoctorWorkTimesLoading;
+  const isInitialError = isDoctorInfoError || isDoctorWorkTimesError || isDoctorVisitsError;
 
   useEffect(() => {
     if (isInitialError) {
@@ -114,17 +123,22 @@ const SingleSpecialistPage: FC = () => {
     return <FullPageLoadingSpinner />;
   }
 
-  if (doctorInfo && allSpecializations) {
+  if (doctorInfo && allSpecializations && doctorVisits) {
     return (
       <div className="flex flex-col">
         <CardHeader title={`dr. ${doctorInfo?.firstName} ${doctorInfo?.lastName}`} />
         <SpecialistTabs
           doctorId={doctorId}
+          doctorVisits={doctorVisits}
+          refetchDoctorVisits={async () => {
+            await refetchDoctorVisits();
+          }}
           currentSpecializations={specializations}
           currentWorkTimes={mapFromReturnWorkTimes(doctorWorkTimes ?? [])}
           allSpecializations={allSpecializations}
           handleUpdateSpecialistSpecializations={handleUpdateSpecialistSpecializations}
           handleUpdateSpecialistWorkTimes={handleUpdateSpecialistWorkTimes}
+          handleCancelVisit={handleCancelVisitClick}
           tabIndex={tabIndex}
           onTabChange={onTabChange}
           loading={isLoading}

@@ -175,6 +175,113 @@ export const useRemoveUserSubscription = <TError = ErrorType<unknown>, TContext 
 
   return useMutation(mutationOptions, queryClient);
 };
+export const getAllPatientsDetails = (signal?: AbortSignal) => {
+  return customInstance<PatientDetailsDTO[]>({ url: `/api/patients`, method: 'GET', signal });
+};
+
+export const getGetAllPatientsDetailsQueryKey = () => {
+  return [`/api/patients`] as const;
+};
+
+export const getGetAllPatientsDetailsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAllPatientsDetails>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getAllPatientsDetails>>, TError, TData>
+  >;
+}) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetAllPatientsDetailsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllPatientsDetails>>> = ({ signal }) =>
+    getAllPatientsDetails(signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAllPatientsDetails>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAllPatientsDetailsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAllPatientsDetails>>
+>;
+export type GetAllPatientsDetailsQueryError = ErrorType<unknown>;
+
+export function useGetAllPatientsDetails<
+  TData = Awaited<ReturnType<typeof getAllPatientsDetails>>,
+  TError = ErrorType<unknown>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllPatientsDetails>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllPatientsDetails>>,
+          TError,
+          Awaited<ReturnType<typeof getAllPatientsDetails>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAllPatientsDetails<
+  TData = Awaited<ReturnType<typeof getAllPatientsDetails>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllPatientsDetails>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllPatientsDetails>>,
+          TError,
+          Awaited<ReturnType<typeof getAllPatientsDetails>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAllPatientsDetails<
+  TData = Awaited<ReturnType<typeof getAllPatientsDetails>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllPatientsDetails>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useGetAllPatientsDetails<
+  TData = Awaited<ReturnType<typeof getAllPatientsDetails>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllPatientsDetails>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetAllPatientsDetailsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
 export const getPatientDetails = (id: number, signal?: AbortSignal) => {
   return customInstance<PatientDetailsDTO>({ url: `/api/patients/${id}`, method: 'GET', signal });
 };

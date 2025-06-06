@@ -24,10 +24,6 @@ public class ReferralService {
         .orElseThrow(() -> new NotFoundException("Referral not found"));
   }
 
-  public List<Referral> getAllReferrals() {
-    return referralDAO.getAll();
-  }
-
   public List<Referral> getReferralsForVisit(int visitId) {
     return referralDAO.getReferralsForVisit(visitId);
   }

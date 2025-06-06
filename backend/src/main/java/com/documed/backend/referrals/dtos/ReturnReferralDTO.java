@@ -15,6 +15,9 @@ public class ReturnReferralDTO {
   private int id;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  private String issuingDoctorFullName;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String diagnosis;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)

@@ -30,7 +30,6 @@ public class SubscriptionController {
     return new ResponseEntity<>(subscription, HttpStatus.OK);
   }
 
-  @StaffOnly
   @GetMapping
   @Operation(summary = "Get all subscriptions")
   public ResponseEntity<List<Subscription>> getAllSubscriptions() {
