@@ -20,6 +20,9 @@ public class JwtUtil {
   @Value("${jwt.expiration}")
   private Long expiration;
 
+  @Value("${jwt.refresh_threshold}")
+  private Long refreshThreshold;
+
   private SecretKey getSigningKey() {
     return Keys.hmacShaKeyFor(secret.getBytes());
   }
@@ -48,6 +51,28 @@ public class JwtUtil {
     } catch (Exception e) {
       return false;
     }
+  }
+
+  public String refreshTokenIfNeeded(String token) {
+    if (shouldRefreshToken(token)) {
+      Claims claims = extractAllClaims(token);
+      return createToken(claims, claims.getSubject());
+    }
+    return null;
+  }
+
+  public boolean shouldRefreshToken(String token) {
+    try {
+      Date expirationDate = extractExpiration(token);
+      long timeUntilExpiration = expirationDate.getTime() - System.currentTimeMillis();
+      return timeUntilExpiration < (refreshThreshold * 1000);
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
+  public Date extractExpiration(String token) {
+    return extractClaim(token, Claims::getExpiration);
   }
 
   public String extractRole(String token) {
