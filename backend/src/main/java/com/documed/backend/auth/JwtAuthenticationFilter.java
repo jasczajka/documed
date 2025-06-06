@@ -75,6 +75,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         throw new RuntimeException("Invalid token");
       }
 
+      String refreshedToken = jwtUtil.refreshTokenIfNeeded(jwt);
+      if (refreshedToken != null) {
+        logger.info("Refreshing JWT token for request: {}", requestUri);
+        addJwtCookieToResponse(response, refreshedToken);
+        jwt = refreshedToken;
+      }
+
       Integer userId = jwtUtil.extractUserId(jwt);
       String role = jwtUtil.extractRole(jwt);
       Integer facilityId = jwtUtil.extractFacilityId(jwt);
@@ -125,6 +132,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     cookie.setAttribute("SameSite", "None");
     cookie.setSecure(true);
     cookie.setMaxAge(0);
+    response.addCookie(cookie);
+  }
+
+  public void addJwtCookieToResponse(HttpServletResponse response, String token) {
+    Cookie cookie = new Cookie(AUTH_COOKIE_NAME, token);
+    cookie.setHttpOnly(true);
+    cookie.setPath("/");
+    cookie.setSecure(true);
+    cookie.setAttribute("SameSite", "None");
     response.addCookie(cookie);
   }
 }
