@@ -74,13 +74,7 @@ public class AuthController {
     AuthResponseDTO authResponse =
         authService.confirmRegistration(request.getEmail(), request.getOtp());
 
-    Cookie jwtCookie = new Cookie(JWT_COOKIE_NAME, authResponse.getToken());
-    jwtCookie.setHttpOnly(true);
-    jwtCookie.setPath("/");
-    jwtCookie.setMaxAge(60 * 60 * 24 * 7); // 1 week
-    jwtCookie.setAttribute("SameSite", "None");
-    jwtCookie.setSecure(true);
-    servletResponse.addCookie(jwtCookie);
+    addJwtCookie(servletResponse, authResponse.getToken());
 
     logger.info("User registration confirmed for ID: {}", authResponse.getUserId());
     return ResponseEntity.ok().build();
@@ -163,14 +157,8 @@ public class AuthController {
         authService.loginUser(request.getLogin(), request.getPassword(), request.getFacilityId());
     logger.debug("Login successful for user ID: {}", authResponse.getUserId());
 
-    Cookie jwtCookie = new Cookie(JWT_COOKIE_NAME, authResponse.getToken());
-    jwtCookie.setHttpOnly(true);
-    jwtCookie.setPath("/");
-    jwtCookie.setMaxAge(60 * 60 * 24 * 7); // 1 week
-    jwtCookie.setAttribute("SameSite", "None");
-    jwtCookie.setSecure(true);
+    addJwtCookie(servletResponse, authResponse.getToken());
 
-    servletResponse.addCookie(jwtCookie);
     logger.debug("JWT cookie set for user {}", authResponse.getUserId());
 
     return ResponseEntity.ok().build();
@@ -254,6 +242,16 @@ public class AuthController {
       logger.error("Failed to deactivate account for user: ID {}", id);
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
     }
+  }
+
+  private void addJwtCookie(HttpServletResponse response, String token) {
+    Cookie jwtCookie = new Cookie(JWT_COOKIE_NAME, token);
+    jwtCookie.setHttpOnly(true);
+    jwtCookie.setPath("/");
+    jwtCookie.setMaxAge(60 * 60 * 24 * 7); // 1 week
+    jwtCookie.setAttribute("SameSite", "None");
+    jwtCookie.setSecure(true);
+    response.addCookie(jwtCookie);
   }
 
   private void clearJwtCookie(HttpServletResponse response) {
