@@ -23,7 +23,7 @@ public class DoctorsController {
 
   private final UserService userService;
 
-  //TODO annotation
+  //TODO pacjent lekarz
   @GetMapping("/{id}")
   public ResponseEntity<DoctorDetailsDTO> getDoctorDetails(@PathVariable("id") int userId) {
     User user =
@@ -35,7 +35,7 @@ public class DoctorsController {
     return new ResponseEntity<>(dto, HttpStatus.OK);
   }
 
-  //TODO annotation admin and clerk?
+  //TODO annotation clerk
   @StaffOnly
   @PatchMapping("/{id}")
   public ResponseEntity<List<Integer>> updateDoctorSpecializations(

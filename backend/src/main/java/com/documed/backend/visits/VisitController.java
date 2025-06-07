@@ -26,7 +26,8 @@ public class VisitController {
 
   private final VisitService visitService;
 
-  //TODO discuss if needed
+  //TODO clerk i lekarz
+  // filtr na date na ostatni miesiac i na bazie uzywac
   @StaffOnly
   @GetMapping
   @Operation(summary = "Get all visits")
@@ -35,6 +36,7 @@ public class VisitController {
     return new ResponseEntity<>(visitService.getAllWithDetails(), HttpStatus.OK);
   }
 
+  //lekarz i paciejnt
   @GetMapping("/{id}")
   @Operation(summary = "Get visit by id")
   public ResponseEntity<VisitWithDetails> getVisitById(@PathVariable("id") int id) {
@@ -42,7 +44,7 @@ public class VisitController {
     return new ResponseEntity<>(visit, HttpStatus.OK);
   }
 
-  //TODO annotatnion
+  //TODO pacjent i clerk
   @PostMapping
   @Operation(summary = "schedule/create visit")
   public ResponseEntity<VisitWithDetails> scheduleVisit(
@@ -81,7 +83,7 @@ public class VisitController {
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
-  @StaffOnly
+  @StaffOnly //pacjent lekrz i rejestrator
   @Operation(summary = "get all visits for selected patient")
   @GetMapping("/patient/{id}")
   public ResponseEntity<List<VisitWithDetails>> getVisitsByPatientId(

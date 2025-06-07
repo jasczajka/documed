@@ -22,17 +22,6 @@ public class TimeSlotController {
   private final TimeSlotService timeSlotService;
   private final FreeDaysService freeDaysService;
 
-  //TODO annotation
-  @StaffOnly
-  @GetMapping("/{id}")
-  @Operation(summary = "Get timeslot by id")
-  public ResponseEntity<TimeSlot> getTimeSlotById(@PathVariable("id") int id) {
-    return timeSlotService
-        .getTimeSlotById(id)
-        .map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
-  }
-
   @GetMapping("/doctors/{doctor_id}/available-timeslots")
   @Operation(summary = "Get available timeslots for doctor by id and required visit length")
   public ResponseEntity<List<AvailableTimeSlotDTO>> getAvailableFirstTimeSlotsByDoctorAndFacility(

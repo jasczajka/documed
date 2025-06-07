@@ -39,7 +39,7 @@ public class PrescriptionController {
         HttpStatus.OK);
   }
 
-  //TODO annotation
+  //TODO annotation, lekarz i pacjent
   @GetMapping("/visit/{visit_id}")
   @Operation(summary = "Get Prescription For Visit")
   public ResponseEntity<Optional<Prescription>> getPrescriptionForVisit(
@@ -66,7 +66,7 @@ public class PrescriptionController {
     return ResponseEntity.ok(prescriptions);
   }
 
-  //TODO annotation
+  //TODO annotation lekarz i pacjent
   @GetMapping("/{prescription_id}/medicines")
   public ResponseEntity<List<MedicineWithAmount>> getMedicinesForPrescription(
       @PathVariable("prescription_id") int prescriptionId) {
@@ -116,18 +116,8 @@ public class PrescriptionController {
     return ResponseEntity.ok(result);
   }
 
-  //TODO do we need it, the prescription is issued when closing visit
-  @DoctorOnly
-  @PatchMapping("/{prescription_id}/issue")
-  @Operation(summary = "Issue prescription")
-  public ResponseEntity<Prescription> issuePrescription(
-      @PathVariable("prescription_id") int prescriptionId,
-      @RequestBody LocalDate newExpirationDate) {
-    return ResponseEntity.ok(
-        prescriptionService.issuePrescription(prescriptionId, newExpirationDate));
-  }
+  //TODO issue przy closowaniu
 
-  @DoctorOnly
   @PatchMapping("/{prescription_id}/expiration-date")
   @Operation(summary = "Update prescription expiration Date")
   public ResponseEntity<Prescription> updatePrescriptionExpirationDate(

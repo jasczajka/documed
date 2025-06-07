@@ -19,7 +19,7 @@ public class WorkTimeController {
 
   private final WorkTimeService workTimeService;
 
-  //TODO annotation
+  //TODO annotation rejestrator, lekarz
   @StaffOnly
   @GetMapping("/{user_id}")
   @Operation(summary = "Get all worktimes for user")

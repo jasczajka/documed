@@ -23,13 +23,4 @@ public class SpecializationController {
     List<Specialization> specializations = specializationService.getAll();
     return new ResponseEntity<>(specializations, HttpStatus.OK);
   }
-
-  //TODO check if it's used
-  @GetMapping("/{id}")
-  public ResponseEntity<Specialization> getSpecialization(@PathVariable int id) {
-    return specializationService
-        .getById(id)
-        .map(value -> new ResponseEntity<>(value, HttpStatus.OK))
-        .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
-  }
 }
