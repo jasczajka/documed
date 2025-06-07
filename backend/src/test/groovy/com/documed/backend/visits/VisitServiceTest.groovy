@@ -142,7 +142,7 @@ class VisitServiceTest extends Specification {
 		def visit = buildVisit([id: id, status: VisitStatus.PLANNED, doctorId: 999])
 		visitDAO.getVisitStatus(id) >> VisitStatus.PLANNED
 		visitDAO.getById(id) >> Optional.of(visit)
-		authService.getCurrentUserId() >> 123 // different than 999
+		authService.getCurrentUserId() >> 123
 
 		when:
 		visitService.startVisit(id)
@@ -586,7 +586,7 @@ class VisitServiceTest extends Specification {
 
 		prescriptionService.getPrescriptionIdForVisitId(visitId) >> Optional.of(prescriptionId)
 		prescriptionService.getNumberOfMedicinesOnPrescriptionByVisitId(visitId) >> 0
-		prescriptionService.getPrescriptionForVisit(visitId) >> Optional.empty() // 👈 DODANE
+		prescriptionService.getPrescriptionForVisit(visitId) >> Optional.empty()
 
 		referralService.getReferralsForVisit(visitId) >> []
 
@@ -613,7 +613,7 @@ class VisitServiceTest extends Specification {
 
 		prescriptionService.getPrescriptionIdForVisitId(visitId) >> Optional.of(prescriptionId)
 		prescriptionService.getNumberOfMedicinesOnPrescriptionByVisitId(visitId) >> 2
-		prescriptionService.getPrescriptionForVisit(visitId) >> Optional.empty() // 👈 DODANE
+		prescriptionService.getPrescriptionForVisit(visitId) >> Optional.empty()
 
 		referralService.getReferralsForVisit(visitId) >> []
 

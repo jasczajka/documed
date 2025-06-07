@@ -1,10 +1,10 @@
 package com.documed.backend.schedules;
 
 import com.documed.backend.auth.annotations.WardClerkOnly;
+import com.documed.backend.schedules.dtos.*;
 import com.documed.backend.schedules.dtos.AvailableTimeSlotDTO;
 import com.documed.backend.schedules.dtos.FreeDaysDTO;
 import com.documed.backend.schedules.dtos.TimeSlotMapper;
-import com.documed.backend.schedules.dtos.*;
 import com.documed.backend.schedules.model.FreeDays;
 import com.documed.backend.schedules.model.TimeSlot;
 import io.swagger.v3.oas.annotations.Operation;
