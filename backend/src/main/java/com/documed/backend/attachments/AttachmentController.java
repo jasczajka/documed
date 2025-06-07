@@ -7,6 +7,7 @@ import com.documed.backend.attachments.dtos.UploadUrlResponseDTO;
 import com.documed.backend.attachments.model.Attachment;
 import com.documed.backend.attachments.model.AttachmentStatus;
 import com.documed.backend.auth.AuthService;
+import com.documed.backend.auth.annotations.MedicalStaffOnly;
 import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
 import com.documed.backend.visits.VisitService;
 import com.documed.backend.visits.model.Visit;
@@ -96,6 +97,7 @@ public class AttachmentController {
         .body(s3Service.generateFileInfoDtosForAttachments(attachmentList));
   }
 
+  @MedicalStaffOnly
   @DeleteMapping("/{id}")
   public ResponseEntity<String> deleteFile(@PathVariable int id) {
     Attachment attachment = s3Service.getUploadedById(id);

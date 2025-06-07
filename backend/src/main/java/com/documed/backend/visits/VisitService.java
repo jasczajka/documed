@@ -6,6 +6,7 @@ import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.others.EmailService;
 import com.documed.backend.prescriptions.PrescriptionService;
+import com.documed.backend.prescriptions.model.Prescription;
 import com.documed.backend.referrals.ReferralService;
 import com.documed.backend.referrals.model.Referral;
 import com.documed.backend.schedules.TimeSlotService;
@@ -147,6 +148,9 @@ public class VisitService {
     removePrescriptionFromVisitIfEmpty(visitId);
     updateVisit(visitId, updateVisitDTO);
     List<Referral> referrals = referralService.getReferralsForVisit(visitId);
+    Optional<Prescription> prescription = prescriptionService.getPrescriptionForVisit(visitId);
+    prescription.ifPresent(value -> prescriptionService.issuePrescription(value.getId()));
+
     if (!referrals.isEmpty()) {
       referrals.forEach(referral -> referralService.issueReferral(referral.getId()));
     }

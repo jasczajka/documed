@@ -1,7 +1,10 @@
 package com.documed.backend.schedules;
 
-import com.documed.backend.auth.annotations.StaffOnly;
+import com.documed.backend.auth.annotations.WardClerkOnly;
 import com.documed.backend.schedules.dtos.*;
+import com.documed.backend.schedules.dtos.AvailableTimeSlotDTO;
+import com.documed.backend.schedules.dtos.FreeDaysDTO;
+import com.documed.backend.schedules.dtos.TimeSlotMapper;
 import com.documed.backend.schedules.model.FreeDays;
 import com.documed.backend.schedules.model.TimeSlot;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,16 +24,6 @@ public class TimeSlotController {
   private final TimeSlotService timeSlotService;
   private final FreeDaysService freeDaysService;
 
-  @StaffOnly
-  @GetMapping("/{id}")
-  @Operation(summary = "Get timeslot by id")
-  public ResponseEntity<TimeSlot> getTimeSlotById(@PathVariable("id") int id) {
-    return timeSlotService
-        .getTimeSlotById(id)
-        .map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
-  }
-
   @GetMapping("/doctors/{doctor_id}/available-timeslots")
   @Operation(summary = "Get available timeslots for doctor by id and required visit length")
   public ResponseEntity<List<AvailableTimeSlotDTO>> getAvailableFirstTimeSlotsByDoctorAndFacility(
@@ -47,6 +40,8 @@ public class TimeSlotController {
     return ResponseEntity.ok(dtos);
   }
 
+  // TODO annotation ward clerk only
+  @WardClerkOnly
   @PostMapping("/freeDay")
   @Operation(summary = "Create new FreeDays for doctor")
   public ResponseEntity<FreeDaysReturnDTO> createFreeDays(

@@ -1,7 +1,8 @@
 package com.documed.backend.referrals;
 
 import com.documed.backend.auth.AuthService;
-import com.documed.backend.auth.annotations.StaffOnly;
+import com.documed.backend.auth.annotations.DoctorOnly;
+import com.documed.backend.auth.annotations.DoctorOrPatient;
 import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
 import com.documed.backend.auth.exceptions.UnauthorizedException;
 import com.documed.backend.referrals.dtos.CreateReferralDTO;
@@ -30,7 +31,7 @@ public class ReferralController {
   private final VisitService visitService;
   private final AuthService authService;
 
-  @StaffOnly
+  @DoctorOnly
   @PostMapping
   @Operation(summary = "Create referral")
   public ResponseEntity<ReturnReferralDTO> createReferral(
@@ -67,6 +68,8 @@ public class ReferralController {
     return new ResponseEntity<>(dtos, HttpStatus.OK);
   }
 
+  // TODO annotation pacjent i lekarz
+  @DoctorOrPatient
   @GetMapping("/visit/{visitId}")
   @Operation(summary = "Get all referrals for visit")
   public ResponseEntity<List<ReturnReferralDTO>> getAllReferralsForVisit(
@@ -86,7 +89,7 @@ public class ReferralController {
     return new ResponseEntity<>(dtos, HttpStatus.OK);
   }
 
-  @StaffOnly
+  @DoctorOnly
   @DeleteMapping("/{referralId}")
   @Operation(summary = "Remove referral")
   public ResponseEntity<Integer> removeReferral(@PathVariable int referralId) {

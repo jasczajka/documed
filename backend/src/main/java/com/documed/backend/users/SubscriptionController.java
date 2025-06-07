@@ -57,6 +57,7 @@ public class SubscriptionController {
     }
   }
 
+  // TODO clerk only
   @StaffOnly
   @PutMapping("{subscriptionId}/services/{serviceId}")
   public ResponseEntity<String> updateServiceDiscount(

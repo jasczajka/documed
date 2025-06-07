@@ -1,5 +1,6 @@
 package com.documed.backend.medicines;
 
+import com.documed.backend.auth.annotations.DoctorOnly;
 import com.documed.backend.medicines.model.Medicine;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class MedicineController {
   private final MedicineService medicineService;
 
+  @DoctorOnly
   @GetMapping("/search")
   @Operation(summary = "Search medicines (lite version for async select)")
   public List<Medicine> searchMedicines(
@@ -25,6 +27,7 @@ public class MedicineController {
     return medicineService.search(query, limit);
   }
 
+  @DoctorOnly
   @GetMapping
   @Operation(summary = "Get all medicines (full version)")
   public List<Medicine> getAllMedicines(
@@ -34,6 +37,7 @@ public class MedicineController {
     return medicineService.getLimited(limit);
   }
 
+  @DoctorOnly
   @GetMapping("/{id}")
   @Operation(summary = "Get medicine by ID")
   public Optional<Medicine> getMedicine(

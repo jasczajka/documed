@@ -1,6 +1,7 @@
 package com.documed.backend.prescriptions;
 
 import com.documed.backend.FullDAO;
+import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.medicines.MedicineService;
 import com.documed.backend.medicines.model.Medicine;
 import com.documed.backend.prescriptions.model.CreatePrescriptionObject;
@@ -105,7 +106,9 @@ public class PrescriptionDAO implements FullDAO<Prescription, CreatePrescription
             """;
 
     List<Integer> userIds = jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("id"), id);
-    return userIds.stream().findFirst().orElse(null);
+    return userIds.stream()
+        .findFirst()
+        .orElseThrow(() -> new NotFoundException("Patient not found"));
   }
 
   public List<Prescription> getAll() {
@@ -158,15 +161,14 @@ public class PrescriptionDAO implements FullDAO<Prescription, CreatePrescription
     return jdbcTemplate.query(sql, rowMapper, userId);
   }
 
-  public int updatePrescriptionStatus(
-      int prescriptionId, PrescriptionStatus status, LocalDate newExpirationDate) {
+  public int updatePrescriptionStatus(int prescriptionId, PrescriptionStatus status) {
     String sql =
         """
         UPDATE prescription
-        SET status = ?, date = current_date, expiration_date = ?
+        SET status = ?, date = current_date
         WHERE id = ?;
-    """;
-    return jdbcTemplate.update(sql, status, newExpirationDate, prescriptionId);
+        """;
+    return jdbcTemplate.update(sql, status.name(), prescriptionId);
   }
 
   public void updatePrescriptionExpirationDate(int prescriptionId, LocalDate newExpirationDate) {
