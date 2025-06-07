@@ -148,20 +148,8 @@ export const AppRouter = () => {
   useLayoutEffect(() => {
     const init = async () => {
       try {
+        await fetchFacilities();
         await verifyAuthentication();
-        const fetches = [fetchFacilities()];
-
-        if (authenticated) {
-          fetches.push(
-            fetchSubscriptions(),
-            fetchDoctors(),
-            fetchAllServices(),
-            fetchSpecializations(),
-            fetchReferralTypes(),
-          );
-        }
-
-        await Promise.allSettled(fetches);
       } catch (error) {
         console.error(error);
       } finally {
@@ -171,6 +159,28 @@ export const AppRouter = () => {
 
     init();
   }, []);
+
+  useLayoutEffect(() => {
+    if (!authenticated) {
+      return;
+    }
+
+    const fetchAfterAuth = async () => {
+      try {
+        await Promise.allSettled([
+          fetchSubscriptions(),
+          fetchDoctors(),
+          fetchAllServices(),
+          fetchSpecializations(),
+          fetchReferralTypes(),
+        ]);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchAfterAuth();
+  }, [authenticated]);
 
   if (loading || !authChecked) {
     return <FullPageLoadingSpinner />;
