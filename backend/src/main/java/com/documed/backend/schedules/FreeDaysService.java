@@ -1,6 +1,7 @@
 package com.documed.backend.schedules;
 
 import com.documed.backend.exceptions.BadRequestException;
+import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.schedules.dtos.FreeDaysDTO;
 import com.documed.backend.schedules.model.FreeDays;
 import com.documed.backend.visits.VisitService;
@@ -19,7 +20,7 @@ public class FreeDaysService {
   private final TimeSlotService timeSlotService;
 
   @Transactional
-  public void createFreeDay(FreeDaysDTO freeDaysDTO) {
+  public FreeDays createFreeDays(FreeDaysDTO freeDaysDTO) {
 
     if (freeDaysDTO.getStartDate().isAfter(freeDaysDTO.getEndDate())) {
       throw new BadRequestException("Start date cannot be after end date");
@@ -36,10 +37,27 @@ public class FreeDaysService {
         timeSlotService.getVisitIdsByDoctorAndDateRange(
             freeDays.getUserId(), freeDays.getStartDate(), freeDays.getEndDate());
 
-    freeDaysDAO.create(freeDays);
+    FreeDays created = freeDaysDAO.create(freeDays);
     if (!visitsToCancel.isEmpty()) {
       visitsToCancel.forEach(visitService::cancelVisit);
     }
     timeSlotDAO.reserveTimeSlotsForFreeDays(freeDays);
+    return created;
+  }
+
+  @Transactional
+  public void cancelFreeDays(int freeDaysId) {
+
+    FreeDays freeDays =
+        freeDaysDAO
+            .getById(freeDaysId)
+            .orElseThrow(() -> new NotFoundException("FreeDays not found"));
+
+    timeSlotDAO.releaseTimeSlotsForFreeDays(freeDays);
+    freeDaysDAO.delete(freeDaysId);
+  }
+
+  public List<FreeDays> getFreeDaysByUserId(int userId) {
+    return freeDaysDAO.getByUserId(userId);
   }
 }
