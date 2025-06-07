@@ -2,7 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Delete } from '@mui/icons-material';
 import { Box, Button, Card, IconButton, TextField } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { format, isAfter, parseISO } from 'date-fns';
+import { areIntervalsOverlapping, format, isAfter, parseISO } from 'date-fns';
 import dayjs from 'dayjs';
 import { FC } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -11,6 +11,7 @@ import { cancelFreeDays } from 'shared/api/generated/time-slot-controller/time-s
 import { appConfig } from 'shared/appConfig';
 import ConfirmationModal from 'shared/components/ConfirmationModal/ConfirmationModal';
 import { useModal } from 'shared/hooks/useModal';
+import { useNotification } from 'shared/hooks/useNotification';
 import * as Yup from 'yup';
 
 type FormData = {
@@ -46,6 +47,8 @@ export const FreeDaysTab: FC<FreeDaysTabProps> = ({
   loading,
 }) => {
   const { openModal } = useModal();
+  const { showNotification, NotificationComponent } = useNotification();
+
   const {
     control,
     handleSubmit,
@@ -56,6 +59,26 @@ export const FreeDaysTab: FC<FreeDaysTabProps> = ({
   });
 
   const onSubmit = async (data: FormData) => {
+    const newRange = {
+      start: new Date(data.startDate),
+      end: new Date(data.endDate),
+    };
+
+    const overlaps = currentFreeDays.some((freeDays) =>
+      areIntervalsOverlapping(
+        {
+          start: new Date(freeDays.startDate),
+          end: new Date(freeDays.endDate),
+        },
+        newRange,
+      ),
+    );
+
+    if (overlaps) {
+      showNotification('Nowy urlop nachodzi na inny istniejący urlop.', 'error');
+      return;
+    }
+
     openModal('confirmNewFreeDaysModal', (close) => (
       <ConfirmationModal
         message="Pamiętaj, że dodanie urlopu dla lekarza spowoduje anulowanie jego wizyt w tym czasie!"
@@ -176,6 +199,7 @@ export const FreeDaysTab: FC<FreeDaysTabProps> = ({
           />
         </Card>
       </Box>
+      <NotificationComponent />
     </Box>
   );
 };

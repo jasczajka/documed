@@ -37,6 +37,17 @@ public class FreeDaysService {
         timeSlotService.getVisitIdsByDoctorAndDateRange(
             freeDays.getUserId(), freeDays.getStartDate(), freeDays.getEndDate());
 
+    List<FreeDays> existingFreeDays = getFreeDaysByUserId(freeDays.getUserId());
+    boolean hasOverlap =
+        existingFreeDays.stream()
+            .anyMatch(
+                existingFreeDay ->
+                    !(existingFreeDay.getEndDate().isBefore(freeDaysDTO.getStartDate())
+                        || existingFreeDay.getStartDate().isAfter(freeDaysDTO.getEndDate())));
+    if (hasOverlap) {
+      throw new BadRequestException("Free days overlap with existing entries");
+    }
+
     FreeDays created = freeDaysDAO.create(freeDays);
     if (!visitsToCancel.isEmpty()) {
       visitsToCancel.forEach(visitService::cancelVisit);
