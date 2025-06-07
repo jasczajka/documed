@@ -4,6 +4,9 @@ import com.documed.backend.auth.annotations.DoctorOrPatient;
 import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.auth.annotations.WardClerkOnly;
 import com.documed.backend.auth.exceptions.UserNotFoundException;
+import com.documed.backend.schedules.FreeDaysService;
+import com.documed.backend.schedules.dtos.FreeDaysMapper;
+import com.documed.backend.schedules.model.FreeDays;
 import com.documed.backend.users.dtos.DoctorDetailsDTO;
 import com.documed.backend.users.dtos.UpdateDoctorSpecializationsDTO;
 import com.documed.backend.users.exceptions.UserNotDoctorException;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 public class DoctorsController {
 
   private final UserService userService;
+  private final FreeDaysService freeDaysService;
 
   // TODO pacjent lekarz
   @DoctorOrPatient
@@ -60,12 +64,14 @@ public class DoctorsController {
       throw new UserNotDoctorException("User is not a doctor");
     }
     List<Specialization> specializations = userService.getUserSpecializationsById(user.getId());
+    List<FreeDays> freeDaysList = freeDaysService.getFreeDaysByUserId(user.getId());
     return DoctorDetailsDTO.builder()
         .id(user.getId())
         .firstName(user.getFirstName())
         .lastName(user.getLastName())
         .email(user.getEmail())
         .specializations(specializations)
+        .freeDays(freeDaysList.stream().map(FreeDaysMapper::toDTO).toList())
         .build();
   }
 }

@@ -23,6 +23,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import type {
   AvailableTimeSlotDTO,
   FreeDaysDTO,
+  FreeDaysReturnDTO,
   GetAvailableFirstTimeSlotsByDoctorAndFacilityParams,
   TimeSlot,
 } from '../generated.schemas';
@@ -31,10 +32,10 @@ import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
 
 /**
- * @summary Create new FreeDay for doctor
+ * @summary Create new FreeDays for doctor
  */
-export const createFreeDay = (freeDaysDTO: FreeDaysDTO, signal?: AbortSignal) => {
-  return customInstance<string>({
+export const createFreeDays = (freeDaysDTO: FreeDaysDTO, signal?: AbortSignal) => {
+  return customInstance<FreeDaysReturnDTO>({
     url: `/timeslots/freeDay`,
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -43,23 +44,23 @@ export const createFreeDay = (freeDaysDTO: FreeDaysDTO, signal?: AbortSignal) =>
   });
 };
 
-export const getCreateFreeDayMutationOptions = <
+export const getCreateFreeDaysMutationOptions = <
   TError = ErrorType<unknown>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createFreeDay>>,
+    Awaited<ReturnType<typeof createFreeDays>>,
     TError,
     { data: FreeDaysDTO },
     TContext
   >;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof createFreeDay>>,
+  Awaited<ReturnType<typeof createFreeDays>>,
   TError,
   { data: FreeDaysDTO },
   TContext
 > => {
-  const mutationKey = ['createFreeDay'];
+  const mutationKey = ['createFreeDays'];
   const { mutation: mutationOptions } = options
     ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
       ? options
@@ -67,28 +68,28 @@ export const getCreateFreeDayMutationOptions = <
     : { mutation: { mutationKey } };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createFreeDay>>,
+    Awaited<ReturnType<typeof createFreeDays>>,
     { data: FreeDaysDTO }
   > = (props) => {
     const { data } = props ?? {};
 
-    return createFreeDay(data);
+    return createFreeDays(data);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type CreateFreeDayMutationResult = NonNullable<Awaited<ReturnType<typeof createFreeDay>>>;
-export type CreateFreeDayMutationBody = FreeDaysDTO;
-export type CreateFreeDayMutationError = ErrorType<unknown>;
+export type CreateFreeDaysMutationResult = NonNullable<Awaited<ReturnType<typeof createFreeDays>>>;
+export type CreateFreeDaysMutationBody = FreeDaysDTO;
+export type CreateFreeDaysMutationError = ErrorType<unknown>;
 
 /**
- * @summary Create new FreeDay for doctor
+ * @summary Create new FreeDays for doctor
  */
-export const useCreateFreeDay = <TError = ErrorType<unknown>, TContext = unknown>(
+export const useCreateFreeDays = <TError = ErrorType<unknown>, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof createFreeDay>>,
+      Awaited<ReturnType<typeof createFreeDays>>,
       TError,
       { data: FreeDaysDTO },
       TContext
@@ -96,12 +97,12 @@ export const useCreateFreeDay = <TError = ErrorType<unknown>, TContext = unknown
   },
   queryClient?: QueryClient,
 ): UseMutationResult<
-  Awaited<ReturnType<typeof createFreeDay>>,
+  Awaited<ReturnType<typeof createFreeDays>>,
   TError,
   { data: FreeDaysDTO },
   TContext
 > => {
-  const mutationOptions = getCreateFreeDayMutationOptions(options);
+  const mutationOptions = getCreateFreeDaysMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };
@@ -379,3 +380,72 @@ export function useGetAvailableFirstTimeSlotsByDoctorAndFacility<
 
   return query;
 }
+
+/**
+ * @summary Cancel existing FreeDays for doctor
+ */
+export const cancelFreeDays = (id: number) => {
+  return customInstance<void>({ url: `/timeslots/freeDay/${id}`, method: 'DELETE' });
+};
+
+export const getCancelFreeDaysMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof cancelFreeDays>>,
+    TError,
+    { id: number },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof cancelFreeDays>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationKey = ['cancelFreeDays'];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof cancelFreeDays>>, { id: number }> = (
+    props,
+  ) => {
+    const { id } = props ?? {};
+
+    return cancelFreeDays(id);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CancelFreeDaysMutationResult = NonNullable<Awaited<ReturnType<typeof cancelFreeDays>>>;
+
+export type CancelFreeDaysMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Cancel existing FreeDays for doctor
+ */
+export const useCancelFreeDays = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof cancelFreeDays>>,
+      TError,
+      { id: number },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof cancelFreeDays>>,
+  TError,
+  { id: number },
+  TContext
+> => {
+  const mutationOptions = getCancelFreeDaysMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};

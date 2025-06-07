@@ -5,7 +5,7 @@ import {
 } from 'shared/api/generated/generated.schemas';
 import { TimePairWithFacilityId, WorkTimeFormValues } from './tabs/EditWorkTimeTab';
 
-export function mapToWorkTimes(formValues: WorkTimeFormValues): UploadWorkTimeDTO[] {
+export const mapToWorkTimes = (formValues: WorkTimeFormValues): UploadWorkTimeDTO[] => {
   return Object.entries(formValues.workTimes)
     .filter(([, value]) => value.startTime && value.endTime && value.facilityId)
     .map(([dayOfWeekStr, value]) => {
@@ -18,9 +18,9 @@ export function mapToWorkTimes(formValues: WorkTimeFormValues): UploadWorkTimeDT
         facilityId: value.facilityId,
       };
     });
-}
+};
 
-export function mapFromWorkTimes(workTimes: UploadWorkTimeDTO[]): WorkTimeFormValues {
+export const mapFromWorkTimes = (workTimes: UploadWorkTimeDTO[]): WorkTimeFormValues => {
   return {
     workTimes: Object.values(DayOfWeekEnum).reduce(
       (acc, day) => {
@@ -35,7 +35,7 @@ export function mapFromWorkTimes(workTimes: UploadWorkTimeDTO[]): WorkTimeFormVa
       {} as Record<DayOfWeekEnum, TimePairWithFacilityId>,
     ),
   };
-}
+};
 
 export const mapFromReturnWorkTimes = (workTimes: WorkTimeReturnDTO[]): UploadWorkTimeDTO[] => {
   return workTimes.map((wt) => ({
@@ -46,11 +46,11 @@ export const mapFromReturnWorkTimes = (workTimes: WorkTimeReturnDTO[]): UploadWo
   }));
 };
 
-export function isValid15MinuteTime(time?: string) {
+export const isValid15MinuteTime = (time?: string) => {
   if (!time) return true;
   const minutes = parseInt(time.split(':')[1], 10);
   return minutes % 15 === 0;
-}
+};
 
 export const dayOfWeekToInt: Record<DayOfWeekEnum, number> = {
   MONDAY: 1,

@@ -7,7 +7,12 @@ import {
   useGetDoctorDetails,
   useUpdateDoctorSpecializations,
 } from 'shared/api/generated/doctors-controller/doctors-controller';
-import { Specialization, UploadWorkTimeDTO } from 'shared/api/generated/generated.schemas';
+import {
+  FreeDaysDTO,
+  Specialization,
+  UploadWorkTimeDTO,
+} from 'shared/api/generated/generated.schemas';
+import { useCreateFreeDays } from 'shared/api/generated/time-slot-controller/time-slot-controller';
 import { useGetVisitsByDoctorId } from 'shared/api/generated/visit-controller/visit-controller';
 
 import {
@@ -39,6 +44,7 @@ const SingleSpecialistPage: FC = () => {
     data: doctorInfo,
     isLoading: isDoctorInfoLoading,
     isError: isDoctorInfoError,
+    refetch: refetchDoctorInfo,
   } = useGetDoctorDetails(doctorId);
 
   const {
@@ -67,6 +73,18 @@ const SingleSpecialistPage: FC = () => {
     isError: isUpdateDoctorWorkTimesError,
   } = useUpdateWorkTimesForUser();
 
+  const {
+    mutateAsync: createFreeDays,
+    isPending: isCreateFreeDaysLoading,
+    isError: isCreateFreeDaysError,
+  } = useCreateFreeDays();
+
+  const handleCreateFreeDays = async (newFreeDays: FreeDaysDTO) => {
+    await createFreeDays({ data: newFreeDays });
+    await refetchDoctorInfo();
+    showNotification('Pomyślnie zaktualizowano urlopy!', 'success');
+  };
+
   const handleUpdateSpecialistSpecializations = async (
     updatedSpecializations: Specialization[],
   ) => {
@@ -78,7 +96,6 @@ const SingleSpecialistPage: FC = () => {
   };
 
   const handleUpdateSpecialistWorkTimes = async (updatedWorkTimes: UploadWorkTimeDTO[]) => {
-    console.log('work times in handler: ', updatedWorkTimes);
     await updateDoctorWorkTimes({ userId: doctorId, data: updatedWorkTimes });
     await refetchDoctorWorkTimes();
     showNotification('Pomyślnie zaktualizowano godziny pracy!', 'success');
@@ -91,7 +108,10 @@ const SingleSpecialistPage: FC = () => {
   };
 
   const isInitialLoading = isDoctorInfoLoading || isDoctorWorkTimesLoading || isDoctorVisitsLoading;
-  const isLoading = isUpdateDoctorSpecializationsLoading || isUpdateDoctorWorkTimesLoading;
+  const isLoading =
+    isUpdateDoctorSpecializationsLoading ||
+    isUpdateDoctorWorkTimesLoading ||
+    isCreateFreeDaysLoading;
   const isInitialError = isDoctorInfoError || isDoctorWorkTimesError || isDoctorVisitsError;
 
   useEffect(() => {
@@ -104,6 +124,9 @@ const SingleSpecialistPage: FC = () => {
     if (isUpdateDoctorWorkTimesError) {
       showNotification('Nie udało się zaktualizować godzin pracy lekarza', 'error');
     }
+    if (isCreateFreeDaysError) {
+      showNotification('Nie udało się zaktualizować urlopów lekarza', 'error');
+    }
     if (doctorInfo) {
       setSpecializations(doctorInfo.specializations);
     }
@@ -113,6 +136,7 @@ const SingleSpecialistPage: FC = () => {
     doctorWorkTimes,
     isUpdateDoctorSpecializationsError,
     isUpdateDoctorWorkTimesError,
+    isCreateFreeDaysError,
   ]);
 
   if (!doctorId) {
@@ -133,12 +157,17 @@ const SingleSpecialistPage: FC = () => {
           refetchDoctorVisits={async () => {
             await refetchDoctorVisits();
           }}
+          refetchDoctorInfo={async () => {
+            await refetchDoctorInfo();
+          }}
           currentSpecializations={specializations}
           currentWorkTimes={mapFromReturnWorkTimes(doctorWorkTimes ?? [])}
+          currentFreeDays={doctorInfo.freeDays}
           allSpecializations={allSpecializations}
           handleUpdateSpecialistSpecializations={handleUpdateSpecialistSpecializations}
           handleUpdateSpecialistWorkTimes={handleUpdateSpecialistWorkTimes}
           handleCancelVisit={handleCancelVisitClick}
+          handleNewFreeDays={handleCreateFreeDays}
           tabIndex={tabIndex}
           onTabChange={onTabChange}
           loading={isLoading}

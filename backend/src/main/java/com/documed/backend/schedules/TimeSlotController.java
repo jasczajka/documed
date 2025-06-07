@@ -4,6 +4,8 @@ import com.documed.backend.auth.annotations.WardClerkOnly;
 import com.documed.backend.schedules.dtos.AvailableTimeSlotDTO;
 import com.documed.backend.schedules.dtos.FreeDaysDTO;
 import com.documed.backend.schedules.dtos.TimeSlotMapper;
+import com.documed.backend.schedules.dtos.*;
+import com.documed.backend.schedules.model.FreeDays;
 import com.documed.backend.schedules.model.TimeSlot;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -41,9 +43,17 @@ public class TimeSlotController {
   // TODO annotation ward clerk only
   @WardClerkOnly
   @PostMapping("/freeDay")
-  @Operation(summary = "Create new FreeDay for doctor")
-  public ResponseEntity<String> createFreeDay(@RequestBody @Valid FreeDaysDTO freeDaysDTO) {
-    freeDaysService.createFreeDay(freeDaysDTO);
-    return new ResponseEntity<>("FreeDay created", HttpStatus.CREATED);
+  @Operation(summary = "Create new FreeDays for doctor")
+  public ResponseEntity<FreeDaysReturnDTO> createFreeDays(
+      @RequestBody @Valid FreeDaysDTO freeDaysDTO) {
+    FreeDays created = freeDaysService.createFreeDays(freeDaysDTO);
+    return new ResponseEntity<>(FreeDaysMapper.toDTO(created), HttpStatus.CREATED);
+  }
+
+  @DeleteMapping("/freeDay/{id}")
+  @Operation(summary = "Cancel existing FreeDays for doctor")
+  public ResponseEntity<Void> cancelFreeDays(@PathVariable("id") int id) {
+    freeDaysService.cancelFreeDays(id);
+    return new ResponseEntity<>(HttpStatus.OK);
   }
 }
