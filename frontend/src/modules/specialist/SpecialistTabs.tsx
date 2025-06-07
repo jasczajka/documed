@@ -3,6 +3,8 @@ import { Box, Paper, Tab, Tabs } from '@mui/material';
 import VisitsTable from 'modules/visits/VisitsTable/VisitsTable';
 import { FC } from 'react';
 import {
+  FreeDaysDTO,
+  FreeDaysReturnDTO,
   Specialization,
   UploadWorkTimeDTO,
   VisitWithDetails,
@@ -10,17 +12,21 @@ import {
 import { useAllServicesStore } from 'shared/hooks/stores/useAllServicesStore';
 import { EditSpecializationsTab } from './tabs/EditSpecializationsTab';
 import { EditWorkTimeTab } from './tabs/EditWorkTimeTab';
+import { FreeDaysTab } from './tabs/FreeDaysTab';
 
 interface SpecialistTabsProps {
   doctorId: number;
   doctorVisits: VisitWithDetails[];
   refetchDoctorVisits: () => Promise<void>;
+  refetchDoctorInfo: () => Promise<void>;
   currentSpecializations: Specialization[];
   currentWorkTimes: UploadWorkTimeDTO[];
+  currentFreeDays: FreeDaysReturnDTO[];
   allSpecializations: Specialization[];
   handleUpdateSpecialistSpecializations: (selected: Specialization[]) => void;
   handleUpdateSpecialistWorkTimes: (selected: UploadWorkTimeDTO[]) => void;
   handleCancelVisit: (visitId: number) => void;
+  handleNewFreeDays: (newFreeDays: FreeDaysDTO) => void;
   tabIndex: number;
   onTabChange: (index: number) => void;
   loading?: boolean;
@@ -29,12 +35,15 @@ export const SpecialistTabs: FC<SpecialistTabsProps> = ({
   doctorId,
   doctorVisits,
   refetchDoctorVisits,
+  refetchDoctorInfo,
   currentSpecializations,
   currentWorkTimes,
+  currentFreeDays,
   allSpecializations,
   handleUpdateSpecialistSpecializations,
   handleUpdateSpecialistWorkTimes,
   handleCancelVisit,
+  handleNewFreeDays,
   tabIndex,
   onTabChange,
   loading,
@@ -72,7 +81,13 @@ export const SpecialistTabs: FC<SpecialistTabsProps> = ({
       </Tabs>
 
       <Paper sx={{ height: '100%', width: '100%', padding: 8, minHeight: '532px' }} elevation={1}>
-        {tabIndex === 0 && <div>Urlopy</div>}
+        {tabIndex === 0 && (
+          <FreeDaysTab
+            currentFreeDays={currentFreeDays}
+            onSubmitForm={(newFreedays) => handleNewFreeDays({ userId: doctorId, ...newFreedays })}
+            onSuccessfulEdit={() => refetchDoctorInfo()}
+          />
+        )}
         {tabIndex === 1 && (
           <VisitsTable
             doctorId={doctorId}

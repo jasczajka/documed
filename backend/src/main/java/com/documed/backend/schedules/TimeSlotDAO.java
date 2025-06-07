@@ -166,6 +166,17 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
     jdbcTemplate.update(sql, freeDays.getStartDate(), freeDays.getEndDate());
   }
 
+  public void releaseTimeSlotsForFreeDays(FreeDays freeDays) {
+    String sql =
+        """
+                UPDATE time_slot
+                SET is_busy = false
+                WHERE date BETWEEN ? AND ?
+                """;
+
+    jdbcTemplate.update(sql, freeDays.getStartDate(), freeDays.getEndDate());
+  }
+
   public List<Integer> getVisitIdsByDoctorAndDateRange(
       int doctorId, LocalDate fromDate, LocalDate toDate) {
     String sql =

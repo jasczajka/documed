@@ -69,6 +69,13 @@ export interface FreeDaysDTO {
   endDate: string;
 }
 
+export interface FreeDaysReturnDTO {
+  id: number;
+  startDate: string;
+  endDate: string;
+  userId: number;
+}
+
 export interface ScheduleVisitDTO {
   patientInformation?: string;
   patientId: number;
@@ -472,6 +479,7 @@ export interface DoctorDetailsDTO {
   lastName: string;
   email: string;
   specializations: Specialization[];
+  freeDays: FreeDaysReturnDTO[];
 }
 
 export interface MeDTO {
