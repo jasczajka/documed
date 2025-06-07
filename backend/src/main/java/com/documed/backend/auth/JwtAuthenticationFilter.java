@@ -70,6 +70,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       logger.debug(
           "JWT token found (truncated): {}...", jwt.substring(0, Math.min(10, jwt.length())));
 
+      logger.info("JWT validation result: {}", jwtUtil.validateToken(jwt));
+      logger.info("Token expiration: {}", jwtUtil.extractExpiration(jwt));
+
       if (!jwtUtil.validateToken(jwt)) {
         logger.warn("Invalid JWT token for {}", requestUri);
         throw new RuntimeException("Invalid token");
@@ -139,8 +142,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     Cookie cookie = new Cookie(AUTH_COOKIE_NAME, token);
     cookie.setHttpOnly(true);
     cookie.setPath("/");
-    cookie.setSecure(true);
+    cookie.setMaxAge(60 * 60 * 24 * 7); // 1 week
     cookie.setAttribute("SameSite", "None");
+    cookie.setSecure(true);
     response.addCookie(cookie);
   }
 }
