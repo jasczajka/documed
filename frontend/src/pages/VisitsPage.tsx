@@ -55,7 +55,7 @@ const VisitsPage: FC = () => {
 
   const handleCancelVisitClick = (visitId: number) => {
     openModal('cancelVisitModal', (close) => (
-      <CancelVisitModal visitId={visitId} onClose={close} onSuccess={refetchAllVisits} />
+      <CancelVisitModal visitId={visitId} onClose={close} onSuccess={refetchVisits} />
     ));
   };
 
