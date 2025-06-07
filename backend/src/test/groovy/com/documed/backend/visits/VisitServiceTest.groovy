@@ -170,6 +170,7 @@ class VisitServiceTest extends Specification {
 		referralService.getReferralsForVisit(id) >> []
 
 		prescriptionService.getPrescriptionIdForVisitId(id) >> Optional.empty()
+		prescriptionService.getPrescriptionForVisit(id) >> Optional.empty()
 
 		when:
 		def result = visitService.closeVisit(id, updateDto)
@@ -585,6 +586,8 @@ class VisitServiceTest extends Specification {
 
 		prescriptionService.getPrescriptionIdForVisitId(visitId) >> Optional.of(prescriptionId)
 		prescriptionService.getNumberOfMedicinesOnPrescriptionByVisitId(visitId) >> 0
+		prescriptionService.getPrescriptionForVisit(visitId) >> Optional.empty() // 👈 DODANE
+
 		referralService.getReferralsForVisit(visitId) >> []
 
 		when:
@@ -610,6 +613,9 @@ class VisitServiceTest extends Specification {
 
 		prescriptionService.getPrescriptionIdForVisitId(visitId) >> Optional.of(prescriptionId)
 		prescriptionService.getNumberOfMedicinesOnPrescriptionByVisitId(visitId) >> 2
+		prescriptionService.getPrescriptionForVisit(visitId) >> Optional.empty() // 👈 DODANE
+
+		referralService.getReferralsForVisit(visitId) >> []
 
 		when:
 		def result = visitService.closeVisit(visitId, updateDto)

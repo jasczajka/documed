@@ -2,7 +2,7 @@ package com.documed.backend.prescriptions;
 
 import com.documed.backend.auth.AuthService;
 import com.documed.backend.auth.annotations.DoctorOnly;
-import com.documed.backend.auth.annotations.StaffOnly;
+import com.documed.backend.auth.annotations.DoctorOrPatient;
 import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
 import com.documed.backend.auth.exceptions.UnauthorizedException;
 import com.documed.backend.medicines.model.Medicine;
@@ -39,7 +39,8 @@ public class PrescriptionController {
         HttpStatus.OK);
   }
 
-  //TODO annotation, lekarz i pacjent
+  // TODO annotation, lekarz i pacjent
+  @DoctorOrPatient
   @GetMapping("/visit/{visit_id}")
   @Operation(summary = "Get Prescription For Visit")
   public ResponseEntity<Optional<Prescription>> getPrescriptionForVisit(
@@ -58,15 +59,24 @@ public class PrescriptionController {
     return ResponseEntity.ok(prescription);
   }
 
+  @DoctorOrPatient
   @StaffOnlyOrSelf
   @GetMapping("/user/{user_id}")
   public ResponseEntity<List<Prescription>> getPrescriptionsForUser(
       @PathVariable("user_id") int userId) {
+
+    UserRole userRole = authService.getCurrentUserRole();
+    int currentUserId = authService.getCurrentUserId();
+    if (userRole == UserRole.PATIENT && currentUserId != userId) {
+      throw new UnauthorizedException("This patient has no access to this prescription");
+    }
+
     List<Prescription> prescriptions = prescriptionService.getPrescriptionsForUser(userId);
     return ResponseEntity.ok(prescriptions);
   }
 
-  //TODO annotation lekarz i pacjent
+  // TODO annotation lekarz i pacjent
+  @DoctorOrPatient
   @GetMapping("/{prescription_id}/medicines")
   public ResponseEntity<List<MedicineWithAmount>> getMedicinesForPrescription(
       @PathVariable("prescription_id") int prescriptionId) {
@@ -75,7 +85,7 @@ public class PrescriptionController {
     int prescriptionUserId = prescriptionService.getUserIdForPrescriptionById(prescriptionId);
     UserRole userRole = authService.getCurrentUserRole();
 
-    if (userRole.equals(UserRole.PATIENT) && userId != prescriptionUserId) {
+    if (userRole == UserRole.PATIENT && userId != prescriptionUserId) {
       throw new UnauthorizedException("Requesting patient id and prescription id do not match");
     }
 
@@ -116,8 +126,8 @@ public class PrescriptionController {
     return ResponseEntity.ok(result);
   }
 
-  //TODO issue przy closowaniu
-
+  // TODO added annotation
+  @DoctorOnly
   @PatchMapping("/{prescription_id}/expiration-date")
   @Operation(summary = "Update prescription expiration Date")
   public ResponseEntity<Prescription> updatePrescriptionExpirationDate(

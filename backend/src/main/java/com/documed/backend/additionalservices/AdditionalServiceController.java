@@ -6,7 +6,6 @@ import com.documed.backend.additionalservices.model.AdditionalServiceWithDetails
 import com.documed.backend.attachments.S3Service;
 import com.documed.backend.attachments.dtos.FileInfoDTO;
 import com.documed.backend.auth.annotations.MedicalStaffOnly;
-import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
 import jakarta.validation.Valid;
 import java.util.Collections;

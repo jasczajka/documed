@@ -8,5 +8,5 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@PreAuthorize("hasAnyRole('DOCTOR', 'NURSE')")
-public @interface MedicalStaffOnly {}
+@PreAuthorize("hasAnyRole('DOCTOR', 'PATIENT')")
+public @interface DoctorOrPatient {}

@@ -201,7 +201,7 @@ class PrescriptionServiceTest extends Specification {
 		prescriptionDAO.getById(1) >> Optional.of(existingPrescription)
 
 		when:
-		service.issuePrescription(1, LocalDate.now().plusDays(30))
+		service.issuePrescription(1)
 		then:
 		thrown(AlreadyIssuedException)
 	}
@@ -220,11 +220,11 @@ class PrescriptionServiceTest extends Specification {
 
 		and: "The DAO will be called in sequence"
 		1 * prescriptionDAO.getById(1) >> Optional.of(newPrescription)
-		1 * prescriptionDAO.updatePrescriptionStatus(1, PrescriptionStatus.ISSUED, LocalDate.now().plusDays(30)) >> 1
+		1 * prescriptionDAO.updatePrescriptionStatus(1, PrescriptionStatus.ISSUED) >> 1
 		1 * prescriptionDAO.getById(1) >> Optional.of(issuedPrescription)
 
 		when: "We issue the prescription"
-		def result = service.issuePrescription(1, LocalDate.now().plusDays(30))
+		def result = service.issuePrescription(1)
 
 		then: "It should return the issued prescription"
 		result.status == PrescriptionStatus.ISSUED
@@ -238,10 +238,10 @@ class PrescriptionServiceTest extends Specification {
 				.build()
 
 		prescriptionDAO.getById(1) >> Optional.of(initialPrescription)
-		prescriptionDAO.updatePrescriptionStatus(1, PrescriptionStatus.ISSUED, LocalDate.now().plusDays(30)) >> 0
+		prescriptionDAO.updatePrescriptionStatus(1, PrescriptionStatus.ISSUED) >> 0
 
 		when:
-		service.issuePrescription(1, LocalDate.now().plusDays(30))
+		service.issuePrescription(1)
 
 		then:
 		thrown(IllegalStateException)

@@ -1,6 +1,7 @@
 package com.documed.backend.schedules;
 
 import com.documed.backend.auth.annotations.StaffOnly;
+import com.documed.backend.auth.annotations.WardClerkOnly;
 import com.documed.backend.schedules.dtos.*;
 import com.documed.backend.schedules.model.WorkTime;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,7 +20,6 @@ public class WorkTimeController {
 
   private final WorkTimeService workTimeService;
 
-  //TODO annotation rejestrator, lekarz
   @StaffOnly
   @GetMapping("/{user_id}")
   @Operation(summary = "Get all worktimes for user")
@@ -29,7 +29,8 @@ public class WorkTimeController {
     return ResponseEntity.ok(workTimes.stream().map(WorkTimeMapper::toDto).toList());
   }
 
-  //TODO annotation ward clerk only
+  // TODO annotation ward clerk only
+  @WardClerkOnly
   @StaffOnly
   @PutMapping("/{user_id}")
   @Operation(summary = "Update worktimes for user")

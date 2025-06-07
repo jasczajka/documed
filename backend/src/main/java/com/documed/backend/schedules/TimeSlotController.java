@@ -1,6 +1,6 @@
 package com.documed.backend.schedules;
 
-import com.documed.backend.auth.annotations.StaffOnly;
+import com.documed.backend.auth.annotations.WardClerkOnly;
 import com.documed.backend.schedules.dtos.AvailableTimeSlotDTO;
 import com.documed.backend.schedules.dtos.FreeDaysDTO;
 import com.documed.backend.schedules.dtos.TimeSlotMapper;
@@ -38,7 +38,8 @@ public class TimeSlotController {
     return ResponseEntity.ok(dtos);
   }
 
-  //TODO annotation ward clerk only
+  // TODO annotation ward clerk only
+  @WardClerkOnly
   @PostMapping("/freeDay")
   @Operation(summary = "Create new FreeDay for doctor")
   public ResponseEntity<String> createFreeDay(@RequestBody @Valid FreeDaysDTO freeDaysDTO) {
