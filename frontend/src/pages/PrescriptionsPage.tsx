@@ -29,7 +29,7 @@ const PrescriptionsPage: FC = () => {
   if (isPatientPrescriptionsError) {
     return <NotificationComponent />;
   }
-  if (patientPrescriptions) {
+  if (patientPrescriptions !== undefined) {
     return (
       <div className="flex flex-col">
         <CardHeader title={'Recepty'} />
