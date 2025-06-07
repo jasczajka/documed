@@ -94,20 +94,18 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
     return jdbcTemplate.query(sql, rowMapper, doctorId, Date.valueOf(date));
   }
 
-  public List<TimeSlot> getAvailableFutureTimeSlotsByDoctorAndFacility(
-      int doctorId, int facilityId) {
+  public List<TimeSlot> getAvailableFutureTimeSlotsByFacilityId(int facilityId) {
     String sql =
         """
         SELECT id, doctor_id, start_time, end_time, date, is_busy, visit_id, facility_id
         FROM time_slot
-        WHERE doctor_id = ?
-        AND facility_id = ?
+        WHERE facility_id = ?
         AND date >= CURRENT_DATE
         AND is_busy = false
         ORDER BY date, start_time
         """;
 
-    return jdbcTemplate.query(sql, rowMapper, doctorId, facilityId);
+    return jdbcTemplate.query(sql, rowMapper, facilityId);
   }
 
   public List<TimeSlot> getSortedTimeSlotsForVisit(int visitId) {

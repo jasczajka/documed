@@ -116,15 +116,14 @@ class TimeSlotServiceTest extends Specification {
 	}
 	def "should return empty list when no available slots exist"() {
 		given:
-		def doctorId = 1
 		def facilityId = 1
 		def neededTimeSlots = 2
 
 		when:
-		timeSlotDAO.getAvailableFutureTimeSlotsByDoctorAndFacility(doctorId, facilityId) >> []
+		timeSlotDAO.getAvailableFutureTimeSlotsByFacilityId(facilityId) >> []
 
 		then:
-		timeSlotService.getAvailableFirstTimeSlotsByDoctorAndFacility(doctorId, neededTimeSlots, facilityId) == []
+		timeSlotService.getAvailableFirstTimeSlotsByFacility(neededTimeSlots, facilityId) == []
 	}
 
 	def "should return first available slot when continuous slots exist"() {
@@ -162,10 +161,10 @@ class TimeSlotServiceTest extends Specification {
 				.build()
 
 		when:
-		timeSlotDAO.getAvailableFutureTimeSlotsByDoctorAndFacility(doctorId, facilityId) >> [slot1, slot2, slot3]
+		timeSlotDAO.getAvailableFutureTimeSlotsByFacilityId(facilityId) >> [slot1, slot2, slot3]
 
 		then:
-		timeSlotService.getAvailableFirstTimeSlotsByDoctorAndFacility(doctorId, neededTimeSlots, facilityId) == [slot1]
+		timeSlotService.getAvailableFirstTimeSlotsByFacility(neededTimeSlots, facilityId) == [slot1]
 	}
 
 	def "should handle multiple dates correctly"() {
@@ -222,7 +221,7 @@ class TimeSlotServiceTest extends Specification {
 				.build()
 
 		when:
-		timeSlotDAO.getAvailableFutureTimeSlotsByDoctorAndFacility(doctorId, facilityId) >> [
+		timeSlotDAO.getAvailableFutureTimeSlotsByFacilityId(facilityId) >> [
 			todaySlot1,
 			todaySlot2,
 			tomorrowSlot1,
@@ -231,7 +230,7 @@ class TimeSlotServiceTest extends Specification {
 		]
 
 		then:
-		timeSlotService.getAvailableFirstTimeSlotsByDoctorAndFacility(doctorId, neededTimeSlots, facilityId) == [tomorrowSlot1]
+		timeSlotService.getAvailableFirstTimeSlotsByFacility(neededTimeSlots, facilityId) == [tomorrowSlot1]
 	}
 
 	def "should skip non-continuous slots"() {
@@ -260,10 +259,10 @@ class TimeSlotServiceTest extends Specification {
 				.build()
 
 		when:
-		timeSlotDAO.getAvailableFutureTimeSlotsByDoctorAndFacility(doctorId, facilityId) >> [slot1, slot2]
+		timeSlotDAO.getAvailableFutureTimeSlotsByFacilityId(facilityId) >> [slot1, slot2]
 
 		then:
-		timeSlotService.getAvailableFirstTimeSlotsByDoctorAndFacility(doctorId, neededTimeSlots, facilityId) == []
+		timeSlotService.getAvailableFirstTimeSlotsByFacility(neededTimeSlots, facilityId) == []
 	}
 
 	def "should return first slot of multiple blocks when multiple continuous blocks exist"() {
@@ -310,10 +309,10 @@ class TimeSlotServiceTest extends Specification {
 				.build()
 
 		when:
-		timeSlotDAO.getAvailableFutureTimeSlotsByDoctorAndFacility(doctorId, facilityId) >> [slot1, slot2, slot3, slot4]
+		timeSlotDAO.getAvailableFutureTimeSlotsByFacilityId(facilityId) >> [slot1, slot2, slot3, slot4]
 
 		then:
-		timeSlotService.getAvailableFirstTimeSlotsByDoctorAndFacility(doctorId, neededTimeSlots, facilityId) == [slot1, slot3]
+		timeSlotService.getAvailableFirstTimeSlotsByFacility(neededTimeSlots, facilityId) == [slot1, slot3]
 	}
 
 	def "should handle minimum neededTimeSlots value (1)"() {
@@ -342,10 +341,10 @@ class TimeSlotServiceTest extends Specification {
 				.build()
 
 		when:
-		timeSlotDAO.getAvailableFutureTimeSlotsByDoctorAndFacility(doctorId, facilityId) >> [slot1, slot2]
+		timeSlotDAO.getAvailableFutureTimeSlotsByFacilityId(facilityId) >> [slot1, slot2]
 
 		then:
-		timeSlotService.getAvailableFirstTimeSlotsByDoctorAndFacility(doctorId, neededTimeSlots, facilityId) == [slot1, slot2]
+		timeSlotService.getAvailableFirstTimeSlotsByFacility(neededTimeSlots, facilityId) == [slot1, slot2]
 	}
 
 	def "should handle overlapping continuous blocks correctly"() {
@@ -392,9 +391,9 @@ class TimeSlotServiceTest extends Specification {
 				.build()
 
 		when:
-		timeSlotDAO.getAvailableFutureTimeSlotsByDoctorAndFacility(doctorId, facilityId) >> [slot1, slot2, slot3, slot4]
+		timeSlotDAO.getAvailableFutureTimeSlotsByFacilityId(facilityId) >> [slot1, slot2, slot3, slot4]
 
 		then:
-		timeSlotService.getAvailableFirstTimeSlotsByDoctorAndFacility(doctorId, neededTimeSlots, facilityId) == [slot1, slot2, slot3]
+		timeSlotService.getAvailableFirstTimeSlotsByFacility(neededTimeSlots, facilityId) == [slot1, slot2, slot3]
 	}
 }
