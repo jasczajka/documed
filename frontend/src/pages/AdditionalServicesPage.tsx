@@ -51,7 +51,7 @@ const AdditionalServicesPage: FC = () => {
     {
       query: {
         enabled: !isPatient,
-        queryKey: ['additionalServicesForPatient', isArchivalModeOn],
+        queryKey: ['additionalServices', isArchivalModeOn],
       },
     },
   );

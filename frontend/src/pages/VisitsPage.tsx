@@ -38,7 +38,7 @@ const VisitsPage: FC = () => {
     {
       query: {
         enabled: isPatient,
-        queryKey: ['visitsForCurrentPatient', isArchivalVisitsOn],
+        queryKey: ['visitsForCurrentDoctor', isArchivalVisitsOn],
       },
     },
   );
@@ -54,7 +54,7 @@ const VisitsPage: FC = () => {
     },
     {
       query: {
-        enabled: isPatient,
+        enabled: !isPatient,
         queryKey: ['visitsForCurrentPatient', isArchivalVisitsOn],
       },
     },
