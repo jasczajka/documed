@@ -11,7 +11,7 @@ import {
   Typography,
 } from '@mui/material';
 import { FC, useMemo, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import { AvailableTimeSlotDTO, ScheduleVisitDTO } from 'shared/api/generated/generated.schemas';
 import { useGetAvailableFirstTimeSlotsByFacility } from 'shared/api/generated/time-slot-controller/time-slot-controller';
 import {
@@ -81,10 +81,9 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
   const {
     control,
     handleSubmit,
-    watch,
     formState: { errors },
-    resetField,
     setValue,
+    resetField,
   } = useForm<Partial<FormData>>({
     resolver: yupResolver(validationSchema) as any,
     defaultValues: {
@@ -96,9 +95,9 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
     },
   });
 
-  const selectedServiceId = watch('serviceId');
-  const selectedDoctorId = watch('doctorId');
-  const selectedFacilityId = watch('facilityId');
+  const selectedServiceId = useWatch({ control, name: 'serviceId' });
+  const selectedDoctorId = useWatch({ control, name: 'doctorId' });
+  const selectedFacilityId = useWatch({ control, name: 'facilityId' });
   const [selectedSlot, setSelectedSlot] = useState<AvailableTimeSlotDTO | null>(null);
 
   const { showNotification, NotificationComponent } = useNotification();
@@ -138,13 +137,6 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
     },
   );
 
-  const availableTimeSlotsFilteredByDoctor = useMemo(() => {
-    if (!selectedDoctorId) {
-      return availableTimeSlots;
-    }
-    return availableTimeSlots.filter((timeslot) => timeslot.doctorId === selectedDoctorId);
-  }, [selectedDoctorId, availableTimeSlots]);
-
   const { data: visitCost, refetch: refetchVisitCost } = useCalculateVisitCost(
     { patientId: patientId, serviceId: selectedServiceId ?? -1 },
     { query: { enabled: !!selectedServiceId } },
@@ -166,7 +158,16 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
         doctorSpecializationIds.includes(requiredId),
       );
     });
-  }, [allDoctors, allServices, selectedServiceId]);
+  }, [selectedServiceId]);
+
+  const availableTimeSlotsFilteredByDoctor = useMemo(() => {
+    if (!selectedDoctorId) {
+      return availableTimeSlots.filter((slot) =>
+        availableDoctorsForChosenService.some((doctor) => doctor.id === slot.doctorId),
+      );
+    }
+    return availableTimeSlots.filter((slot) => slot.doctorId === selectedDoctorId);
+  }, [selectedDoctorId, availableTimeSlots, availableDoctorsForChosenService]);
 
   const availableServices = useMemo(() => {
     if (!initialDoctorId) {
@@ -180,7 +181,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
     return allServices.filter((service) =>
       service.specializationIds.some((id) => doctorSpecializationIds.includes(id)),
     );
-  }, [allServices, allDoctors, initialDoctorId]);
+  }, [initialDoctorId]);
 
   const onSubmit = async (data: Partial<FormData>) => {
     if (data.serviceId && data.doctorId && data.visitDate && data.facilityId && selectedSlot) {
@@ -260,14 +261,12 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
                 options={availableDoctorsForChosenService}
                 getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
                 onChange={(_, newValue) => {
-                  field.onChange(newValue?.id);
-                  resetField('visitDate');
-                  resetField('firstTimeSlotId');
-                  if (newValue?.id) {
-                    refetchTimeSlots();
-                  }
+                  field.onChange(newValue?.id ?? null);
+                  setValue('visitDate', undefined);
+                  setSelectedSlot(null);
                 }}
                 value={allDoctors.find((doctor) => doctor.id === field.value) ?? null}
+                isOptionEqualToValue={(option, value) => option.id === value?.id}
                 noOptionsText="Brak opcji spełniających wyszukiwanie"
                 renderInput={(params) => (
                   <TextField

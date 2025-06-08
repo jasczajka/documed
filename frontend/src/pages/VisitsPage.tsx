@@ -1,6 +1,7 @@
-import { CardHeader } from '@mui/material';
+import { Box, Button, CardHeader } from '@mui/material';
 import VisitsTable from 'modules/visits/VisitsTable/VisitsTable';
-import { FC, useEffect } from 'react';
+import { FC, useCallback, useEffect } from 'react';
+import { getPatientDetails } from 'shared/api/generated/patients-controller/patients-controller';
 import { useGetAllServices } from 'shared/api/generated/service-controller/service-controller';
 import {
   useGetAllVisits,
@@ -8,9 +9,11 @@ import {
 } from 'shared/api/generated/visit-controller/visit-controller';
 import CancelVisitModal from 'shared/components/ConfirmationModal/CancelVisitModal';
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
+import { ScheduleVisitModal } from 'shared/components/ScheduleVisitModal/ScheduleVisitModal';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
+import { getAgeFromBirthDate } from 'shared/utils/getAgeFromBirthDate';
 
 const VisitsPage: FC = () => {
   const { user, isPatient, isDoctor } = useAuth();
@@ -59,6 +62,24 @@ const VisitsPage: FC = () => {
     ));
   };
 
+  const handleScheduleVisitClick = useCallback(async () => {
+    const patientDetails = await getPatientDetails(user.id);
+    openModal('scheduleVisitModal', (close) => (
+      <ScheduleVisitModal
+        patientId={patientDetails.id}
+        patientFullName={`${patientDetails.firstName} ${patientDetails.lastName}`}
+        patientAge={
+          patientDetails?.birthdate ? getAgeFromBirthDate(new Date(patientDetails.birthdate)) : null
+        }
+        onConfirm={async () => {
+          close();
+          showNotification('Umówiono wizytę', 'success');
+        }}
+        onCancel={close}
+      />
+    ));
+  }, [openModal]);
+
   useEffect(() => {
     if (isError) {
       showNotification('Coś poszło nie tak', 'error');
@@ -75,7 +96,33 @@ const VisitsPage: FC = () => {
   if (visits && allServices) {
     return (
       <div className="flex flex-col">
-        <CardHeader title={'Wizyty'} />
+        <Box
+          sx={{
+            display: 'flex',
+            width: '100%',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+          }}
+        >
+          <CardHeader title={'Wizyty'} />
+          {isPatient && (
+            <Button
+              sx={{
+                alignSelf: 'center',
+                backgroundColor: '#3f51b5',
+                color: 'white',
+                '&:hover': {
+                  backgroundColor: '#283593',
+                },
+              }}
+              onClick={handleScheduleVisitClick}
+              variant="contained"
+            >
+              Umów wizytę
+            </Button>
+          )}
+        </Box>
+
         <VisitsTable
           visits={visits}
           allServices={allServices}
