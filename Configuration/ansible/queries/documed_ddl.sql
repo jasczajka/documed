@@ -541,6 +541,95 @@ ALTER TABLE Worktime ADD CONSTRAINT Worktime_User
     INITIALLY IMMEDIATE
 ;
 
+-- unique constraints
+ALTER TABLE Time_slot
+DROP CONSTRAINT IF EXISTS unique_timeslot;
+
+ALTER TABLE Time_slot
+ADD CONSTRAINT unique_timeslot
+UNIQUE (doctor_id, date, start_time, end_time);
+
+
+ALTER TABLE Feedback
+DROP CONSTRAINT IF EXISTS unique_feedback;
+
+ALTER TABLE Feedback
+ADD CONSTRAINT unique_feedback
+UNIQUE (visit_id);
+
+
+ALTER TABLE Free_days
+DROP CONSTRAINT IF EXISTS unique_free_days;
+
+ADD CONSTRAINT unique_free_days
+EXCLUDE USING gist (
+  user_id WITH =,
+  daterange(start_date, end_date, '[]') WITH &&
+);
+
+ALTER TABLE Prescription
+DROP CONSTRAINT IF EXISTS unique_prescription;
+
+ALTER TABLE Prescription
+ADD CONSTRAINT unique_prescription
+UNIQUE (visit_id);
+
+
+ALTER TABLE Service
+DROP CONSTRAINT IF EXISTS unique_service;
+
+ALTER TABLE Service
+ADD CONSTRAINT unique_service
+UNIQUE (name);
+
+
+ALTER TABLE Specialization
+DROP CONSTRAINT IF EXISTS unique_specialization;
+
+ALTER TABLE Specialization
+ADD CONSTRAINT unique_specialization
+UNIQUE (name);
+
+
+ALTER TABLE Subscription
+DROP CONSTRAINT IF EXISTS unique_subscription;
+
+ALTER TABLE Subscription
+ADD CONSTRAINT unique_subscription
+UNIQUE (name);
+
+
+ALTER TABLE "User"
+DROP CONSTRAINT IF EXISTS unique_user_pesel;
+
+ALTER TABLE "User"
+ADD CONSTRAINT unique_user_pesel
+UNIQUE (pesel);
+
+
+ALTER TABLE "User"
+DROP CONSTRAINT IF EXISTS unique_user_passport_number;
+
+ALTER TABLE "User"
+ADD CONSTRAINT unique_user_passport_number
+UNIQUE (passport_number);
+
+
+ALTER TABLE "User"
+DROP CONSTRAINT IF EXISTS unique_user_pwz;
+
+ALTER TABLE "User"
+ADD CONSTRAINT unique_user_pwz
+UNIQUE (pwz);
+
+
+ALTER TABLE "User"
+DROP CONSTRAINT IF EXISTS unique_user_email;
+
+ALTER TABLE "User"
+ADD CONSTRAINT unique_user_email
+UNIQUE (email);
+
 
 -- Simple indexes @TODO - improve them
 CREATE INDEX IF NOT EXISTS idx_visit_status ON Visit(status);
