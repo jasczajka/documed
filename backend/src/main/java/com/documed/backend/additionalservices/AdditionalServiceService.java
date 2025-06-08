@@ -28,8 +28,9 @@ public class AdditionalServiceService {
   private final UserDAO userDAO;
   private final ServiceDAO serviceDAO;
 
-  public List<AdditionalServiceWithDetails> getAllWithDetails() {
-    return additionalServiceDAO.findAllWithDetails();
+  public List<AdditionalServiceWithDetails> getAllWithDetailsBetweenDates(
+      LocalDate startDate, LocalDate endDate) {
+    return additionalServiceDAO.findAllWithDetailsBetweenDates(startDate, endDate);
   }
 
   public AdditionalServiceWithDetails getByIdWithDetails(int id) {
@@ -38,21 +39,28 @@ public class AdditionalServiceService {
         .orElseThrow(() -> new NotFoundException("Additional service not found"));
   }
 
-  public List<AdditionalServiceWithDetails> getByPatientIdWithDetails(int patientId) {
-    return additionalServiceDAO.findByPatientIdWithDetails(patientId);
+  public List<AdditionalServiceWithDetails> getByPatientIdWithDetailsBetweenDates(
+      int patientId, LocalDate startDate, LocalDate endDate) {
+    return additionalServiceDAO.findByPatientIdWithDetailsBetweenDates(
+        patientId, startDate, endDate);
   }
 
-  public List<AdditionalServiceWithDetails> getByFulfillerIdWithDetails(int fulfillerId) {
-    return additionalServiceDAO.findByFulfillerIdWithDetails(fulfillerId);
+  public List<AdditionalServiceWithDetails> getByFulfillerIdWithDetailsBetweenDates(
+      int fulfillerId, LocalDate startDate, LocalDate endDate) {
+    return additionalServiceDAO.findByFulfillerIdWithDetailsBetweenDates(
+        fulfillerId, startDate, endDate);
   }
 
-  public List<AdditionalServiceWithDetails> getByServiceIdWithDetails(int serviceId) {
-    return additionalServiceDAO.findByServiceIdWithDetails(serviceId);
+  public List<AdditionalServiceWithDetails> getByServiceIdWithDetailsBetweenDates(
+      int serviceId, LocalDate startDate, LocalDate endDate) {
+    return additionalServiceDAO.findByServiceIdWithDetailsBetweenDates(
+        serviceId, startDate, endDate);
   }
 
-  public List<AdditionalServiceWithDetails> getByPatientIdAndFulfillerIdWithDetails(
-      int patientId, int fulfillerId) {
-    return additionalServiceDAO.findByPatientIdAndFulfillerIdWithDetails(patientId, fulfillerId);
+  public List<AdditionalServiceWithDetails> getByPatientIdAndFulfillerIdWithDetailsBetweenDates(
+      int patientId, int fulfillerId, LocalDate startDate, LocalDate endDate) {
+    return additionalServiceDAO.findByPatientIdAndFulfillerIdWithDetailsBetweenDates(
+        patientId, fulfillerId, startDate, endDate);
   }
 
   public List<AdditionalService> getAll() {

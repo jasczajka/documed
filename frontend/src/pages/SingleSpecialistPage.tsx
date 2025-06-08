@@ -25,6 +25,7 @@ import { useDoctorsStore } from 'shared/hooks/stores/useDoctorsStore';
 import { useSpecializationsStore } from 'shared/hooks/stores/useSpecializationsStore';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
+import { getYearAgoAsDateString } from 'shared/utils/getYearAgoAsDateString';
 
 const SingleSpecialistPage: FC = () => {
   const { id } = useParams();
@@ -32,6 +33,7 @@ const SingleSpecialistPage: FC = () => {
   const allSpecializations = useSpecializationsStore((state) => state.specializations);
   const refetchDoctors = useDoctorsStore((state) => state.fetchDoctors);
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
+  const [isArchivalModeOn, setIsArchivalModeOn] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
   const { showNotification, NotificationComponent } = useNotification();
   const { openModal } = useModal();
@@ -59,7 +61,17 @@ const SingleSpecialistPage: FC = () => {
     isLoading: isDoctorVisitsLoading,
     isError: isDoctorVisitsError,
     refetch: refetchDoctorVisits,
-  } = useGetVisitsByDoctorId(doctorId);
+  } = useGetVisitsByDoctorId(
+    doctorId,
+    {
+      startDate: isArchivalModeOn ? getYearAgoAsDateString() : undefined,
+    },
+    {
+      query: {
+        queryKey: ['visitsForDoctor', isArchivalModeOn],
+      },
+    },
+  );
 
   const {
     mutateAsync: updateDoctorSpecializations,
@@ -171,6 +183,8 @@ const SingleSpecialistPage: FC = () => {
           tabIndex={tabIndex}
           onTabChange={onTabChange}
           loading={isLoading}
+          isArchivalVisitsOn={isArchivalModeOn}
+          onArchivalModeToggle={() => setIsArchivalModeOn((prev) => !prev)}
         />
         <NotificationComponent />
       </div>

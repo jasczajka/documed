@@ -1,6 +1,6 @@
 import { CardHeader } from '@mui/material';
 import AdditionalServicesTable from 'modules/additionalServices/additionalServicesTable/AdditionalServicesTable';
-import { FC, useEffect, useMemo } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import {
   useGetAdditionalServicesByPatient,
   useGetAllAdditionalServices,
@@ -10,10 +10,12 @@ import { useGetAllServices } from 'shared/api/generated/service-controller/servi
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useNotification } from 'shared/hooks/useNotification';
+import { getYearAgoAsDateString } from 'shared/utils/getYearAgoAsDateString';
 
 const AdditionalServicesPage: FC = () => {
   const { user, isPatient, isDoctor } = useAuth();
   const { showNotification, NotificationComponent } = useNotification();
+  const [isArchivalModeOn, setIsArchivalModeOn] = useState(false);
 
   if (!user || !user.id) {
     return null;
@@ -24,14 +26,35 @@ const AdditionalServicesPage: FC = () => {
     isLoading: isPatientAdditionalServicesLoading,
     isError: isPatientAdditionalServicesError,
     refetch: refetchPatientAdditionalServices,
-  } = useGetAdditionalServicesByPatient(user.id, { query: { enabled: isPatient } });
+  } = useGetAdditionalServicesByPatient(
+    user.id,
+    {
+      startDate: isArchivalModeOn ? getYearAgoAsDateString() : undefined,
+    },
+    {
+      query: {
+        enabled: isPatient,
+        queryKey: ['additionalServicesForPatient', isArchivalModeOn],
+      },
+    },
+  );
 
   const {
     data: allAdditionalServiceInstances,
     isLoading: isAllAdditionalServiceInstancesLoading,
     isError: isAllAdditionalServiceInstancesError,
     refetch: refetchAllAdditionalServiceInstances,
-  } = useGetAllAdditionalServices({ query: { enabled: !isPatient } });
+  } = useGetAllAdditionalServices(
+    {
+      startDate: isArchivalModeOn ? getYearAgoAsDateString() : undefined,
+    },
+    {
+      query: {
+        enabled: !isPatient,
+        queryKey: ['additionalServices', isArchivalModeOn],
+      },
+    },
+  );
 
   const {
     data: allServices,
@@ -81,6 +104,8 @@ const AdditionalServicesPage: FC = () => {
             }
             refetchAllAdditionalServiceInstances();
           }}
+          isArchivalAdditionalServicesOn={isArchivalModeOn}
+          onArchivalModeToggle={() => setIsArchivalModeOn((prev) => !prev)}
         />
       </div>
     );

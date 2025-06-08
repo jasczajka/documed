@@ -22,6 +22,11 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 
 import type {
   CalculateVisitCostParams,
+  GetAllVisitsParams,
+  GetVisitsByDoctorIdParams,
+  GetVisitsByPatientIdParams,
+  GetVisitsForCurrentDoctorParams,
+  GetVisitsForCurrentPatientParams,
   GiveFeedbackDTO,
   ScheduleVisitDTO,
   UpdateVisitDTO,
@@ -34,26 +39,29 @@ import { customInstance } from '../../axios-instance';
 /**
  * @summary Get all visits
  */
-export const getAllVisits = (signal?: AbortSignal) => {
-  return customInstance<VisitWithDetails[]>({ url: `/api/visits`, method: 'GET', signal });
+export const getAllVisits = (params?: GetAllVisitsParams, signal?: AbortSignal) => {
+  return customInstance<VisitWithDetails[]>({ url: `/api/visits`, method: 'GET', params, signal });
 };
 
-export const getGetAllVisitsQueryKey = () => {
-  return [`/api/visits`] as const;
+export const getGetAllVisitsQueryKey = (params?: GetAllVisitsParams) => {
+  return [`/api/visits`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetAllVisitsQueryOptions = <
   TData = Awaited<ReturnType<typeof getAllVisits>>,
   TError = ErrorType<unknown>,
->(options?: {
-  query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllVisits>>, TError, TData>>;
-}) => {
+>(
+  params?: GetAllVisitsParams,
+  options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllVisits>>, TError, TData>>;
+  },
+) => {
   const { query: queryOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetAllVisitsQueryKey();
+  const queryKey = queryOptions?.queryKey ?? getGetAllVisitsQueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllVisits>>> = ({ signal }) =>
-    getAllVisits(signal);
+    getAllVisits(params, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getAllVisits>>,
@@ -69,6 +77,7 @@ export function useGetAllVisits<
   TData = Awaited<ReturnType<typeof getAllVisits>>,
   TError = ErrorType<unknown>,
 >(
+  params: undefined | GetAllVisitsParams,
   options: {
     query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllVisits>>, TError, TData>> &
       Pick<
@@ -86,6 +95,7 @@ export function useGetAllVisits<
   TData = Awaited<ReturnType<typeof getAllVisits>>,
   TError = ErrorType<unknown>,
 >(
+  params?: GetAllVisitsParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllVisits>>, TError, TData>> &
       Pick<
@@ -103,6 +113,7 @@ export function useGetAllVisits<
   TData = Awaited<ReturnType<typeof getAllVisits>>,
   TError = ErrorType<unknown>,
 >(
+  params?: GetAllVisitsParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllVisits>>, TError, TData>>;
   },
@@ -116,12 +127,13 @@ export function useGetAllVisits<
   TData = Awaited<ReturnType<typeof getAllVisits>>,
   TError = ErrorType<unknown>,
 >(
+  params?: GetAllVisitsParams,
   options?: {
     query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllVisits>>, TError, TData>>;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getGetAllVisitsQueryOptions(options);
+  const queryOptions = getGetAllVisitsQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;
@@ -673,31 +685,44 @@ export const useCancelPlannedVisit = <TError = ErrorType<unknown>, TContext = un
   return useMutation(mutationOptions, queryClient);
 };
 /**
- * @summary get all visits for logged in patient
+ * @summary Get all visits for logged in patient
  */
-export const getVisitsForCurrentPatient = (signal?: AbortSignal) => {
-  return customInstance<VisitWithDetails[]>({ url: `/api/visits/patient`, method: 'GET', signal });
+export const getVisitsForCurrentPatient = (
+  params?: GetVisitsForCurrentPatientParams,
+  signal?: AbortSignal,
+) => {
+  return customInstance<VisitWithDetails[]>({
+    url: `/api/visits/patient`,
+    method: 'GET',
+    params,
+    signal,
+  });
 };
 
-export const getGetVisitsForCurrentPatientQueryKey = () => {
-  return [`/api/visits/patient`] as const;
+export const getGetVisitsForCurrentPatientQueryKey = (
+  params?: GetVisitsForCurrentPatientParams,
+) => {
+  return [`/api/visits/patient`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetVisitsForCurrentPatientQueryOptions = <
   TData = Awaited<ReturnType<typeof getVisitsForCurrentPatient>>,
   TError = ErrorType<unknown>,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof getVisitsForCurrentPatient>>, TError, TData>
-  >;
-}) => {
+>(
+  params?: GetVisitsForCurrentPatientParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getVisitsForCurrentPatient>>, TError, TData>
+    >;
+  },
+) => {
   const { query: queryOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetVisitsForCurrentPatientQueryKey();
+  const queryKey = queryOptions?.queryKey ?? getGetVisitsForCurrentPatientQueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getVisitsForCurrentPatient>>> = ({
     signal,
-  }) => getVisitsForCurrentPatient(signal);
+  }) => getVisitsForCurrentPatient(params, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getVisitsForCurrentPatient>>,
@@ -715,6 +740,7 @@ export function useGetVisitsForCurrentPatient<
   TData = Awaited<ReturnType<typeof getVisitsForCurrentPatient>>,
   TError = ErrorType<unknown>,
 >(
+  params: undefined | GetVisitsForCurrentPatientParams,
   options: {
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsForCurrentPatient>>, TError, TData>
@@ -734,6 +760,7 @@ export function useGetVisitsForCurrentPatient<
   TData = Awaited<ReturnType<typeof getVisitsForCurrentPatient>>,
   TError = ErrorType<unknown>,
 >(
+  params?: GetVisitsForCurrentPatientParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsForCurrentPatient>>, TError, TData>
@@ -753,6 +780,7 @@ export function useGetVisitsForCurrentPatient<
   TData = Awaited<ReturnType<typeof getVisitsForCurrentPatient>>,
   TError = ErrorType<unknown>,
 >(
+  params?: GetVisitsForCurrentPatientParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsForCurrentPatient>>, TError, TData>
@@ -761,13 +789,14 @@ export function useGetVisitsForCurrentPatient<
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
- * @summary get all visits for logged in patient
+ * @summary Get all visits for logged in patient
  */
 
 export function useGetVisitsForCurrentPatient<
   TData = Awaited<ReturnType<typeof getVisitsForCurrentPatient>>,
   TError = ErrorType<unknown>,
 >(
+  params?: GetVisitsForCurrentPatientParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsForCurrentPatient>>, TError, TData>
@@ -775,7 +804,7 @@ export function useGetVisitsForCurrentPatient<
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getGetVisitsForCurrentPatientQueryOptions(options);
+  const queryOptions = getGetVisitsForCurrentPatientQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;
@@ -787,18 +816,26 @@ export function useGetVisitsForCurrentPatient<
 }
 
 /**
- * @summary get all visits for selected patient
+ * @summary Get all visits for selected patient
  */
-export const getVisitsByPatientId = (id: number, signal?: AbortSignal) => {
+export const getVisitsByPatientId = (
+  id: number,
+  params?: GetVisitsByPatientIdParams,
+  signal?: AbortSignal,
+) => {
   return customInstance<VisitWithDetails[]>({
     url: `/api/visits/patient/${id}`,
     method: 'GET',
+    params,
     signal,
   });
 };
 
-export const getGetVisitsByPatientIdQueryKey = (id: number) => {
-  return [`/api/visits/patient/${id}`] as const;
+export const getGetVisitsByPatientIdQueryKey = (
+  id: number,
+  params?: GetVisitsByPatientIdParams,
+) => {
+  return [`/api/visits/patient/${id}`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetVisitsByPatientIdQueryOptions = <
@@ -806,6 +843,7 @@ export const getGetVisitsByPatientIdQueryOptions = <
   TError = ErrorType<unknown>,
 >(
   id: number,
+  params?: GetVisitsByPatientIdParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsByPatientId>>, TError, TData>
@@ -814,10 +852,10 @@ export const getGetVisitsByPatientIdQueryOptions = <
 ) => {
   const { query: queryOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetVisitsByPatientIdQueryKey(id);
+  const queryKey = queryOptions?.queryKey ?? getGetVisitsByPatientIdQueryKey(id, params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getVisitsByPatientId>>> = ({ signal }) =>
-    getVisitsByPatientId(id, signal);
+    getVisitsByPatientId(id, params, signal);
 
   return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getVisitsByPatientId>>,
@@ -836,6 +874,7 @@ export function useGetVisitsByPatientId<
   TError = ErrorType<unknown>,
 >(
   id: number,
+  params: undefined | GetVisitsByPatientIdParams,
   options: {
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsByPatientId>>, TError, TData>
@@ -856,6 +895,7 @@ export function useGetVisitsByPatientId<
   TError = ErrorType<unknown>,
 >(
   id: number,
+  params?: GetVisitsByPatientIdParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsByPatientId>>, TError, TData>
@@ -876,6 +916,7 @@ export function useGetVisitsByPatientId<
   TError = ErrorType<unknown>,
 >(
   id: number,
+  params?: GetVisitsByPatientIdParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsByPatientId>>, TError, TData>
@@ -884,7 +925,7 @@ export function useGetVisitsByPatientId<
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
- * @summary get all visits for selected patient
+ * @summary Get all visits for selected patient
  */
 
 export function useGetVisitsByPatientId<
@@ -892,6 +933,7 @@ export function useGetVisitsByPatientId<
   TError = ErrorType<unknown>,
 >(
   id: number,
+  params?: GetVisitsByPatientIdParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsByPatientId>>, TError, TData>
@@ -899,7 +941,7 @@ export function useGetVisitsByPatientId<
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getGetVisitsByPatientIdQueryOptions(id, options);
+  const queryOptions = getGetVisitsByPatientIdQueryOptions(id, params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;
@@ -913,29 +955,40 @@ export function useGetVisitsByPatientId<
 /**
  * @summary get all visits assigned for logged in doctor
  */
-export const getVisitsForCurrentDoctor = (signal?: AbortSignal) => {
-  return customInstance<VisitWithDetails[]>({ url: `/api/visits/doctor`, method: 'GET', signal });
+export const getVisitsForCurrentDoctor = (
+  params?: GetVisitsForCurrentDoctorParams,
+  signal?: AbortSignal,
+) => {
+  return customInstance<VisitWithDetails[]>({
+    url: `/api/visits/doctor`,
+    method: 'GET',
+    params,
+    signal,
+  });
 };
 
-export const getGetVisitsForCurrentDoctorQueryKey = () => {
-  return [`/api/visits/doctor`] as const;
+export const getGetVisitsForCurrentDoctorQueryKey = (params?: GetVisitsForCurrentDoctorParams) => {
+  return [`/api/visits/doctor`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetVisitsForCurrentDoctorQueryOptions = <
   TData = Awaited<ReturnType<typeof getVisitsForCurrentDoctor>>,
   TError = ErrorType<unknown>,
->(options?: {
-  query?: Partial<
-    UseQueryOptions<Awaited<ReturnType<typeof getVisitsForCurrentDoctor>>, TError, TData>
-  >;
-}) => {
+>(
+  params?: GetVisitsForCurrentDoctorParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getVisitsForCurrentDoctor>>, TError, TData>
+    >;
+  },
+) => {
   const { query: queryOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetVisitsForCurrentDoctorQueryKey();
+  const queryKey = queryOptions?.queryKey ?? getGetVisitsForCurrentDoctorQueryKey(params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getVisitsForCurrentDoctor>>> = ({
     signal,
-  }) => getVisitsForCurrentDoctor(signal);
+  }) => getVisitsForCurrentDoctor(params, signal);
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getVisitsForCurrentDoctor>>,
@@ -953,6 +1006,7 @@ export function useGetVisitsForCurrentDoctor<
   TData = Awaited<ReturnType<typeof getVisitsForCurrentDoctor>>,
   TError = ErrorType<unknown>,
 >(
+  params: undefined | GetVisitsForCurrentDoctorParams,
   options: {
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsForCurrentDoctor>>, TError, TData>
@@ -972,6 +1026,7 @@ export function useGetVisitsForCurrentDoctor<
   TData = Awaited<ReturnType<typeof getVisitsForCurrentDoctor>>,
   TError = ErrorType<unknown>,
 >(
+  params?: GetVisitsForCurrentDoctorParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsForCurrentDoctor>>, TError, TData>
@@ -991,6 +1046,7 @@ export function useGetVisitsForCurrentDoctor<
   TData = Awaited<ReturnType<typeof getVisitsForCurrentDoctor>>,
   TError = ErrorType<unknown>,
 >(
+  params?: GetVisitsForCurrentDoctorParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsForCurrentDoctor>>, TError, TData>
@@ -1006,6 +1062,7 @@ export function useGetVisitsForCurrentDoctor<
   TData = Awaited<ReturnType<typeof getVisitsForCurrentDoctor>>,
   TError = ErrorType<unknown>,
 >(
+  params?: GetVisitsForCurrentDoctorParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsForCurrentDoctor>>, TError, TData>
@@ -1013,7 +1070,7 @@ export function useGetVisitsForCurrentDoctor<
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getGetVisitsForCurrentDoctorQueryOptions(options);
+  const queryOptions = getGetVisitsForCurrentDoctorQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;
@@ -1027,16 +1084,21 @@ export function useGetVisitsForCurrentDoctor<
 /**
  * @summary get all visits assigned for selected doctor
  */
-export const getVisitsByDoctorId = (id: number, signal?: AbortSignal) => {
+export const getVisitsByDoctorId = (
+  id: number,
+  params?: GetVisitsByDoctorIdParams,
+  signal?: AbortSignal,
+) => {
   return customInstance<VisitWithDetails[]>({
     url: `/api/visits/doctor/${id}`,
     method: 'GET',
+    params,
     signal,
   });
 };
 
-export const getGetVisitsByDoctorIdQueryKey = (id: number) => {
-  return [`/api/visits/doctor/${id}`] as const;
+export const getGetVisitsByDoctorIdQueryKey = (id: number, params?: GetVisitsByDoctorIdParams) => {
+  return [`/api/visits/doctor/${id}`, ...(params ? [params] : [])] as const;
 };
 
 export const getGetVisitsByDoctorIdQueryOptions = <
@@ -1044,6 +1106,7 @@ export const getGetVisitsByDoctorIdQueryOptions = <
   TError = ErrorType<unknown>,
 >(
   id: number,
+  params?: GetVisitsByDoctorIdParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsByDoctorId>>, TError, TData>
@@ -1052,10 +1115,10 @@ export const getGetVisitsByDoctorIdQueryOptions = <
 ) => {
   const { query: queryOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetVisitsByDoctorIdQueryKey(id);
+  const queryKey = queryOptions?.queryKey ?? getGetVisitsByDoctorIdQueryKey(id, params);
 
   const queryFn: QueryFunction<Awaited<ReturnType<typeof getVisitsByDoctorId>>> = ({ signal }) =>
-    getVisitsByDoctorId(id, signal);
+    getVisitsByDoctorId(id, params, signal);
 
   return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
     Awaited<ReturnType<typeof getVisitsByDoctorId>>,
@@ -1074,6 +1137,7 @@ export function useGetVisitsByDoctorId<
   TError = ErrorType<unknown>,
 >(
   id: number,
+  params: undefined | GetVisitsByDoctorIdParams,
   options: {
     query: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsByDoctorId>>, TError, TData>
@@ -1094,6 +1158,7 @@ export function useGetVisitsByDoctorId<
   TError = ErrorType<unknown>,
 >(
   id: number,
+  params?: GetVisitsByDoctorIdParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsByDoctorId>>, TError, TData>
@@ -1114,6 +1179,7 @@ export function useGetVisitsByDoctorId<
   TError = ErrorType<unknown>,
 >(
   id: number,
+  params?: GetVisitsByDoctorIdParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsByDoctorId>>, TError, TData>
@@ -1130,6 +1196,7 @@ export function useGetVisitsByDoctorId<
   TError = ErrorType<unknown>,
 >(
   id: number,
+  params?: GetVisitsByDoctorIdParams,
   options?: {
     query?: Partial<
       UseQueryOptions<Awaited<ReturnType<typeof getVisitsByDoctorId>>, TError, TData>
@@ -1137,7 +1204,7 @@ export function useGetVisitsByDoctorId<
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getGetVisitsByDoctorIdQueryOptions(id, options);
+  const queryOptions = getGetVisitsByDoctorIdQueryOptions(id, params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;

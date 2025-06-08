@@ -1,4 +1,4 @@
-import { Box, Button, Link, Paper, Typography } from '@mui/material';
+import { Box, Button, FormControlLabel, Link, Paper, Switch, Typography } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 
 import { endOfDay, format, parse, startOfDay } from 'date-fns';
@@ -39,6 +39,8 @@ interface VisitTableProps {
   doctorId?: number;
   loading?: boolean;
   refetchVisits: () => Promise<void>;
+  isArchivalVisitsOn: boolean;
+  onArchivalModeToggle: () => void;
 }
 
 const columns = (
@@ -212,6 +214,8 @@ export const VisitsTable: FC<VisitTableProps> = ({
   patientId,
   doctorId,
   refetchVisits,
+  isArchivalVisitsOn,
+  onArchivalModeToggle,
 }) => {
   const currentFacilityId = useAuthStore((state) => state.user?.facilityId);
   const { isPatient } = useAuth();
@@ -316,10 +320,16 @@ export const VisitsTable: FC<VisitTableProps> = ({
 
   return (
     <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', p: 2 }}>
-      <Box sx={{ paddingBottom: 2 }}>
+      <Box sx={{ paddingBottom: 2, display: 'flex', gap: 4 }}>
         <Button variant="contained" onClick={setFilterDateToToday}>
           Pokaż dzisiejsze
         </Button>
+        <FormControlLabel
+          control={
+            <Switch checked={isArchivalVisitsOn} onChange={onArchivalModeToggle} color="primary" />
+          }
+          label="Pokaż archiwalne wizyty"
+        />
       </Box>
       <TableFilters<VisitsFilters>
         filters={filters}

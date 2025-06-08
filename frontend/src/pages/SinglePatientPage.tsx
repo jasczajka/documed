@@ -17,10 +17,12 @@ import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
 import { getAgeFromBirthDate } from 'shared/utils/getAgeFromBirthDate';
+import { getYearAgoAsDateString } from 'shared/utils/getYearAgoAsDateString';
 
 const SinglePatientPage: FC = () => {
   const { id } = useParams();
   const patientId = Number(id);
+  const [isArchivalModeOn, setIsArchivalModeOn] = useState(false);
   const fulfillerId = useAuthStore((state) => state.user?.id);
   const allServices = useAllServicesStore((state) => state.allServices);
 
@@ -56,14 +58,26 @@ const SinglePatientPage: FC = () => {
     isLoading: isPatientVisitsLoading,
     isError: isPatientVisitsError,
     refetch: refetchPatientVisits,
-  } = useGetVisitsByPatientId(patientId);
+  } = useGetVisitsByPatientId(
+    patientId,
+    {
+      startDate: isArchivalModeOn ? getYearAgoAsDateString() : undefined,
+    },
+    { query: { queryKey: ['visitsForPatient', isArchivalModeOn] } },
+  );
 
   const {
     data: patientAdditionalServices,
     isLoading: isPatientAdditionalServicesLoading,
     isError: isPatientAdditionalServicesError,
     refetch: refetchPatientAdditionalServices,
-  } = useGetAdditionalServicesByPatient(patientId);
+  } = useGetAdditionalServicesByPatient(
+    patientId,
+    {
+      startDate: isArchivalModeOn ? getYearAgoAsDateString() : undefined,
+    },
+    { query: { queryKey: ['additionalServicesForPatient', isArchivalModeOn] } },
+  );
 
   const {
     data: patientReferrals,
@@ -212,6 +226,8 @@ const SinglePatientPage: FC = () => {
         refetchPatientInfo={async () => {
           await refetchPatientInfo();
         }}
+        isArchivalModeOn={isArchivalModeOn}
+        onArchivalModeToggle={() => setIsArchivalModeOn((prev) => !prev)}
       />
       <NotificationComponent />
     </div>

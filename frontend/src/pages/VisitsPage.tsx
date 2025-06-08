@@ -1,6 +1,6 @@
 import { Box, Button, CardHeader } from '@mui/material';
 import VisitsTable from 'modules/visits/VisitsTable/VisitsTable';
-import { FC, useCallback, useEffect } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { getPatientDetails } from 'shared/api/generated/patients-controller/patients-controller';
 import { useGetAllServices } from 'shared/api/generated/service-controller/service-controller';
 import {
@@ -14,11 +14,13 @@ import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
 import { getAgeFromBirthDate } from 'shared/utils/getAgeFromBirthDate';
+import { getYearAgoAsDateString } from 'shared/utils/getYearAgoAsDateString';
 
 const VisitsPage: FC = () => {
   const { user, isPatient, isDoctor } = useAuth();
   const { openModal } = useModal();
   const { showNotification, NotificationComponent } = useNotification();
+  const [isArchivalVisitsOn, setIsArchivalVisitsOn] = useState(false);
 
   if (!user || !user.id) {
     return null;
@@ -29,14 +31,34 @@ const VisitsPage: FC = () => {
     isLoading: isPatientVisitsLoading,
     isError: isPatientVisitsError,
     refetch: refetchPatientVisits,
-  } = useGetVisitsForCurrentPatient({ query: { enabled: isPatient } });
+  } = useGetVisitsForCurrentPatient(
+    {
+      startDate: isArchivalVisitsOn ? getYearAgoAsDateString() : undefined,
+    },
+    {
+      query: {
+        enabled: isPatient,
+        queryKey: ['visitsForCurrentDoctor', isArchivalVisitsOn],
+      },
+    },
+  );
 
   const {
     data: allVisits,
     isLoading: isAllVisitsLoading,
     isError: isAllVisitsError,
     refetch: refetchAllVisits,
-  } = useGetAllVisits({ query: { enabled: !isPatient } });
+  } = useGetAllVisits(
+    {
+      startDate: isArchivalVisitsOn ? getYearAgoAsDateString() : undefined,
+    },
+    {
+      query: {
+        enabled: !isPatient,
+        queryKey: ['visitsForCurrentPatient', isArchivalVisitsOn],
+      },
+    },
+  );
 
   const {
     data: allServices,
@@ -131,6 +153,8 @@ const VisitsPage: FC = () => {
           doctorId={isDoctor ? user.id : undefined}
           onCancel={handleCancelVisitClick}
           refetchVisits={refetchVisits}
+          isArchivalVisitsOn={isArchivalVisitsOn}
+          onArchivalModeToggle={() => setIsArchivalVisitsOn((prev) => !prev)}
         />
       </div>
     );
