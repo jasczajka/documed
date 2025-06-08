@@ -30,6 +30,8 @@ interface SpecialistTabsProps {
   tabIndex: number;
   onTabChange: (index: number) => void;
   loading?: boolean;
+  isArchivalVisitsOn: boolean;
+  onArchivalModeToggle: () => void;
 }
 export const SpecialistTabs: FC<SpecialistTabsProps> = ({
   doctorId,
@@ -47,6 +49,8 @@ export const SpecialistTabs: FC<SpecialistTabsProps> = ({
   tabIndex,
   onTabChange,
   loading,
+  isArchivalVisitsOn,
+  onArchivalModeToggle,
 }) => {
   const allServices = useAllServicesStore((state) => state.allServices);
   return (
@@ -95,6 +99,8 @@ export const SpecialistTabs: FC<SpecialistTabsProps> = ({
             allServices={allServices}
             onCancel={handleCancelVisit}
             refetchVisits={refetchDoctorVisits}
+            isArchivalVisitsOn={isArchivalVisitsOn}
+            onArchivalModeToggle={onArchivalModeToggle}
           />
         )}
         {tabIndex === 2 && (

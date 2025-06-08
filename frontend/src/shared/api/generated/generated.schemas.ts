@@ -480,6 +480,10 @@ export interface MeDTO {
   facilityId: number;
 }
 
+export type GetAllVisitsParams = {
+  startDate?: string;
+};
+
 export type CreateSubscriptionParams = {
   name: string;
   price: number;
@@ -492,6 +496,22 @@ export type AddMedicineToPrescriptionParams = {
 export type GetAvailableFirstTimeSlotsByFacilityParams = {
   neededTimeSlots: number;
   facilityId: number;
+};
+
+export type GetVisitsForCurrentPatientParams = {
+  startDate?: string;
+};
+
+export type GetVisitsByPatientIdParams = {
+  startDate?: string;
+};
+
+export type GetVisitsForCurrentDoctorParams = {
+  startDate?: string;
+};
+
+export type GetVisitsByDoctorIdParams = {
+  startDate?: string;
 };
 
 export type CalculateVisitCostParams = {
