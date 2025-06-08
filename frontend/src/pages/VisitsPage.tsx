@@ -72,6 +72,7 @@ const VisitsPage: FC = () => {
           patientDetails?.birthdate ? getAgeFromBirthDate(new Date(patientDetails.birthdate)) : null
         }
         onConfirm={async () => {
+          await refetchPatientVisits();
           close();
           showNotification('Umówiono wizytę', 'success');
         }}
