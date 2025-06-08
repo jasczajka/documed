@@ -419,17 +419,6 @@ export interface UpdateDoctorSpecializationsDTO {
   specializationIds: number[];
 }
 
-export interface TimeSlot {
-  id?: number;
-  visitId?: number;
-  doctorId?: number;
-  facilityId?: number;
-  startTime?: string;
-  endTime?: string;
-  date?: string;
-  busy?: boolean;
-}
-
 export interface AvailableTimeSlotDTO {
   id: number;
   doctorId: number;
@@ -500,7 +489,7 @@ export type AddMedicineToPrescriptionParams = {
   amount?: number;
 };
 
-export type GetAvailableFirstTimeSlotsByDoctorAndFacilityParams = {
+export type GetAvailableFirstTimeSlotsByFacilityParams = {
   neededTimeSlots: number;
   facilityId: number;
 };

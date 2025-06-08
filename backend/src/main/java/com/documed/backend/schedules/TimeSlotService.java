@@ -102,10 +102,8 @@ public class TimeSlotService {
     }
   }
 
-  public List<TimeSlot> getAvailableFirstTimeSlotsByDoctorAndFacility(
-      int doctorId, int neededTimeSlots, int facilityId) {
-    List<TimeSlot> allSlots =
-        timeSlotDAO.getAvailableFutureTimeSlotsByDoctorAndFacility(doctorId, facilityId);
+  public List<TimeSlot> getAvailableFirstTimeSlotsByFacility(int neededTimeSlots, int facilityId) {
+    List<TimeSlot> allSlots = timeSlotDAO.getAvailableFutureTimeSlotsByFacilityId(facilityId);
 
     Map<LocalDate, List<TimeSlot>> slotsByDate =
         allSlots.stream()

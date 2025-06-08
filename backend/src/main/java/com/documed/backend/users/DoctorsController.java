@@ -1,6 +1,5 @@
 package com.documed.backend.users;
 
-import com.documed.backend.auth.annotations.DoctorOrPatient;
 import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.auth.annotations.WardClerkOnly;
 import com.documed.backend.auth.exceptions.UserNotFoundException;
@@ -30,7 +29,8 @@ public class DoctorsController {
   private final FreeDaysService freeDaysService;
 
   // TODO pacjent lekarz
-  @DoctorOrPatient
+  // zmiana from Janek - potrzebujemy tego dla ward clerka tez
+  @StaffOnly
   @GetMapping("/{id}")
   public ResponseEntity<DoctorDetailsDTO> getDoctorDetails(@PathVariable("id") int userId) {
     User user =

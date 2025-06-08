@@ -10,10 +10,10 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { FC, useMemo } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { ScheduleVisitDTO } from 'shared/api/generated/generated.schemas';
-import { useGetAvailableFirstTimeSlotsByDoctorAndFacility } from 'shared/api/generated/time-slot-controller/time-slot-controller';
+import { FC, useMemo, useState } from 'react';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import { AvailableTimeSlotDTO, ScheduleVisitDTO } from 'shared/api/generated/generated.schemas';
+import { useGetAvailableFirstTimeSlotsByFacility } from 'shared/api/generated/time-slot-controller/time-slot-controller';
 import {
   useCalculateVisitCost,
   useScheduleVisit,
@@ -53,7 +53,7 @@ interface ScheduleVisitModalProps {
 
 const validationSchema = Yup.object().shape({
   serviceId: Yup.number().required('Wybierz rodzaj usługi'),
-  doctorId: Yup.number().required('Wybierz specjalistę'),
+  doctorId: Yup.number().nullable(),
   facilityId: Yup.number().required('Wybierz placówkę'),
   visitDate: Yup.date().required('Wybierz termin wizyty'),
   additionalInfo: Yup.string().max(
@@ -81,8 +81,8 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
   const {
     control,
     handleSubmit,
-    watch,
     formState: { errors },
+    setValue,
     resetField,
   } = useForm<Partial<FormData>>({
     resolver: yupResolver(validationSchema) as any,
@@ -95,9 +95,10 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
     },
   });
 
-  const selectedServiceId = watch('serviceId');
-  const selectedDoctorId = watch('doctorId');
-  const selectedFacilityId = watch('facilityId');
+  const selectedServiceId = useWatch({ control, name: 'serviceId' });
+  const selectedDoctorId = useWatch({ control, name: 'doctorId' });
+  const selectedFacilityId = useWatch({ control, name: 'facilityId' });
+  const [selectedSlot, setSelectedSlot] = useState<AvailableTimeSlotDTO | null>(null);
 
   const { showNotification, NotificationComponent } = useNotification();
 
@@ -124,16 +125,14 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
     data: availableTimeSlots = [],
     isLoading: isPossibleStartTimesLoading,
     refetch: refetchTimeSlots,
-  } = useGetAvailableFirstTimeSlotsByDoctorAndFacility(
-    selectedDoctorId ?? -1,
+  } = useGetAvailableFirstTimeSlotsByFacility(
     {
       neededTimeSlots,
       facilityId: selectedFacilityId ?? -1,
     },
     {
       query: {
-        enabled:
-          !!selectedDoctorId && !!selectedServiceId && !!selectedFacilityId && !!neededTimeSlots,
+        enabled: !!selectedServiceId && !!selectedFacilityId && !!neededTimeSlots,
       },
     },
   );
@@ -142,14 +141,6 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
     { patientId: patientId, serviceId: selectedServiceId ?? -1 },
     { query: { enabled: !!selectedServiceId } },
   );
-
-  const possibleStartTimes = useMemo(() => {
-    if (!availableTimeSlots) {
-      return [];
-    }
-
-    return availableTimeSlots.map((slot) => new Date(slot.startTime));
-  }, [availableTimeSlots]);
 
   const availableDoctorsForChosenService = useMemo(() => {
     if (!selectedServiceId) {
@@ -167,7 +158,16 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
         doctorSpecializationIds.includes(requiredId),
       );
     });
-  }, [allDoctors, allServices, selectedServiceId]);
+  }, [selectedServiceId]);
+
+  const availableTimeSlotsFilteredByDoctor = useMemo(() => {
+    if (!selectedDoctorId) {
+      return availableTimeSlots.filter((slot) =>
+        availableDoctorsForChosenService.some((doctor) => doctor.id === slot.doctorId),
+      );
+    }
+    return availableTimeSlots.filter((slot) => slot.doctorId === selectedDoctorId);
+  }, [selectedDoctorId, availableTimeSlots, availableDoctorsForChosenService]);
 
   const availableServices = useMemo(() => {
     if (!initialDoctorId) {
@@ -181,24 +181,15 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
     return allServices.filter((service) =>
       service.specializationIds.some((id) => doctorSpecializationIds.includes(id)),
     );
-  }, [allServices, allDoctors, initialDoctorId]);
+  }, [initialDoctorId]);
 
   const onSubmit = async (data: Partial<FormData>) => {
-    if (data.serviceId && data.doctorId && data.visitDate && data.facilityId) {
-      const selectedTimeSlot = availableTimeSlots.find(
-        (slot) => new Date(slot.startTime).getTime() === data.visitDate!.getTime(),
-      );
-
-      if (!selectedTimeSlot) {
-        console.error('No matching time slot found');
-        return;
-      }
-
+    if (data.serviceId && data.doctorId && data.visitDate && data.facilityId && selectedSlot) {
       await handleScheduleVisit({
         patientInformation: data.additionalInfo,
         patientId: patientId,
-        doctorId: data.doctorId,
-        firstTimeSlotId: selectedTimeSlot.id,
+        doctorId: selectedSlot.doctorId,
+        firstTimeSlotId: selectedSlot.id,
         serviceId: data.serviceId,
         facilityId: data.facilityId,
       });
@@ -242,6 +233,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
                   field.onChange(newValue?.id);
                   resetField('doctorId');
                   resetField('visitDate');
+                  setSelectedSlot(null);
                   if (newValue?.id) {
                     refetchVisitCost();
                   }
@@ -265,17 +257,16 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
             control={control}
             render={({ field }) => (
               <Autocomplete
-                disabled={!selectedServiceId || !!initialDoctorId || loading}
+                disabled={!selectedServiceId || loading}
                 options={availableDoctorsForChosenService}
                 getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
                 onChange={(_, newValue) => {
-                  field.onChange(newValue?.id);
-                  resetField('visitDate');
-                  if (newValue?.id) {
-                    refetchTimeSlots();
-                  }
+                  field.onChange(newValue?.id ?? null);
+                  setValue('visitDate', undefined);
+                  setSelectedSlot(null);
                 }}
                 value={allDoctors.find((doctor) => doctor.id === field.value) ?? null}
+                isOptionEqualToValue={(option, value) => option.id === value?.id}
                 noOptionsText="Brak opcji spełniających wyszukiwanie"
                 renderInput={(params) => (
                   <TextField
@@ -330,15 +321,19 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
           <Controller
             name="visitDate"
             control={control}
-            render={({ field }) => (
+            render={() => (
               <VisitDatepicker
                 timeSlotCount={neededTimeSlots}
                 timeSlotLengthInMinutes={appConfig.timeSlotLengthInMinutes}
-                possibleStartTimes={possibleStartTimes}
-                onConfirmSelectedStartTime={(selectedStartDate) => {
-                  field.onChange(selectedStartDate);
+                possibleStartTimes={availableTimeSlotsFilteredByDoctor}
+                selectedTimeSlot={selectedSlot}
+                onSelectTimeSlot={(slot) => {
+                  setSelectedSlot(slot);
+                  setValue('visitDate', new Date(slot.startTime));
+                  setValue('doctorId', slot.doctorId);
+                  setValue('firstTimeSlotId', slot.id);
                 }}
-                disabled={!selectedDoctorId || !selectedServiceId || !selectedFacilityId || loading}
+                disabled={!selectedServiceId || !selectedFacilityId || loading}
                 error={errors.visitDate?.message}
               />
             )}

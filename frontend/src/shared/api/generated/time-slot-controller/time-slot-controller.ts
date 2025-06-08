@@ -24,8 +24,7 @@ import type {
   AvailableTimeSlotDTO,
   FreeDaysDTO,
   FreeDaysReturnDTO,
-  GetAvailableFirstTimeSlotsByDoctorAndFacilityParams,
-  TimeSlot,
+  GetAvailableFirstTimeSlotsByFacilityParams,
 } from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
@@ -107,149 +106,35 @@ export const useCreateFreeDays = <TError = ErrorType<unknown>, TContext = unknow
   return useMutation(mutationOptions, queryClient);
 };
 /**
- * @summary Get timeslot by id
- */
-export const getTimeSlotById = (id: number, signal?: AbortSignal) => {
-  return customInstance<TimeSlot>({ url: `/timeslots/${id}`, method: 'GET', signal });
-};
-
-export const getGetTimeSlotByIdQueryKey = (id: number) => {
-  return [`/timeslots/${id}`] as const;
-};
-
-export const getGetTimeSlotByIdQueryOptions = <
-  TData = Awaited<ReturnType<typeof getTimeSlotById>>,
-  TError = ErrorType<unknown>,
->(
-  id: number,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getTimeSlotById>>, TError, TData>>;
-  },
-) => {
-  const { query: queryOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetTimeSlotByIdQueryKey(id);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof getTimeSlotById>>> = ({ signal }) =>
-    getTimeSlotById(id, signal);
-
-  return { queryKey, queryFn, enabled: !!id, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getTimeSlotById>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type GetTimeSlotByIdQueryResult = NonNullable<Awaited<ReturnType<typeof getTimeSlotById>>>;
-export type GetTimeSlotByIdQueryError = ErrorType<unknown>;
-
-export function useGetTimeSlotById<
-  TData = Awaited<ReturnType<typeof getTimeSlotById>>,
-  TError = ErrorType<unknown>,
->(
-  id: number,
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof getTimeSlotById>>, TError, TData>> &
-      Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getTimeSlotById>>,
-          TError,
-          Awaited<ReturnType<typeof getTimeSlotById>>
-        >,
-        'initialData'
-      >;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetTimeSlotById<
-  TData = Awaited<ReturnType<typeof getTimeSlotById>>,
-  TError = ErrorType<unknown>,
->(
-  id: number,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getTimeSlotById>>, TError, TData>> &
-      Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getTimeSlotById>>,
-          TError,
-          Awaited<ReturnType<typeof getTimeSlotById>>
-        >,
-        'initialData'
-      >;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetTimeSlotById<
-  TData = Awaited<ReturnType<typeof getTimeSlotById>>,
-  TError = ErrorType<unknown>,
->(
-  id: number,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getTimeSlotById>>, TError, TData>>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-/**
- * @summary Get timeslot by id
- */
-
-export function useGetTimeSlotById<
-  TData = Awaited<ReturnType<typeof getTimeSlotById>>,
-  TError = ErrorType<unknown>,
->(
-  id: number,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof getTimeSlotById>>, TError, TData>>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getGetTimeSlotByIdQueryOptions(id, options);
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-  };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-/**
  * @summary Get available timeslots for doctor by id and required visit length
  */
-export const getAvailableFirstTimeSlotsByDoctorAndFacility = (
-  doctorId: number,
-  params: GetAvailableFirstTimeSlotsByDoctorAndFacilityParams,
+export const getAvailableFirstTimeSlotsByFacility = (
+  params: GetAvailableFirstTimeSlotsByFacilityParams,
   signal?: AbortSignal,
 ) => {
   return customInstance<AvailableTimeSlotDTO[]>({
-    url: `/timeslots/doctors/${doctorId}/available-timeslots`,
+    url: `/timeslots/available-timeslots`,
     method: 'GET',
     params,
     signal,
   });
 };
 
-export const getGetAvailableFirstTimeSlotsByDoctorAndFacilityQueryKey = (
-  doctorId: number,
-  params: GetAvailableFirstTimeSlotsByDoctorAndFacilityParams,
+export const getGetAvailableFirstTimeSlotsByFacilityQueryKey = (
+  params: GetAvailableFirstTimeSlotsByFacilityParams,
 ) => {
-  return [
-    `/timeslots/doctors/${doctorId}/available-timeslots`,
-    ...(params ? [params] : []),
-  ] as const;
+  return [`/timeslots/available-timeslots`, ...(params ? [params] : [])] as const;
 };
 
-export const getGetAvailableFirstTimeSlotsByDoctorAndFacilityQueryOptions = <
-  TData = Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByDoctorAndFacility>>,
+export const getGetAvailableFirstTimeSlotsByFacilityQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByFacility>>,
   TError = ErrorType<unknown>,
 >(
-  doctorId: number,
-  params: GetAvailableFirstTimeSlotsByDoctorAndFacilityParams,
+  params: GetAvailableFirstTimeSlotsByFacilityParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
-        Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByDoctorAndFacility>>,
+        Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByFacility>>,
         TError,
         TData
       >
@@ -259,85 +144,81 @@ export const getGetAvailableFirstTimeSlotsByDoctorAndFacilityQueryOptions = <
   const { query: queryOptions } = options ?? {};
 
   const queryKey =
-    queryOptions?.queryKey ??
-    getGetAvailableFirstTimeSlotsByDoctorAndFacilityQueryKey(doctorId, params);
+    queryOptions?.queryKey ?? getGetAvailableFirstTimeSlotsByFacilityQueryKey(params);
 
   const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByDoctorAndFacility>>
-  > = ({ signal }) => getAvailableFirstTimeSlotsByDoctorAndFacility(doctorId, params, signal);
+    Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByFacility>>
+  > = ({ signal }) => getAvailableFirstTimeSlotsByFacility(params, signal);
 
-  return { queryKey, queryFn, enabled: !!doctorId, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByDoctorAndFacility>>,
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByFacility>>,
     TError,
     TData
   > & { queryKey: DataTag<QueryKey, TData, TError> };
 };
 
-export type GetAvailableFirstTimeSlotsByDoctorAndFacilityQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByDoctorAndFacility>>
+export type GetAvailableFirstTimeSlotsByFacilityQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByFacility>>
 >;
-export type GetAvailableFirstTimeSlotsByDoctorAndFacilityQueryError = ErrorType<unknown>;
+export type GetAvailableFirstTimeSlotsByFacilityQueryError = ErrorType<unknown>;
 
-export function useGetAvailableFirstTimeSlotsByDoctorAndFacility<
-  TData = Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByDoctorAndFacility>>,
+export function useGetAvailableFirstTimeSlotsByFacility<
+  TData = Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByFacility>>,
   TError = ErrorType<unknown>,
 >(
-  doctorId: number,
-  params: GetAvailableFirstTimeSlotsByDoctorAndFacilityParams,
+  params: GetAvailableFirstTimeSlotsByFacilityParams,
   options: {
     query: Partial<
       UseQueryOptions<
-        Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByDoctorAndFacility>>,
+        Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByFacility>>,
         TError,
         TData
       >
     > &
       Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByDoctorAndFacility>>,
+          Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByFacility>>,
           TError,
-          Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByDoctorAndFacility>>
+          Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByFacility>>
         >,
         'initialData'
       >;
   },
   queryClient?: QueryClient,
 ): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetAvailableFirstTimeSlotsByDoctorAndFacility<
-  TData = Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByDoctorAndFacility>>,
+export function useGetAvailableFirstTimeSlotsByFacility<
+  TData = Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByFacility>>,
   TError = ErrorType<unknown>,
 >(
-  doctorId: number,
-  params: GetAvailableFirstTimeSlotsByDoctorAndFacilityParams,
+  params: GetAvailableFirstTimeSlotsByFacilityParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
-        Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByDoctorAndFacility>>,
+        Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByFacility>>,
         TError,
         TData
       >
     > &
       Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByDoctorAndFacility>>,
+          Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByFacility>>,
           TError,
-          Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByDoctorAndFacility>>
+          Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByFacility>>
         >,
         'initialData'
       >;
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useGetAvailableFirstTimeSlotsByDoctorAndFacility<
-  TData = Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByDoctorAndFacility>>,
+export function useGetAvailableFirstTimeSlotsByFacility<
+  TData = Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByFacility>>,
   TError = ErrorType<unknown>,
 >(
-  doctorId: number,
-  params: GetAvailableFirstTimeSlotsByDoctorAndFacilityParams,
+  params: GetAvailableFirstTimeSlotsByFacilityParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
-        Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByDoctorAndFacility>>,
+        Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByFacility>>,
         TError,
         TData
       >
@@ -349,16 +230,15 @@ export function useGetAvailableFirstTimeSlotsByDoctorAndFacility<
  * @summary Get available timeslots for doctor by id and required visit length
  */
 
-export function useGetAvailableFirstTimeSlotsByDoctorAndFacility<
-  TData = Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByDoctorAndFacility>>,
+export function useGetAvailableFirstTimeSlotsByFacility<
+  TData = Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByFacility>>,
   TError = ErrorType<unknown>,
 >(
-  doctorId: number,
-  params: GetAvailableFirstTimeSlotsByDoctorAndFacilityParams,
+  params: GetAvailableFirstTimeSlotsByFacilityParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
-        Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByDoctorAndFacility>>,
+        Awaited<ReturnType<typeof getAvailableFirstTimeSlotsByFacility>>,
         TError,
         TData
       >
@@ -366,11 +246,7 @@ export function useGetAvailableFirstTimeSlotsByDoctorAndFacility<
   },
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getGetAvailableFirstTimeSlotsByDoctorAndFacilityQueryOptions(
-    doctorId,
-    params,
-    options,
-  );
+  const queryOptions = getGetAvailableFirstTimeSlotsByFacilityQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;
