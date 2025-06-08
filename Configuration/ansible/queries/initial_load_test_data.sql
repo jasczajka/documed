@@ -153,10 +153,10 @@ INSERT INTO Subscription_Service (subscription_id, service_id, discount) VALUES
 
 ---
 -- Tabela: User
--- Role: DOCTOR, PATIENT, ADMIN, NURSE, WARD_CLERK
+-- Role: DOCTOR, PATIENT, ADMINISTRATOR, NURSE, WARD_CLERK
 -- hasło dla wszystkich: 'Password123' (hash: $2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS)
 INSERT INTO "User" (first_name, last_name, pesel, passport_number, email, address, password, phone_number, account_status, birthdate, pwz, role, subscription_id, email_notifications) VALUES
--- Lekarze (id: 1, 2, 3)
+-- Lekarze
 ('Jan', 'Kowalski', NULL, NULL, 'jan.kowalski@documed.pl', 'ul. Lekarska 1, Warszawa', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '111222333', 'ACTIVE', '1980-05-10', '1234567', 'DOCTOR', NULL, true),
 ('Anna', 'Nowak', NULL, NULL, 'anna.nowak@documed.pl', 'ul. Medyczna 2, Kraków', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '444555666', 'ACTIVE', '1985-09-15', '7654321', 'DOCTOR', NULL, true),
 ('Piotr', 'Wiśniewski', NULL, NULL, 'piotr.wisniewski@documed.pl', 'ul. Szpitalna 3, Warszawa', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '777888999', 'ACTIVE', '1978-02-20', '1122334', 'DOCTOR', NULL, false),
@@ -194,9 +194,9 @@ INSERT INTO "User" (first_name, last_name, pesel, passport_number, email, addres
 ('Krzysztof', 'Lopez', '82110512345', 'ADM12345', 'krzysztof.mazur@email.com', 'ul. Radosna 4, Warszawa', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '654654654', 'ACTIVE', '1982-11-05', NULL, 'PATIENT', NULL, true),
 ('Ewa', 'Krawczyk', '99123112345', NULL, 'ewa.krawczyk@email.com', 'ul. Cicha 5, Kraków', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '789789789', 'DEACTIVATED', '1999-12-31', NULL, 'PATIENT', NULL, true),
 -- Personel (id: 9, 10, 11)
-('Admin', 'Adminski', NULL, NULL, 'admin@documed.pl', 'ul. Główna 100, Warszawa', '$2a$10$9.l3Jeyp1iA2a1s7p6H52uS1G5G.1K6g.FnyI6bHtQkmmExlT/mde', '000000000', 'ACTIVE', '1990-01-01', NULL, 'ADMIN', NULL, true),
-('Katarzyna', 'Pielęgniarczyk', NULL, NULL, 'katarzyna.p@documed.pl', 'ul. Pomocna 1, Warszawa', '$2a$10$9.l3Jeyp1iA2a1s7p6H52uS1G5G.1K6g.FnyI6bHtQkmmExlT/mde', '101102103', 'ACTIVE', '1992-04-12', NULL, 'NURSE', NULL, true),
-('Robert', 'Rejestrator', NULL, NULL, 'robert.r@documed.pl', 'ul. Biurowa 2, Kraków', '$2a$10$9.l3Jeyp1iA2a1s7p6H52uS1G5G.1K6g.FnyI6bHtQkmmExlT/mde', '104105106', 'ACTIVE', '1995-11-25', NULL, 'WARD_CLERK', NULL, true);
+('Admin', 'Adminski', NULL, NULL, 'admin@documed.pl', 'ul. Główna 100, Warszawa', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '000000000', 'ACTIVE', '1990-01-01', NULL, 'ADMINISTRATOR', NULL, true),
+('Katarzyna', 'Pielęgniarczyk', NULL, NULL, 'katarzyna.p@documed.pl', 'ul. Pomocna 1, Warszawa', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '101102103', 'ACTIVE', '1992-04-12', NULL, 'NURSE', NULL, true),
+('Robert', 'Rejestrator', NULL, NULL, 'robert.r@documed.pl', 'ul. Biurowa 2, Kraków', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '104105106', 'ACTIVE', '1995-11-25', NULL, 'WARD_CLERK', NULL, true);
 
 
 ---
@@ -272,7 +272,21 @@ INSERT INTO Visit (status, interview, diagnosis, recommendations, total_cost, fa
 ('CLOSED', 'Okresowa kontrola znamion skórnych.', 'Brak niepokojących zmian', 'Kolejna kontrola za rok.', 220.00, 3, 2, NULL, 5, 2),
 ('PLANNED', 'Pogorszenie ostrości wzroku w prawym oku.', NULL, NULL, 180.00, 2, 3, 'Pierwsza wizyta.', 4, 3),
 ('CANCELLED', 'Ból głowy i gorączka u dziecka.', NULL, NULL, 200.00, 1, 4, NULL, 7, 1),
-('CLOSED', 'Pacjentka zgłasza wysypkę na przedramionach.', 'Alergiczne zapalenie skóry', 'Stosować maść z hydrokortyzonem, unikać alergenu.', 50.00, 3, 2, 'Mam wysypkę na przedramionach', 5, 2);
+('CLOSED', 'Pacjentka zgłasza wysypkę na przedramionach.', 'Alergiczne zapalenie skóry', 'Stosować maść z hydrokortyzonem, unikać alergenu.', 50.00, 3, 2, 'Mam wysypkę na przedramionach', 5, 2),
+('PLANNED', NULL, NULL, NULL, 250.00, 1, 1, 'Pacjent z bólem w klatce piersiowej.', 8, 1),
+('CLOSED', 'Ból głowy od tygodnia.', 'Migrena', 'Zalecane leki przeciwbólowe, kontrola za miesiąc.', 220.00, 2, 2, 'Mam migrenę.', 6, 2),
+('CANCELLED', 'Ból gardła i gorączka.', NULL, NULL, 200.00, 3, 4, NULL, 8, 3),
+('CLOSED', 'Zmęczenie i senność.', 'Niedobór żelaza', 'Suplementacja żelaza, dieta bogata w żelazo.', 180.00, 1, 3, NULL, 6, 4),
+('PLANNED', NULL, NULL, NULL, 250.00, 2, 1, 'Pierwsza konsultacja kardiologiczna.', 7, 5),
+('PLANNED', NULL, NULL, NULL, 220.00, 2, 2, 'Podejrzenie alergii skórnej.', 7, 6),
+('CLOSED', 'Kaszel suchy od 3 dni.', 'Zapalenie oskrzeli', 'Antybiotyk przez 5 dni, nawadnianie.', 180.00, 1, 3, NULL, 5, 7),
+('PLANNED', NULL, NULL, NULL, 250.00, 3, 1, NULL, 5, 8),
+('CANCELLED', 'Uraz kolana po bieganiu.', NULL, NULL, 250.00, 1, 1, NULL, 5, 9),
+('CLOSED', 'Zawroty głowy, nudności.', 'Nadciśnienie', 'Zalecane pomiar ciśnienia, leki.', 250.00, 2, 1, NULL, 4, 10),
+('PLANNED', NULL, NULL, NULL, 200.00, 2, 4, 'Wizyta dziecka z gorączką.', 5, 11),
+('CLOSED', 'Kontrola znamion skórnych.', 'Brak zmian podejrzanych.', 'Kontrola za 12 miesięcy.', 220.00, 3, 2, NULL, 4, 12),
+('CLOSED', 'Kontrola po zawale.', 'Stan stabilny.', 'Zalecane kontynuowanie leków.', 250.00, 1, 1, NULL, 4, 13),
+('CANCELLED', 'Konsultacja dietetyczna.', NULL, NULL, 180.00, 3, 3, NULL, 4, 14);
 
 ---
 -- Tabela: Additional_service
