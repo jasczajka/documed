@@ -297,92 +297,102 @@ class VisitServiceTest extends Specification {
 		thrown(NotFoundException)
 	}
 
-	def "getAllWithDetails should return all visits"() {
+	def "getAllWithDetailsBetweenDates should return all visits within date range"() {
 		given:
+		def startDate = LocalDate.now().minusMonths(3)
+		def endDate = LocalDate.now()
 		def visits = [
-			buildVisitWithDetails(id: 1),
-			buildVisitWithDetails(id: 2)
+			buildVisitWithDetails(id: 1, visitDate: startDate.plusDays(1)),
+			buildVisitWithDetails(id: 2, visitDate: endDate.minusDays(1))
 		]
 
 		when:
-		def result = visitService.getAllWithDetails()
+		def result = visitService.getAllWithDetailsBetweenDates(startDate, endDate)
 
 		then:
-		1 * visitDAO.findAllWithDetails() >> visits
+		1 * visitDAO.findAllWithDetailsBetweenDates(startDate, endDate) >> visits
 		result == visits
 	}
 
-	def "getVisitsForCurrentPatientWithDetails should return patient's visits"() {
+	def "getVisitsForCurrentPatientWithDetailsBetweenDates should return patient's visits within date range"() {
 		given:
 		def patientId = 10
 		def facilityId = 1
+		def startDate = LocalDate.now().minusMonths(3)
+		def endDate = LocalDate.now()
 		def visits = [
-			buildVisitWithDetails(patientId: patientId, facilityId: facilityId),
-			buildVisitWithDetails(patientId: patientId, facilityId: facilityId)
+			buildVisitWithDetails(patientId: patientId, facilityId: facilityId, visitDate: startDate.plusDays(1)),
+			buildVisitWithDetails(patientId: patientId, facilityId: facilityId, visitDate: endDate.minusDays(1))
 		]
 
 		when:
-		def result = visitService.getVisitsForCurrentPatientWithDetails()
+		def result = visitService.getVisitsForCurrentPatientWithDetailsBetweenDates(startDate, endDate)
 
 		then:
 		1 * authService.getCurrentUserId() >> patientId
 		1 * authService.getCurrentFacilityId() >> facilityId
-		1 * visitDAO.findByPatientIdAndFacilityIdWithDetails(patientId, facilityId) >> visits
+		1 * visitDAO.findByPatientIdAndFacilityIdWithDetailsBetweenDates(patientId, facilityId, startDate, endDate) >> visits
 		result == visits
 	}
 
-	def "getVisitsByPatientIdWithDetails should return visits for specified patient"() {
+	def "getVisitsByPatientIdWithDetailsBetweenDates should return visits for specified patient within date range"() {
 		given:
 		def patientId = 10
 		def facilityId = 1
+		def startDate = LocalDate.now().minusMonths(3)
+		def endDate = LocalDate.now()
 		def visits = [
-			buildVisitWithDetails(patientId: patientId, facilityId: facilityId),
-			buildVisitWithDetails(patientId: patientId, facilityId: facilityId)
+			buildVisitWithDetails(patientId: patientId, facilityId: facilityId, visitDate: startDate.plusDays(1)),
+			buildVisitWithDetails(patientId: patientId, facilityId: facilityId, visitDate: endDate.minusDays(1))
 		]
 
 		when:
-		def result = visitService.getVisitsByPatientIdWithDetails(patientId)
+		def result = visitService.getVisitsByPatientIdWithDetailsBetweenDates(patientId, startDate, endDate)
 
 		then:
 		1 * authService.getCurrentFacilityId() >> facilityId
-		1 * visitDAO.findByPatientIdAndFacilityIdWithDetails(patientId, facilityId) >> visits
+		1 * visitDAO.findByPatientIdAndFacilityIdWithDetailsBetweenDates(patientId, facilityId, startDate, endDate) >> visits
 		result == visits
 	}
 
-	def "getVisitsByDoctorIdWithDetails should return visits for specified doctor"() {
+	def "getVisitsByDoctorIdWithDetailsBetweenDates should return visits for specified doctor within date range"() {
 		given:
 		def doctorId = 5
 		def facilityId = 1
+		def startDate = LocalDate.now().minusMonths(3)
+		def endDate = LocalDate.now()
 		def visits = [
-			buildVisitWithDetails(doctorId: doctorId, facilityId: facilityId),
-			buildVisitWithDetails(doctorId: doctorId, facilityId: facilityId)
+			buildVisitWithDetails(doctorId: doctorId, facilityId: facilityId, visitDate: startDate.plusDays(1)),
+			buildVisitWithDetails(doctorId: doctorId, facilityId: facilityId, visitDate: endDate.minusDays(1))
 		]
 
 		when:
-		def result = visitService.getVisitsByDoctorIdWithDetails(doctorId)
+		def result = visitService.getVisitsByDoctorIdWithDetailsBetweenDates(doctorId, startDate, endDate)
 
 		then:
 		1 * authService.getCurrentFacilityId() >> facilityId
-		1 * visitDAO.findByDoctorIdAndFacilityIdWithDetails(doctorId, facilityId) >> visits
+		1 * visitDAO.findByDoctorIdAndFacilityIdWithDetailsBetweenDates(doctorId, facilityId, startDate, endDate) >> visits
 		result == visits
 	}
 
-	def "getVisitsForCurrentDoctorWithDetails should return doctor's visits"() {
+	def "getVisitsForCurrentDoctorWithDetailsBetweenDates should return doctor's visits within date range"() {
 		given:
 		def doctorId = 5
 		def facilityId = 1
+		def startDate = LocalDate.now().minusMonths(3)
+		def endDate = LocalDate.now()
 		def visits = [
-			buildVisitWithDetails(doctorId: doctorId, facilityId: facilityId),
-			buildVisitWithDetails(doctorId: doctorId, facilityId: facilityId)
+			buildVisitWithDetails(doctorId: doctorId, facilityId: facilityId, visitDate: startDate.plusDays(1)),
+			buildVisitWithDetails(doctorId: doctorId, facilityId: facilityId, visitDate: endDate.minusDays(1))
 		]
 
 		when:
-		def result = visitService.getVisitsForCurrentDoctorWithDetails()
+		def result = visitService.getVisitsForCurrentDoctorWithDetailsBetweenDates(startDate, endDate)
 
 		then:
 		1 * authService.getCurrentUserId() >> doctorId
 		1 * authService.getCurrentFacilityId() >> facilityId
-		1 * visitDAO.findByDoctorIdAndFacilityIdWithDetails(doctorId, facilityId) >> visits
+		1 * visitDAO.findByDoctorIdAndFacilityIdWithDetailsBetweenDates(doctorId, facilityId, startDate, endDate) >> visits
 		result == visits
 	}
 
@@ -429,79 +439,6 @@ class VisitServiceTest extends Specification {
 		thrown(NotFoundException)
 	}
 
-	def "getVisitsForCurrentPatient should return patient's visits"() {
-		given:
-		def patientId = 10
-		def facilityId = 1
-		def visits = [
-			buildVisit(patientId: patientId, facilityId: facilityId),
-			buildVisit(patientId: patientId, facilityId: facilityId)
-		]
-
-		when:
-		def result = visitService.getVisitsForCurrentPatient()
-
-		then:
-		1 * authService.getCurrentUserId() >> patientId
-		1 * authService.getCurrentFacilityId() >> facilityId
-		1 * visitDAO.getVisitsByPatientIdAndFacilityId(patientId, facilityId) >> visits
-		result == visits
-	}
-
-	def "getVisitsByPatientId should return visits for specified patient"() {
-		given:
-		def patientId = 10
-		def facilityId = 1
-		def visits = [
-			buildVisit(patientId: patientId, facilityId: facilityId),
-			buildVisit(patientId: patientId, facilityId: facilityId)
-		]
-
-		when:
-		def result = visitService.getVisitsByPatientId(patientId)
-
-		then:
-		1 * authService.getCurrentFacilityId() >> facilityId
-		1 * visitDAO.getVisitsByPatientIdAndFacilityId(patientId, facilityId) >> visits
-		result == visits
-	}
-
-	def "getVisitsByDoctorId should return visits for specified doctor"() {
-		given:
-		def doctorId = 5
-		def facilityId = 1
-		def visits = [
-			buildVisit(doctorId: doctorId, facilityId: facilityId),
-			buildVisit(doctorId: doctorId, facilityId: facilityId)
-		]
-
-		when:
-		def result = visitService.getVisitsByDoctorId(doctorId)
-
-		then:
-		1 * authService.getCurrentFacilityId() >> facilityId
-		1 * visitDAO.getVisitsByDoctorIdAndFacilityId(doctorId, facilityId) >> visits
-		result == visits
-	}
-
-	def "getVisitsForCurrentDoctor should return doctor's visits"() {
-		given:
-		def doctorId = 5
-		def facilityId = 1
-		def visits = [
-			buildVisit(doctorId: doctorId, facilityId: facilityId),
-			buildVisit(doctorId: doctorId, facilityId: facilityId)
-		]
-
-		when:
-		def result = visitService.getVisitsForCurrentDoctor()
-
-		then:
-		1 * authService.getCurrentUserId() >> doctorId
-		1 * authService.getCurrentFacilityId() >> facilityId
-		1 * visitDAO.getVisitsByDoctorIdAndFacilityId(doctorId, facilityId) >> visits
-		result == visits
-	}
 
 	def "calculateTotalCost should return basic price when no subscription"() {
 		given:

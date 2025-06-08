@@ -24,6 +24,7 @@ import com.documed.backend.visits.model.VisitStatus;
 import com.documed.backend.visits.model.VisitWithDetails;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -59,30 +60,39 @@ public class VisitService {
     return visit;
   }
 
-  public List<VisitWithDetails> getAllWithDetails() {
-    return visitDAO.findAllWithDetails();
+  public List<VisitWithDetails> getAllWithDetailsBetweenDates(
+      LocalDate startDate, LocalDate endDate) {
+    return visitDAO.findAllWithDetailsBetweenDates(startDate, endDate);
   }
 
-  public List<VisitWithDetails> getVisitsForCurrentPatientWithDetails() {
+  public List<VisitWithDetails> getVisitsForCurrentPatientWithDetailsBetweenDates(
+      LocalDate startDate, LocalDate endDate) {
     int patientId = authService.getCurrentUserId();
     int facilityId = authService.getCurrentFacilityId();
-    return visitDAO.findByPatientIdAndFacilityIdWithDetails(patientId, facilityId);
+    return visitDAO.findByPatientIdAndFacilityIdWithDetailsBetweenDates(
+        patientId, facilityId, startDate, endDate);
   }
 
-  public List<VisitWithDetails> getVisitsByPatientIdWithDetails(int patientId) {
+  public List<VisitWithDetails> getVisitsByPatientIdWithDetailsBetweenDates(
+      int patientId, LocalDate startDate, LocalDate endDate) {
     int facilityId = authService.getCurrentFacilityId();
-    return visitDAO.findByPatientIdAndFacilityIdWithDetails(patientId, facilityId);
+    return visitDAO.findByPatientIdAndFacilityIdWithDetailsBetweenDates(
+        patientId, facilityId, startDate, endDate);
   }
 
-  public List<VisitWithDetails> getVisitsByDoctorIdWithDetails(int doctorId) {
+  public List<VisitWithDetails> getVisitsByDoctorIdWithDetailsBetweenDates(
+      int doctorId, LocalDate startDate, LocalDate endDate) {
     int facilityId = authService.getCurrentFacilityId();
-    return visitDAO.findByDoctorIdAndFacilityIdWithDetails(doctorId, facilityId);
+    return visitDAO.findByDoctorIdAndFacilityIdWithDetailsBetweenDates(
+        doctorId, facilityId, startDate, endDate);
   }
 
-  public List<VisitWithDetails> getVisitsForCurrentDoctorWithDetails() {
+  public List<VisitWithDetails> getVisitsForCurrentDoctorWithDetailsBetweenDates(
+      LocalDate startDate, LocalDate endDate) {
     int doctorId = authService.getCurrentUserId();
     int facilityId = authService.getCurrentFacilityId();
-    return visitDAO.findByDoctorIdAndFacilityIdWithDetails(doctorId, facilityId);
+    return visitDAO.findByDoctorIdAndFacilityIdWithDetailsBetweenDates(
+        doctorId, facilityId, startDate, endDate);
   }
 
   public Visit getById(int id) {
@@ -155,25 +165,6 @@ public class VisitService {
       referrals.forEach(referral -> referralService.issueReferral(referral.getId()));
     }
     return visitDAO.updateVisitStatus(visitId, VisitStatus.CLOSED);
-  }
-
-  List<Visit> getVisitsForCurrentPatient() {
-    return visitDAO.getVisitsByPatientIdAndFacilityId(
-        authService.getCurrentUserId(), authService.getCurrentFacilityId());
-  }
-
-  List<Visit> getVisitsByPatientId(int patientId) {
-    return visitDAO.getVisitsByPatientIdAndFacilityId(
-        patientId, authService.getCurrentFacilityId());
-  }
-
-  List<Visit> getVisitsByDoctorId(int doctorId) {
-    return visitDAO.getVisitsByDoctorIdAndFacilityId(doctorId, authService.getCurrentFacilityId());
-  }
-
-  List<Visit> getVisitsForCurrentDoctor() {
-    return visitDAO.getVisitsByDoctorIdAndFacilityId(
-        authService.getCurrentUserId(), authService.getCurrentFacilityId());
   }
 
   Visit updateVisit(int visitId, UpdateVisitDTO updateVisitDTO) {

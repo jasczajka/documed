@@ -9,6 +9,7 @@ import com.documed.backend.visits.model.VisitWithDetailsRowMapper;
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -111,10 +112,13 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
     return jdbcTemplate.query(sql, rowMapper);
   }
 
-  public List<VisitWithDetails> findAllWithDetails() {
+  public List<VisitWithDetails> findAllWithDetailsBetweenDates(
+      LocalDate startDate, LocalDate endDate) {
     String sql =
-        VISIT_DETAILS_BASE_QUERY + " ORDER BY v.id DESC, first_ts.date, first_ts.start_time";
-    return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper());
+        VISIT_DETAILS_BASE_QUERY
+            + " WHERE first_ts.date BETWEEN ? AND ? "
+            + " ORDER BY first_ts.date DESC, first_ts.start_time DESC";
+    return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), startDate, endDate);
   }
 
   public Optional<VisitWithDetails> findByIdWithDetails(int id) {
@@ -125,64 +129,30 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
     return visits.stream().findFirst();
   }
 
-  public List<VisitWithDetails> findByPatientIdWithDetails(int patientId) {
+  public List<VisitWithDetails> findByPatientIdAndFacilityIdWithDetailsBetweenDates(
+      int patientId, int facilityId, LocalDate startDate, LocalDate endDate) {
     String sql =
         VISIT_DETAILS_BASE_QUERY
-            + " WHERE v.patient_id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
-    return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), patientId);
+            + " WHERE v.patient_id = ? AND v.facility_id = ? AND first_ts.date BETWEEN ? AND ? "
+            + " ORDER BY first_ts.date DESC, first_ts.start_time DESC";
+    return jdbcTemplate.query(
+        sql, new VisitWithDetailsRowMapper(), patientId, facilityId, startDate, endDate);
   }
 
-  public List<VisitWithDetails> findByDoctorIdWithDetails(int doctorId) {
+  public List<VisitWithDetails> findByDoctorIdAndFacilityIdWithDetailsBetweenDates(
+      int doctorId, int facilityId, LocalDate startDate, LocalDate endDate) {
     String sql =
         VISIT_DETAILS_BASE_QUERY
-            + " WHERE v.doctor_id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
-    return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), doctorId);
-  }
-
-  public List<VisitWithDetails> findByPatientIdAndFacilityIdWithDetails(
-      int patientId, int facilityId) {
-    String sql =
-        VISIT_DETAILS_BASE_QUERY
-            + " WHERE v.patient_id = ? AND v.facility_id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
-    return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), patientId, facilityId);
-  }
-
-  public List<VisitWithDetails> findByDoctorIdAndFacilityIdWithDetails(
-      int doctorId, int facilityId) {
-    String sql =
-        VISIT_DETAILS_BASE_QUERY
-            + " WHERE v.doctor_id = ? AND v.facility_id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
-    return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), doctorId, facilityId);
+            + " WHERE v.doctor_id = ? AND v.facility_id = ? AND first_ts.date BETWEEN ? AND ? "
+            + " ORDER BY first_ts.date DESC, first_ts.start_time DESC";
+    return jdbcTemplate.query(
+        sql, new VisitWithDetailsRowMapper(), doctorId, facilityId, startDate, endDate);
   }
 
   public boolean updateVisitStatus(int visitId, VisitStatus status) {
     String sql = "UPDATE visit SET status = ? WHERE id = ?";
     int affectedRows = jdbcTemplate.update(sql, status.name(), visitId);
     return affectedRows == 1;
-  }
-
-  public List<Visit> getVisitsByPatientIdAndFacilityId(int patientId, int facilityId) {
-    String sql =
-        """
-                  SELECT id, status, interview, diagnosis, recommendations, total_cost, facility_id, service_id, patient_information, patient_id, doctor_id
-                  FROM visit
-                  WHERE patient_id = ?
-                  AND facility_id = ?
-                 """;
-
-    return jdbcTemplate.query(sql, rowMapper, patientId, facilityId);
-  }
-
-  public List<Visit> getVisitsByDoctorIdAndFacilityId(int doctorId, int facilityId) {
-    String sql =
-        """
-                  SELECT DISTINCT id, status, interview, diagnosis, recommendations, total_cost, facility_id, service_id, patient_information, patient_id, doctor_id
-                  FROM visit
-                  WHERE doctor_id = ?
-                  AND facility_id = ?
-                 """;
-
-    return jdbcTemplate.query(sql, rowMapper, doctorId, facilityId);
   }
 
   public Visit update(Visit visit) {
@@ -205,13 +175,6 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
     return jdbcTemplate
         .query(sql, (rs, rowNum) -> VisitStatus.valueOf(rs.getString("status")), visitId)
         .stream()
-        .findFirst()
-        .orElseThrow();
-  }
-
-  public int getVisitPatientId(int visitId) {
-    String sql = "SELECT patient_id FROM visit WHERE id = ?";
-    return jdbcTemplate.query(sql, (rs, rowNum) -> rs.getInt("patient_id"), visitId).stream()
         .findFirst()
         .orElseThrow();
   }

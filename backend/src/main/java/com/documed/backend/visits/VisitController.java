@@ -17,6 +17,8 @@ import com.documed.backend.visits.model.VisitWithDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -33,14 +35,32 @@ public class VisitController {
   private final VisitService visitService;
   private final AuthService authService;
 
+  private static final Period DEFAULT_VISIT_LOOKBACK_PERIOD = Period.ofMonths(3);
+
+  private LocalDate resolveStartDate(LocalDate inputStartDate) {
+    return (inputStartDate != null)
+        ? inputStartDate
+        : LocalDate.now().minus(DEFAULT_VISIT_LOOKBACK_PERIOD);
+  }
+
+  private LocalDate resolveEndDate() {
+    return LocalDate.now();
+  }
+
   // TODO clerk i lekarz
   // filtr na date na ostatni miesiac i na bazie uzywac
   @StaffOnly
   @GetMapping
   @Operation(summary = "Get all visits")
-  public ResponseEntity<List<VisitWithDetails>> getAllVisits() {
+  public ResponseEntity<List<VisitWithDetails>> getAllVisits(
+      @RequestParam(required = false) LocalDate startDate) {
 
-    return new ResponseEntity<>(visitService.getAllWithDetails(), HttpStatus.OK);
+    LocalDate resolvedStart = resolveStartDate(startDate);
+    LocalDate endDate = resolveEndDate();
+
+    List<VisitWithDetails> visits =
+        visitService.getAllWithDetailsBetweenDates(resolvedStart, endDate);
+    return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
   // TODO lekarz i pacjent
@@ -102,20 +122,25 @@ public class VisitController {
     }
   }
 
-  @Operation(summary = "get all visits for logged in patient")
   @GetMapping("/patient")
-  public ResponseEntity<List<VisitWithDetails>> getVisitsForCurrentPatient() {
-    List<VisitWithDetails> visits = visitService.getVisitsForCurrentPatientWithDetails();
+  @Operation(summary = "Get all visits for logged in patient")
+  public ResponseEntity<List<VisitWithDetails>> getVisitsForCurrentPatient(
+      @RequestParam(required = false) LocalDate startDate) {
 
+    LocalDate resolvedStart = resolveStartDate(startDate);
+    LocalDate endDate = resolveEndDate();
+
+    List<VisitWithDetails> visits =
+        visitService.getVisitsForCurrentPatientWithDetailsBetweenDates(resolvedStart, endDate);
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
   // TODO annotation pacjent lekarz i rejestrator
   @PreAuthorize("hasAnyRole('WARD_CLERK', 'DOCTOR', 'PATIENT')")
-  @Operation(summary = "get all visits for selected patient")
   @GetMapping("/patient/{id}")
+  @Operation(summary = "Get all visits for selected patient")
   public ResponseEntity<List<VisitWithDetails>> getVisitsByPatientId(
-      @PathVariable("id") int patientId) {
+      @PathVariable("id") int patientId, @RequestParam(required = false) LocalDate startDate) {
 
     int currentUserId = authService.getCurrentUserId();
     UserRole userRole = authService.getCurrentUserRole();
@@ -124,8 +149,11 @@ public class VisitController {
       throw new UnauthorizedException("You are not authorized to view these visits");
     }
 
-    List<VisitWithDetails> visits = visitService.getVisitsByPatientIdWithDetails(patientId);
+    LocalDate resolvedStart = resolveStartDate(startDate);
+    LocalDate endDate = resolveEndDate();
 
+    List<VisitWithDetails> visits =
+        visitService.getVisitsByPatientIdWithDetailsBetweenDates(patientId, resolvedStart, endDate);
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
@@ -134,18 +162,27 @@ public class VisitController {
   @Operation(summary = "get all visits assigned for selected doctor")
   @GetMapping("/doctor/{id}")
   public ResponseEntity<List<VisitWithDetails>> getVisitsByDoctorId(
-      @PathVariable("id") int doctorId) {
-    List<VisitWithDetails> visits = visitService.getVisitsByDoctorIdWithDetails(doctorId);
+      @PathVariable("id") int doctorId, @RequestParam(required = false) LocalDate startDate) {
 
+    LocalDate resolvedStart = resolveStartDate(startDate);
+    LocalDate endDate = resolveEndDate();
+
+    List<VisitWithDetails> visits =
+        visitService.getVisitsByDoctorIdWithDetailsBetweenDates(doctorId, resolvedStart, endDate);
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
   @DoctorOnly
   @Operation(summary = "get all visits assigned for logged in doctor")
   @GetMapping("/doctor")
-  public ResponseEntity<List<VisitWithDetails>> getVisitsForCurrentDoctor() {
-    List<VisitWithDetails> visits = visitService.getVisitsForCurrentDoctorWithDetails();
+  public ResponseEntity<List<VisitWithDetails>> getVisitsForCurrentDoctor(
+      @RequestParam(required = false) LocalDate startDate) {
 
+    LocalDate resolvedStart = resolveStartDate(startDate);
+    LocalDate endDate = resolveEndDate();
+
+    List<VisitWithDetails> visits =
+        visitService.getVisitsForCurrentDoctorWithDetailsBetweenDates(resolvedStart, endDate);
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
