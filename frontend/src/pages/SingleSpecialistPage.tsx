@@ -33,7 +33,7 @@ const SingleSpecialistPage: FC = () => {
   const allSpecializations = useSpecializationsStore((state) => state.specializations);
   const refetchDoctors = useDoctorsStore((state) => state.fetchDoctors);
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
-  const [isArchivalVisitsOn, setIsArchivalVisitsOn] = useState(false);
+  const [isArchivalModeOn, setIsArchivalModeOn] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
   const { showNotification, NotificationComponent } = useNotification();
   const { openModal } = useModal();
@@ -64,11 +64,11 @@ const SingleSpecialistPage: FC = () => {
   } = useGetVisitsByDoctorId(
     doctorId,
     {
-      startDate: isArchivalVisitsOn ? getYearAgoAsDateString() : undefined,
+      startDate: isArchivalModeOn ? getYearAgoAsDateString() : undefined,
     },
     {
       query: {
-        queryKey: ['visitsForDoctor', isArchivalVisitsOn],
+        queryKey: ['visitsForDoctor', isArchivalModeOn],
       },
     },
   );
@@ -183,8 +183,8 @@ const SingleSpecialistPage: FC = () => {
           tabIndex={tabIndex}
           onTabChange={onTabChange}
           loading={isLoading}
-          isArchivalVisitsOn={isArchivalVisitsOn}
-          onArchivalModeToggle={() => setIsArchivalVisitsOn((prev) => !prev)}
+          isArchivalVisitsOn={isArchivalModeOn}
+          onArchivalModeToggle={() => setIsArchivalModeOn((prev) => !prev)}
         />
         <NotificationComponent />
       </div>

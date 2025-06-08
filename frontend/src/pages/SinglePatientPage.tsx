@@ -22,7 +22,7 @@ import { getYearAgoAsDateString } from 'shared/utils/getYearAgoAsDateString';
 const SinglePatientPage: FC = () => {
   const { id } = useParams();
   const patientId = Number(id);
-  const [isArchivalVisitsOn, setIsArchivalVisitsOn] = useState(false);
+  const [isArchivalModeOn, setIsArchivalModeOn] = useState(false);
   const fulfillerId = useAuthStore((state) => state.user?.id);
   const allServices = useAllServicesStore((state) => state.allServices);
 
@@ -61,9 +61,9 @@ const SinglePatientPage: FC = () => {
   } = useGetVisitsByPatientId(
     patientId,
     {
-      startDate: isArchivalVisitsOn ? getYearAgoAsDateString() : undefined,
+      startDate: isArchivalModeOn ? getYearAgoAsDateString() : undefined,
     },
-    { query: { queryKey: ['visitsForPatient', isArchivalVisitsOn] } },
+    { query: { queryKey: ['visitsForPatient', isArchivalModeOn] } },
   );
 
   const {
@@ -71,7 +71,13 @@ const SinglePatientPage: FC = () => {
     isLoading: isPatientAdditionalServicesLoading,
     isError: isPatientAdditionalServicesError,
     refetch: refetchPatientAdditionalServices,
-  } = useGetAdditionalServicesByPatient(patientId);
+  } = useGetAdditionalServicesByPatient(
+    patientId,
+    {
+      startDate: isArchivalModeOn ? getYearAgoAsDateString() : undefined,
+    },
+    { query: { queryKey: ['additionalServicesForPatient', isArchivalModeOn] } },
+  );
 
   const {
     data: patientReferrals,
@@ -220,8 +226,8 @@ const SinglePatientPage: FC = () => {
         refetchPatientInfo={async () => {
           await refetchPatientInfo();
         }}
-        isArchivalVisitsOn={isArchivalVisitsOn}
-        onArchivalModeToggle={() => setIsArchivalVisitsOn((prev) => !prev)}
+        isArchivalModeOn={isArchivalModeOn}
+        onArchivalModeToggle={() => setIsArchivalModeOn((prev) => !prev)}
       />
       <NotificationComponent />
     </div>

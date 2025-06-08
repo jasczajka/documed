@@ -45,7 +45,7 @@ interface PatientTabsProps {
   refetchVisits: () => Promise<void>;
   refetchAdditionalServices: () => Promise<void>;
   refetchPatientInfo: () => Promise<void>;
-  isArchivalVisitsOn: boolean;
+  isArchivalModeOn: boolean;
   onArchivalModeToggle: () => void;
 }
 
@@ -64,7 +64,7 @@ export const PatientTabs: FC<PatientTabsProps> = ({
   refetchVisits,
   refetchAdditionalServices,
   refetchPatientInfo,
-  isArchivalVisitsOn,
+  isArchivalModeOn,
   onArchivalModeToggle,
 }) => {
   const { showNotification, NotificationComponent } = useNotification();
@@ -128,7 +128,7 @@ export const PatientTabs: FC<PatientTabsProps> = ({
             refetchVisits={async () => {
               await refetchVisits();
             }}
-            isArchivalVisitsOn={isArchivalVisitsOn}
+            isArchivalVisitsOn={isArchivalModeOn}
             onArchivalModeToggle={onArchivalModeToggle}
           />
         )}
@@ -138,6 +138,8 @@ export const PatientTabs: FC<PatientTabsProps> = ({
             allAdditionalServices={allAdditionalServices}
             loading={isCancelVisitLoading}
             refetch={refetchAdditionalServices}
+            isArchivalAdditionalServicesOn={isArchivalModeOn}
+            onArchivalModeToggle={onArchivalModeToggle}
           />
         )}
         {tabIndex === 3 && (

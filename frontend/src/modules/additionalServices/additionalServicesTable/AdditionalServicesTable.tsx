@@ -1,4 +1,4 @@
-import { Box, Button, Link, Paper, Typography } from '@mui/material';
+import { Box, Button, FormControlLabel, Link, Paper, Switch, Typography } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 
 import { endOfDay, format, startOfDay } from 'date-fns';
@@ -33,6 +33,8 @@ interface AdditionalServicesTableProps {
   patientId?: number;
   doctorId?: number;
   loading?: boolean;
+  isArchivalAdditionalServicesOn: boolean;
+  onArchivalModeToggle: () => void;
 }
 
 const columns = (
@@ -139,6 +141,8 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
   refetch,
   patientId,
   doctorId,
+  isArchivalAdditionalServicesOn,
+  onArchivalModeToggle,
 }) => {
   const { isPatient } = useAuth();
   const navigate = useNavigate();
@@ -226,10 +230,20 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
 
   return (
     <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', p: 2 }}>
-      <Box sx={{ paddingBottom: 2 }}>
+      <Box sx={{ paddingBottom: 2, display: 'flex', gap: 4 }}>
         <Button variant="contained" onClick={setFilterDateToToday}>
           Pokaż dzisiejsze
         </Button>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={isArchivalAdditionalServicesOn}
+              onChange={onArchivalModeToggle}
+              color="primary"
+            />
+          }
+          label="Pokaż archiwalne usługi dodatkowe"
+        />
       </Box>
       <TableFilters<AdditionalServiceFilters>
         filters={filters}

@@ -493,6 +493,10 @@ export type AddMedicineToPrescriptionParams = {
   amount?: number;
 };
 
+export type GetAllAdditionalServicesParams = {
+  startDate?: string;
+};
+
 export type GetAvailableFirstTimeSlotsByFacilityParams = {
   neededTimeSlots: number;
   facilityId: number;
@@ -535,4 +539,16 @@ export type SearchMedicinesParams = {
    * Maximum results to return
    */
   limit?: number;
+};
+
+export type GetAdditionalServicesByServiceParams = {
+  startDate?: string;
+};
+
+export type GetAdditionalServicesByPatientParams = {
+  startDate?: string;
+};
+
+export type GetAdditionalServicesByFulfillerParams = {
+  startDate?: string;
 };
