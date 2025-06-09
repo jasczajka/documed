@@ -1,5 +1,6 @@
 package com.documed.backend.medicines;
 
+import com.documed.backend.auth.annotations.AdminOnly;
 import com.documed.backend.auth.annotations.DoctorOnly;
 import com.documed.backend.medicines.model.Medicine;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,6 +9,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class MedicineController {
   private final MedicineService medicineService;
+  private final MedicineImportService medicineImportService;
 
   @DoctorOnly
   @GetMapping("/search")
@@ -48,5 +52,13 @@ public class MedicineController {
           @PathVariable
           String id) {
     return medicineService.getById(id);
+  }
+
+  @AdminOnly
+  @PostMapping
+  @Operation(summary = "Import medicines from datasource")
+  public ResponseEntity<String> importMedicines() {
+    medicineImportService.onStartup();
+    return new ResponseEntity<>("Medicines imported", HttpStatus.CREATED);
   }
 }
