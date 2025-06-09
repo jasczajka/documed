@@ -23,12 +23,14 @@ import CancelVisitModal from 'shared/components/ConfirmationModal/CancelVisitMod
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { useDoctorsStore } from 'shared/hooks/stores/useDoctorsStore';
 import { useSpecializationsStore } from 'shared/hooks/stores/useSpecializationsStore';
+import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
 import { getYearAgoAsDateString } from 'shared/utils/getYearAgoAsDateString';
 
 const SingleSpecialistPage: FC = () => {
   const { id } = useParams();
+  const { isDoctor } = useAuth();
   const doctorId = Number(id);
   const allSpecializations = useSpecializationsStore((state) => state.specializations);
   const refetchDoctors = useDoctorsStore((state) => state.fetchDoctors);
@@ -185,6 +187,7 @@ const SingleSpecialistPage: FC = () => {
           loading={isLoading}
           isArchivalVisitsOn={isArchivalModeOn}
           onArchivalModeToggle={() => setIsArchivalModeOn((prev) => !prev)}
+          disabled={isDoctor}
         />
         <NotificationComponent />
       </div>

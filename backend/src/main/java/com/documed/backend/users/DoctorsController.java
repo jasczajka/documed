@@ -1,6 +1,5 @@
 package com.documed.backend.users;
 
-import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.auth.annotations.WardClerkOnly;
 import com.documed.backend.auth.exceptions.UserNotFoundException;
 import com.documed.backend.schedules.FreeDaysService;
@@ -18,6 +17,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -28,9 +28,7 @@ public class DoctorsController {
   private final UserService userService;
   private final FreeDaysService freeDaysService;
 
-  // TODO pacjent lekarz
-  // zmiana from Janek - potrzebujemy tego dla ward clerka tez
-  @StaffOnly
+  @Secured({"ADMINISTRATOR", "WARD_CLERK", "DOCTOR", "PATIENT"})
   @GetMapping("/{id}")
   public ResponseEntity<DoctorDetailsDTO> getDoctorDetails(@PathVariable("id") int userId) {
     User user =
@@ -42,9 +40,7 @@ public class DoctorsController {
     return new ResponseEntity<>(dto, HttpStatus.OK);
   }
 
-  // TODO annotation clerk
   @WardClerkOnly
-  @StaffOnly
   @PatchMapping("/{id}")
   public ResponseEntity<List<Integer>> updateDoctorSpecializations(
       @PathVariable("id") int userId, @Valid @RequestBody UpdateDoctorSpecializationsDTO request) {

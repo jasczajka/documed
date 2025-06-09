@@ -38,7 +38,6 @@ public class TimeSlotController {
     return ResponseEntity.ok(dtos);
   }
 
-  // TODO annotation ward clerk only
   @WardClerkOnly
   @PostMapping("/freeDay")
   @Operation(summary = "Create new FreeDays for doctor")

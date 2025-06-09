@@ -19,6 +19,7 @@ interface EditWorkTimeTabProps {
   currentWorkTimes: UploadWorkTimeDTO[];
   onSave: (updatedWorkTimes: UploadWorkTimeDTO[]) => void;
   loading?: boolean;
+  disabled?: boolean;
 }
 
 const polishDayAbbreviations: Record<DayOfWeekEnum, string> = {
@@ -90,6 +91,7 @@ export const EditWorkTimeTab: FC<EditWorkTimeTabProps> = ({
   currentWorkTimes,
   onSave,
   loading,
+  disabled = false,
 }) => {
   const defaultValues = mapFromWorkTimes(currentWorkTimes);
   const allFacilities = useFacilityStore((state) => state.facilities);
@@ -107,14 +109,12 @@ export const EditWorkTimeTab: FC<EditWorkTimeTabProps> = ({
   const selectedDay = days[selectedDayIndex];
 
   const onSubmit = (data: WorkTimeFormValues) => {
-    console.log('data in onsubmit: ', data);
-    console.log('currentWorkTimes in onsubmit: ', currentWorkTimes);
     const updatedWorkTimes = mapToWorkTimes(data);
     onSave(updatedWorkTimes);
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit(onSubmit)} p={2}>
+    <Box component={disabled ? 'div' : 'form'} onSubmit={handleSubmit(onSubmit)} p={2}>
       <Pagination
         count={days.length}
         page={selectedDayIndex + 1}
@@ -158,6 +158,7 @@ export const EditWorkTimeTab: FC<EditWorkTimeTabProps> = ({
                 errors.workTimes?.[selectedDay]?.startTime?.message ??
                 errors.workTimes?.[selectedDay]?.message
               }
+              disabled={disabled}
             />
           )}
         />
@@ -180,6 +181,7 @@ export const EditWorkTimeTab: FC<EditWorkTimeTabProps> = ({
                 errors.workTimes?.[selectedDay]?.endTime?.message ??
                 errors.workTimes?.[selectedDay]?.message
               }
+              disabled={disabled}
             />
           )}
         />
@@ -208,6 +210,7 @@ export const EditWorkTimeTab: FC<EditWorkTimeTabProps> = ({
                 />
               )}
               sx={{ width: '100%' }}
+              disabled={disabled}
             />
           )}
         />
@@ -231,7 +234,7 @@ export const EditWorkTimeTab: FC<EditWorkTimeTabProps> = ({
           variant="contained"
           color="primary"
           loading={loading}
-          disabled={loading}
+          disabled={loading || disabled}
         >
           Zapisz
         </Button>

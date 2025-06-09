@@ -39,7 +39,6 @@ public class PrescriptionController {
         HttpStatus.OK);
   }
 
-  // TODO annotation, lekarz i pacjent
   @DoctorOrPatient
   @GetMapping("/visit/{visit_id}")
   @Operation(summary = "Get Prescription For Visit")
@@ -76,7 +75,6 @@ public class PrescriptionController {
     return ResponseEntity.ok(prescriptions);
   }
 
-  // TODO annotation lekarz i pacjent
   @DoctorOrPatient
   @GetMapping("/{prescription_id}/medicines")
   public ResponseEntity<List<MedicineWithAmount>> getMedicinesForPrescription(
@@ -127,7 +125,6 @@ public class PrescriptionController {
     return ResponseEntity.ok(result);
   }
 
-  // TODO added annotation
   @DoctorOnly
   @PatchMapping("/{prescription_id}/expiration-date")
   @Operation(summary = "Update prescription expiration Date")

@@ -15,6 +15,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -122,7 +123,7 @@ public class AdditionalServiceController {
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
   }
 
-  @MedicalStaffOnly
+  @Secured({"NURSE", "WARD_CLERK", "DOCTOR"})
   @GetMapping
   public ResponseEntity<List<AdditionalServiceWithDetails>> getAllAdditionalServices(
       @RequestParam(required = false) LocalDate startDate) {

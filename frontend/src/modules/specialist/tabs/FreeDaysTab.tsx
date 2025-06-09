@@ -24,6 +24,7 @@ interface FreeDaysTabProps {
   onSubmitForm: (data: FormData) => void;
   onSuccessfulEdit: () => Promise<void>;
   loading?: boolean;
+  disabled?: boolean;
 }
 
 const validationSchema = Yup.object({
@@ -45,6 +46,7 @@ export const FreeDaysTab: FC<FreeDaysTabProps> = ({
   onSubmitForm,
   onSuccessfulEdit,
   loading,
+  disabled = false,
 }) => {
   const { openModal } = useModal();
   const { showNotification, NotificationComponent } = useNotification();
@@ -114,18 +116,21 @@ export const FreeDaysTab: FC<FreeDaysTabProps> = ({
       field: 'actions',
       headerName: 'Akcje',
       flex: 0.5,
-      renderCell: ({ row }) => (
-        <IconButton onClick={() => handleDelete(row)}>
-          <Delete />
-        </IconButton>
-      ),
+      renderCell: ({ row }) =>
+        disabled ? (
+          <span style={{ color: '#999' }}>Brak akcji</span>
+        ) : (
+          <IconButton onClick={() => handleDelete(row)}>
+            <Delete />
+          </IconButton>
+        ),
     },
   ];
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
       <Box
-        component="form"
+        component={disabled ? 'div' : 'form'}
         onSubmit={handleSubmit(onSubmit)}
         sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}
       >
@@ -147,6 +152,7 @@ export const FreeDaysTab: FC<FreeDaysTabProps> = ({
                 error={!!errors.startDate}
                 helperText={errors.startDate?.message}
                 fullWidth
+                disabled={disabled}
               />
             )}
           />
@@ -167,6 +173,7 @@ export const FreeDaysTab: FC<FreeDaysTabProps> = ({
                 error={!!errors.endDate}
                 helperText={errors.endDate?.message}
                 fullWidth
+                disabled={disabled}
               />
             )}
           />
@@ -174,7 +181,7 @@ export const FreeDaysTab: FC<FreeDaysTabProps> = ({
             type="submit"
             variant="contained"
             color="primary"
-            disabled={loading}
+            disabled={loading || disabled}
             sx={{ minWidth: '200px', alignSelf: 'flex-start' }}
           >
             Dodaj urlop
