@@ -58,8 +58,6 @@ public class PrescriptionController {
     return ResponseEntity.ok(prescription);
   }
 
-  // zmiana from Janek - potrzebujemy tego dla ward clerka / nie mozna 2 anotacji tego typu naraz
-  // robic
   @StaffOnlyOrSelf
   @GetMapping("/user/{user_id}")
   public ResponseEntity<List<Prescription>> getPrescriptionsForUser(

@@ -17,7 +17,7 @@ interface PrescriptionsTableProps {
 }
 
 const columns = (
-  onShowPrescription: (id: number) => void,
+  onShowPrescription: (id: number, accessCode: number) => void,
   loading?: boolean,
 ): GridColDef<Prescription>[] => [
   {
@@ -51,7 +51,7 @@ const columns = (
       <Button
         variant="text"
         size="small"
-        onClick={() => onShowPrescription(row.id)}
+        onClick={() => onShowPrescription(row.id, row.accessCode)}
         loading={loading}
         disabled={loading}
       >
@@ -84,7 +84,7 @@ export const PrescriptionsTable: FC<PrescriptionsTableProps> = ({ prescriptions 
   const { openModal } = useModal();
 
   const handleShowPrescriptionClick = useCallback(
-    async (id: number) => {
+    async (id: number, accessCode: number) => {
       setIsLoading(true);
 
       const medicines = await getMedicinesForPrescription(id);
@@ -93,7 +93,7 @@ export const PrescriptionsTable: FC<PrescriptionsTableProps> = ({ prescriptions 
 
       openModal('prescriptionMedicinesModal', (close) => (
         <PrescriptionMedicinesModal
-          prescriptionId={id.toString()}
+          accessCode={accessCode.toString()}
           medicines={medicines ?? []}
           onCancel={close}
         />

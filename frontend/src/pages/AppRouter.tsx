@@ -71,7 +71,16 @@ const getAuthRoutes = ({
     element: <LoggedLayout />,
     children: [
       { path: '/', element: <Navigate to="/visits" replace /> },
-      { path: '/visits', element: <VisitsPage /> },
+      {
+        path: '/visits',
+        element: (
+          <ProtectedRoute
+            element={<VisitsPage />}
+            isAllowed={!isAdmin}
+            redirectTo={isAdmin ? '/admin' : '/visits'}
+          />
+        ),
+      },
       {
         path: '/visits/:id',
         element: (
@@ -98,7 +107,7 @@ const getAuthRoutes = ({
           <ProtectedRoute
             element={<PatientsPage />}
             isAllowed={isWardClerk || isDoctor || isNurse}
-            redirectTo="/visits"
+            redirectTo={isAdmin ? '/admin' : '/visits'}
           />
         ),
       },

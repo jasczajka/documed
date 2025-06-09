@@ -45,9 +45,9 @@ export const AppHeader = memo(() => {
 
   const paths = useMemo(() => {
     return [
-      { path: sitemap.visits, label: 'Wizyty' },
-      { path: sitemap.additionalServices, label: 'Usługi dod.' },
-      ...(!isPatient ? [{ path: sitemap.patients, label: 'Pacjenci' }] : []),
+      ...(!isAdmin ? [{ path: sitemap.visits, label: 'Wizyty' }] : []),
+      ...(!isAdmin ? [{ path: sitemap.additionalServices, label: 'Usługi dod.' }] : []),
+      ...(!isPatient && !isAdmin ? [{ path: sitemap.patients, label: 'Pacjenci' }] : []),
       ...(isPatient ? [{ path: sitemap.specialists, label: 'Specjaliści' }] : []),
       ...(isPatient ? [{ path: sitemap.referrals, label: 'Skierowania' }] : []),
       ...(isPatient ? [{ path: sitemap.prescriptions, label: 'Recepty' }] : []),
