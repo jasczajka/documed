@@ -33,10 +33,6 @@ public class AdditionalServiceController {
         : LocalDate.now().minus(DEFAULT_VISIT_LOOKBACK_PERIOD);
   }
 
-  private LocalDate resolveEndDate() {
-    return LocalDate.now();
-  }
-
   @MedicalStaffOnly
   @PostMapping
   public ResponseEntity<AdditionalServiceWithDetails> createAdditionalService(
@@ -81,11 +77,9 @@ public class AdditionalServiceController {
       @PathVariable int userId, @RequestParam(required = false) LocalDate startDate) {
 
     LocalDate resolvedStart = resolveStartDate(startDate);
-    LocalDate endDate = resolveEndDate();
 
     List<AdditionalServiceWithDetails> services =
-        additionalServiceService.getByFulfillerIdWithDetailsBetweenDates(
-            userId, resolvedStart, endDate);
+        additionalServiceService.getByFulfillerIdWithDetailsBetweenDates(userId, resolvedStart);
     List<AdditionalServiceWithDetails> dtos =
         services.stream().map(this::enrichAdditionalServiceToDto).toList();
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
@@ -97,11 +91,9 @@ public class AdditionalServiceController {
       @PathVariable int serviceId, @RequestParam(required = false) LocalDate startDate) {
 
     LocalDate resolvedStart = resolveStartDate(startDate);
-    LocalDate endDate = resolveEndDate();
 
     List<AdditionalServiceWithDetails> services =
-        additionalServiceService.getByServiceIdWithDetailsBetweenDates(
-            serviceId, resolvedStart, endDate);
+        additionalServiceService.getByServiceIdWithDetailsBetweenDates(serviceId, resolvedStart);
     List<AdditionalServiceWithDetails> dtos =
         services.stream().map(this::enrichAdditionalServiceToDto).toList();
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
@@ -113,11 +105,9 @@ public class AdditionalServiceController {
       @PathVariable int userId, @RequestParam(required = false) LocalDate startDate) {
 
     LocalDate resolvedStart = resolveStartDate(startDate);
-    LocalDate endDate = resolveEndDate();
 
     List<AdditionalServiceWithDetails> services =
-        additionalServiceService.getByPatientIdWithDetailsBetweenDates(
-            userId, resolvedStart, endDate);
+        additionalServiceService.getByPatientIdWithDetailsBetweenDates(userId, resolvedStart);
     List<AdditionalServiceWithDetails> dtos =
         services.stream().map(this::enrichAdditionalServiceToDto).toList();
     return ResponseEntity.status(HttpStatus.OK).body(dtos);
@@ -129,10 +119,9 @@ public class AdditionalServiceController {
       @RequestParam(required = false) LocalDate startDate) {
 
     LocalDate resolvedStart = resolveStartDate(startDate);
-    LocalDate endDate = resolveEndDate();
 
     List<AdditionalServiceWithDetails> services =
-        additionalServiceService.getAllWithDetailsBetweenDates(resolvedStart, endDate);
+        additionalServiceService.getAllWithDetailsBetweenDates(resolvedStart);
     List<AdditionalServiceWithDetails> dtos =
         services.stream().map(this::enrichAdditionalServiceToDto).toList();
     return ResponseEntity.status(HttpStatus.OK).body(dtos);

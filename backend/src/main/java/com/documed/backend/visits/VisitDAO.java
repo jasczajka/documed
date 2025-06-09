@@ -112,13 +112,12 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
     return jdbcTemplate.query(sql, rowMapper);
   }
 
-  public List<VisitWithDetails> findAllWithDetailsBetweenDates(
-      LocalDate startDate, LocalDate endDate) {
+  public List<VisitWithDetails> findAllWithDetailsBetweenDates(LocalDate startDate) {
     String sql =
         VISIT_DETAILS_BASE_QUERY
-            + " WHERE first_ts.date BETWEEN ? AND ? "
+            + " WHERE first_ts.date >= ? "
             + " ORDER BY first_ts.date DESC, first_ts.start_time DESC";
-    return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), startDate, endDate);
+    return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), startDate);
   }
 
   public Optional<VisitWithDetails> findByIdWithDetails(int id) {
@@ -130,23 +129,23 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
   }
 
   public List<VisitWithDetails> findByPatientIdAndFacilityIdWithDetailsBetweenDates(
-      int patientId, int facilityId, LocalDate startDate, LocalDate endDate) {
+      int patientId, int facilityId, LocalDate startDate) {
     String sql =
         VISIT_DETAILS_BASE_QUERY
-            + " WHERE v.patient_id = ? AND v.facility_id = ? AND first_ts.date BETWEEN ? AND ? "
+            + " WHERE v.patient_id = ? AND v.facility_id = ? AND first_ts.date >= ?"
             + " ORDER BY first_ts.date DESC, first_ts.start_time DESC";
     return jdbcTemplate.query(
-        sql, new VisitWithDetailsRowMapper(), patientId, facilityId, startDate, endDate);
+        sql, new VisitWithDetailsRowMapper(), patientId, facilityId, startDate);
   }
 
   public List<VisitWithDetails> findByDoctorIdAndFacilityIdWithDetailsBetweenDates(
-      int doctorId, int facilityId, LocalDate startDate, LocalDate endDate) {
+      int doctorId, int facilityId, LocalDate startDate) {
     String sql =
         VISIT_DETAILS_BASE_QUERY
-            + " WHERE v.doctor_id = ? AND v.facility_id = ? AND first_ts.date BETWEEN ? AND ? "
+            + " WHERE v.doctor_id = ? AND v.facility_id = ? AND first_ts.date >= ?"
             + " ORDER BY first_ts.date DESC, first_ts.start_time DESC";
     return jdbcTemplate.query(
-        sql, new VisitWithDetailsRowMapper(), doctorId, facilityId, startDate, endDate);
+        sql, new VisitWithDetailsRowMapper(), doctorId, facilityId, startDate);
   }
 
   public boolean updateVisitStatus(int visitId, VisitStatus status) {

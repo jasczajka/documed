@@ -36,10 +36,6 @@ public class VisitController {
 
   private static final Period DEFAULT_VISIT_LOOKBACK_PERIOD = Period.ofMonths(3);
 
-  private LocalDate resolveEndDate() {
-    return LocalDate.now();
-  }
-
   private LocalDate resolveStartDate(LocalDate inputStartDate) {
     return (inputStartDate != null)
         ? inputStartDate
@@ -53,10 +49,8 @@ public class VisitController {
       @RequestParam(required = false) LocalDate startDate) {
 
     LocalDate resolvedStart = resolveStartDate(startDate);
-    LocalDate endDate = resolveEndDate();
 
-    List<VisitWithDetails> visits =
-        visitService.getAllWithDetailsBetweenDates(resolvedStart, endDate);
+    List<VisitWithDetails> visits = visitService.getAllWithDetailsBetweenDates(resolvedStart);
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
@@ -122,10 +116,9 @@ public class VisitController {
       @RequestParam(required = false) LocalDate startDate) {
 
     LocalDate resolvedStart = resolveStartDate(startDate);
-    LocalDate endDate = resolveEndDate();
 
     List<VisitWithDetails> visits =
-        visitService.getVisitsForCurrentPatientWithDetailsBetweenDates(resolvedStart, endDate);
+        visitService.getVisitsForCurrentPatientWithDetailsBetweenDates(resolvedStart);
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
@@ -143,10 +136,9 @@ public class VisitController {
     }
 
     LocalDate resolvedStart = resolveStartDate(startDate);
-    LocalDate endDate = resolveEndDate();
 
     List<VisitWithDetails> visits =
-        visitService.getVisitsByPatientIdWithDetailsBetweenDates(patientId, resolvedStart, endDate);
+        visitService.getVisitsByPatientIdWithDetailsBetweenDates(patientId, resolvedStart);
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
@@ -157,10 +149,9 @@ public class VisitController {
       @PathVariable("id") int doctorId, @RequestParam(required = false) LocalDate startDate) {
 
     LocalDate resolvedStart = resolveStartDate(startDate);
-    LocalDate endDate = resolveEndDate();
 
     List<VisitWithDetails> visits =
-        visitService.getVisitsByDoctorIdWithDetailsBetweenDates(doctorId, resolvedStart, endDate);
+        visitService.getVisitsByDoctorIdWithDetailsBetweenDates(doctorId, resolvedStart);
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
@@ -171,10 +162,9 @@ public class VisitController {
       @RequestParam(required = false) LocalDate startDate) {
 
     LocalDate resolvedStart = resolveStartDate(startDate);
-    LocalDate endDate = resolveEndDate();
 
     List<VisitWithDetails> visits =
-        visitService.getVisitsForCurrentDoctorWithDetailsBetweenDates(resolvedStart, endDate);
+        visitService.getVisitsForCurrentDoctorWithDetailsBetweenDates(resolvedStart);
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
