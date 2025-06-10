@@ -32,6 +32,7 @@ interface SpecialistTabsProps {
   loading?: boolean;
   isArchivalVisitsOn: boolean;
   onArchivalModeToggle: () => void;
+  disabled?: boolean;
 }
 export const SpecialistTabs: FC<SpecialistTabsProps> = ({
   doctorId,
@@ -51,6 +52,7 @@ export const SpecialistTabs: FC<SpecialistTabsProps> = ({
   loading,
   isArchivalVisitsOn,
   onArchivalModeToggle,
+  disabled = false,
 }) => {
   const allServices = useAllServicesStore((state) => state.allServices);
   return (
@@ -90,6 +92,7 @@ export const SpecialistTabs: FC<SpecialistTabsProps> = ({
             currentFreeDays={currentFreeDays}
             onSubmitForm={(newFreedays) => handleNewFreeDays({ userId: doctorId, ...newFreedays })}
             onSuccessfulEdit={() => refetchDoctorInfo()}
+            disabled={disabled}
           />
         )}
         {tabIndex === 1 && (
@@ -109,6 +112,7 @@ export const SpecialistTabs: FC<SpecialistTabsProps> = ({
             allSpecializations={allSpecializations}
             onSave={handleUpdateSpecialistSpecializations}
             loading={loading}
+            disabled={disabled}
           />
         )}
         {tabIndex === 3 && (
@@ -116,6 +120,7 @@ export const SpecialistTabs: FC<SpecialistTabsProps> = ({
             currentWorkTimes={currentWorkTimes}
             onSave={handleUpdateSpecialistWorkTimes}
             loading={loading}
+            disabled={disabled}
           />
         )}
       </Paper>

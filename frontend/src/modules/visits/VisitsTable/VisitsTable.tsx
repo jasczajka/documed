@@ -48,7 +48,8 @@ const columns = (
   onNavigateToVisit: (id: number) => void,
   onNavigateToPatient: (id: number) => void,
   isPatient: boolean,
-  allowAddReview: boolean,
+  isDoctor: boolean,
+  isWardClerk: boolean,
   onViewReview?: (id: number, rating: number, message?: string) => void,
   onAddReview?: (id: number) => void,
   loading?: boolean,
@@ -147,7 +148,7 @@ const columns = (
 
       const actions = [];
 
-      if (params.row.status === VisitWithDetailsStatus.PLANNED) {
+      if ((isWardClerk || isPatient) && params.row.status === VisitWithDetailsStatus.PLANNED) {
         actions.push(
           <GridActionsCellItem
             key={`cancel-${params.row.id}`}
@@ -160,7 +161,7 @@ const columns = (
         );
       }
 
-      if (!isPatient || params.row.status === VisitWithDetailsStatus.CLOSED) {
+      if ((isPatient && params.row.status === VisitWithDetailsStatus.CLOSED) || isDoctor) {
         actions.push(
           <GridActionsCellItem
             key={`begin-${params.row.id}`}
@@ -173,7 +174,7 @@ const columns = (
 
       if (
         params.row.status === VisitWithDetailsStatus.CLOSED &&
-        allowAddReview &&
+        isPatient &&
         !params.row.feedbackRating
       ) {
         actions.push(
@@ -218,7 +219,8 @@ export const VisitsTable: FC<VisitTableProps> = ({
   onArchivalModeToggle,
 }) => {
   const currentFacilityId = useAuthStore((state) => state.user?.facilityId);
-  const { isPatient } = useAuth();
+
+  const { isPatient, isDoctor, isWardClerk } = useAuth();
   const navigate = useNavigate();
   const sitemap = useSitemap();
   const { showNotification, NotificationComponent } = useNotification();
@@ -346,7 +348,8 @@ export const VisitsTable: FC<VisitTableProps> = ({
             onNavigateToVisit,
             onNavigateToPatient,
             isPatient,
-            isPatient,
+            isDoctor,
+            isWardClerk,
             handleViewReview,
             handleAddReview,
             loading,

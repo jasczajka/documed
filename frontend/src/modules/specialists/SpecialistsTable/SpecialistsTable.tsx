@@ -24,6 +24,7 @@ export type SpecialistFilters = {
 };
 
 const columns = (
+  canNavigateToSpecialist: boolean,
   onNavigateToSpecialist: (specialistId: number) => void,
   onScheduleVisitClick?: (specialistId: number) => void,
 ): GridColDef<DoctorDetailsDTO>[] => [
@@ -39,17 +40,20 @@ const columns = (
     headerName: 'Imię i nazwisko',
     minWidth: 200,
     flex: 0.25,
-    renderCell: ({ row }) => (
-      <Link
-        component="button"
-        onClick={() => onNavigateToSpecialist(row.id)}
-        underline="hover"
-        color="primary"
-        sx={{ cursor: 'pointer', fontWeight: 500 }}
-      >
-        {`${row.firstName} ${row.lastName}`}
-      </Link>
-    ),
+    renderCell: ({ row }) =>
+      canNavigateToSpecialist ? (
+        <Link
+          component="button"
+          onClick={() => onNavigateToSpecialist(row.id)}
+          underline="hover"
+          color="primary"
+          sx={{ cursor: 'pointer', fontWeight: 500 }}
+        >
+          {`${row.firstName} ${row.lastName}`}
+        </Link>
+      ) : (
+        <Typography>{`${row.firstName} ${row.lastName}`}</Typography>
+      ),
   },
   {
     field: 'specializations',
@@ -148,7 +152,7 @@ export const SpecialistsTable = () => {
   const sitemap = useSitemap();
   const { showNotification, NotificationComponent } = useNotification();
   const { openModal } = useModal();
-  const { isPatient, isWardClerk } = useAuth();
+  const { isWardClerk, isDoctor, isAdmin } = useAuth();
   const userId = useAuthStore((state) => state.user!.id);
 
   const specialists = useDoctorsStore((state) => state.doctors);
@@ -214,10 +218,9 @@ export const SpecialistsTable = () => {
         <DataGrid
           rows={filteredSpecialists}
           columns={columns(
+            isAdmin || isWardClerk || isDoctor,
             onNavigateToSpecialist,
-            isPatient || isWardClerk
-              ? (specialistId: number) => handleScheduleVisitClick(specialistId)
-              : undefined,
+            (specialistId: number) => handleScheduleVisitClick(specialistId),
           )}
           initialState={{
             pagination: {

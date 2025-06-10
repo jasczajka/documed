@@ -50,24 +50,65 @@ const getDefaultRoutes = () => [
   },
 ];
 
-const getAuthRoutes = (
-  isAdmin: boolean,
-  isPatient: boolean,
-  canEditDoctorData: boolean,
-  isStaff: boolean,
-): RouteObject[] => [
+type AuthRouteOptions = {
+  isAdmin: boolean;
+  isDoctor: boolean;
+  isPatient: boolean;
+  isWardClerk: boolean;
+  isNurse: boolean;
+  isStaff: boolean;
+};
+
+const getAuthRoutes = ({
+  isAdmin,
+  isDoctor,
+  isPatient,
+  isWardClerk,
+  isNurse,
+}: AuthRouteOptions): RouteObject[] => [
   {
     path: '/',
     element: <LoggedLayout />,
     children: [
       { path: '/', element: <Navigate to="/visits" replace /> },
-      { path: '/visits', element: <VisitsPage /> },
-      { path: '/visits/:id', element: <SingleVisitPage /> },
-      { path: '/additional-services', element: <AdditionalServicesPage /> },
+      {
+        path: '/visits',
+        element: (
+          <ProtectedRoute
+            element={<VisitsPage />}
+            isAllowed={!isAdmin}
+            redirectTo={isAdmin ? '/admin' : '/visits'}
+          />
+        ),
+      },
+      {
+        path: '/visits/:id',
+        element: (
+          <ProtectedRoute
+            element={<SingleVisitPage />}
+            isAllowed={isPatient || isDoctor}
+            redirectTo="/visits"
+          />
+        ),
+      },
+      {
+        path: '/additional-services',
+        element: (
+          <ProtectedRoute
+            element={<AdditionalServicesPage />}
+            isAllowed={!isAdmin}
+            redirectTo="/visits"
+          />
+        ),
+      },
       {
         path: '/patients',
         element: (
-          <ProtectedRoute element={<PatientsPage />} isAllowed={!isPatient} redirectTo="/visits" />
+          <ProtectedRoute
+            element={<PatientsPage />}
+            isAllowed={isWardClerk || isDoctor || isNurse}
+            redirectTo={isAdmin ? '/admin' : '/visits'}
+          />
         ),
       },
       { path: '/specialists', element: <SpecialistsPage /> },
@@ -97,7 +138,7 @@ const getAuthRoutes = (
         element: (
           <ProtectedRoute
             element={<SingleSpecialistPage />}
-            isAllowed={canEditDoctorData}
+            isAllowed={isAdmin || isWardClerk || isDoctor}
             redirectTo="/visits"
           />
         ),
@@ -107,7 +148,7 @@ const getAuthRoutes = (
         element: (
           <ProtectedRoute
             element={<SinglePatientPage />}
-            isAllowed={isStaff}
+            isAllowed={isWardClerk || isDoctor || isNurse}
             redirectTo="/visits"
           />
         ),
@@ -128,8 +169,16 @@ const getAuthRoutes = (
 ];
 
 export const AppRouter = () => {
-  const { verifyAuthentication, loading, isAdmin, isPatient, canEditDoctorData, isStaff } =
-    useAuth();
+  const {
+    verifyAuthentication,
+    loading,
+    isAdmin,
+    isPatient,
+    isDoctor,
+    isWardClerk,
+    isNurse,
+    isStaff,
+  } = useAuth();
   const authenticated = useAuthStore((state) => state.authenticated);
   const fetchFacilities = useFacilityStore((state) => state.fetchFacilities);
   const fetchSubscriptions = useSubscriptionStore((state) => state.fetchSubscriptions);
@@ -140,7 +189,14 @@ export const AppRouter = () => {
   const [authChecked, setAuthChecked] = useState(false);
   const router = useMemo(() => {
     const routes = authenticated
-      ? getAuthRoutes(isAdmin, isPatient, canEditDoctorData, isStaff)
+      ? getAuthRoutes({
+          isAdmin,
+          isDoctor,
+          isPatient,
+          isWardClerk,
+          isNurse,
+          isStaff,
+        })
       : getDefaultRoutes();
     return createBrowserRouter(routes);
   }, [authenticated, isPatient, isAdmin]);

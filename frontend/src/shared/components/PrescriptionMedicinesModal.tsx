@@ -1,15 +1,15 @@
-import { Card, Dialog, Paper, Stack, Typography } from '@mui/material';
+import { Box, Card, Dialog, Paper, Stack, Typography } from '@mui/material';
 import { FC } from 'react';
 import { MedicineWithAmount } from 'shared/api/generated/generated.schemas';
 
 export interface PrescriptionMedicinesModalProps {
-  prescriptionId: string;
+  accessCode: string;
   medicines: MedicineWithAmount[];
   onCancel: () => void;
 }
 
 export const PrescriptionMedicinesModal: FC<PrescriptionMedicinesModalProps> = ({
-  prescriptionId,
+  accessCode,
   medicines,
   onCancel,
 }) => {
@@ -25,8 +25,14 @@ export const PrescriptionMedicinesModal: FC<PrescriptionMedicinesModalProps> = (
           gap: 6,
         }}
       >
-        <Typography variant="h6">{`Recepta ${prescriptionId}`}</Typography>
-
+        <Box>
+          <Typography variant="h6" fontWeight="bold">
+            Recepta
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+            Kod dostępu: {accessCode}
+          </Typography>
+        </Box>
         <Stack spacing={3}>
           {medicines.map((medicine) => (
             <Paper

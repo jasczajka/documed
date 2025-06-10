@@ -60,39 +60,38 @@ public class VisitService {
     return visit;
   }
 
-  public List<VisitWithDetails> getAllWithDetailsBetweenDates(
-      LocalDate startDate, LocalDate endDate) {
-    return visitDAO.findAllWithDetailsBetweenDates(startDate, endDate);
+  public List<VisitWithDetails> getAllWithDetailsBetweenDates(LocalDate startDate) {
+    return visitDAO.findAllWithDetailsBetweenDates(startDate);
   }
 
   public List<VisitWithDetails> getVisitsForCurrentPatientWithDetailsBetweenDates(
-      LocalDate startDate, LocalDate endDate) {
+      LocalDate startDate) {
     int patientId = authService.getCurrentUserId();
     int facilityId = authService.getCurrentFacilityId();
     return visitDAO.findByPatientIdAndFacilityIdWithDetailsBetweenDates(
-        patientId, facilityId, startDate, endDate);
+        patientId, facilityId, startDate);
   }
 
   public List<VisitWithDetails> getVisitsByPatientIdWithDetailsBetweenDates(
-      int patientId, LocalDate startDate, LocalDate endDate) {
+      int patientId, LocalDate startDate) {
     int facilityId = authService.getCurrentFacilityId();
     return visitDAO.findByPatientIdAndFacilityIdWithDetailsBetweenDates(
-        patientId, facilityId, startDate, endDate);
+        patientId, facilityId, startDate);
   }
 
   public List<VisitWithDetails> getVisitsByDoctorIdWithDetailsBetweenDates(
-      int doctorId, LocalDate startDate, LocalDate endDate) {
+      int doctorId, LocalDate startDate) {
     int facilityId = authService.getCurrentFacilityId();
     return visitDAO.findByDoctorIdAndFacilityIdWithDetailsBetweenDates(
-        doctorId, facilityId, startDate, endDate);
+        doctorId, facilityId, startDate);
   }
 
   public List<VisitWithDetails> getVisitsForCurrentDoctorWithDetailsBetweenDates(
-      LocalDate startDate, LocalDate endDate) {
+      LocalDate startDate) {
     int doctorId = authService.getCurrentUserId();
     int facilityId = authService.getCurrentFacilityId();
     return visitDAO.findByDoctorIdAndFacilityIdWithDetailsBetweenDates(
-        doctorId, facilityId, startDate, endDate);
+        doctorId, facilityId, startDate);
   }
 
   public Visit getById(int id) {

@@ -1,7 +1,6 @@
 package com.documed.backend.users;
 
 import com.documed.backend.auth.annotations.AdminOnly;
-import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.users.model.Subscription;
 import com.documed.backend.users.model.SubscriptionToService;
 import com.documed.backend.users.services.SubscriptionService;
@@ -22,7 +21,6 @@ public class SubscriptionController {
 
   private final SubscriptionService subscriptionService;
 
-  @StaffOnly
   @GetMapping("/{id}")
   @Operation(summary = "Get subscription by ID")
   public ResponseEntity<Subscription> getSubscription(@PathVariable int id) {
@@ -57,8 +55,7 @@ public class SubscriptionController {
     }
   }
 
-  // TODO clerk only
-  @StaffOnly
+  @AdminOnly
   @PutMapping("{subscriptionId}/services/{serviceId}")
   public ResponseEntity<String> updateServiceDiscount(
       @PathVariable int subscriptionId,

@@ -46,7 +46,6 @@ export const ChangePasswordForm: FC<ChangePasswordFormProps> = ({ onSubmit, erro
       onSubmit={handleSubmit(onSubmit)}
       sx={{
         display: 'flex',
-        width: '44%',
         flexDirection: 'column',
         gap: 8,
         minWidth: '500px',

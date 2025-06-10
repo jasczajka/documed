@@ -144,7 +144,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
   isArchivalAdditionalServicesOn,
   onArchivalModeToggle,
 }) => {
-  const { isPatient } = useAuth();
+  const { isNurse, isDoctor, isPatient } = useAuth();
   const navigate = useNavigate();
   const sitemap = useSitemap();
   const { openModal } = useModal();
@@ -196,7 +196,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
           mode="edit"
           existingServiceData={existingServiceData}
           refetch={refetch}
-          readOnly={isPatient}
+          readOnly={!(isNurse || isDoctor)}
         />
       ));
     },

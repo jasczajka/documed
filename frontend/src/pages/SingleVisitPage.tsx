@@ -72,7 +72,7 @@ const SingleVisitPage: FC = () => {
   const visitId = Number(id);
   const { showNotification, NotificationComponent } = useNotification();
   const { uploadFile, deleteFile } = useFileUpload();
-  const { isPatient } = useAuth();
+  const { isDoctor } = useAuth();
   const { openModal } = useModal();
 
   const [fileUploadLoading, setFileUploadLoading] = useState(false);
@@ -527,7 +527,7 @@ const SingleVisitPage: FC = () => {
         recommendations: visitInfo.recommendations ?? '',
       });
     }
-    if (visitInfo?.status === VisitWithDetailsStatus.PLANNED && !isPatient) {
+    if (visitInfo?.status === VisitWithDetailsStatus.PLANNED && isDoctor) {
       showNotification('Rozpocznij wizytę, aby edytować jej szczegóły', 'warning');
     }
   }, [visitInfo, reset]);
@@ -543,7 +543,7 @@ const SingleVisitPage: FC = () => {
   const { label: visitStatusLabel, color: visitStatusColor } = getVisitStatusLabel(
     visitInfo.status,
   );
-  const inputsDisabled = isPatient || visitInfo.status !== VisitWithDetailsStatus.IN_PROGRESS;
+  const inputsDisabled = !isDoctor || visitInfo.status !== VisitWithDetailsStatus.IN_PROGRESS;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-8">
@@ -573,7 +573,7 @@ const SingleVisitPage: FC = () => {
             patientAge={getAgeFromBirthDate(new Date(visitInfo.patientBirthDate))}
           />
         </Box>
-        {!isPatient && (
+        {isDoctor && (
           <Box sx={{ display: 'flex', flexDirection: 'row', gap: 3 }}>
             {visitInfo.status === VisitWithDetailsStatus.IN_PROGRESS && (
               <Button

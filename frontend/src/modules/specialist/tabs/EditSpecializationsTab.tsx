@@ -10,6 +10,7 @@ interface EditSpecializationsTabProps {
   allSpecializations: Specialization[];
   onSave: (selected: Specialization[]) => void;
   loading?: boolean;
+  disabled?: boolean;
 }
 
 type FormValues = {
@@ -27,6 +28,7 @@ export const EditSpecializationsTab: FC<EditSpecializationsTabProps> = ({
   allSpecializations,
   onSave,
   loading,
+  disabled = false,
 }) => {
   const {
     control,
@@ -44,7 +46,7 @@ export const EditSpecializationsTab: FC<EditSpecializationsTabProps> = ({
 
   return (
     <Box
-      component="form"
+      component={disabled ? 'div' : 'form'}
       onSubmit={handleSubmit(onSubmit)}
       sx={{ display: 'flex', flexDirection: 'column', gap: 6 }}
     >
@@ -90,6 +92,7 @@ export const EditSpecializationsTab: FC<EditSpecializationsTabProps> = ({
                     value={null}
                     noOptionsText="Brak opcji spełniających wyszukiwanie"
                     renderInput={(params) => <TextField {...params} label="Dodaj specjalizację" />}
+                    disabled={disabled}
                   />
                 </FormControl>
               </Box>
@@ -103,7 +106,7 @@ export const EditSpecializationsTab: FC<EditSpecializationsTabProps> = ({
           variant="contained"
           color="primary"
           loading={loading}
-          disabled={loading}
+          disabled={loading || disabled}
         >
           Zapisz zmiany
         </Button>

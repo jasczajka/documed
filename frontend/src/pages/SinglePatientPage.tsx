@@ -14,6 +14,7 @@ import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner
 import { ScheduleVisitModal } from 'shared/components/ScheduleVisitModal/ScheduleVisitModal';
 import { useAllServicesStore } from 'shared/hooks/stores/useAllServicesStore';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
+import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
 import { getAgeFromBirthDate } from 'shared/utils/getAgeFromBirthDate';
@@ -21,6 +22,7 @@ import { getYearAgoAsDateString } from 'shared/utils/getYearAgoAsDateString';
 
 const SinglePatientPage: FC = () => {
   const { id } = useParams();
+  const { isNurse, isDoctor, isWardClerk } = useAuth();
   const patientId = Number(id);
   const [isArchivalModeOn, setIsArchivalModeOn] = useState(false);
   const fulfillerId = useAuthStore((state) => state.user?.id);
@@ -193,12 +195,17 @@ const SinglePatientPage: FC = () => {
       <div className="flex w-full items-center justify-between">
         <CardHeader title={patientFullName} />
         <div className="flex gap-2">
-          <Button onClick={handleScheduleVisitClick} variant="contained">
-            Umów wizytę dla pacjenta
-          </Button>
-          <Button onClick={handleAdditionalServiceClick} variant="contained">
-            Rozpocznij usługę dodatkową
-          </Button>
+          {isWardClerk && (
+            <Button onClick={handleScheduleVisitClick} variant="contained">
+              Umów wizytę dla pacjenta
+            </Button>
+          )}
+
+          {(isNurse || isDoctor) && (
+            <Button onClick={handleAdditionalServiceClick} variant="contained">
+              Rozpocznij usługę dodatkową
+            </Button>
+          )}
         </div>
       </div>
       <PatientTabs
