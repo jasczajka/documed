@@ -95,12 +95,13 @@ const VisitsPage: FC = () => {
   const refetchVisits = async () => {
     if (isPatient) {
       await refetchPatientVisits();
+      return;
     }
     if (isDoctor) {
       refetchDoctorVisits();
-    } else {
-      await refetchAllVisits();
+      return;
     }
+    await refetchAllVisits();
   };
 
   const visits = isPatient ? patientVisits : isDoctor ? doctorVisits : allVisits;
@@ -125,7 +126,7 @@ const VisitsPage: FC = () => {
           patientDetails?.birthdate ? getAgeFromBirthDate(new Date(patientDetails.birthdate)) : null
         }
         onConfirm={async () => {
-          await refetchPatientVisits();
+          await refetchVisits();
           close();
           showNotification('Umówiono wizytę', 'success');
         }}
