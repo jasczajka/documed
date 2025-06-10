@@ -6,6 +6,7 @@ import { getPatientDetails } from 'shared/api/generated/patients-controller/pati
 import { useGetAllServices } from 'shared/api/generated/service-controller/service-controller';
 import {
   useGetAllVisits,
+  useGetVisitsForCurrentDoctor,
   useGetVisitsForCurrentPatient,
 } from 'shared/api/generated/visit-controller/visit-controller';
 import CancelVisitModal from 'shared/components/ConfirmationModal/CancelVisitModal';
@@ -46,7 +47,7 @@ const VisitsPage: FC = () => {
     {
       query: {
         enabled: isPatient,
-        queryKey: ['visitsForCurrentDoctor', isArchivalVisitsOn],
+        queryKey: ['visitsForCurrentPatient', isArchivalVisitsOn],
       },
     },
   );
@@ -62,8 +63,25 @@ const VisitsPage: FC = () => {
     },
     {
       query: {
-        enabled: !isPatient,
-        queryKey: ['visitsForCurrentPatient', isArchivalVisitsOn],
+        enabled: !isPatient && !isDoctor,
+        queryKey: ['allVisits', isArchivalVisitsOn],
+      },
+    },
+  );
+
+  const {
+    data: doctorVisits,
+    isLoading: isDoctorVisitsLoading,
+    isError: isDoctorVisitsError,
+    refetch: refetchDoctorVisits,
+  } = useGetVisitsForCurrentDoctor(
+    {
+      startDate: isArchivalVisitsOn ? getYearAgoAsDateString() : undefined,
+    },
+    {
+      query: {
+        enabled: isDoctor,
+        queryKey: ['visitsForCurrentDoctor', isArchivalVisitsOn],
       },
     },
   );
@@ -77,14 +95,20 @@ const VisitsPage: FC = () => {
   const refetchVisits = async () => {
     if (isPatient) {
       await refetchPatientVisits();
-    } else {
-      await refetchAllVisits();
+      return;
     }
+    if (isDoctor) {
+      refetchDoctorVisits();
+      return;
+    }
+    await refetchAllVisits();
   };
 
-  const visits = isPatient ? patientVisits : allVisits;
-  const isLoading = isPatientVisitsLoading || isAllVisitsLoading || isServicesLoading;
-  const isError = isPatientVisitsError || isAllVisitsError || isServicesError;
+  const visits = isPatient ? patientVisits : isDoctor ? doctorVisits : allVisits;
+  const isLoading =
+    isPatientVisitsLoading || isAllVisitsLoading || isServicesLoading || isDoctorVisitsLoading;
+  const isError =
+    isPatientVisitsError || isAllVisitsError || isServicesError || isDoctorVisitsError;
 
   const handleCancelVisitClick = (visitId: number) => {
     openModal('cancelVisitModal', (close) => (
@@ -102,7 +126,7 @@ const VisitsPage: FC = () => {
           patientDetails?.birthdate ? getAgeFromBirthDate(new Date(patientDetails.birthdate)) : null
         }
         onConfirm={async () => {
-          await refetchPatientVisits();
+          await refetchVisits();
           close();
           showNotification('Umówiono wizytę', 'success');
         }}

@@ -2,6 +2,7 @@ import { CardHeader } from '@mui/material';
 import AdditionalServicesTable from 'modules/additionalServices/additionalServicesTable/AdditionalServicesTable';
 import { FC, useEffect, useMemo, useState } from 'react';
 import {
+  useGetAdditionalServicesByFulfiller,
   useGetAdditionalServicesByPatient,
   useGetAllAdditionalServices,
 } from 'shared/api/generated/additional-service-controller/additional-service-controller';
@@ -50,8 +51,26 @@ const AdditionalServicesPage: FC = () => {
     },
     {
       query: {
-        enabled: !isPatient,
+        enabled: !isPatient && !isDoctor,
         queryKey: ['additionalServices', isArchivalModeOn],
+      },
+    },
+  );
+
+  const {
+    data: doctorAdditionalServiceInstances,
+    isLoading: isDoctorAdditionalServiceInstancesLoading,
+    isError: isDoctorServiceInstancesError,
+    refetch: refetchDoctorAdditionalServiceInstances,
+  } = useGetAdditionalServicesByFulfiller(
+    user.id,
+    {
+      startDate: isArchivalModeOn ? getYearAgoAsDateString() : undefined,
+    },
+    {
+      query: {
+        enabled: isDoctor,
+        queryKey: ['doctorAdditionalServices', isArchivalModeOn],
       },
     },
   );
@@ -62,7 +81,11 @@ const AdditionalServicesPage: FC = () => {
     isError: isServicesError,
   } = useGetAllServices();
 
-  const additionalServices = isPatient ? patientAdditionalServices : allAdditionalServiceInstances;
+  const additionalServices = isPatient
+    ? patientAdditionalServices
+    : isDoctor
+      ? doctorAdditionalServiceInstances
+      : allAdditionalServiceInstances;
   const allAdditionalServices = useMemo(
     () => allServices?.filter((service) => service.type === ServiceType.ADDITIONAL_SERVICE),
     [allServices],
@@ -70,10 +93,14 @@ const AdditionalServicesPage: FC = () => {
   const isLoading =
     isPatientAdditionalServicesLoading ||
     isAllAdditionalServiceInstancesLoading ||
+    isDoctorAdditionalServiceInstancesLoading ||
     isServicesLoading ||
     isServicesLoading;
   const isError =
-    isPatientAdditionalServicesError || isAllAdditionalServiceInstancesError || isServicesError;
+    isPatientAdditionalServicesError ||
+    isAllAdditionalServiceInstancesError ||
+    isServicesError ||
+    isDoctorServiceInstancesError;
 
   useEffect(() => {
     if (isError) {
@@ -100,6 +127,10 @@ const AdditionalServicesPage: FC = () => {
           refetch={async () => {
             if (isPatient) {
               refetchPatientAdditionalServices();
+              return;
+            }
+            if (isDoctor) {
+              refetchDoctorAdditionalServiceInstances();
               return;
             }
             refetchAllAdditionalServiceInstances();
