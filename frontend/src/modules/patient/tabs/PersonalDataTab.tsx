@@ -3,6 +3,7 @@ import { FC, useCallback, useEffect } from 'react';
 import { useDeactivateAccount } from 'shared/api/generated/auth-controller/auth-controller';
 import ConfirmationModal from 'shared/components/ConfirmationModal/ConfirmationModal';
 import { PatientInfoPanel, PatientInfoPanelProps } from 'shared/components/PatientInfoPanel';
+import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
 
@@ -16,6 +17,7 @@ export const PersonalDataTab: FC<PersonalDataTabProps> = ({
   onSuccessfulDeactivate,
 }) => {
   const { showNotification, NotificationComponent } = useNotification();
+  const { isWardClerk } = useAuth();
   const { openModal } = useModal();
   const {
     mutateAsync: deactivateAccount,
@@ -50,16 +52,18 @@ export const PersonalDataTab: FC<PersonalDataTabProps> = ({
   return (
     <div className="flex w-1/2 flex-col gap-8">
       <PatientInfoPanel {...patientInfo} />
-      <Button
-        disabled={isDeactivateAccountLoading}
-        loading={isDeactivateAccountLoading}
-        onClick={handleDeactivateAccountClick}
-        sx={{ width: 290 }}
-        variant="contained"
-        color="error"
-      >
-        Usuń dane osobowe pacjenta
-      </Button>
+      {isWardClerk && (
+        <Button
+          disabled={isDeactivateAccountLoading}
+          loading={isDeactivateAccountLoading}
+          onClick={handleDeactivateAccountClick}
+          sx={{ width: 290 }}
+          variant="contained"
+          color="error"
+        >
+          Usuń dane osobowe pacjenta
+        </Button>
+      )}
       <NotificationComponent />
     </div>
   );

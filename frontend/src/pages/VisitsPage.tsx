@@ -1,6 +1,7 @@
 import { Box, Button, CardHeader } from '@mui/material';
 import VisitsTable from 'modules/visits/VisitsTable/VisitsTable';
 import { FC, useCallback, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { getPatientDetails } from 'shared/api/generated/patients-controller/patients-controller';
 import { useGetAllServices } from 'shared/api/generated/service-controller/service-controller';
 import {
@@ -13,14 +14,21 @@ import { ScheduleVisitModal } from 'shared/components/ScheduleVisitModal/Schedul
 import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
+import { useSitemap } from 'shared/hooks/useSitemap';
 import { getAgeFromBirthDate } from 'shared/utils/getAgeFromBirthDate';
 import { getYearAgoAsDateString } from 'shared/utils/getYearAgoAsDateString';
 
 const VisitsPage: FC = () => {
-  const { user, isPatient, isDoctor } = useAuth();
+  const { user, isPatient, isDoctor, isAdmin } = useAuth();
+  const sitemap = useSitemap();
+  const navigate = useNavigate();
   const { openModal } = useModal();
   const { showNotification, NotificationComponent } = useNotification();
   const [isArchivalVisitsOn, setIsArchivalVisitsOn] = useState(false);
+
+  if (isAdmin) {
+    navigate(sitemap.admin);
+  }
 
   if (!user || !user.id) {
     return null;

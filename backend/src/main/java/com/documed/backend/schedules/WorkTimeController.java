@@ -29,7 +29,6 @@ public class WorkTimeController {
     return ResponseEntity.ok(workTimes.stream().map(WorkTimeMapper::toDto).toList());
   }
 
-  // TODO annotation ward clerk only
   @WardClerkOnly
   @StaffOnly
   @PutMapping("/{user_id}")

@@ -7,6 +7,7 @@ import { PatientDetailsDTO, Subscription } from 'shared/api/generated/generated.
 import { ScheduleVisitModal } from 'shared/components/ScheduleVisitModal/ScheduleVisitModal';
 import { TableFilters } from 'shared/components/TableFilters';
 import { useSubscriptionStore } from 'shared/hooks/stores/useSubscriptionStore';
+import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
 import { useSitemap } from 'shared/hooks/useSitemap';
@@ -26,6 +27,7 @@ const columns = (
   allSubscriptions: Subscription[],
   onNavigateToPatient: (patientId: number) => void,
   onScheduleVisitClick: (patientDetails: PatientDetailsDTO) => void,
+  canScheduleVisit: boolean,
 ): GridColDef<PatientDetailsDTO>[] => [
   {
     field: 'index',
@@ -72,7 +74,13 @@ const columns = (
     field: 'actions',
     headerName: 'Akcje',
     flex: 0.5,
-    renderCell: ({ row }) => <Button onClick={() => onScheduleVisitClick(row)}>Umów wizytę</Button>,
+    renderCell: ({ row }) => {
+      return canScheduleVisit ? (
+        <Button onClick={() => onScheduleVisitClick(row)}>Umów wizytę</Button>
+      ) : (
+        <span style={{ color: '#999' }}>Brak akcji</span>
+      );
+    },
   },
 ];
 
@@ -83,6 +91,7 @@ export const PatientsTable: FC<PatientsTableProps> = ({ patients }) => {
   });
 
   const navigate = useNavigate();
+  const { isWardClerk, isPatient } = useAuth();
   const sitemap = useSitemap();
   const { showNotification, NotificationComponent } = useNotification();
   const { openModal } = useModal();
@@ -147,6 +156,7 @@ export const PatientsTable: FC<PatientsTableProps> = ({ patients }) => {
             allSubscriptions,
             onNavigateToPatient,
             (patientDetails: PatientDetailsDTO) => handleScheduleVisitClick(patientDetails),
+            isWardClerk || isPatient,
           )}
           initialState={{
             pagination: {

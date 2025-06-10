@@ -4,7 +4,6 @@ import com.documed.backend.auth.AuthService;
 import com.documed.backend.auth.annotations.DoctorOnly;
 import com.documed.backend.auth.annotations.DoctorOrPatient;
 import com.documed.backend.auth.annotations.StaffOnly;
-import com.documed.backend.auth.annotations.WardClerkOnly;
 import com.documed.backend.auth.exceptions.UnauthorizedException;
 import com.documed.backend.users.model.UserRole;
 import com.documed.backend.visits.dtos.GiveFeedbackDTO;
@@ -43,12 +42,6 @@ public class VisitController {
         : LocalDate.now().minus(DEFAULT_VISIT_LOOKBACK_PERIOD);
   }
 
-  private LocalDate resolveEndDate() {
-    return LocalDate.now();
-  }
-
-  // TODO clerk i lekarz
-  // filtr na date na ostatni miesiac i na bazie uzywac
   @StaffOnly
   @GetMapping
   @Operation(summary = "Get all visits")
@@ -56,14 +49,11 @@ public class VisitController {
       @RequestParam(required = false) LocalDate startDate) {
 
     LocalDate resolvedStart = resolveStartDate(startDate);
-    LocalDate endDate = resolveEndDate();
 
-    List<VisitWithDetails> visits =
-        visitService.getAllWithDetailsBetweenDates(resolvedStart, endDate);
+    List<VisitWithDetails> visits = visitService.getAllWithDetailsBetweenDates(resolvedStart);
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
-  // TODO lekarz i pacjent
   @DoctorOrPatient
   @GetMapping("/{id}")
   @Operation(summary = "Get visit by id")
@@ -81,7 +71,6 @@ public class VisitController {
     return new ResponseEntity<>(visit, HttpStatus.OK);
   }
 
-  // TODO pacjent i clerk
   @PreAuthorize("hasAnyRole('PATIENT', 'WARD_CLERK')")
   @PostMapping
   @Operation(summary = "schedule/create visit")
@@ -101,7 +90,6 @@ public class VisitController {
     return new ResponseEntity<>(HttpStatus.OK);
   }
 
-  // TODO annotation patient and clerk
   @PreAuthorize("hasAnyRole('PATIENT', 'WARD_CLERK')")
   @PatchMapping("/{id}/cancel")
   @Operation(summary = "cancel visit")
@@ -128,15 +116,13 @@ public class VisitController {
       @RequestParam(required = false) LocalDate startDate) {
 
     LocalDate resolvedStart = resolveStartDate(startDate);
-    LocalDate endDate = resolveEndDate();
 
     List<VisitWithDetails> visits =
-        visitService.getVisitsForCurrentPatientWithDetailsBetweenDates(resolvedStart, endDate);
+        visitService.getVisitsForCurrentPatientWithDetailsBetweenDates(resolvedStart);
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
-  // TODO annotation pacjent lekarz i rejestrator
-  @PreAuthorize("hasAnyRole('WARD_CLERK', 'DOCTOR', 'PATIENT')")
+  @Secured({"WARD_CLERK", "DOCTOR", "NURSE", "PATIENT"})
   @GetMapping("/patient/{id}")
   @Operation(summary = "Get all visits for selected patient")
   public ResponseEntity<List<VisitWithDetails>> getVisitsByPatientId(
@@ -150,25 +136,22 @@ public class VisitController {
     }
 
     LocalDate resolvedStart = resolveStartDate(startDate);
-    LocalDate endDate = resolveEndDate();
 
     List<VisitWithDetails> visits =
-        visitService.getVisitsByPatientIdWithDetailsBetweenDates(patientId, resolvedStart, endDate);
+        visitService.getVisitsByPatientIdWithDetailsBetweenDates(patientId, resolvedStart);
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
-  // TODO annoatation clerk
-  @WardClerkOnly
+  @Secured({"WARD_CLERK", "DOCTOR"})
   @Operation(summary = "get all visits assigned for selected doctor")
   @GetMapping("/doctor/{id}")
   public ResponseEntity<List<VisitWithDetails>> getVisitsByDoctorId(
       @PathVariable("id") int doctorId, @RequestParam(required = false) LocalDate startDate) {
 
     LocalDate resolvedStart = resolveStartDate(startDate);
-    LocalDate endDate = resolveEndDate();
 
     List<VisitWithDetails> visits =
-        visitService.getVisitsByDoctorIdWithDetailsBetweenDates(doctorId, resolvedStart, endDate);
+        visitService.getVisitsByDoctorIdWithDetailsBetweenDates(doctorId, resolvedStart);
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
@@ -179,10 +162,9 @@ public class VisitController {
       @RequestParam(required = false) LocalDate startDate) {
 
     LocalDate resolvedStart = resolveStartDate(startDate);
-    LocalDate endDate = resolveEndDate();
 
     List<VisitWithDetails> visits =
-        visitService.getVisitsForCurrentDoctorWithDetailsBetweenDates(resolvedStart, endDate);
+        visitService.getVisitsForCurrentDoctorWithDetailsBetweenDates(resolvedStart);
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 

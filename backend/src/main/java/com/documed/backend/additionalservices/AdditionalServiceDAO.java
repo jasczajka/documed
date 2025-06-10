@@ -62,13 +62,10 @@ public class AdditionalServiceDAO implements FullDAO<AdditionalService, Addition
     return jdbcTemplate.update(sql, id);
   }
 
-  public List<AdditionalServiceWithDetails> findAllWithDetailsBetweenDates(
-      LocalDate startDate, LocalDate endDate) {
+  public List<AdditionalServiceWithDetails> findAllWithDetailsBetweenDates(LocalDate startDate) {
     String sql =
-        ADDITIONAL_SERVICE_DETAILS_BASE_QUERY
-            + " WHERE a.date BETWEEN ? AND ? "
-            + " ORDER BY a.id DESC";
-    return jdbcTemplate.query(sql, new AdditionalServiceWithDetailsRowMapper(), startDate, endDate);
+        ADDITIONAL_SERVICE_DETAILS_BASE_QUERY + " WHERE a.date >= ? " + " ORDER BY a.id DESC";
+    return jdbcTemplate.query(sql, new AdditionalServiceWithDetailsRowMapper(), startDate);
   }
 
   public Optional<AdditionalServiceWithDetails> findByIdWithDetails(int id) {
@@ -79,48 +76,43 @@ public class AdditionalServiceDAO implements FullDAO<AdditionalService, Addition
   }
 
   public List<AdditionalServiceWithDetails> findByPatientIdWithDetailsBetweenDates(
-      int patientId, LocalDate startDate, LocalDate endDate) {
+      int patientId, LocalDate startDate) {
     String sql =
         ADDITIONAL_SERVICE_DETAILS_BASE_QUERY
-            + " WHERE a.patient_id = ? AND a.date BETWEEN ? AND ? "
+            + " WHERE a.patient_id = ? AND a.date >= ?"
             + " ORDER BY a.date DESC, a.id DESC";
     return jdbcTemplate.query(
-        sql, new AdditionalServiceWithDetailsRowMapper(), patientId, startDate, endDate);
+        sql, new AdditionalServiceWithDetailsRowMapper(), patientId, startDate);
   }
 
   public List<AdditionalServiceWithDetails> findByFulfillerIdWithDetailsBetweenDates(
-      int fulfillerId, LocalDate startDate, LocalDate endDate) {
+      int fulfillerId, LocalDate startDate) {
     String sql =
         ADDITIONAL_SERVICE_DETAILS_BASE_QUERY
-            + " WHERE a.fulfiller_id = ? AND a.date BETWEEN ? AND ? "
+            + " WHERE a.fulfiller_id = ? AND a.date >= ?"
             + " ORDER BY a.date DESC, a.id DESC";
     return jdbcTemplate.query(
-        sql, new AdditionalServiceWithDetailsRowMapper(), fulfillerId, startDate, endDate);
+        sql, new AdditionalServiceWithDetailsRowMapper(), fulfillerId, startDate);
   }
 
   public List<AdditionalServiceWithDetails> findByServiceIdWithDetailsBetweenDates(
-      int serviceId, LocalDate startDate, LocalDate endDate) {
+      int serviceId, LocalDate startDate) {
     String sql =
         ADDITIONAL_SERVICE_DETAILS_BASE_QUERY
-            + " WHERE a.service_id = ? AND a.date BETWEEN ? AND ? "
+            + " WHERE a.service_id = ? AND a.date >= ?"
             + " ORDER BY a.date DESC, a.id DESC";
     return jdbcTemplate.query(
-        sql, new AdditionalServiceWithDetailsRowMapper(), serviceId, startDate, endDate);
+        sql, new AdditionalServiceWithDetailsRowMapper(), serviceId, startDate);
   }
 
   public List<AdditionalServiceWithDetails> findByPatientIdAndFulfillerIdWithDetailsBetweenDates(
-      int patientId, int fulfillerId, LocalDate startDate, LocalDate endDate) {
+      int patientId, int fulfillerId, LocalDate startDate) {
     String sql =
         ADDITIONAL_SERVICE_DETAILS_BASE_QUERY
-            + " WHERE a.patient_id = ? AND a.fulfiller_id = ? AND a.date BETWEEN ? AND ? "
+            + " WHERE a.patient_id = ? AND a.fulfiller_id = ? AND a.date >= ?"
             + " ORDER BY a.date DESC, a.id DESC";
     return jdbcTemplate.query(
-        sql,
-        new AdditionalServiceWithDetailsRowMapper(),
-        patientId,
-        fulfillerId,
-        startDate,
-        endDate);
+        sql, new AdditionalServiceWithDetailsRowMapper(), patientId, fulfillerId, startDate);
   }
 
   @Override

@@ -24,6 +24,7 @@ import {
 import { useCancelPlannedVisit } from 'shared/api/generated/visit-controller/visit-controller';
 import CancelVisitModal from 'shared/components/ConfirmationModal/CancelVisitModal';
 import { PatientInfoPanelProps } from 'shared/components/PatientInfoPanel';
+import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
 import { AttachmentsTab } from './tabs/AttachmentsTab';
@@ -69,6 +70,7 @@ export const PatientTabs: FC<PatientTabsProps> = ({
 }) => {
   const { showNotification, NotificationComponent } = useNotification();
   const { openModal } = useModal();
+  const { isWardClerk } = useAuth();
 
   const { isPending: isCancelVisitLoading, isError: isCancelVisitError } = useCancelPlannedVisit();
 
@@ -112,9 +114,14 @@ export const PatientTabs: FC<PatientTabsProps> = ({
         <Tab icon={<CalendarMonth />} iconPosition="start" label="Wizyty" />
         <Tab icon={<CalendarMonthOutlined />} iconPosition="start" label="Usługi dodatkowe" />
         <Tab icon={<Person2 />} iconPosition="start" label="Dane osobowe" />
-        <Tab icon={<CreditCard />} iconPosition="start" label="Abonament" />
+        <Tab disabled={!isWardClerk} icon={<CreditCard />} iconPosition="start" label="Abonament" />
         <Tab icon={<MedicationOutlined />} iconPosition="start" label="Recepty" />
-        <Tab icon={<ArrowForwardIosOutlined />} iconPosition="start" label="Skierowania" />
+        <Tab
+          disabled={isWardClerk}
+          icon={<ArrowForwardIosOutlined />}
+          iconPosition="start"
+          label="Skierowania"
+        />
       </Tabs>
 
       <Paper sx={{ height: '100%', width: '100%', padding: 8, minHeight: '532px' }} elevation={1}>

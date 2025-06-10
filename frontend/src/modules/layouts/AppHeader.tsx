@@ -26,7 +26,7 @@ import { useShallow } from 'zustand/react/shallow';
 export const AppHeader = memo(() => {
   const sitemap = useSitemap();
   const navigate = useNavigate();
-  const { logout, loading, isAdmin, isPatient, canSeePrescriptions } = useAuth();
+  const { logout, loading, isAdmin, isPatient } = useAuth();
   const { firstName, lastName, email, facilityId } = useAuthStore(
     useShallow(
       (state) => state.user ?? { firstName: '', lastName: '', email: '', facilityId: undefined },
@@ -45,12 +45,12 @@ export const AppHeader = memo(() => {
 
   const paths = useMemo(() => {
     return [
-      { path: sitemap.visits, label: 'Wizyty' },
-      { path: sitemap.additionalServices, label: 'Usługi dod.' },
-      ...(!isPatient ? [{ path: sitemap.patients, label: 'Pacjenci' }] : []),
-      { path: sitemap.specialists, label: 'Specjaliści' },
-      { path: sitemap.referrals, label: 'Skierowania' },
-      ...(canSeePrescriptions ? [{ path: sitemap.prescriptions, label: 'Recepty' }] : []),
+      ...(!isAdmin ? [{ path: sitemap.visits, label: 'Wizyty' }] : []),
+      ...(!isAdmin ? [{ path: sitemap.additionalServices, label: 'Usługi dod.' }] : []),
+      ...(!isPatient && !isAdmin ? [{ path: sitemap.patients, label: 'Pacjenci' }] : []),
+      ...(isPatient ? [{ path: sitemap.specialists, label: 'Specjaliści' }] : []),
+      ...(isPatient ? [{ path: sitemap.referrals, label: 'Skierowania' }] : []),
+      ...(isPatient ? [{ path: sitemap.prescriptions, label: 'Recepty' }] : []),
       ...(isAdmin ? [{ path: sitemap.admin, label: 'Administracja' }] : []),
     ];
   }, [sitemap]);

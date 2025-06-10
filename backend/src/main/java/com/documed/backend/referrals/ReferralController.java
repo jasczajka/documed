@@ -68,7 +68,6 @@ public class ReferralController {
     return new ResponseEntity<>(dtos, HttpStatus.OK);
   }
 
-  // TODO annotation pacjent i lekarz
   @DoctorOrPatient
   @GetMapping("/visit/{visitId}")
   @Operation(summary = "Get all referrals for visit")
