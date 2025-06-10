@@ -69,7 +69,9 @@ INSERT INTO Service (name, price, type, estimated_time) VALUES
 ('Konsultacja pediatryczna', 190.00, 'REGULAR_SERVICE', 30),
 ('Konsultacja psychiatryczna', 250.00, 'REGULAR_SERVICE', 30),
 ('Badanie spirometryczne', 120.00, 'ADDITIONAL_SERVICE', 15),
-('Konsultacja nefrologiczna', 230.00, 'REGULAR_SERVICE', 30);
+('Morfologia krwi', 100.00, 'ADDITIONAL_SERVICE', 15),
+('Konsultacja nefrologiczna', 230.00, 'REGULAR_SERVICE', 30),
+('Badanie EKG', 210.00, 'ADDITIONAL_SERVICE', 30);
 
 ---
 -- Tabela: Specialization_Service (Powiązanie usług ze specjalizacjami)
@@ -113,7 +115,9 @@ INSERT INTO Subscription_Service (subscription_id, service_id, discount) VALUES
 (1, 12, 15),
 (1, 13, 10),
 (1, 14, 0),
-(1, 15, 10);
+(1, 15, 10),
+(1, 16, 10),
+(1, 17, 40);
 
 -- Pakiet Rozszerzony
 INSERT INTO Subscription_Service (subscription_id, service_id, discount) VALUES
@@ -131,7 +135,9 @@ INSERT INTO Subscription_Service (subscription_id, service_id, discount) VALUES
 (2, 12, 50),
 (2, 13, 45),
 (2, 14, 40),
-(2, 15, 45);
+(2, 16, 45),
+(2, 15, 45),
+(2, 17, 70);
 
 -- Pakiet Premium
 INSERT INTO Subscription_Service (subscription_id, service_id, discount) VALUES
@@ -149,7 +155,9 @@ INSERT INTO Subscription_Service (subscription_id, service_id, discount) VALUES
 (3, 12, 100),
 (3, 13, 100),
 (3, 14, 100),
-(3, 15, 100);
+(3, 15, 100),
+(3, 16, 100),
+(3, 17, 100);
 
 ---
 -- Tabela: User
@@ -187,7 +195,7 @@ INSERT INTO "User" (first_name, last_name, pesel, passport_number, email, addres
 ('Monika', 'Rogowska', NULL, NULL, 'm.rogowska@documed.pl', 'ul. Specjalistyczna 34, Kalisz', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '987690190', 'ACTIVE', '1985-04-11', '1000025', 'DOCTOR', NULL, true),
 ('Rafał', 'Lis', NULL, NULL, 'r.lis@documed.pl', 'ul. Lecznicza 35, Płock', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '998700200', 'ACTIVE', '1981-07-26', '1000026', 'DOCTOR', NULL, true),
 ('Maria', 'Sokołowska', NULL, NULL, 'm.sokolowska@documed.pl', 'ul. Tęczowa 44, Łódź', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '990880770', 'ACTIVE', '1986-12-03', '1000041', 'DOCTOR', NULL, true),
--- Pacjenci (id: 4, 5, 6, 7, 8)
+-- Pacjenci (id: 31, 32, 33, 34, 35)
 ('Alicja', 'Zielińska', '90010112345', NULL, 'alicja.zielinska@email.com', 'ul. Pacjenta 1, Warszawa', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '123123123', 'ACTIVE', '1990-01-01', NULL, 'PATIENT', 1, true),
 ('Tomasz', 'Wójcik', '88031554321', NULL, 'tomasz.wojcik@email.com', 'ul. Zdrowa 2, Kraków', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '321321321', 'ACTIVE', '1988-03-15', NULL, 'PATIENT', 2, true),
 ('Magdalena', 'Lis', '95072012345', NULL, 'magdalena.lis@email.com', 'ul. Spokojna 3, Warszawa', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '456456456', 'ACTIVE', '1995-07-20', NULL, 'PATIENT', 3, false),
@@ -206,7 +214,18 @@ INSERT INTO Doctor_Specialization (doctor_id, specialization_id) VALUES
 (12, 14),
 (13, 15),
 (14, 16),
-(15, 17),
+(4, 17),
+(5, 1),
+(6, 4),
+(7, 7),
+(8, 2),
+(9, 9),
+(10, 14),
+(11, 11),
+(12, 13),
+(13, 1),
+(14, 2),
+(15, 3),
 (16, 18),
 (16, 19),
 (17, 19),
@@ -291,8 +310,17 @@ INSERT INTO Visit (status, interview, diagnosis, recommendations, total_cost, fa
 ---
 -- Tabela: Additional_service
 INSERT INTO Additional_service (description, date, fulfiller_id, patient_id, service_id) VALUES
-('EKG wykonane po konsultacji', '2025-08-11', 1, 6, 5), -- Wykonawca: Lekarz Jan Kowalski (ID: 1)
-('Pobranie krwi na zlecenie lekarza', '2025-08-11', 10, 6, 7); -- Wykonawca: Pielęgniarka Katarzyna (ID: 10)
+('Wyniki nie zostały jeszcze zamieszczone', '2025-08-11', 1, 32, 5), -- Wykonawca: Lekarz Jan Kowalski (ID: 1)
+('Hemoglobina (HGB): 14,2 g/dL (norma: kobiety 12,0–16,0; mężczyźni 14,0–18,0)
+Hematokryt (HCT): 42,0% (norma: kobiety 36–46; mężczyźni 40–54)
+Erytrocyty (RBC): 4,7 mln/µL (norma: kobiety 3,8–5,2; mężczyźni 4,2–5,6)
+Leukocyty (WBC): 6,4 tys./µL (norma: 4,0–10,0)
+Płytki krwi (PLT): 250 tys./µL (norma: 150–400)', '2025-08-11', 37, 33, 15), -- Wykonawca: Pielęgniarka Katarzyna (ID: 10)
+('Rytm: zatokowy, miarowy
+Częstość akcji serca: 72/min
+Oś elektryczna serca: prawidłowa
+Załamki P: prawidłowe, przed każdym zespołem QRS
+Odstęp PQ: 0,16 s (norma: 0,12–0,20 s)', '2025-08-11', 37, 34, 17);
 
 ---
 -- Tabela: Feedback
@@ -307,7 +335,7 @@ INSERT INTO Referral (visit_id, diagnosis, type, expiration_date, status) VALUES
 
 DO $$
 DECLARE
-    slot_date DATE := CURRENT_DATE;
+    slot_date DATE := CURRENT_DATE - INTERVAL '7 days';
     end_date DATE := CURRENT_DATE + INTERVAL '14 days';
     wt RECORD;
     slot_start TIME;
@@ -343,3 +371,6 @@ BEGIN
     END LOOP;
 END
 $$;
+
+
+
