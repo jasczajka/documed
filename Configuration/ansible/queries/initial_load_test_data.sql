@@ -277,6 +277,79 @@ INSERT INTO Worktime (user_id, day_of_week, start_time, end_time, facility_id) V
 (3, 4, '14:00:00', '19:00:00', 2), -- Cz, Warszawa Jerozolimskie
 (3, 5, '08:00:00', '12:00:00', 1); -- Pt, Warszawa Centralna
 
+INSERT INTO Worktime (user_id, day_of_week, start_time, end_time, facility_id) VALUES
+(4, 1, '14:00:00', '19:00:00', 1), -- Pn, Warszawa Centralna
+(4, 2, '14:00:00', '19:00:00', 2), -- Wt, Warszawa Jerozolimskie
+(4, 3, '08:00:00', '12:00:00', 1), -- Śr, Warszawa Centralna
+(4, 4, '14:00:00', '19:00:00', 2), -- Cz, Warszawa Jerozolimskie
+(4, 5, '08:00:00', '12:00:00', 1); -- Pt, Warszawa Centralna
+INSERT INTO Worktime (user_id, day_of_week, start_time, end_time, facility_id) VALUES
+(5, 1, '14:00:00', '19:00:00', 1), -- Pn, Warszawa Centralna
+(5, 2, '14:00:00', '19:00:00', 2), -- Wt, Warszawa Jerozolimskie
+(5, 3, '08:00:00', '12:00:00', 1), -- Śr, Warszawa Centralna
+(5, 4, '14:00:00', '19:00:00', 2), -- Cz, Warszawa Jerozolimskie
+(5, 5, '08:00:00', '12:00:00', 1); -- Pt, Warszawa Centralna
+INSERT INTO Worktime (user_id, day_of_week, start_time, end_time, facility_id) VALUES
+(6, 1, '14:00:00', '19:00:00', 1), -- Pn, Warszawa Centralna
+(6, 2, '14:00:00', '19:00:00', 2), -- Wt, Warszawa Jerozolimskie
+(6, 3, '08:00:00', '12:00:00', 1), -- Śr, Warszawa Centralna
+(6, 4, '14:00:00', '19:00:00', 2), -- Cz, Warszawa Jerozolimskie
+(6, 5, '08:00:00', '12:00:00', 1); -- Pt, Warszawa Centralna
+INSERT INTO Worktime (user_id, day_of_week, start_time, end_time, facility_id) VALUES
+(7, 1, '14:00:00', '19:00:00', 1), -- Pn, Warszawa Centralna
+(7, 2, '14:00:00', '19:00:00', 2), -- Wt, Warszawa Jerozolimskie
+(7, 3, '08:00:00', '12:00:00', 1), -- Śr, Warszawa Centralna
+(7, 4, '14:00:00', '19:00:00', 2), -- Cz, Warszawa Jerozolimskie
+(7, 5, '08:00:00', '12:00:00', 1); -- Pt, Warszawa Centralna
+INSERT INTO Worktime (user_id, day_of_week, start_time, end_time, facility_id) VALUES
+(8, 1, '14:00:00', '19:00:00', 1), -- Pn, Warszawa Centralna
+(8, 2, '14:00:00', '19:00:00', 2), -- Wt, Warszawa Jerozolimskie
+(8, 3, '08:00:00', '12:00:00', 1), -- Śr, Warszawa Centralna
+(8, 4, '14:00:00', '19:00:00', 2), -- Cz, Warszawa Jerozolimskie
+(8, 5, '08:00:00', '12:00:00', 1); -- Pt, Warszawa Centralna
+INSERT INTO Worktime (user_id, day_of_week, start_time, end_time, facility_id) VALUES
+(9, 1, '14:00:00', '19:00:00', 1), -- Pn, Warszawa Centralna
+(9, 2, '14:00:00', '19:00:00', 2), -- Wt, Warszawa Jerozolimskie
+(9, 3, '08:00:00', '12:00:00', 1), -- Śr, Warszawa Centralna
+(9, 4, '14:00:00', '19:00:00', 2), -- Cz, Warszawa Jerozolimskie
+(9, 5, '08:00:00', '12:00:00', 1); -- Pt, Warszawa Centralna
+INSERT INTO Worktime (user_id, day_of_week, start_time, end_time, facility_id) VALUES
+(10, 1, '14:00:00', '19:00:00', 1), -- Pn, Warszawa Centralna
+(10, 2, '14:00:00', '19:00:00', 2), -- Wt, Warszawa Jerozolimskie
+(10, 3, '08:00:00', '12:00:00', 1), -- Śr, Warszawa Centralna
+(10, 4, '14:00:00', '19:00:00', 2), -- Cz, Warszawa Jerozolimskie
+(10, 5, '08:00:00', '12:00:00', 1); -- Pt, Warszawa Centralna
+INSERT INTO Worktime (user_id, day_of_week, start_time, end_time, facility_id) VALUES
+(11, 1, '14:00:00', '19:00:00', 1), -- Pn, Warszawa Centralna
+(11, 2, '14:00:00', '19:00:00', 2), -- Wt, Warszawa Jerozolimskie
+(11, 3, '08:00:00', '12:00:00', 1), -- Śr, Warszawa Centralna
+(11, 4, '14:00:00', '19:00:00', 2), -- Cz, Warszawa Jerozolimskie
+(11, 5, '08:00:00', '12:00:00', 1); -- Pt, Warszawa Centralna
+INSERT INTO Worktime (user_id, day_of_week, start_time, end_time, facility_id) VALUES
+(12, 1, '14:00:00', '19:00:00', 1), -- Pn, Warszawa Centralna
+(12, 2, '14:00:00', '19:00:00', 2), -- Wt, Warszawa Jerozolimskie
+(12, 3, '08:00:00', '12:00:00', 1), -- Śr, Warszawa Centralna
+(12, 4, '14:00:00', '19:00:00', 2), -- Cz, Warszawa Jerozolimskie
+(12, 5, '08:00:00', '12:00:00', 1); -- Pt, Warszawa Centralna
+INSERT INTO Worktime (user_id, day_of_week, start_time, end_time, facility_id) VALUES
+(13, 1, '14:00:00', '19:00:00', 1), -- Pn, Warszawa Centralna
+(13, 2, '14:00:00', '19:00:00', 2), -- Wt, Warszawa Jerozolimskie
+(13, 3, '08:00:00', '12:00:00', 1), -- Śr, Warszawa Centralna
+(13, 4, '14:00:00', '19:00:00', 2), -- Cz, Warszawa Jerozolimskie
+(13, 5, '08:00:00', '12:00:00', 1); -- Pt, Warszawa Centralna
+INSERT INTO Worktime (user_id, day_of_week, start_time, end_time, facility_id) VALUES
+(14, 1, '14:00:00', '19:00:00', 1), -- Pn, Warszawa Centralna
+(14, 2, '14:00:00', '19:00:00', 2), -- Wt, Warszawa Jerozolimskie
+(14, 3, '08:00:00', '12:00:00', 1), -- Śr, Warszawa Centralna
+(14, 4, '14:00:00', '19:00:00', 2), -- Cz, Warszawa Jerozolimskie
+(14, 5, '08:00:00', '12:00:00', 1); -- Pt, Warszawa Centralna
+INSERT INTO Worktime (user_id, day_of_week, start_time, end_time, facility_id) VALUES
+(15, 1, '14:00:00', '19:00:00', 1), -- Pn, Warszawa Centralna
+(15, 2, '14:00:00', '19:00:00', 2), -- Wt, Warszawa Jerozolimskie
+(15, 3, '08:00:00', '12:00:00', 1), -- Śr, Warszawa Centralna
+(15, 4, '14:00:00', '19:00:00', 2), -- Cz, Warszawa Jerozolimskie
+(15, 5, '08:00:00', '12:00:00', 1); -- Pt, Warszawa Centralna
+
 ---
 -- Tabela: Free_days
 INSERT INTO Free_days (user_id, start_date, end_date) VALUES
@@ -287,25 +360,25 @@ INSERT INTO Free_days (user_id, start_date, end_date) VALUES
 -- Tabela: Visit
 -- Statusy: PLANNED, IN_PROGRESS, CANCELLED, CLOSED
 INSERT INTO Visit (status, interview, diagnosis, recommendations, total_cost, facility_id, service_id, patient_information, patient_id, doctor_id) VALUES
-('CLOSED', 'Pacjent zgłasza ból w klatce piersiowej od 2 tygodni.', 'Stabilna choroba wieńcowa', 'Zaleca się regularne przyjmowanie leków, kontrola za 3 miesiące.', 250.00, 1, 1, 'Mam bóle w klastce piersiowej.', 6, 1),
-('CLOSED', 'Okresowa kontrola znamion skórnych.', 'Brak niepokojących zmian', 'Kolejna kontrola za rok.', 220.00, 3, 2, NULL, 5, 2),
-('PLANNED', 'Pogorszenie ostrości wzroku w prawym oku.', NULL, NULL, 180.00, 2, 3, 'Pierwsza wizyta.', 4, 3),
-('CANCELLED', 'Ból głowy i gorączka u dziecka.', NULL, NULL, 200.00, 1, 4, NULL, 7, 1),
-('CLOSED', 'Pacjentka zgłasza wysypkę na przedramionach.', 'Alergiczne zapalenie skóry', 'Stosować maść z hydrokortyzonem, unikać alergenu.', 50.00, 3, 2, 'Mam wysypkę na przedramionach', 5, 2),
-('PLANNED', NULL, NULL, NULL, 250.00, 1, 1, 'Pacjent z bólem w klatce piersiowej.', 8, 1),
-('CLOSED', 'Ból głowy od tygodnia.', 'Migrena', 'Zalecane leki przeciwbólowe, kontrola za miesiąc.', 220.00, 2, 2, 'Mam migrenę.', 6, 2),
-('CANCELLED', 'Ból gardła i gorączka.', NULL, NULL, 200.00, 3, 4, NULL, 8, 3),
-('CLOSED', 'Zmęczenie i senność.', 'Niedobór żelaza', 'Suplementacja żelaza, dieta bogata w żelazo.', 180.00, 1, 3, NULL, 6, 4),
-('PLANNED', NULL, NULL, NULL, 250.00, 2, 1, 'Pierwsza konsultacja kardiologiczna.', 7, 5),
-('PLANNED', NULL, NULL, NULL, 220.00, 2, 2, 'Podejrzenie alergii skórnej.', 7, 6),
-('CLOSED', 'Kaszel suchy od 3 dni.', 'Zapalenie oskrzeli', 'Antybiotyk przez 5 dni, nawadnianie.', 180.00, 1, 3, NULL, 5, 7),
-('PLANNED', NULL, NULL, NULL, 250.00, 3, 1, NULL, 5, 8),
-('CANCELLED', 'Uraz kolana po bieganiu.', NULL, NULL, 250.00, 1, 1, NULL, 5, 9),
-('CLOSED', 'Zawroty głowy, nudności.', 'Nadciśnienie', 'Zalecane pomiar ciśnienia, leki.', 250.00, 2, 1, NULL, 4, 10),
-('PLANNED', NULL, NULL, NULL, 200.00, 2, 4, 'Wizyta dziecka z gorączką.', 5, 11),
-('CLOSED', 'Kontrola znamion skórnych.', 'Brak zmian podejrzanych.', 'Kontrola za 12 miesięcy.', 220.00, 3, 2, NULL, 4, 12),
-('CLOSED', 'Kontrola po zawale.', 'Stan stabilny.', 'Zalecane kontynuowanie leków.', 250.00, 1, 1, NULL, 4, 13),
-('CANCELLED', 'Konsultacja dietetyczna.', NULL, NULL, 180.00, 3, 3, NULL, 4, 14);
+('CLOSED', 'Pacjent zgłasza ból w klatce piersiowej od 2 tygodni.', 'Stabilna choroba wieńcowa', 'Zaleca się regularne przyjmowanie leków, kontrola za 3 miesiące.', 250.00, 1, 1, 'Mam bóle w klastce piersiowej.', 31, 1),
+('CLOSED', 'Okresowa kontrola znamion skórnych.', 'Brak niepokojących zmian', 'Kolejna kontrola za rok.', 220.00, 3, 2, NULL, 32, 2),
+('PLANNED', 'Pogorszenie ostrości wzroku w prawym oku.', NULL, NULL, 180.00, 2, 3, 'Pierwsza wizyta.', 34, 3),
+('CANCELLED', NULL, NULL, NULL, 200.00, 1, 4, NULL, 33, 1),
+('CLOSED', 'Pacjentka zgłasza wysypkę na przedramionach.', 'Alergiczne zapalenie skóry', 'Stosować maść z hydrokortyzonem, unikać alergenu.', 50.00, 3, 2, 'Mam wysypkę na przedramionach', 32, 2),
+('PLANNED', NULL, NULL, NULL, 250.00, 1, 1, 'Pacjent z bólem w klatce piersiowej.', 33, 1),
+('CLOSED', 'Ból głowy od tygodnia.', 'Migrena', 'Zalecane leki przeciwbólowe, kontrola za miesiąc.', 220.00, 2, 2, 'Mam migrenę.', 34, 2),
+('CANCELLED', NULL, NULL, NULL, 200.00, 3, 4, NULL, 32, 3),
+('CLOSED', 'Zmęczenie i senność.', 'Niedobór żelaza', 'Suplementacja żelaza, dieta bogata w żelazo.', 180.00, 1, 3, NULL, 35, 4),
+('PLANNED', NULL, NULL, NULL, 250.00, 2, 1, 'Pierwsza konsultacja kardiologiczna.', 35, 5),
+('PLANNED', NULL, NULL, NULL, 220.00, 2, 2, 'Podejrzenie alergii skórnej.', 31, 6),
+('CLOSED', 'Kaszel suchy od 3 dni.', 'Zapalenie oskrzeli', 'Antybiotyk przez 5 dni, nawadnianie.', 180.00, 1, 3, NULL, 31, 7),
+('PLANNED', NULL, NULL, NULL, 250.00, 3, 1, NULL, 32, 8),
+('PLANNED', NULL, NULL, NULL, 250.00, 1, 1, NULL, 33, 9),
+('CLOSED', 'Zawroty głowy, nudności.', 'Nadciśnienie', 'Zalecane pomiar ciśnienia, leki.', 250.00, 2, 1, NULL, 34, 10),
+('PLANNED', NULL, NULL, NULL, 200.00, 2, 4, 'Wizyta dziecka z gorączką.', 35, 1),
+('CLOSED', 'Kontrola znamion skórnych.', 'Brak zmian podejrzanych.', 'Kontrola za 12 miesięcy.', 220.00, 3, 2, NULL, 35, 12),
+('CLOSED', 'Kontrola po zawale.', 'Stan stabilny.', 'Zalecane kontynuowanie leków.', 250.00, 1, 1, NULL, 31, 13),
+('CANCELLED', NULL, NULL, NULL, 180.00, 3, 3, NULL, 33, 14);
 
 ---
 -- Tabela: Additional_service
@@ -373,4 +446,19 @@ END
 $$;
 
 
-
+UPDATE time_slot SET visit_id = 1, is_busy = true WHERE id = 2;
+UPDATE time_slot SET visit_id = 2, is_busy = true WHERE id = 3258;
+UPDATE time_slot SET visit_id = 3, is_busy = true WHERE id = 2455;
+UPDATE time_slot SET visit_id = 5, is_busy = true WHERE id = 851;
+UPDATE time_slot SET visit_id = 6, is_busy = true WHERE id = 2184;
+UPDATE time_slot SET visit_id = 7, is_busy = true WHERE id = 846;
+UPDATE time_slot SET visit_id = 9, is_busy = true WHERE id = 887;
+UPDATE time_slot SET visit_id = 10, is_busy = true WHERE id = 1963;
+UPDATE time_slot SET visit_id = 11, is_busy = true WHERE id = 1999;
+UPDATE time_slot SET visit_id = 12, is_busy = true WHERE id = 394;
+UPDATE time_slot SET visit_id = 13, is_busy = true WHERE id = 3392;
+UPDATE time_slot SET visit_id = 14, is_busy = true WHERE id = 3408;
+UPDATE time_slot SET visit_id = 15, is_busy = true WHERE id = 443;
+UPDATE time_slot SET visit_id = 16, is_busy = true WHERE id = 3017;
+UPDATE time_slot SET visit_id = 17, is_busy = true WHERE id = 1006;
+UPDATE time_slot SET visit_id = 18, is_busy = true WHERE id = 1023;
