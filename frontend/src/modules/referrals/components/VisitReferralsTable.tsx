@@ -153,7 +153,7 @@ export const VisitReferralsTable: FC<VisitReferralsTableProps> = ({
           rows={referrals}
           columns={columns}
           getRowId={(row) => row.id || row.tempId || ''}
-          pageSizeOptions={[5, 10]}
+          pageSizeOptions={[5, 10, 100]}
           disableRowSelectionOnClick
           disableColumnFilter
           sx={{
