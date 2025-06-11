@@ -82,7 +82,7 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
       creationObject.setId(key.intValue());
       return creationObject;
     } else {
-      throw new CreationFailException("Failed create subscription");
+      throw new CreationFailException("Failed to create visit");
     }
   }
 
@@ -115,15 +115,13 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
   public List<VisitWithDetails> findAllWithDetailsBetweenDates(LocalDate startDate) {
     String sql =
         VISIT_DETAILS_BASE_QUERY
-            + " WHERE first_ts.date >= ? "
-            + " ORDER BY first_ts.date DESC, first_ts.start_time DESC";
+            + " WHERE v.date >= ? "
+            + " ORDER BY v.date DESC, v.start_time DESC";
     return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), startDate);
   }
 
   public Optional<VisitWithDetails> findByIdWithDetails(int id) {
-    String sql =
-        VISIT_DETAILS_BASE_QUERY
-            + " WHERE v.id = ? ORDER BY v.id, first_ts.date, first_ts.start_time";
+    String sql = VISIT_DETAILS_BASE_QUERY + " WHERE v.id = ? ORDER BY v.id, v.date, v.start_time";
     List<VisitWithDetails> visits = jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), id);
     return visits.stream().findFirst();
   }
@@ -132,8 +130,8 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
       int patientId, int facilityId, LocalDate startDate) {
     String sql =
         VISIT_DETAILS_BASE_QUERY
-            + " WHERE v.patient_id = ? AND v.facility_id = ? AND first_ts.date >= ?"
-            + " ORDER BY first_ts.date DESC, first_ts.start_time DESC";
+            + " WHERE v.patient_id = ? AND v.facility_id = ? AND v.date >= ?"
+            + " ORDER BY v.date DESC, v.start_time DESC";
     return jdbcTemplate.query(
         sql, new VisitWithDetailsRowMapper(), patientId, facilityId, startDate);
   }
@@ -142,8 +140,8 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
       int doctorId, int facilityId, LocalDate startDate) {
     String sql =
         VISIT_DETAILS_BASE_QUERY
-            + " WHERE v.doctor_id = ? AND v.facility_id = ? AND first_ts.date >= ?"
-            + " ORDER BY first_ts.date DESC, first_ts.start_time DESC";
+            + " WHERE v.doctor_id = ? AND v.facility_id = ? AND v.date >= ?"
+            + " ORDER BY v.date DESC, v.start_time DESC";
     return jdbcTemplate.query(
         sql, new VisitWithDetailsRowMapper(), doctorId, facilityId, startDate);
   }
@@ -169,6 +167,21 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
     return visit;
   }
 
+  public Visit updateWithTimeInfo(Visit visit) {
+    String sql =
+        """
+        UPDATE visit
+        SET date = ?,
+            start_time = ?,
+            end_time = ?
+        WHERE id = ?;
+        """;
+
+    jdbcTemplate.update(
+        sql, visit.getDate(), visit.getStartTime(), visit.getEndTime(), visit.getId());
+    return visit;
+  }
+
   public VisitStatus getVisitStatus(int visitId) {
     String sql = "SELECT status FROM visit WHERE id = ?";
     return jdbcTemplate
@@ -190,9 +203,6 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
                d.last_name AS doctor_last_name,
                s.id AS service_id,
                s.name AS service_name,
-               first_ts.start_time AS timeslot_start,
-               last_ts.end_time AS timeslot_end,
-               first_ts.date AS timeslot_date,
                f.rating AS feedback_rating,
                f.text AS feedback_message
            FROM visit v
@@ -200,19 +210,5 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
            JOIN "User" d ON v.doctor_id = d.id
            JOIN service s ON v.service_id = s.id
            LEFT JOIN feedback f ON f.visit_id = v.id
-           LEFT JOIN LATERAL (
-               SELECT ts.start_time, ts.date
-               FROM time_slot ts
-               WHERE ts.visit_id = v.id
-               ORDER BY ts.start_time ASC
-               LIMIT 1
-           ) first_ts ON true
-           LEFT JOIN LATERAL (
-               SELECT ts.end_time
-               FROM time_slot ts
-               WHERE ts.visit_id = v.id
-               ORDER BY ts.start_time DESC
-               LIMIT 1
-           ) last_ts ON true
            """;
 }
