@@ -17,3 +17,11 @@ SELECT cron.schedule_in_database(
     'SELECT cleanup_pending_users()',
     'prod_db'
 );
+
+-- Schedule old timeslots cleanup to run weekly on Sunday at 03:00
+SELECT cron.schedule_in_database(
+    'cleanup_old_timeslots_weekly',
+    '0 3 * * 0',  
+    'SELECT cleanup_old_timeslots()',
+    'prod_db'
+);

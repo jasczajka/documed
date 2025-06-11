@@ -462,3 +462,33 @@ UPDATE time_slot SET visit_id = 15, is_busy = true WHERE id = 443;
 UPDATE time_slot SET visit_id = 16, is_busy = true WHERE id = 3017;
 UPDATE time_slot SET visit_id = 17, is_busy = true WHERE id = 1006;
 UPDATE time_slot SET visit_id = 18, is_busy = true WHERE id = 1023;
+
+
+WITH visit_timeslot_mapping AS (
+    SELECT
+        ts.id AS timeslot_id,
+        ts.visit_id,
+        ts.date,
+        ts.start_time,
+        ts.end_time
+    FROM time_slot ts
+    WHERE ts.visit_id IS NOT NULL
+),
+
+visit_time_ranges AS (
+    SELECT
+        visit_id,
+        date,
+        MIN(start_time) AS start_time,
+        MAX(end_time) AS end_time
+    FROM visit_timeslot_mapping
+    GROUP BY visit_id, date
+)
+
+UPDATE visit v
+SET
+    date = vtr.date,
+    start_time = vtr.start_time,
+    end_time = vtr.end_time
+FROM visit_time_ranges vtr
+WHERE v.id = vtr.visit_id;
