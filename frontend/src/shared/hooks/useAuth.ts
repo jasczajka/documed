@@ -45,14 +45,16 @@ export const useAuth = () => {
   const verifyAuthentication = async () => {
     try {
       const { data } = await fetchCurrentUser();
-      console.log('data from verify authentication');
       if (data) {
         authenticateUser(data);
       } else {
         clearUser();
       }
+      return true;
     } catch (error) {
       console.error('Auth check failed:', error);
+      clearUser();
+      throw error;
     }
   };
 
@@ -97,7 +99,6 @@ export const useAuth = () => {
   const deleteAccount = async (userId: number) => {
     try {
       await deleteAccountMutation({ id: userId });
-      await verifyAuthentication();
     } finally {
       clearUser();
     }

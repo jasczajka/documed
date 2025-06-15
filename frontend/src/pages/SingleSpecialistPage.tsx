@@ -117,7 +117,14 @@ const SingleSpecialistPage: FC = () => {
 
   const handleCancelVisitClick = (visitId: number) => {
     openModal('cancelVisitModal', (close) => (
-      <CancelVisitModal visitId={visitId} onClose={close} onSuccess={refetchDoctorVisits} />
+      <CancelVisitModal
+        visitId={visitId}
+        onClose={close}
+        onSuccess={() => {
+          refetchDoctorVisits();
+          showNotification('Pomyślnie odwołano wizytę!', 'success');
+        }}
+      />
     ));
   };
 
