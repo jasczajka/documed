@@ -51,10 +51,13 @@ public class VisitWithDetails {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String doctorFullName;
 
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   LocalDate date;
 
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   LocalTime startTime;
 
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   LocalTime endTime;
 
   private Integer feedbackRating;

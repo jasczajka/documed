@@ -12,3 +12,10 @@ SELECT cron.schedule(
   '0 0 * * *',
   $$SELECT cleanup_otps();$$
 );
+
+-- Schedule old timeslots cleanup to run weekly on Sunday at 03:00
+SELECT cron.schedule(
+  'cleanup_old_timeslots_weekly',
+  '0 3 * * 0',
+  $$SELECT cleanup_old_timeslots();$$
+);

@@ -190,6 +190,9 @@ CREATE TABLE IF NOT EXISTS Visit (
     patient_information varchar(255)  NULL,
     patient_id int  NOT NULL,
     doctor_id int  NOT NULL,
+    date DATE,
+    start_time TIME,
+    end_time TIME,
     CONSTRAINT Visit_pk PRIMARY KEY (id)
 );
 
@@ -717,6 +720,20 @@ DECLARE
 BEGIN
     DELETE FROM "User"
      WHERE account_status = 'PENDING';
+
+    GET DIAGNOSTICS deleted_count = ROW_COUNT;
+
+    RETURN deleted_count;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cleanup_old_timeslots()
+RETURNS INTEGER AS $$
+DECLARE
+    deleted_count INTEGER;
+BEGIN
+    DELETE FROM Time_slot
+     WHERE date < CURRENT_DATE - INTERVAL '1 month';
 
     GET DIAGNOSTICS deleted_count = ROW_COUNT;
 

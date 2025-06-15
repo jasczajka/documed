@@ -8,6 +8,7 @@ import com.documed.backend.others.EmailService
 import com.documed.backend.prescriptions.PrescriptionService
 import com.documed.backend.referrals.ReferralService
 import com.documed.backend.schedules.TimeSlotService
+import com.documed.backend.schedules.model.TimeRange
 import com.documed.backend.schedules.model.TimeSlot
 import com.documed.backend.services.ServiceService
 import com.documed.backend.users.model.AccountStatus
@@ -20,6 +21,7 @@ import com.documed.backend.visits.dtos.UpdateVisitDTO
 import com.documed.backend.visits.exceptions.*
 import com.documed.backend.visits.model.*
 import java.time.LocalDate
+import java.time.LocalTime
 import spock.lang.Specification
 import spock.lang.Subject
 
@@ -52,6 +54,9 @@ class VisitServiceTest extends Specification {
 				.patientBirthDate(overrides.patientBirthDate ?: LocalDate.now().minusYears(30))
 				.doctorId(overrides.doctorId ?: 1)
 				.doctorFullName(overrides.doctorFullName ?: "Doctor Name")
+				.date(overrides.date)
+				.startTime(overrides.startTime)
+				.endTime(overrides.endTime)
 				.build()
 	}
 
@@ -65,22 +70,42 @@ class VisitServiceTest extends Specification {
 				.doctorId(overrides.doctorId ?: 1)
 				.totalCost(overrides.totalCost ?: BigDecimal.valueOf(100))
 				.patientInformation(overrides.patientInformation ?: "Info")
+				.date(overrides.date)
+				.startTime(overrides.startTime)
+				.endTime(overrides.endTime)
 				.build()
 	}
 
 	def "scheduleVisit should create and reserve needed time slots"() {
 		given:
-		def dto = new ScheduleVisitDTO("patient info", 1,2 , 3, 4, 222)
-		def slot = Mock(TimeSlot)
-		def createdVisit = Visit.builder()
-				.id(333)
-				.facilityId(222)
-				.serviceId(dto.serviceId)
-				.patientId(dto.patientId)
-				.doctorId(dto.doctorId)
-				.totalCost(BigDecimal.valueOf(50))
-				.status(VisitStatus.PLANNED)
-				.build()
+		def dto = new ScheduleVisitDTO("patient info", 1, 2, 3, 4, 222)
+		def slot = Mock(TimeSlot) {
+			getDate() >> LocalDate.now()
+		}
+		def timeRange = new TimeRange(LocalTime.of(9, 0), LocalTime.of(10, 0))
+
+		def createdVisit = buildVisit(
+				facilityId: 222,
+				serviceId: dto.serviceId,
+				patientId: dto.patientId,
+				doctorId: dto.doctorId,
+				totalCost: BigDecimal.valueOf(50),
+				status: VisitStatus.PLANNED
+				)
+
+		def updatedVisit = buildVisit(
+				id: createdVisit.id,
+				facilityId: createdVisit.facilityId,
+				serviceId: createdVisit.serviceId,
+				patientId: createdVisit.patientId,
+				doctorId: createdVisit.doctorId,
+				totalCost: createdVisit.totalCost,
+				status: createdVisit.status,
+				patientInformation: createdVisit.patientInformation,
+				date: slot.date,
+				startTime: timeRange.startTime(),
+				endTime: timeRange.endTime()
+				)
 
 		when:
 		def result = visitService.scheduleVisit(dto)
@@ -89,8 +114,14 @@ class VisitServiceTest extends Specification {
 		1 * timeSlotService.getTimeSlotById(dto.firstTimeSlotId) >> Optional.of(slot)
 		1 * serviceService.getPriceForService(dto.serviceId) >> BigDecimal.valueOf(50)
 		1 * visitDAO.create(_) >> createdVisit
-		1 * timeSlotService.reserveTimeSlotsForVisit(createdVisit, slot)
-		result == createdVisit
+		1 * timeSlotService.reserveTimeSlotsForVisit(createdVisit, slot) >> timeRange
+		1 * visitDAO.updateWithTimeInfo(_) >> { Visit v ->
+			assert v.date == slot.date
+			assert v.startTime == timeRange.startTime()
+			assert v.endTime == timeRange.endTime()
+			updatedVisit
+		}
+		result == updatedVisit
 	}
 
 	def "scheduleVisit should throw NotFoundException when time slot not found"() {

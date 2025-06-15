@@ -2,6 +2,8 @@ package com.documed.backend.visits.model;
 
 import com.documed.backend.schedules.model.TimeSlot;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import lombok.Builder;
 import lombok.Data;
@@ -22,4 +24,7 @@ public class Visit {
   private int patientId;
   private int doctorId;
   private List<TimeSlot> reservedTimeSlots;
+  LocalDate date;
+  LocalTime startTime;
+  LocalTime endTime;
 }

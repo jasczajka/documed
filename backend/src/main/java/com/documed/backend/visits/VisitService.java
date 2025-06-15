@@ -10,6 +10,7 @@ import com.documed.backend.prescriptions.model.Prescription;
 import com.documed.backend.referrals.ReferralService;
 import com.documed.backend.referrals.model.Referral;
 import com.documed.backend.schedules.TimeSlotService;
+import com.documed.backend.schedules.model.TimeRange;
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.services.ServiceService;
 import com.documed.backend.users.model.UserRole;
@@ -114,9 +115,13 @@ public class VisitService {
 
     Visit visit = createVisit(scheduleVisitDTO);
 
-    timeSlotService.reserveTimeSlotsForVisit(visit, timeSlot);
+    TimeRange timeRange = timeSlotService.reserveTimeSlotsForVisit(visit, timeSlot);
 
-    return visit;
+    visit.setDate(timeSlot.getDate());
+    visit.setStartTime(timeRange.startTime());
+    visit.setEndTime(timeRange.endTime());
+
+    return visitDAO.updateWithTimeInfo(visit);
   }
 
   private Visit createVisit(ScheduleVisitDTO scheduleVisitDTO) {

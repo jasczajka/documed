@@ -2,6 +2,7 @@ package com.documed.backend.schedules;
 
 import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.schedules.exceptions.NotEnoughTimeInTimeSlotException;
+import com.documed.backend.schedules.model.TimeRange;
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.schedules.model.WorkTime;
 import com.documed.backend.services.ServiceService;
@@ -62,7 +63,7 @@ public class TimeSlotService {
   }
 
   @Transactional
-  public void reserveTimeSlotsForVisit(Visit visit, TimeSlot firstTimeSlot) {
+  public TimeRange reserveTimeSlotsForVisit(Visit visit, TimeSlot firstTimeSlot) {
     int serviceId = visit.getServiceId();
     com.documed.backend.services.model.Service service =
         serviceService
@@ -100,6 +101,9 @@ public class TimeSlotService {
 
       timeSlotDAO.update(slotToReserve);
     }
+
+    TimeSlot lastSlot = availableSlots.get(startIndex + neededTimeSlots - 1);
+    return new TimeRange(firstTimeSlot.getStartTime(), lastSlot.getEndTime());
   }
 
   public List<TimeSlot> getAvailableFirstTimeSlotsByFacility(int neededTimeSlots, int facilityId) {

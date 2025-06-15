@@ -31,9 +31,9 @@ public class VisitWithDetailsRowMapper implements RowMapper<VisitWithDetails> {
         .patientPesel(rs.getString("patient_pesel"))
         .doctorId(rs.getInt("doctor_id"))
         .doctorFullName(rs.getString("doctor_first_name") + " " + rs.getString("doctor_last_name"))
-        .startTime(getLocalTimeOrNull(rs, "timeslot_start"))
-        .endTime(getLocalTimeOrNull(rs, "timeslot_end"))
-        .date(getLocalDateOrNull(rs, "timeslot_date"))
+        .startTime(getLocalTimeOrNull(rs, "start_time"))
+        .endTime(getLocalTimeOrNull(rs, "end_time"))
+        .date(getLocalDateOrNull(rs, "date"))
         .feedbackRating(rs.getObject("feedback_rating", Integer.class))
         .feedbackMessage(rs.getString("feedback_message"))
         .build();
