@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS Notification (
     additional_service_id int  NULL,
     status varchar(255)  NOT NULL,
     type varchar(255) NOT NULL,
+    sent_at timestamp NULL,
     CONSTRAINT Notification_pk PRIMARY KEY (id)
 );
 
@@ -728,6 +729,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
 CREATE OR REPLACE FUNCTION cleanup_old_timeslots()
 RETURNS INTEGER AS $$
 DECLARE
@@ -741,6 +743,40 @@ BEGIN
     RETURN deleted_count;
 END;
 $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION cleanup_old_notifications()
+RETURNS INTEGER AS $$
+DECLARE
+    deleted_count INTEGER;
+BEGIN
+    DELETE FROM Notification
+     WHERE sent_at IS NOT NULL
+       AND sent_at < NOW() - INTERVAL '1 month';
+
+    GET DIAGNOSTICS deleted_count = ROW_COUNT;
+
+    RETURN deleted_count;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Tiggers
+
+CREATE OR REPLACE FUNCTION set_notification_sent_at()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.status = 'SENT' AND OLD.status IS DISTINCT FROM 'SENT' THEN
+    NEW.sent_at := CURRENT_TIMESTAMP;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER trg_set_notification_sent_at
+BEFORE UPDATE ON Notification
+FOR EACH ROW
+EXECUTE FUNCTION set_notification_sent_at();
 
 
 -- End of file.
