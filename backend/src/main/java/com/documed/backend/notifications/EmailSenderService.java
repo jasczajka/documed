@@ -26,7 +26,6 @@ public class EmailSenderService {
     message.setText(template.getBody());
 
     mailSender.send(message);
-    log.info("Email sent to {} with subject '{}'", template.getRecipient(), template.getSubject());
   }
 
   private boolean isValidEmail(String email) {

@@ -7,17 +7,14 @@ import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
 
-  private final JavaMailSender mailSender;
+  private final EmailSenderService emailSenderService;
   private final EmailFactory emailFactory;
   private final NotificationDAO notificationDAO;
 
@@ -54,23 +51,13 @@ public class NotificationService {
       Integer visitId,
       Integer additionalServiceId,
       NotificationType type) {
-    if (!isValidEmail(email.getRecipient())) {
-      log.warn("Invalid email address: {}", email.getRecipient());
-      return;
-    }
 
     int notificationId =
         notificationDAO.createNotification(
             visitId, additionalServiceId, NotificationStatus.PENDING, type);
 
     try {
-      SimpleMailMessage message = new SimpleMailMessage();
-      message.setTo(email.getRecipient().trim());
-      message.setFrom(email.getFrom());
-      message.setSubject(email.getSubject());
-      message.setText(email.getBody());
-
-      mailSender.send(message);
+      emailSenderService.send(email);
 
       notificationDAO.updateNotificationStatus(notificationId, NotificationStatus.SENT);
       log.info("Email sent to {} with subject '{}'", email.getRecipient(), email.getSubject());
@@ -83,28 +70,14 @@ public class NotificationService {
   }
 
   private void sendWithoutNotification(BaseEmailTemplate email) {
-    if (!isValidEmail(email.getRecipient())) {
-      log.warn("Invalid email address: {}", email.getRecipient());
-      return;
-    }
 
     try {
-      SimpleMailMessage message = new SimpleMailMessage();
-      message.setTo(email.getRecipient().trim());
-      message.setFrom(email.getFrom());
-      message.setSubject(email.getSubject());
-      message.setText(email.getBody());
-
-      mailSender.send(message);
+      emailSenderService.send(email);
       log.info("Email sent to {} with subject '{}'", email.getRecipient(), email.getSubject());
 
     } catch (MailException e) {
       log.error("Failed to send email to {}", email.getRecipient(), e);
       throw e;
     }
-  }
-
-  private boolean isValidEmail(String email) {
-    return StringUtils.hasText(email) && email.contains("@");
   }
 }
