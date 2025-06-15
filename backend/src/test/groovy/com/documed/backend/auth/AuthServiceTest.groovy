@@ -4,7 +4,10 @@ import com.documed.backend.auth.exceptions.*
 import com.documed.backend.auth.model.CurrentUser
 import com.documed.backend.auth.model.OtpPurpose
 import com.documed.backend.exceptions.NotFoundException
-import com.documed.backend.others.EmailService
+import com.documed.backend.notifications.EmailFactory
+import com.documed.backend.notifications.EmailSenderService
+import com.documed.backend.notifications.NotificationService
+import com.documed.backend.notifications.mails.SimpleMail
 import com.documed.backend.schedules.WorkTimeService
 import com.documed.backend.users.UserDAO
 import com.documed.backend.users.model.AccountStatus
@@ -26,13 +29,13 @@ class AuthServiceTest extends Specification {
 	def jwtUtil = Mock(JwtUtil)
 	def userService = Mock(UserService)
 	def otpService = Mock(OtpService)
-	def emailService = Mock(EmailService)
+	def notificationService = Mock(NotificationService)
 	def facilityService = Mock(FacilityService)
 	def workTimeService = Mock(WorkTimeService)
 
 	@Subject
 	AuthService authService = new AuthService(
-	userDAO, passwordEncoder, jwtUtil, userService, otpService, emailService, facilityService, workTimeService
+	userDAO, passwordEncoder, jwtUtil, userService, otpService, notificationService , facilityService, workTimeService
 	)
 
 	private User buildPatient(Map overrides = [:]) {
@@ -94,6 +97,7 @@ class AuthServiceTest extends Specification {
 		given:
 		def email = 'user@example.com'
 		def otp = '123456'
+
 		otpService.validateOtp(email, otp, OtpPurpose.PASSWORD_RESET) >> true
 		userService.getByEmail(email) >> Optional.of(buildPatient())
 		passwordEncoder.encode(_ as String) >> 'encodedNew'
@@ -103,7 +107,7 @@ class AuthServiceTest extends Specification {
 
 		then:
 		1 * userDAO.updatePasswordByEmail(email, 'encodedNew')
-		1 * emailService.sendEmail(email, 'Twoje nowe hasło', _ as String)
+		1 * notificationService.sendSimpleEmail(email, "Twoje nowe hasło", { it.startsWith("Twoje nowe hasło to: ") })
 	}
 
 	def "resetPassword should throw when OTP invalid"() {

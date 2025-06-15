@@ -146,6 +146,15 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
         sql, new VisitWithDetailsRowMapper(), doctorId, facilityId, startDate);
   }
 
+  public List<VisitWithDetails> findPlannedWithDetailsByDate(LocalDate date) {
+    String sql =
+        VISIT_DETAILS_BASE_QUERY
+            + " WHERE v.date = ? "
+            + " AND v.status = 'PLANNED'"
+            + " ORDER BY v.start_time DESC";
+    return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), date);
+  }
+
   public boolean updateVisitStatus(int visitId, VisitStatus status) {
     String sql = "UPDATE visit SET status = ? WHERE id = ?";
     int affectedRows = jdbcTemplate.update(sql, status.name(), visitId);

@@ -4,24 +4,26 @@ import com.documed.backend.auth.dtos.OtpGenerationResponse;
 import com.documed.backend.auth.exceptions.*;
 import com.documed.backend.auth.model.Otp;
 import com.documed.backend.auth.model.OtpPurpose;
-import com.documed.backend.others.EmailService;
+import com.documed.backend.notifications.NotificationService;
 import com.documed.backend.users.services.UserService;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@RequiredArgsConstructor
 @Service
 public class OtpService {
   private static final Logger logger = LoggerFactory.getLogger(OtpService.class);
 
   private final OtpDAO otpDAO;
-  private final EmailService emailService;
+  private final NotificationService notificationService;
   private final UserService userService;
 
   @Value("${otp.length:6}")
@@ -35,12 +37,6 @@ public class OtpService {
 
   @Value("${otp.resend.cooldown.minutes:1}")
   private int resendCooldownMinutes;
-
-  public OtpService(OtpDAO otpDAO, EmailService emailService, UserService userService) {
-    this.otpDAO = otpDAO;
-    this.emailService = emailService;
-    this.userService = userService;
-  }
 
   @Transactional
   public OtpGenerationResponse generateOtp(String email, OtpPurpose purpose) {
@@ -81,7 +77,12 @@ public class OtpService {
 
     otpDAO.create(otp);
 
-    emailService.sendOtpEmail(email, otpCode, purpose);
+    try {
+      notificationService.sendOtpEmail(email, otpCode, purpose);
+    } catch (Exception e) {
+      logger.warn("Failed to send OTP email to {}: {}", email, e.getMessage());
+      throw new OtpException("Failed to send OTP email");
+    }
 
     logger.info("Generated OTP for {} with purpose {}", email, purpose);
 

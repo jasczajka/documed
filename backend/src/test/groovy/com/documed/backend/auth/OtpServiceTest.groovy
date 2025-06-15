@@ -4,7 +4,7 @@ package com.documed.backend.auth
 import com.documed.backend.auth.exceptions.*
 import com.documed.backend.auth.model.Otp
 import com.documed.backend.auth.model.OtpPurpose
-import com.documed.backend.others.EmailService
+import com.documed.backend.notifications.NotificationService
 import com.documed.backend.users.services.UserService
 import java.time.LocalDateTime
 import spock.lang.Specification
@@ -12,11 +12,11 @@ import spock.lang.Subject
 
 class OtpServiceTest extends Specification {
 	def otpDAO = Mock(OtpDAO)
-	def emailService = Mock(EmailService)
+	def notificationService = Mock(NotificationService)
 	def userService = Mock(UserService)
 
 	@Subject
-	OtpService otpService = new OtpService(otpDAO, emailService, userService)
+	OtpService otpService = new OtpService(otpDAO, notificationService, userService)
 
 	def setup() {
 		// default config values
@@ -82,7 +82,7 @@ class OtpServiceTest extends Specification {
 			assert otp.expiresAt.isAfter(otp.generatedAt)
 			true
 		})
-		1 * emailService.sendOtpEmail(email, _ as String, OtpPurpose.REGISTRATION)
+		1 * notificationService.sendOtpEmail(email, _ as String, OtpPurpose.REGISTRATION)
 		response.email == email
 		response.purpose == OtpPurpose.REGISTRATION
 		response.message == 'OTP generated successfully'

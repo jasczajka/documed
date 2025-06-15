@@ -5,7 +5,7 @@ import com.documed.backend.auth.exceptions.*;
 import com.documed.backend.auth.model.CurrentUser;
 import com.documed.backend.auth.model.OtpPurpose;
 import com.documed.backend.exceptions.NotFoundException;
-import com.documed.backend.others.EmailService;
+import com.documed.backend.notifications.NotificationService;
 import com.documed.backend.schedules.WorkTimeService;
 import com.documed.backend.users.*;
 import com.documed.backend.users.model.AccountStatus;
@@ -33,7 +33,7 @@ public class AuthService {
 
   private final UserService userService;
   private final OtpService otpService;
-  private final EmailService emailService;
+  private final NotificationService notificationService;
 
   private final FacilityService facilityService;
   private final WorkTimeService workTimeService;
@@ -46,7 +46,7 @@ public class AuthService {
       JwtUtil jwtUtil,
       UserService userService,
       OtpService otpService,
-      EmailService emailService,
+      NotificationService notificationService,
       FacilityService facilityService,
       WorkTimeService workTimeService) {
     this.userDAO = userDAO;
@@ -54,7 +54,7 @@ public class AuthService {
     this.jwtUtil = jwtUtil;
     this.userService = userService;
     this.otpService = otpService;
-    this.emailService = emailService;
+    this.notificationService = notificationService;
     this.facilityService = facilityService;
     this.workTimeService = workTimeService;
   }
@@ -264,10 +264,9 @@ public class AuthService {
   }
 
   private void sendNewPasswordEmail(String email, String newPassword) {
-    String subject = "Twoje nowe hasło";
-    String text = "Twoje nowe hasło to: " + newPassword;
 
-    emailService.sendEmail(email, subject, text);
+    notificationService.sendSimpleEmail(
+        email, "Twoje nowe hasło", "Twoje nowe hasło to: " + newPassword);
   }
 
   @Transactional

@@ -76,7 +76,14 @@ export const PatientTabs: FC<PatientTabsProps> = ({
 
   const handleCancelVisitClick = (visitId: number) => {
     openModal('cancelVisitModal', (close) => (
-      <CancelVisitModal visitId={visitId} onClose={close} onSuccess={refetchVisits} />
+      <CancelVisitModal
+        visitId={visitId}
+        onClose={close}
+        onSuccess={() => {
+          refetchVisits();
+          showNotification('Pomyślnie odwołano wizytę!', 'success');
+        }}
+      />
     ));
   };
 

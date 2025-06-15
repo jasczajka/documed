@@ -62,7 +62,6 @@ export const AccountTab = () => {
           )}
         </Box>
       )}
-
       <NotificationComponent />
     </Box>
   );

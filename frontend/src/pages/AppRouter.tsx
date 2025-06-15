@@ -171,7 +171,7 @@ const getAuthRoutes = ({
 export const AppRouter = () => {
   const {
     verifyAuthentication,
-    loading,
+    loading: authLoading,
     isAdmin,
     isPatient,
     isDoctor,
@@ -180,13 +180,26 @@ export const AppRouter = () => {
     isStaff,
   } = useAuth();
   const authenticated = useAuthStore((state) => state.authenticated);
-  const fetchFacilities = useFacilityStore((state) => state.fetchFacilities);
-  const fetchSubscriptions = useSubscriptionStore((state) => state.fetchSubscriptions);
-  const fetchDoctors = useDoctorsStore((state) => state.fetchDoctors);
-  const fetchAllServices = useAllServicesStore((state) => state.fetchAllServices);
-  const fetchSpecializations = useSpecializationsStore((state) => state.fetchSpecializations);
-  const fetchReferralTypes = useReferralTypesStore((state) => state.fetchReferralTypes);
-  const [authChecked, setAuthChecked] = useState(false);
+
+  const fetchAllRequiredData = async () => {
+    const [subscriptions, doctors, services, specializations, referralTypes] =
+      await Promise.allSettled([
+        useSubscriptionStore.getState().fetchSubscriptions(),
+        useDoctorsStore.getState().fetchDoctors(),
+        useAllServicesStore.getState().fetchAllServices(),
+        useSpecializationsStore.getState().fetchSpecializations(),
+        useReferralTypesStore.getState().fetchReferralTypes(),
+      ]);
+
+    [subscriptions, doctors, services, specializations, referralTypes].forEach((result) => {
+      if (result.status === 'rejected') {
+        console.error('Data fetch failed:', result.reason);
+      }
+    });
+  };
+
+  const [appReady, setAppReady] = useState(false);
+
   const router = useMemo(() => {
     const routes = authenticated
       ? getAuthRoutes({
@@ -202,43 +215,26 @@ export const AppRouter = () => {
   }, [authenticated, isPatient, isAdmin]);
 
   useLayoutEffect(() => {
-    const init = async () => {
+    const initializeApp = async () => {
       try {
-        await fetchFacilities();
+        console.log('authenticated in uselayout effect: ', authenticated);
+        await useFacilityStore.getState().fetchFacilities();
         await verifyAuthentication();
+
+        if (authenticated) {
+          await fetchAllRequiredData();
+        }
+        setAppReady(true);
       } catch (error) {
-        console.error(error);
-      } finally {
-        setAuthChecked(true);
+        console.error('Initialization failed:', error);
+        setAppReady(true);
       }
     };
 
-    init();
+    initializeApp();
   }, []);
 
-  useLayoutEffect(() => {
-    if (!authenticated) {
-      return;
-    }
-
-    const fetchAfterAuth = async () => {
-      try {
-        await Promise.allSettled([
-          fetchSubscriptions(),
-          fetchDoctors(),
-          fetchAllServices(),
-          fetchSpecializations(),
-          fetchReferralTypes(),
-        ]);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-
-    fetchAfterAuth();
-  }, [authenticated]);
-
-  if (loading || !authChecked) {
+  if (authLoading || !appReady) {
     return <FullPageLoadingSpinner />;
   }
 

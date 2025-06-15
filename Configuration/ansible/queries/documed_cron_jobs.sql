@@ -19,3 +19,10 @@ SELECT cron.schedule(
   '0 3 * * 0',
   $$SELECT cleanup_old_timeslots();$$
 );
+
+-- Schedule old notifications cleanup to run weekly on Sunday at 03:00
+SELECT cron.schedule(
+  'cleanup_old_notifications_weekly',
+  '0 3 * * 0',
+  $$SELECT cleanup_old_notifications();$$
+);
