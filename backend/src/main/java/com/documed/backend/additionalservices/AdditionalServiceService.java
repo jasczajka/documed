@@ -8,6 +8,7 @@ import com.documed.backend.attachments.model.Attachment;
 import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.exceptions.InvalidAssignmentException;
 import com.documed.backend.exceptions.NotFoundException;
+import com.documed.backend.notifications.NotificationService;
 import com.documed.backend.services.ServiceDAO;
 import com.documed.backend.services.model.ServiceType;
 import com.documed.backend.users.UserDAO;
@@ -16,9 +17,11 @@ import com.documed.backend.users.model.UserRole;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class AdditionalServiceService {
@@ -27,6 +30,7 @@ public class AdditionalServiceService {
   private final AttachmentDAO attachmentDAO;
   private final UserDAO userDAO;
   private final ServiceDAO serviceDAO;
+  private final NotificationService notificationService;
 
   public List<AdditionalServiceWithDetails> getAllWithDetailsBetweenDates(LocalDate startDate) {
     return additionalServiceDAO.findAllWithDetailsBetweenDates(startDate);
@@ -146,13 +150,24 @@ public class AdditionalServiceService {
     toDelete.forEach(s3Service::deleteFile);
 
     toAssign.forEach(id -> attachmentDAO.assignToAdditionalService(id, additionalServiceId));
+
     return this.getById(additionalServiceId);
   }
 
   public void updateDescription(int id, String newDescription) {
-    this.additionalServiceDAO
-        .getById(id)
-        .orElseThrow(() -> new NotFoundException("Additional service not found"));
+    AdditionalService additionalService =
+        this.additionalServiceDAO
+            .getById(id)
+            .orElseThrow(() -> new NotFoundException("Additional service not found"));
     this.additionalServiceDAO.updateDescription(id, newDescription);
+
+    User patient =
+        userDAO
+            .getById(additionalService.getPatientId())
+            .orElseThrow(() -> new NotFoundException("User not found"));
+    if (patient.isEmailNotifications()) {
+
+      notificationService.sendAdditionalServiceUpdateEmail(patient.getEmail(), id);
+    }
   }
 }

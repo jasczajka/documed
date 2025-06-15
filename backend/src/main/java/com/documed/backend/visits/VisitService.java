@@ -4,7 +4,7 @@ import com.documed.backend.auth.AuthService;
 import com.documed.backend.auth.exceptions.UnauthorizedException;
 import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.exceptions.NotFoundException;
-import com.documed.backend.others.EmailService;
+import com.documed.backend.notifications.NotificationService;
 import com.documed.backend.prescriptions.PrescriptionService;
 import com.documed.backend.prescriptions.model.Prescription;
 import com.documed.backend.referrals.ReferralService;
@@ -13,6 +13,7 @@ import com.documed.backend.schedules.TimeSlotService;
 import com.documed.backend.schedules.model.TimeRange;
 import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.services.ServiceService;
+import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
 import com.documed.backend.users.services.SubscriptionService;
 import com.documed.backend.users.services.UserService;
@@ -29,9 +30,12 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class VisitService {
@@ -45,7 +49,7 @@ public class VisitService {
   private final SubscriptionService subscriptionService;
   private final PrescriptionService prescriptionService;
   private final ReferralService referralService;
-  private final EmailService emailService;
+  private final NotificationService notificationService;
 
   public VisitWithDetails getByIdWithDetails(int id) {
     VisitWithDetails visit =
@@ -213,16 +217,39 @@ public class VisitService {
       throw new UnauthorizedException("Patient can only cancel their own visit");
     }
     timeSlotService.releaseTimeSlotsForVisit(visitId);
+    User patient =
+        userService.getById(patientId).orElseThrow(() -> new NotFoundException("User not found"));
 
-    String email =
-        userService
-            .getById(patientId)
-            .orElseThrow(() -> new NotFoundException("User not found"))
-            .getEmail();
-
-    emailService.sendCancelVisitEmail(email, visit.getDate());
+    if (patient.isEmailNotifications()) {
+      notificationService.sendCancelVisitEmail(patient.getEmail(), visit.getDate(), visit.getId());
+    }
 
     return visitDAO.updateVisitStatus(visitId, VisitStatus.CANCELLED);
+  }
+
+  @Scheduled(cron = "0 0 18 * * ?") // every day at 6 PM
+  public void sendVisitReminders() {
+    LocalDate tomorrow = LocalDate.now().plusDays(1);
+    log.info("Sending visit reminders for date: {}", tomorrow);
+
+    List<VisitWithDetails> visits = visitDAO.findPlannedWithDetailsByDate(tomorrow);
+
+    visits.forEach(
+        visit -> {
+          User patient =
+              userService
+                  .getById(visit.getPatientId())
+                  .orElseThrow(() -> new NotFoundException("Patient not found"));
+
+          if (patient.isEmailNotifications()) {
+            String recipientEmail = patient.getEmail();
+            String doctorName = visit.getDoctorFullName();
+
+            notificationService.sendVisitReminderEmail(
+                recipientEmail, visit.getDate(), doctorName, visit.getId());
+            log.info("Sent visit reminder to {}", recipientEmail);
+          }
+        });
   }
 
   private void removePrescriptionFromVisitIfEmpty(int visitId) {

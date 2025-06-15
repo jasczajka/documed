@@ -4,7 +4,7 @@ import com.documed.backend.auth.AuthService
 import com.documed.backend.auth.exceptions.UnauthorizedException
 import com.documed.backend.exceptions.BadRequestException
 import com.documed.backend.exceptions.NotFoundException
-import com.documed.backend.others.EmailService
+import com.documed.backend.notifications.NotificationService
 import com.documed.backend.prescriptions.PrescriptionService
 import com.documed.backend.referrals.ReferralService
 import com.documed.backend.schedules.TimeSlotService
@@ -36,10 +36,11 @@ class VisitServiceTest extends Specification {
 	def userService = Mock(UserService)
 	def prescriptionService = Mock(PrescriptionService)
 	def referralService = Mock(ReferralService)
-	def emailService = Mock(EmailService)
+	def notificationService = Mock(NotificationService)
+
 
 	@Subject
-	def visitService = new VisitService(visitDAO, feedbackDAO, timeSlotService, authService, serviceService, userService, subscriptionService, prescriptionService, referralService, emailService)
+	def visitService = new VisitService(visitDAO, feedbackDAO, timeSlotService, authService, serviceService, userService, subscriptionService, prescriptionService, referralService, notificationService)
 
 	private VisitWithDetails buildVisitWithDetails(Map overrides = [:]) {
 		return VisitWithDetails.builder()
@@ -75,6 +76,7 @@ class VisitServiceTest extends Specification {
 				.endTime(overrides.endTime)
 				.build()
 	}
+
 
 	def "scheduleVisit should create and reserve needed time slots"() {
 		given:
@@ -752,5 +754,68 @@ class VisitServiceTest extends Specification {
 		0 * visitDAO.getById(_)
 		0 * feedbackDAO.getByVisitId(_)
 		0 * feedbackDAO.create(_)
+	}
+
+
+	def "sendVisitReminders should send notifications only to patients with email notifications enabled"() {
+		given:
+		def tomorrow = LocalDate.now().plusDays(1)
+		def doctorName = "Dr. Smith"
+		def visits = [
+			buildVisitWithDetails(id: 1, patientId: 10, status: VisitStatus.PLANNED, date: tomorrow, doctorFullName: doctorName),
+			buildVisitWithDetails(id: 2, patientId: 20, status: VisitStatus.PLANNED, date: tomorrow, doctorFullName: doctorName)
+		]
+
+		def patient1 = User.builder()
+				.id(10)
+				.firstName("John")
+				.lastName("Doe")
+				.email("patient1@example.com")
+				.accountStatus(AccountStatus.ACTIVE)
+				.role(UserRole.PATIENT)
+				.emailNotifications(true)  // Notifications enabled
+				.build()
+
+		def patient2 = User.builder()
+				.id(20)
+				.firstName("Jane")
+				.lastName("Smith")
+				.email("patient2@example.com")
+				.accountStatus(AccountStatus.ACTIVE)
+				.role(UserRole.PATIENT)
+				.emailNotifications(false)  // Notifications disabled
+				.build()
+
+		when:
+		visitService.sendVisitReminders()
+
+		then:
+		1 * visitDAO.findPlannedWithDetailsByDate(tomorrow) >> visits
+
+		and: "First patient should get notification"
+		1 * userService.getById(10) >> Optional.of(patient1)
+		1 * notificationService.sendVisitReminderEmail("patient1@example.com", tomorrow, doctorName, 1)
+
+		and: "Second patient should not get notification"
+		1 * userService.getById(20) >> Optional.of(patient2)
+		0 * notificationService.sendVisitReminderEmail("patient2@example.com", _, _, _)
+	}
+
+
+
+	def "sendVisitReminders should log error when patient not found"() {
+		given:
+		def tomorrow = LocalDate.now().plusDays(1)
+		def visits = [
+			buildVisitWithDetails(id: 1, patientId: 99, status: VisitStatus.PLANNED, date: tomorrow)
+		]
+
+		when:
+		visitService.sendVisitReminders()
+
+		then:
+		1 * visitDAO.findPlannedWithDetailsByDate(tomorrow) >> visits
+		1 * userService.getById(99) >> Optional.empty()
+		thrown(NotFoundException)
 	}
 }
