@@ -59,6 +59,7 @@ export const MedicineSearch: FC<MedicineSearchProps> = ({ onChange, excludeIds =
         <TextField
           {...params}
           label="Lek"
+          placeholder="Poszę wpisać nazwę"
           slotProps={{
             input: {
               ...params.InputProps,

@@ -45,7 +45,6 @@ export const LoginPage: FC = () => {
     },
   });
   const sitemap = useSitemap();
-  console.log('sitemap: ', sitemap);
 
   const onSubmit = async (data: FormData) => {
     try {

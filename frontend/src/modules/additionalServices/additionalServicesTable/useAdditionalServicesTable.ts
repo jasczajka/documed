@@ -33,8 +33,8 @@ const generateAddionalServicesFilterConfig = (
     ? []
     : [
         {
-          name: 'specialist',
-          label: 'Specjalista',
+          name: 'fulfiller',
+          label: 'Wykonawca',
           type: 'text',
         } as const,
       ]),
