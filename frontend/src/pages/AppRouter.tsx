@@ -217,11 +217,9 @@ export const AppRouter = () => {
   useLayoutEffect(() => {
     const initializeApp = async () => {
       try {
-        console.log('authenticated in uselayout effect: ', authenticated);
         await useFacilityStore.getState().fetchFacilities();
-        await verifyAuthentication();
-
-        if (authenticated) {
+        const isAuthenticated = await verifyAuthentication();
+        if (isAuthenticated) {
           await fetchAllRequiredData();
         }
         setAppReady(true);

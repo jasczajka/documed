@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@mui/material';
 import PopupState, { bindPopper, bindToggle } from 'material-ui-popup-state';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { useFacilityStore } from 'shared/hooks/stores/useFacilityStore';
@@ -38,10 +38,6 @@ export const AppHeader = memo(() => {
     const currentFacility = facilities.find((facility) => facility.id === facilityId);
     return `${currentFacility?.city} ${currentFacility?.address}`;
   }, [facilityId, facilities]);
-
-  const handleLogout = useCallback(async () => {
-    await logout();
-  }, []);
 
   const paths = useMemo(() => {
     return [
@@ -129,7 +125,7 @@ export const AppHeader = memo(() => {
                           >
                             <Settings /> Ustawienia
                           </MenuItem>
-                          <MenuItem className="flex gap-2" onClick={handleLogout}>
+                          <MenuItem className="flex gap-2" onClick={() => logout()}>
                             {loading ? <CircularProgress size={24} /> : <Logout />}Wyloguj się
                           </MenuItem>
                         </MenuList>
