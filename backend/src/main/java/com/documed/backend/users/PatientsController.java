@@ -4,16 +4,19 @@ import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.auth.annotations.StaffOnlyOrSelf;
 import com.documed.backend.auth.exceptions.UserNotFoundException;
 import com.documed.backend.users.dtos.PatientDetailsDTO;
+import com.documed.backend.users.dtos.UpdateUserPersonalDataDTO;
 import com.documed.backend.users.dtos.UserMapper;
 import com.documed.backend.users.exceptions.UserNotPatientException;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
 import com.documed.backend.users.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -59,6 +62,23 @@ public class PatientsController {
   public ResponseEntity<String> removeUserSubscription(@PathVariable("id") int userId) {
     userService.removeUserSubscription(userId);
     return new ResponseEntity<>("Subscription cancelled", HttpStatus.OK);
+  }
+
+  @Secured({"WARD_CLERK"})
+  @Operation(summary = "Update patient personal data")
+  @PatchMapping("/{id}/personal-data")
+  public ResponseEntity<PatientDetailsDTO> updatePatientPersonalData(
+      @PathVariable("id") int userId, @Valid @RequestBody UpdateUserPersonalDataDTO dto) {
+
+    User updatedUser =
+        userService.updatePersonalData(
+            userId,
+            dto.getFirstName(),
+            dto.getLastName(),
+            dto.getEmail(),
+            dto.getAddress(),
+            dto.getPhoneNumber());
+    return new ResponseEntity<>(UserMapper.toPatientDetailsDTO(updatedUser), HttpStatus.OK);
   }
 
   @StaffOnly
