@@ -75,10 +75,9 @@ export const AddServiceTab: FC = () => {
 
   const onSubmit = async (data: FormData) => {
     try {
-      console.log(data);
       await createService({ data });
-    } catch (error) {
-      console.error('Service adding error:', error);
+    } catch {
+      showNotification('Nie udało się stworzyć usługi', 'error');
     }
   };
 

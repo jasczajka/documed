@@ -10,7 +10,6 @@ export const mapToWorkTimes = (formValues: WorkTimeFormValues): UploadWorkTimeDT
     .filter(([, value]) => value.startTime && value.endTime && value.facilityId)
     .map(([dayOfWeekStr, value]) => {
       const dayOfWeek = DayOfWeekEnum[dayOfWeekStr as keyof typeof DayOfWeekEnum];
-      console.log('facility Id : ', value.facilityId);
       return {
         dayOfWeek,
         startTime: value.startTime,
