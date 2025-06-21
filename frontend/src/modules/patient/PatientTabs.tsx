@@ -16,6 +16,7 @@ import { FC, useEffect } from 'react';
 import {
   AdditionalServiceWithDetails,
   FileInfoDTO,
+  PatientDetailsDTO,
   Prescription,
   ReturnReferralDTO,
   Service,
@@ -23,7 +24,6 @@ import {
 } from 'shared/api/generated/generated.schemas';
 import { useCancelPlannedVisit } from 'shared/api/generated/visit-controller/visit-controller';
 import CancelVisitModal from 'shared/components/ConfirmationModal/CancelVisitModal';
-import { PatientInfoPanelProps } from 'shared/components/PatientInfoPanel';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
@@ -32,7 +32,7 @@ import { PersonalDataTab } from './tabs/PersonalDataTab';
 import { SubscriptionTab } from './tabs/SubscriptionTab';
 
 interface PatientTabsProps {
-  patientInfo: PatientInfoPanelProps;
+  patientDetails: PatientDetailsDTO;
   patientSubscriptionId: number | null;
   tabIndex: number;
   onTabChange: (index: number) => void;
@@ -51,7 +51,7 @@ interface PatientTabsProps {
 }
 
 export const PatientTabs: FC<PatientTabsProps> = ({
-  patientInfo,
+  patientDetails,
   patientSubscriptionId,
   tabIndex,
   onTabChange,
@@ -157,7 +157,7 @@ export const PatientTabs: FC<PatientTabsProps> = ({
           />
         )}
         {tabIndex === 3 && (
-          <PersonalDataTab patientInfo={patientInfo} onSuccessfulDeactivate={refetchPatientInfo} />
+          <PersonalDataTab patientDetails={patientDetails} onSuccessfulEdit={refetchPatientInfo} />
         )}
         {tabIndex === 4 && (
           <SubscriptionTab
