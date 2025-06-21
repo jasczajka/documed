@@ -198,6 +198,9 @@ export const FreeDaysTab: FC<FreeDaysTabProps> = ({
               pagination: {
                 paginationModel: { page: 0, pageSize: 5 },
               },
+              sorting: {
+                sortModel: [{ field: 'startDate', sort: 'asc' }],
+              },
             }}
             pageSizeOptions={[5, 10]}
             disableRowSelectionOnClick
