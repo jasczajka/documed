@@ -3,7 +3,6 @@ package com.documed.backend.visits;
 import com.documed.backend.auth.AuthService;
 import com.documed.backend.auth.annotations.DoctorOnly;
 import com.documed.backend.auth.annotations.DoctorOrPatient;
-import com.documed.backend.auth.annotations.StaffOnly;
 import com.documed.backend.auth.exceptions.UnauthorizedException;
 import com.documed.backend.users.model.UserRole;
 import com.documed.backend.visits.dtos.GiveFeedbackDTO;
@@ -42,7 +41,7 @@ public class VisitController {
         : LocalDate.now().minus(DEFAULT_VISIT_LOOKBACK_PERIOD);
   }
 
-  @StaffOnly
+  @Secured({"DOCTOR", "WARD_CLERK", "ADMINISTRATOR"})
   @GetMapping
   @Operation(summary = "Get all visits")
   public ResponseEntity<List<VisitWithDetails>> getAllVisits(

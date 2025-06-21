@@ -26,7 +26,7 @@ import { useShallow } from 'zustand/react/shallow';
 export const AppHeader = memo(() => {
   const sitemap = useSitemap();
   const navigate = useNavigate();
-  const { logout, loading, isAdmin, isPatient, isWardClerk } = useAuth();
+  const { logout, loading, isAdmin, isPatient, isWardClerk, isNurse } = useAuth();
   const { firstName, lastName, email, facilityId } = useAuthStore(
     useShallow(
       (state) => state.user ?? { firstName: '', lastName: '', email: '', facilityId: undefined },
@@ -41,7 +41,7 @@ export const AppHeader = memo(() => {
 
   const paths = useMemo(() => {
     return [
-      ...(!isAdmin ? [{ path: sitemap.visits, label: 'Wizyty' }] : []),
+      ...(!isAdmin && !isNurse ? [{ path: sitemap.visits, label: 'Wizyty' }] : []),
       ...(!isAdmin ? [{ path: sitemap.additionalServices, label: 'Usługi dod.' }] : []),
       ...(!isPatient && !isAdmin ? [{ path: sitemap.patients, label: 'Pacjenci' }] : []),
       ...(isPatient || isWardClerk ? [{ path: sitemap.specialists, label: 'Specjaliści' }] : []),
