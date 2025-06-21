@@ -104,6 +104,9 @@ export const ReferralsTable: FC<ReferralsTableProps> = ({ referrals }) => {
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },
             },
+            sorting: {
+              sortModel: [{ field: 'expirationDate', sort: 'asc' }],
+            },
           }}
           pageSizeOptions={[5, 10, 25]}
           paginationMode="client"

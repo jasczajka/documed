@@ -155,6 +155,11 @@ export const VisitReferralsTable: FC<VisitReferralsTableProps> = ({
           pageSizeOptions={[5, 10, 100]}
           disableRowSelectionOnClick
           disableColumnFilter
+          initialState={{
+            sorting: {
+              sortModel: [{ field: 'expirationDate', sort: 'asc' }],
+            },
+          }}
           sx={{
             width: '100%',
           }}

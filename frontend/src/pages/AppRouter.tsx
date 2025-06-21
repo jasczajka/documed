@@ -76,8 +76,8 @@ const getAuthRoutes = ({
         element: (
           <ProtectedRoute
             element={<VisitsPage />}
-            isAllowed={!isAdmin}
-            redirectTo={isAdmin ? '/admin' : '/visits'}
+            isAllowed={!isAdmin && !isNurse}
+            redirectTo={isAdmin ? '/admin' : isNurse ? '/additional-services' : '/visits'}
           />
         ),
       },

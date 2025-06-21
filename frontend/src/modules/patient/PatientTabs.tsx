@@ -123,12 +123,7 @@ export const PatientTabs: FC<PatientTabsProps> = ({
         <Tab icon={<Person2 />} iconPosition="start" label="Dane osobowe" />
         <Tab disabled={!isWardClerk} icon={<CreditCard />} iconPosition="start" label="Abonament" />
         <Tab icon={<MedicationOutlined />} iconPosition="start" label="Recepty" />
-        <Tab
-          disabled={isWardClerk}
-          icon={<ArrowForwardIosOutlined />}
-          iconPosition="start"
-          label="Skierowania"
-        />
+        <Tab icon={<ArrowForwardIosOutlined />} iconPosition="start" label="Skierowania" />
       </Tabs>
 
       <Paper sx={{ height: '100%', width: '100%', padding: 8, minHeight: '532px' }} elevation={1}>

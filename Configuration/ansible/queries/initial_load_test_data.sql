@@ -201,7 +201,7 @@ INSERT INTO "User" (first_name, last_name, pesel, passport_number, email, addres
 ('Magdalena', 'Lis', '95072012345', NULL, 'magdalena.lis@email.com', 'ul. Spokojna 3, Warszawa', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '456456456', 'ACTIVE', '1995-07-20', NULL, 'PATIENT', 3, false),
 ('Krzysztof', 'Lopez', '82110512345', 'ADM12345', 'krzysztof.mazur@email.com', 'ul. Radosna 4, Warszawa', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '654654654', 'ACTIVE', '1982-11-05', NULL, 'PATIENT', NULL, true),
 ('Ewa', 'Krawczyk', '99123112345', NULL, 'ewa.krawczyk@email.com', 'ul. Cicha 5, Kraków', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '789789789', 'DEACTIVATED', '1999-12-31', NULL, 'PATIENT', NULL, true),
--- Personel (id: 9, 10, 11)
+-- Personel (id: 36, 37, 38)
 ('Admin', 'Adminski', NULL, NULL, 'admin@documed.pl', 'ul. Główna 100, Warszawa', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '000000000', 'ACTIVE', '1990-01-01', NULL, 'ADMINISTRATOR', NULL, true),
 ('Katarzyna', 'Pielęgniarczyk', NULL, NULL, 'katarzyna.p@documed.pl', 'ul. Pomocna 1, Warszawa', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '101102103', 'ACTIVE', '1992-04-12', NULL, 'NURSE', NULL, true),
 ('Robert', 'Rejestrator', NULL, NULL, 'robert.r@documed.pl', 'ul. Biurowa 2, Kraków', '$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS', '104105106', 'ACTIVE', '1995-11-25', NULL, 'WARD_CLERK', NULL, true);
@@ -404,7 +404,7 @@ INSERT INTO Feedback (rating, text, visit_id) VALUES
 ---
 -- Tabela: Referral
 INSERT INTO Referral (visit_id, diagnosis, type, expiration_date, status) VALUES
-(2, 'Podejrzenie czerniaka', 'Do chirurga onkologa', '2026-08-12', 'ISSUED');
+(2, 'Podejrzenie czerniaka', 'TO_SPECIALIST', '2026-08-12', 'ISSUED');
 
 DO $$
 DECLARE

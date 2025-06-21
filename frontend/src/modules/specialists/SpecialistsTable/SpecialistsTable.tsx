@@ -40,6 +40,7 @@ const columns = (
     headerName: 'Imię i nazwisko',
     minWidth: 200,
     flex: 0.25,
+    valueGetter: (_value, row) => `${row.firstName} ${row.lastName}`,
     renderCell: ({ row }) =>
       canNavigateToSpecialist ? (
         <Link
@@ -227,6 +228,9 @@ export const SpecialistsTable = () => {
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },
+            },
+            sorting: {
+              sortModel: [{ field: 'specialistName', sort: 'asc' }],
             },
           }}
           pageSizeOptions={[5, 10, 25]}

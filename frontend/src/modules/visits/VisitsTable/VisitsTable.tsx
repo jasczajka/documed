@@ -358,6 +358,12 @@ export const VisitsTable: FC<VisitTableProps> = ({
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },
             },
+            sorting: {
+              sortModel: [
+                { field: 'date', sort: 'asc' },
+                { field: 'hour', sort: 'asc' },
+              ],
+            },
           }}
           pageSizeOptions={[5, 10, 25]}
           paginationMode="client"
