@@ -164,7 +164,7 @@ export const PatientsTable: FC<PatientsTableProps> = ({ patients }) => {
               paginationModel: { page: 0, pageSize: 10 },
             },
             sorting: {
-              sortModel: [{ field: 'specialistName', sort: 'asc' }],
+              sortModel: [{ field: 'patientName', sort: 'asc' }],
             },
           }}
           pageSizeOptions={[5, 10, 25]}
