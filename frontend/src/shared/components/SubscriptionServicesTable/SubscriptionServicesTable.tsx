@@ -139,6 +139,9 @@ export const SubscriptionServicesTable: FC<SubscriptionServicesTableProps> = ({
             pagination: {
               paginationModel: { pageSize: 5, page: 0 },
             },
+            sorting: {
+              sortModel: [{ field: 'name', sort: 'asc' }],
+            },
           }}
           disableRowSelectionOnClick
         />

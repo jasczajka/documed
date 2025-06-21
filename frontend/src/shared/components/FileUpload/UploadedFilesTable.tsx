@@ -48,6 +48,9 @@ export const UploadedFilesTable: FC<UploadedFilesTableProps> = ({ files, classNa
           pagination: {
             paginationModel: { page: 0, pageSize: 5 },
           },
+          sorting: {
+            sortModel: [{ field: 'fileName', sort: 'asc' }],
+          },
         }}
         pageSizeOptions={[5, 10, 25]}
         disableRowSelectionOnClick

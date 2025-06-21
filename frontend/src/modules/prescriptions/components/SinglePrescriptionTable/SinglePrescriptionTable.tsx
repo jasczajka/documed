@@ -136,6 +136,7 @@ export const SinglePrescriptionTable: FC<SinglePrescriptionTableProps> = ({
           pageSizeOptions={[5, 10]}
           disableRowSelectionOnClick
           disableColumnFilter
+          initialState={{ sorting: { sortModel: [{ field: 'name', sort: 'asc' }] } }}
           sx={{
             width: '100%',
           }}
