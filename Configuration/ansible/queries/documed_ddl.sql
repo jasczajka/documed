@@ -697,7 +697,11 @@ INCLUDE (facility_id, service_id, doctor_id);
 CREATE INDEX IF NOT EXISTS idx_visit_facility_status_date ON Visit(facility_id, status) 
 INCLUDE (doctor_id, patient_id, service_id, total_cost);
 
-
+-- For doctors query
+CREATE INDEX IF NOT EXISTS idx_specialization_id ON Specialization(id);
+CREATE INDEX IF NOT EXISTS idx_doctor_spec_doctor_id ON doctor_specialization(doctor_id);
+CREATE INDEX IF NOT EXISTS idx_doctor_spec_spec_id ON doctor_specialization(specialization_id);
+CREATE INDEX IF NOT EXISTS idx_free_days_user_id ON free_days(user_id);
 
 CREATE OR REPLACE FUNCTION cleanup_otps()
 RETURNS INTEGER AS $$
