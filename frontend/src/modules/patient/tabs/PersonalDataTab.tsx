@@ -6,6 +6,7 @@ import { useDeactivateAccount } from 'shared/api/generated/auth-controller/auth-
 import { PatientDetailsDTO } from 'shared/api/generated/generated.schemas';
 import { useUpdatePatientPersonalData } from 'shared/api/generated/patients-controller/patients-controller';
 import ConfirmationModal from 'shared/components/ConfirmationModal/ConfirmationModal';
+import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
 import * as Yup from 'yup';
@@ -35,8 +36,7 @@ interface PersonalDataTabProps {
 
 export const PersonalDataTab: FC<PersonalDataTabProps> = ({ patientDetails, onSuccessfulEdit }) => {
   const { showNotification, NotificationComponent } = useNotification();
-  // const { isWardClerk } = useAuth();
-  const isWardClerk = true;
+  const { isWardClerk } = useAuth();
   const { openModal } = useModal();
 
   const {
