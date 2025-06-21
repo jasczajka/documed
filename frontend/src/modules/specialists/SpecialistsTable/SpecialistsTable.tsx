@@ -152,7 +152,7 @@ export const SpecialistsTable = () => {
   const sitemap = useSitemap();
   const { showNotification, NotificationComponent } = useNotification();
   const { openModal } = useModal();
-  const { isWardClerk, isDoctor, isAdmin } = useAuth();
+  const { isWardClerk, isDoctor } = useAuth();
   const userId = useAuthStore((state) => state.user!.id);
 
   const specialists = useDoctorsStore((state) => state.doctors);
@@ -218,9 +218,11 @@ export const SpecialistsTable = () => {
         <DataGrid
           rows={filteredSpecialists}
           columns={columns(
-            isAdmin || isWardClerk || isDoctor,
+            isWardClerk || isDoctor,
             onNavigateToSpecialist,
-            (specialistId: number) => handleScheduleVisitClick(specialistId),
+            isWardClerk
+              ? undefined
+              : (specialistId: number) => handleScheduleVisitClick(specialistId),
           )}
           initialState={{
             pagination: {
