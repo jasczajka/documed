@@ -31,7 +31,6 @@ export const VisitReferralsTable: FC<VisitReferralsTableProps> = ({
   const [referrals, setReferrals] = useState<ReferralWithTempId[]>(existingReferrals);
   const referralTypeMap = useReferralTypesStore((state) => state.referralTypeMap);
 
-  console.log('referrals: ', referrals);
   const { openModal } = useModal();
 
   const handleAddReferralClick = () => {

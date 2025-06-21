@@ -42,10 +42,10 @@ const SinglePatientPage: FC = () => {
   const { showNotification, NotificationComponent } = useNotification();
 
   const {
-    data: patientInfo,
-    isLoading: isPatientInfoLoading,
-    isError: isPatientInfoError,
-    refetch: refetchPatientInfo,
+    data: patientDetails,
+    isLoading: isPatientDetailsLoading,
+    isError: isPatientDetailsError,
+    refetch: refetchPatientDetails,
   } = useGetPatientDetails(patientId);
 
   const {
@@ -94,14 +94,15 @@ const SinglePatientPage: FC = () => {
   } = useGetPrescriptionsForUser(patientId);
 
   const isInitialLoading =
-    isPatientInfoLoading ||
+    isPatientDetailsLoading ||
     isPatientAttachmentsLoading ||
     isPatientVisitsLoading ||
     isPatientAdditionalServicesLoading ||
     isPatientReferralsLoading ||
     isPatientPrescriptionsLoading;
+
   const isInitialError =
-    isPatientInfoError ||
+    isPatientDetailsError ||
     isPatientAttachmentsError ||
     isPatientVisitsError ||
     isPatientAdditionalServicesError ||
@@ -109,8 +110,8 @@ const SinglePatientPage: FC = () => {
     isPatientPrescriptionsError;
 
   const patientFullName = useMemo(
-    () => `${patientInfo?.firstName} ${patientInfo?.lastName}`,
-    [patientInfo],
+    () => `${patientDetails?.firstName} ${patientDetails?.lastName}`,
+    [patientDetails],
   );
 
   const handleAdditionalServiceClick = useCallback(async () => {
@@ -118,12 +119,14 @@ const SinglePatientPage: FC = () => {
       openModal('createAdditionalServiceModal', (close) => (
         <AdditionalServiceModal
           allAdditionalServices={allAdditionalServices}
-          patientPesel={patientInfo?.pesel}
+          patientPesel={patientDetails?.pesel}
           patientId={patientId}
           fulfillerId={fulfillerId}
-          patientFullName={`${patientInfo?.firstName} ${patientInfo?.lastName}`}
+          patientFullName={`${patientDetails?.firstName} ${patientDetails?.lastName}`}
           patientAge={
-            patientInfo?.birthdate ? getAgeFromBirthDate(new Date(patientInfo.birthdate)) : null
+            patientDetails?.birthdate
+              ? getAgeFromBirthDate(new Date(patientDetails.birthdate))
+              : null
           }
           onConfirm={async () => {
             close();
@@ -140,7 +143,7 @@ const SinglePatientPage: FC = () => {
     openModal,
     allServices,
     allAdditionalServices,
-    patientInfo,
+    patientDetails,
     patientId,
     fulfillerId,
     refetchPatientAttachments,
@@ -153,7 +156,7 @@ const SinglePatientPage: FC = () => {
         patientId={patientId}
         patientFullName={patientFullName}
         patientAge={
-          patientInfo?.birthdate ? getAgeFromBirthDate(new Date(patientInfo.birthdate)) : null
+          patientDetails?.birthdate ? getAgeFromBirthDate(new Date(patientDetails.birthdate)) : null
         }
         onConfirm={async () => {
           await refetchPatientVisits();
@@ -163,23 +166,20 @@ const SinglePatientPage: FC = () => {
         onCancel={close}
       />
     ));
-  }, [openModal, patientId, patientInfo, patientFullName, refetchPatientVisits]);
+  }, [openModal, patientId, patientDetails, patientFullName, refetchPatientVisits]);
 
   useEffect(() => {
     if (isInitialError) {
       showNotification('Coś poszło nie tak', 'error');
     }
-    if (allServices) {
-      console.log(allServices.filter((service) => service.type === ServiceType.ADDITIONAL_SERVICE));
-    }
-  }, [allServices, isInitialError]);
+  }, [isInitialError]);
 
   if (isInitialLoading) {
     return <FullPageLoadingSpinner />;
   }
 
   if (
-    !patientInfo ||
+    !patientDetails ||
     !fulfillerId ||
     patientVisits === undefined ||
     allServices === undefined ||
@@ -209,12 +209,8 @@ const SinglePatientPage: FC = () => {
         </div>
       </div>
       <PatientTabs
-        patientInfo={{
-          patientId: patientInfo.id,
-          patientFullName,
-          patientAge: getAgeFromBirthDate(new Date(patientInfo.birthdate)),
-        }}
-        patientSubscriptionId={patientInfo.subscriptionId ?? null}
+        patientDetails={patientDetails}
+        patientSubscriptionId={patientDetails.subscriptionId ?? null}
         tabIndex={tabIndex}
         onTabChange={onTabChange}
         patientAttachments={patientAttachments ?? []}
@@ -231,7 +227,7 @@ const SinglePatientPage: FC = () => {
           await refetchPatientAdditionalServices();
         }}
         refetchPatientInfo={async () => {
-          await refetchPatientInfo();
+          await refetchPatientDetails();
         }}
         isArchivalModeOn={isArchivalModeOn}
         onArchivalModeToggle={() => setIsArchivalModeOn((prev) => !prev)}

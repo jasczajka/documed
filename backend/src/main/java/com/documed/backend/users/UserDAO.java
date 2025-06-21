@@ -180,6 +180,35 @@ public class UserDAO implements FullDAO<User, User> {
         .orElseThrow(() -> new IllegalStateException("Failed to retrieve created user"));
   }
 
+  public User updatePersonalData(
+      int userId,
+      String firstName,
+      String lastName,
+      String email,
+      String address,
+      String phoneNumber) {
+    String sql =
+        """
+        UPDATE "User"
+        SET first_name = ?,
+            last_name = ?,
+            email = ?,
+            address = ?,
+            phone_number = ?
+        WHERE id = ? AND account_status != 'DEACTIVATED'
+        """;
+
+    int rowsAffected =
+        jdbcTemplate.update(sql, firstName, lastName, email, address, phoneNumber, userId);
+
+    if (rowsAffected == 0) {
+      throw new UserNotFoundException("User not found or deactivated with ID: " + userId);
+    }
+
+    return getById(userId)
+        .orElseThrow(() -> new IllegalStateException("Failed to retrieve updated user"));
+  }
+
   @Transactional
   public User updateUserSpecializations(int doctorId, List<Integer> newSpecIds) {
     String selectSql = "SELECT specialization_id FROM doctor_specialization WHERE doctor_id = ?";

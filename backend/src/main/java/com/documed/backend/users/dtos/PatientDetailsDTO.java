@@ -21,6 +21,12 @@ public class PatientDetailsDTO {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull private String email;
 
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  @NonNull private String address;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  @NonNull private String phoneNumber;
+
   private String pesel;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)

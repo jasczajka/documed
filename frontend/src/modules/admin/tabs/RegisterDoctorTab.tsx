@@ -80,7 +80,6 @@ export const RegisterDoctorTab: FC = () => {
   });
 
   const onSubmit = async (data: FormData) => {
-    console.log(data);
     await registerDoctor({
       data: {
         email: data.email,

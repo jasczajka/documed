@@ -95,7 +95,7 @@ export const EditWorkTimeTab: FC<EditWorkTimeTabProps> = ({
 }) => {
   const defaultValues = mapFromWorkTimes(currentWorkTimes);
   const allFacilities = useFacilityStore((state) => state.facilities);
-  console.log('defaultValues: ', defaultValues);
+
   const {
     control,
     handleSubmit,

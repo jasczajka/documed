@@ -3,9 +3,11 @@ package com.documed.backend.users.services;
 import com.documed.backend.attachments.S3Service;
 import com.documed.backend.attachments.model.Attachment;
 import com.documed.backend.auth.exceptions.UserNotFoundException;
+import com.documed.backend.exceptions.BadRequestException;
 import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.users.UserDAO;
 import com.documed.backend.users.exceptions.SpecializationToNonDoctorException;
+import com.documed.backend.users.exceptions.UserNotPatientException;
 import com.documed.backend.users.model.*;
 import java.util.List;
 import java.util.Optional;
@@ -108,6 +110,30 @@ public class UserService {
 
   public void updateUserSubscription(int userId, int subscriptionId) {
     userDAO.updateUserSubscription(userId, subscriptionId);
+  }
+
+  @Transactional
+  public User updatePersonalData(
+      int userId,
+      String firstName,
+      String lastName,
+      String email,
+      String address,
+      String phoneNumber) {
+    User user =
+        userDAO
+            .getById(userId)
+            .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+
+    if (user.getAccountStatus() == AccountStatus.DEACTIVATED) {
+      throw new BadRequestException("Cannot update data for deactivated user");
+    }
+
+    if (user.getRole() != UserRole.PATIENT) {
+      throw new UserNotPatientException("User is not a patient");
+    }
+
+    return userDAO.updatePersonalData(userId, firstName, lastName, email, address, phoneNumber);
   }
 
   public void removeUserSubscription(int userId) {

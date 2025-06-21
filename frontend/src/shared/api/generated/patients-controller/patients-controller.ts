@@ -20,7 +20,7 @@ import type {
 } from '@tanstack/react-query';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import type { PatientDetailsDTO } from '../generated.schemas';
+import type { PatientDetailsDTO, UpdateUserPersonalDataDTO } from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
@@ -172,6 +172,85 @@ export const useRemoveUserSubscription = <TError = ErrorType<unknown>, TContext 
   TContext
 > => {
   const mutationOptions = getRemoveUserSubscriptionMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+/**
+ * @summary Update patient personal data
+ */
+export const updatePatientPersonalData = (
+  id: number,
+  updateUserPersonalDataDTO: UpdateUserPersonalDataDTO,
+) => {
+  return customInstance<PatientDetailsDTO>({
+    url: `/api/patients/${id}/personal-data`,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    data: updateUserPersonalDataDTO,
+  });
+};
+
+export const getUpdatePatientPersonalDataMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updatePatientPersonalData>>,
+    TError,
+    { id: number; data: UpdateUserPersonalDataDTO },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updatePatientPersonalData>>,
+  TError,
+  { id: number; data: UpdateUserPersonalDataDTO },
+  TContext
+> => {
+  const mutationKey = ['updatePatientPersonalData'];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updatePatientPersonalData>>,
+    { id: number; data: UpdateUserPersonalDataDTO }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return updatePatientPersonalData(id, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdatePatientPersonalDataMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updatePatientPersonalData>>
+>;
+export type UpdatePatientPersonalDataMutationBody = UpdateUserPersonalDataDTO;
+export type UpdatePatientPersonalDataMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Update patient personal data
+ */
+export const useUpdatePatientPersonalData = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updatePatientPersonalData>>,
+      TError,
+      { id: number; data: UpdateUserPersonalDataDTO },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updatePatientPersonalData>>,
+  TError,
+  { id: number; data: UpdateUserPersonalDataDTO },
+  TContext
+> => {
+  const mutationOptions = getUpdatePatientPersonalDataMutationOptions(options);
 
   return useMutation(mutationOptions, queryClient);
 };

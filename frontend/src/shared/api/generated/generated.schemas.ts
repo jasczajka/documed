@@ -113,9 +113,9 @@ export interface VisitWithDetails {
   patientBirthDate: string;
   doctorId: number;
   doctorFullName: string;
-  date?: string;
-  startTime?: string;
-  endTime?: string;
+  date: string;
+  startTime: string;
+  endTime: string;
   feedbackRating?: number;
   feedbackMessage?: string;
 }
@@ -414,6 +414,50 @@ export interface UpdateVisitDTO {
   recommendations?: string;
 }
 
+/**
+ * DTO for updating user personal data
+ */
+export interface UpdateUserPersonalDataDTO {
+  /**
+   * @minLength 0
+   * @maxLength 255
+   */
+  firstName: string;
+  /**
+   * @minLength 0
+   * @maxLength 255
+   */
+  lastName: string;
+  /**
+   * @minLength 0
+   * @maxLength 255
+   */
+  email: string;
+  /**
+   * @minLength 0
+   * @maxLength 255
+   */
+  address: string;
+  /**
+   * @minLength 0
+   * @maxLength 255
+   * @pattern ^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\s./0-9]*$
+   */
+  phoneNumber: string;
+}
+
+export interface PatientDetailsDTO {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  address: string;
+  phoneNumber: string;
+  pesel?: string;
+  birthdate: string;
+  subscriptionId?: number;
+}
+
 export interface UpdateDoctorSpecializationsDTO {
   /** @minItems 1 */
   specializationIds: number[];
@@ -444,16 +488,6 @@ export interface MedicineWithAmount {
   commonName: string;
   dosage: string;
   amount: number;
-}
-
-export interface PatientDetailsDTO {
-  id: number;
-  firstName: string;
-  lastName: string;
-  email: string;
-  pesel?: string;
-  birthdate: string;
-  subscriptionId?: number;
 }
 
 export interface FacilityInfoReturnDTO {
@@ -493,6 +527,13 @@ export type AddMedicineToPrescriptionParams = {
   amount?: number;
 };
 
+export type GetAllMedicinesParams = {
+  /**
+   * Maximum results to return
+   */
+  limit?: number;
+};
+
 export type GetAllAdditionalServicesParams = {
   startDate?: string;
 };
@@ -521,13 +562,6 @@ export type GetVisitsByDoctorIdParams = {
 export type CalculateVisitCostParams = {
   patientId: number;
   serviceId: number;
-};
-
-export type GetAllMedicinesParams = {
-  /**
-   * Maximum results to return
-   */
-  limit?: number;
 };
 
 export type SearchMedicinesParams = {
