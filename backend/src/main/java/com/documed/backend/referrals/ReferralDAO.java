@@ -64,13 +64,8 @@ public class ReferralDAO implements FullDAO<Referral, CreateReferralDTO> {
     Number key = keyHolder.getKey();
 
     if (key != null) {
-      return Referral.builder()
-          .id(key.intValue())
-          .visitId(createReferralDTO.getVisitId())
-          .diagnosis(createReferralDTO.getDiagnosis())
-          .type(createReferralDTO.getType())
-          .expirationDate(createReferralDTO.getExpirationDate())
-          .build();
+      return getById(key.intValue())
+          .orElseThrow(() -> new CreationFailException("Failed to fetch created referral"));
     } else {
       throw new CreationFailException("Failed to create referral");
     }
