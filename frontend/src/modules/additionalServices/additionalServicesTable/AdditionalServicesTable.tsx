@@ -197,7 +197,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
           mode="edit"
           existingServiceData={existingServiceData}
           refetch={refetch}
-          readOnly={!(isNurse || isDoctor) || fulfillerId !== user?.id}
+          readOnly={!(isNurse || isDoctor)}
         />
       ));
     },
