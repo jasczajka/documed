@@ -54,6 +54,7 @@ const generateVisitsFilterConfig = (
       label: `${facility.city} ${facility.address}`,
     })),
     type: 'select',
+    width: '350px',
   },
   ...(hasDoctorId
     ? []
