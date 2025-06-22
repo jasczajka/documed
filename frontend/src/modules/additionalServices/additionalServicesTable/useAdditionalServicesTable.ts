@@ -7,7 +7,6 @@ const generateAddionalServicesFilterConfig = (
   allAdditionalServices: Service[],
   isPatient: boolean,
   hasPatientId: boolean,
-  hasDoctorId: boolean,
 ): FilterConfig[] => [
   ...(!isPatient && !hasPatientId
     ? [
@@ -29,15 +28,11 @@ const generateAddionalServicesFilterConfig = (
     })),
   },
 
-  ...(hasDoctorId
-    ? []
-    : [
-        {
-          name: 'fulfiller',
-          label: 'Wykonawca',
-          type: 'text',
-        } as const,
-      ]),
+  {
+    name: 'fulfiller',
+    label: 'Wykonawca',
+    type: 'text',
+  },
 
   {
     name: 'dateFrom',
@@ -57,7 +52,6 @@ export const useAdditionalServicesTable = ({
   allAdditionalServices,
   isPatient,
   patientId,
-  doctorId,
 }: {
   additionalServices: AdditionalServiceWithDetails[];
   filters: AdditionalServiceFilters;
@@ -136,14 +130,8 @@ export const useAdditionalServicesTable = ({
   ]);
 
   const additionalServicesFilterConfig = useMemo(
-    () =>
-      generateAddionalServicesFilterConfig(
-        allAdditionalServices,
-        isPatient,
-        !!patientId,
-        !!doctorId,
-      ),
-    [allAdditionalServices, isPatient, patientId, doctorId],
+    () => generateAddionalServicesFilterConfig(allAdditionalServices, isPatient, !!patientId),
+    [allAdditionalServices, isPatient, patientId],
   );
 
   return {

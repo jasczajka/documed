@@ -145,6 +145,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
   onArchivalModeToggle,
 }) => {
   const { isNurse, isDoctor, isPatient } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const sitemap = useSitemap();
   const { openModal } = useModal();
@@ -152,7 +153,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
   const [filters, setFilters] = useState<AdditionalServiceFilters>({
     patientName: '',
     service: '',
-    fulfiller: '',
+    fulfiller: isNurse || isDoctor ? `${user?.firstName} ${user?.lastName}` : '',
     dateFrom: '',
     dateTo: '',
   });
@@ -196,7 +197,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
           mode="edit"
           existingServiceData={existingServiceData}
           refetch={refetch}
-          readOnly={!(isNurse || isDoctor)}
+          readOnly={!(isNurse || isDoctor) || fulfillerId !== user?.id}
         />
       ));
     },

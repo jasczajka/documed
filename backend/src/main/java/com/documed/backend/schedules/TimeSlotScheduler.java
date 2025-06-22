@@ -13,6 +13,7 @@ public class TimeSlotScheduler {
   private final TimeSlotService timeSlotService;
   private final WorkTimeService workTimeService;
 
+  // every Monday at midnight
   @Scheduled(cron = "0 0 0 * * 1")
   public void scheduleTimeSlots() {
     List<WorkTime> workTimes = workTimeService.getAllWorkTimes();
