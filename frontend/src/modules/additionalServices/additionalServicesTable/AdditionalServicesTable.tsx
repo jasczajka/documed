@@ -1,4 +1,4 @@
-import { Box, Button, FormControlLabel, Link, Paper, Switch, Typography } from '@mui/material';
+import { Box, Button, FormControlLabel, Link, Paper, Switch } from '@mui/material';
 import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 
 import { endOfDay, format, startOfDay } from 'date-fns';
@@ -61,26 +61,27 @@ const columns = (
     valueGetter: (_value, row, _, apiRef) =>
       apiRef.current.getRowIndexRelativeToVisibleRows(row.id) + 1,
   },
-  {
-    field: 'patientName',
-    headerName: 'Pacjent',
-    minWidth: 200,
-    flex: 1,
-    renderCell: ({ row }) =>
-      isPatient ? (
-        <Typography>{row.patientFullName}</Typography>
-      ) : (
-        <Link
-          component="button"
-          onClick={() => onNavigateToPatient(row.patientId)}
-          underline="hover"
-          color="primary"
-          sx={{ cursor: 'pointer', fontWeight: 500 }}
-        >
-          {row.patientFullName}
-        </Link>
-      ),
-  },
+  ...(isPatient
+    ? []
+    : [
+        {
+          field: 'patientName',
+          headerName: 'Pacjent',
+          minWidth: 200,
+          flex: 1,
+          renderCell: ({ row }: { row: AdditionalServiceWithDetails }) => (
+            <Link
+              component="button"
+              onClick={() => onNavigateToPatient(row.patientId)}
+              underline="hover"
+              color="primary"
+              sx={{ cursor: 'pointer', fontWeight: 500 }}
+            >
+              {row.patientFullName}
+            </Link>
+          ),
+        },
+      ]),
   {
     field: 'date',
     headerName: 'Data',
