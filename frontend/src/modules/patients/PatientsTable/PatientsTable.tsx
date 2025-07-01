@@ -41,7 +41,7 @@ const columns = (
     headerName: 'Imię i nazwisko',
     minWidth: 200,
     flex: 1,
-    valueGetter: (_value, row) => `${row.firstName} ${row.lastName}`,
+    valueGetter: (_value, row) => `${row.lastName} ${row.firstName}`,
     renderCell: ({ row }) => (
       <Link
         component="button"
@@ -50,7 +50,7 @@ const columns = (
         color="primary"
         sx={{ cursor: 'pointer', fontWeight: 500 }}
       >
-        {`${row.firstName} ${row.lastName}`}
+        {`${row.lastName} ${row.firstName}`}
       </Link>
     ),
   },
@@ -111,7 +111,7 @@ export const PatientsTable: FC<PatientsTableProps> = ({ patients }) => {
       openModal('scheduleVisitModal', (close) => (
         <ScheduleVisitModal
           patientId={patientDetails.id}
-          patientFullName={`${patientDetails.firstName} ${patientDetails.lastName}`}
+          patientFullName={`${patientDetails.lastName} ${patientDetails.firstName}`}
           patientAge={
             patientDetails?.birthdate
               ? getAgeFromBirthDate(new Date(patientDetails.birthdate))

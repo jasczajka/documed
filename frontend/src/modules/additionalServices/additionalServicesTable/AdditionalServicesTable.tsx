@@ -153,7 +153,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
   const [filters, setFilters] = useState<AdditionalServiceFilters>({
     patientName: '',
     service: '',
-    fulfiller: isNurse || isDoctor ? `${user?.firstName} ${user?.lastName}` : '',
+    fulfiller: isNurse || isDoctor ? `${user?.lastName} ${user?.firstName}` : '',
     dateFrom: '',
     dateTo: '',
   });

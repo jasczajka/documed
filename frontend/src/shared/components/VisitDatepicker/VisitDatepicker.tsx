@@ -99,7 +99,7 @@ export const VisitDatepicker: FC<VisitDatepickerProps> = ({
             <Accordion key={doctorId} sx={{ marginTop: 6 }}>
               <AccordionSummary expandIcon={<ExpandMore />}>
                 <Typography>
-                  {doctorMap[doctorId]?.firstName} {doctorMap[doctorId]?.lastName}
+                  {doctorMap[doctorId]?.lastName} {doctorMap[doctorId]?.firstName}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails>

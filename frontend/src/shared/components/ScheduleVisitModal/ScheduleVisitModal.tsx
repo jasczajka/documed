@@ -259,7 +259,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
               <Autocomplete
                 disabled={!selectedServiceId || loading}
                 options={availableDoctorsForChosenService}
-                getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+                getOptionLabel={(option) => `${option.lastName} ${option.firstName}`}
                 onChange={(_, newValue) => {
                   field.onChange(newValue?.id ?? null);
                   setValue('visitDate', undefined);
