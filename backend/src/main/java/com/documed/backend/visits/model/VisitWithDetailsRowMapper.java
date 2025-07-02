@@ -26,11 +26,11 @@ public class VisitWithDetailsRowMapper implements RowMapper<VisitWithDetails> {
         .patientInformation(rs.getString("patient_information"))
         .patientId(rs.getInt("patient_id"))
         .patientFullName(
-            rs.getString("patient_first_name") + " " + rs.getString("patient_last_name"))
+            rs.getString("patient_last_name") + " " + rs.getString("patient_first_name"))
         .patientBirthDate(getLocalDateOrNull(rs, "patient_birth_date"))
         .patientPesel(rs.getString("patient_pesel"))
         .doctorId(rs.getInt("doctor_id"))
-        .doctorFullName(rs.getString("doctor_first_name") + " " + rs.getString("doctor_last_name"))
+        .doctorFullName(rs.getString("doctor_last_name") + " " + rs.getString("doctor_first_name"))
         .startTime(getLocalTimeOrNull(rs, "start_time"))
         .endTime(getLocalTimeOrNull(rs, "end_time"))
         .date(getLocalDateOrNull(rs, "date"))

@@ -19,10 +19,10 @@ public class AdditionalServiceWithDetailsRowMapper
         .date(getLocalDateOrNull(rs, "date"))
         .fulfillerId(rs.getInt("fulfiller_id"))
         .fulfillerFullName(
-            rs.getString("fulfiller_first_name") + " " + rs.getString("fulfiller_last_name"))
+            rs.getString("fulfiller_last_name") + " " + rs.getString("fulfiller_first_name"))
         .patientId(rs.getInt("patient_id"))
         .patientFullName(
-            rs.getString("patient_first_name") + " " + rs.getString("patient_last_name"))
+            rs.getString("patient_last_name") + " " + rs.getString("patient_first_name"))
         .patientPesel(rs.getString("patient_pesel"))
         .serviceId(rs.getInt("service_id"))
         .serviceName(rs.getString("service_name"))

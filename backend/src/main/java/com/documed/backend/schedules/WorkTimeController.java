@@ -30,7 +30,6 @@ public class WorkTimeController {
   }
 
   @WardClerkOnly
-  @StaffOnly
   @PutMapping("/{user_id}")
   @Operation(summary = "Update worktimes for user")
   public ResponseEntity<List<WorkTimeReturnDTO>> updateWorkTimesForUser(

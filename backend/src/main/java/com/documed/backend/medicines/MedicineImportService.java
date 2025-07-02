@@ -1,5 +1,6 @@
 package com.documed.backend.medicines;
 
+import com.monitorjbl.xlsx.StreamingReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -16,11 +17,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +45,7 @@ public class MedicineImportService {
   private static final Logger logger = LoggerFactory.getLogger(MedicineImportService.class);
 
   @Scheduled(cron = "0 0 23 * * SAT") // every Saturday at 23:00
-  public void onStartup() {
+  public void importMedicinesWeekly() {
     try {
       downloadFile();
       importMedicines();
@@ -82,7 +79,8 @@ public class MedicineImportService {
     transactionTemplate.execute(
         status -> {
           try (InputStream fileIn = Files.newInputStream(LOCAL_FILE_PATH);
-              XSSFWorkbook workbook = new XSSFWorkbook(fileIn)) {
+              Workbook workbook =
+                  StreamingReader.builder().rowCacheSize(100).bufferSize(4096).open(fileIn)) {
 
             Sheet sheet = workbook.getSheetAt(0);
             int totalRows = sheet.getLastRowNum();

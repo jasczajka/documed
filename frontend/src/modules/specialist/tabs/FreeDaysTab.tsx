@@ -58,6 +58,10 @@ export const FreeDaysTab: FC<FreeDaysTabProps> = ({
     reset,
   } = useForm<FormData>({
     resolver: yupResolver(validationSchema),
+    defaultValues: {
+      startDate: '',
+      endDate: '',
+    },
   });
 
   const onSubmit = async (data: FormData) => {

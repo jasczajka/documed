@@ -110,7 +110,7 @@ const SinglePatientPage: FC = () => {
     isPatientPrescriptionsError;
 
   const patientFullName = useMemo(
-    () => `${patientDetails?.firstName} ${patientDetails?.lastName}`,
+    () => `${patientDetails?.lastName} ${patientDetails?.firstName}`,
     [patientDetails],
   );
 
@@ -122,7 +122,7 @@ const SinglePatientPage: FC = () => {
           patientPesel={patientDetails?.pesel}
           patientId={patientId}
           fulfillerId={fulfillerId}
-          patientFullName={`${patientDetails?.firstName} ${patientDetails?.lastName}`}
+          patientFullName={`${patientDetails?.lastName} ${patientDetails?.firstName}`}
           patientAge={
             patientDetails?.birthdate
               ? getAgeFromBirthDate(new Date(patientDetails.birthdate))

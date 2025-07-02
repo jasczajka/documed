@@ -19,7 +19,7 @@ export const MedicineSearch: FC<MedicineSearchProps> = ({ onChange, excludeIds =
     { q: debouncedQuery, limit: 10 },
     {
       query: {
-        enabled: Boolean(debouncedQuery.trim()),
+        enabled: open,
       },
     },
   );
@@ -55,6 +55,7 @@ export const MedicineSearch: FC<MedicineSearchProps> = ({ onChange, excludeIds =
       loading={isFetching}
       onInputChange={(_, value) => setMedicineQuery(value)}
       onChange={(_, selectedMedicine) => onChange(selectedMedicine)}
+      filterOptions={(x) => x}
       renderInput={(params) => (
         <TextField
           {...params}

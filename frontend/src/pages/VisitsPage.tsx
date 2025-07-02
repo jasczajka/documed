@@ -128,7 +128,7 @@ const VisitsPage: FC = () => {
     openModal('scheduleVisitModal', (close) => (
       <ScheduleVisitModal
         patientId={patientDetails.id}
-        patientFullName={`${patientDetails.firstName} ${patientDetails.lastName}`}
+        patientFullName={`${patientDetails.lastName} ${patientDetails.firstName}`}
         patientAge={
           patientDetails?.birthdate ? getAgeFromBirthDate(new Date(patientDetails.birthdate)) : null
         }

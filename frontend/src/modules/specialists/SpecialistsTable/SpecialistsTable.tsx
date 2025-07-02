@@ -37,10 +37,10 @@ const columns = (
   },
   {
     field: 'specialistName',
-    headerName: 'Imię i nazwisko',
+    headerName: 'Nazwisko i imię',
     minWidth: 200,
     flex: 0.25,
-    valueGetter: (_value, row) => `${row.firstName} ${row.lastName}`,
+    valueGetter: (_value, row) => `${row.lastName} ${row.firstName}`,
     renderCell: ({ row }) =>
       canNavigateToSpecialist ? (
         <Link
@@ -50,10 +50,10 @@ const columns = (
           color="primary"
           sx={{ cursor: 'pointer', fontWeight: 500 }}
         >
-          {`${row.firstName} ${row.lastName}`}
+          {`${row.lastName} ${row.firstName}`}
         </Link>
       ) : (
-        <Typography>{`${row.firstName} ${row.lastName}`}</Typography>
+        <Typography>{`${row.lastName} ${row.firstName}`}</Typography>
       ),
   },
   {
@@ -175,7 +175,7 @@ export const SpecialistsTable = () => {
       openModal('scheduleVisitModal', (close) => (
         <ScheduleVisitModal
           patientId={patientDetails.id}
-          patientFullName={`${patientDetails.firstName} ${patientDetails.lastName}`}
+          patientFullName={`${patientDetails.lastName} ${patientDetails.firstName}`}
           patientAge={
             patientDetails?.birthdate
               ? getAgeFromBirthDate(new Date(patientDetails.birthdate))

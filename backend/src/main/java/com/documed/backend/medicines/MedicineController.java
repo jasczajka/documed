@@ -58,7 +58,7 @@ public class MedicineController {
   @PostMapping
   @Operation(summary = "Import medicines from datasource")
   public ResponseEntity<String> importMedicines() {
-    medicineImportService.onStartup();
+    medicineImportService.importMedicinesWeekly();
     return new ResponseEntity<>("Medicines imported", HttpStatus.CREATED);
   }
 }
