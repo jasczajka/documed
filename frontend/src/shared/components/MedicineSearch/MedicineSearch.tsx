@@ -30,15 +30,14 @@ export const MedicineSearch: FC<MedicineSearchProps> = ({ onChange, excludeIds =
 
   const handleClose = useCallback(() => {
     setOpen(false);
-    setOptions([]);
   }, []);
 
   useEffect(() => {
     if (data) {
-      const filteredOptions = data.filter((medicine) => !excludeIds.includes(medicine.id));
+      const filteredOptions = data
+        .filter((medicine) => !excludeIds.includes(medicine.id))
+        .sort((a, b) => a.name.localeCompare(b.name));
       setOptions(filteredOptions);
-    } else {
-      setOptions([]);
     }
   }, [data, excludeIds]);
 
