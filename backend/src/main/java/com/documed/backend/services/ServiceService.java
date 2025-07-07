@@ -22,6 +22,10 @@ public class ServiceService {
     return serviceDAO.getAll();
   }
 
+  public List<com.documed.backend.services.model.Service> getAllRegular() {
+    return serviceDAO.getAllRegular();
+  }
+
   public Optional<com.documed.backend.services.model.Service> getById(int id) {
     return serviceDAO.getById(id);
   }
