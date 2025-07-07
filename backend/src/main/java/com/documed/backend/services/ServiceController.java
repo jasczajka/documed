@@ -28,7 +28,7 @@ public class ServiceController {
     return new ResponseEntity<>(services, HttpStatus.OK);
   }
 
-  @GetMapping
+  @GetMapping("/regular")
   public ResponseEntity<List<Service>> getAllRegularServices() {
     List<Service> services = serviceService.getAllRegular();
     return new ResponseEntity<>(services, HttpStatus.OK);
