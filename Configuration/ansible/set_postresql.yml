@@ -7,6 +7,7 @@
     
   vars:
     cron_db: "prod_db"
+    backup_dir: "/var/backups/postgresql"
 
   tasks:
     - name: Install PostgreSQL and required packages
@@ -95,6 +96,27 @@
         db: prod_db
         query: "{{ lookup('file', 'queries/documed_ddl.sql') }}"
       become_user: postgres
+
+    - name: Ensure backup directory exists
+      file:
+        path: "{{ backup_dir }}"
+        state: directory
+        owner: postgres
+        group: postgres
+        mode: '0755'
+
+    - name: Schedule weekly pg_dump backup via cron on Sunday at 2:00
+      cron:
+        name: "Weekly PostgreSQL backup"
+        user: postgres
+        minute: "*"
+        hour: "*"
+        weekday: "*"
+        # uncomment and remove above after testing
+        # minute: "0"
+        # hour: "2"
+        # weekday: "0"
+        job: "pg_dump -Fc -U postgres {{ cron_db }} > {{ backup_dir }}/{{ cron_db }}_$(date +\\%F_%H-%M).dump"
       
     - name: Schedule jobs using existing SQL file
       postgresql_query:
