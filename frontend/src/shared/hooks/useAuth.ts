@@ -8,11 +8,11 @@ import {
 } from 'shared/api/generated/auth-controller/auth-controller';
 import { UserRole } from 'shared/api/generated/generated.schemas';
 import { mapAuthError } from 'shared/utils/mapAuthError';
-import { useAllServicesStore } from './stores/useAllServicesStore';
 import { useAuthStore } from './stores/useAuthStore';
 import { useDoctorsStore } from './stores/useDoctorsStore';
 import { useFacilityStore } from './stores/useFacilityStore';
 import { useReferralTypesStore } from './stores/useReferralTypesStore';
+import { useServicesStore } from './stores/useServicesStore';
 import { useSpecializationsStore } from './stores/useSpecializationsStore';
 import { useSubscriptionStore } from './stores/useSubscriptionStore';
 
@@ -76,7 +76,7 @@ export const useAuth = () => {
             useFacilityStore.getState().fetchFacilities(),
             useSubscriptionStore.getState().fetchSubscriptions(),
             useDoctorsStore.getState().fetchDoctors(),
-            useAllServicesStore.getState().fetchAllServices(),
+            useServicesStore.getState().fetchAllServices(),
             useSpecializationsStore.getState().fetchSpecializations(),
             useReferralTypesStore.getState().fetchReferralTypes(),
           ]);

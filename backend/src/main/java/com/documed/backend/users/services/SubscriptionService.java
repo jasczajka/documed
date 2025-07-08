@@ -77,7 +77,7 @@ public class SubscriptionService {
   }
 
   void createSubscriptionToServiceForNewSubscription(int subscriptionId) {
-    List<com.documed.backend.services.model.Service> services = serviceDAO.getAllRegular();
+    List<com.documed.backend.services.model.Service> services = serviceDAO.getAll();
 
     services.forEach(
         service ->

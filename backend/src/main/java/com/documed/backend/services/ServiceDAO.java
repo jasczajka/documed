@@ -116,8 +116,13 @@ public class ServiceDAO implements FullDAO<Service, Service> {
 
   @Override
   public List<Service> getAll() {
-    String sql =
-        """
+    return getByType(null);
+  }
+
+  public List<Service> getByType(ServiceType serviceType) {
+    StringBuilder sql =
+        new StringBuilder(
+            """
         SELECT
             s.id AS service_id,
             s.name,
@@ -127,11 +132,14 @@ public class ServiceDAO implements FullDAO<Service, Service> {
             ss.specialization_id
         FROM service s
         LEFT JOIN specialization_service ss ON s.id = ss.service_id
-        ORDER BY s.id
-        """;
+        """);
+    if (serviceType != null) {
+      sql.append(" WHERE s.type = ?");
+    }
+    sql.append(" ORDER BY s.id");
 
     return jdbcTemplate.query(
-        sql,
+        sql.toString(),
         rs -> {
           Map<Integer, Service> services = new LinkedHashMap<>();
 
@@ -155,45 +163,6 @@ public class ServiceDAO implements FullDAO<Service, Service> {
             int specId = rs.getInt("specialization_id");
             if (!rs.wasNull()) {
               service.getSpecializationIds().add(specId);
-            }
-          }
-
-          return new ArrayList<>(services.values());
-        });
-  }
-
-  public List<Service> getAllRegular() {
-    String sql =
-        """
-                SELECT
-                    s.id AS service_id,
-                    s.name,
-                    s.price,
-                    s.type,
-                    s.estimated_time
-                FROM service s
-                WHERE s.type = 'REGULAR_SERVICE'
-                """;
-
-    return jdbcTemplate.query(
-        sql,
-        rs -> {
-          Map<Integer, Service> services = new LinkedHashMap<>();
-
-          while (rs.next()) {
-            int serviceId = rs.getInt("service_id");
-            Service service = services.get(serviceId);
-
-            if (service == null) {
-              service =
-                  Service.builder()
-                      .id(serviceId)
-                      .name(rs.getString("name"))
-                      .price(rs.getBigDecimal("price"))
-                      .type(ServiceType.valueOf(rs.getString("type")))
-                      .estimatedTime(rs.getInt("estimated_time"))
-                      .build();
-              services.put(serviceId, service);
             }
           }
 

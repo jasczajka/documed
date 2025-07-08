@@ -3,7 +3,6 @@ import VisitsTable from 'modules/visits/VisitsTable/VisitsTable';
 import { FC, useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { getPatientDetails } from 'shared/api/generated/patients-controller/patients-controller';
-import { useGetAllServices } from 'shared/api/generated/service-controller/service-controller';
 import {
   useGetAllVisits,
   useGetVisitsForCurrentDoctor,
@@ -86,12 +85,6 @@ const VisitsPage: FC = () => {
     },
   );
 
-  const {
-    data: allServices,
-    isLoading: isServicesLoading,
-    isError: isServicesError,
-  } = useGetAllServices();
-
   const refetchVisits = async () => {
     if (isPatient) {
       await refetchPatientVisits();
@@ -105,10 +98,8 @@ const VisitsPage: FC = () => {
   };
 
   const visits = isPatient ? patientVisits : isDoctor ? doctorVisits : allVisits;
-  const isLoading =
-    isPatientVisitsLoading || isAllVisitsLoading || isServicesLoading || isDoctorVisitsLoading;
-  const isError =
-    isPatientVisitsError || isAllVisitsError || isServicesError || isDoctorVisitsError;
+  const isLoading = isPatientVisitsLoading || isAllVisitsLoading || isDoctorVisitsLoading;
+  const isError = isPatientVisitsError || isAllVisitsError || isDoctorVisitsError;
 
   const handleCancelVisitClick = (visitId: number) => {
     openModal('cancelVisitModal', (close) => (
@@ -155,7 +146,7 @@ const VisitsPage: FC = () => {
   if (isError) {
     return <NotificationComponent />;
   }
-  if (visits && allServices) {
+  if (visits) {
     return (
       <div className="flex flex-col">
         <Box
@@ -187,13 +178,14 @@ const VisitsPage: FC = () => {
 
         <VisitsTable
           visits={visits}
-          allServices={allServices}
           patientId={isPatient ? user.id : undefined}
           doctorId={isDoctor ? user.id : undefined}
           onCancel={handleCancelVisitClick}
           refetchVisits={refetchVisits}
           isArchivalVisitsOn={isArchivalVisitsOn}
           onArchivalModeToggle={() => setIsArchivalVisitsOn((prev) => !prev)}
+          displayPatientColumn={!isPatient}
+          displayDoctorColumn={!isDoctor}
         />
       </div>
     );

@@ -4,7 +4,6 @@ import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router';
 import { useGetAdditionalServicesByPatient } from 'shared/api/generated/additional-service-controller/additional-service-controller';
 import { useGetFilesForPatient } from 'shared/api/generated/attachment-controller/attachment-controller';
-import { ServiceType } from 'shared/api/generated/generated.schemas';
 import { useGetPatientDetails } from 'shared/api/generated/patients-controller/patients-controller';
 import { useGetPrescriptionsForUser } from 'shared/api/generated/prescription-controller/prescription-controller';
 import { useGetAllReferralsForPatient } from 'shared/api/generated/referral-controller/referral-controller';
@@ -12,8 +11,8 @@ import { useGetVisitsByPatientId } from 'shared/api/generated/visit-controller/v
 import { AdditionalServiceModal } from 'shared/components/AdditionalServiceModal';
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { ScheduleVisitModal } from 'shared/components/ScheduleVisitModal/ScheduleVisitModal';
-import { useAllServicesStore } from 'shared/hooks/stores/useAllServicesStore';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
+import { useServicesStore } from 'shared/hooks/stores/useServicesStore';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
@@ -26,11 +25,11 @@ const SinglePatientPage: FC = () => {
   const patientId = Number(id);
   const [isArchivalModeOn, setIsArchivalModeOn] = useState(false);
   const fulfillerId = useAuthStore((state) => state.user?.id);
-  const allServices = useAllServicesStore((state) => state.allServices);
-
-  const allAdditionalServices = allServices.filter(
-    (service) => service.type === ServiceType.ADDITIONAL_SERVICE,
-  );
+  const allAdditionalServices = useServicesStore((state) => state.addditionalServices);
+  const allServices = [
+    ...useServicesStore((state) => state.regularServices),
+    ...allAdditionalServices,
+  ];
 
   const [tabIndex, setTabIndex] = useState(0);
 
@@ -218,8 +217,6 @@ const SinglePatientPage: FC = () => {
         patientAdditionalServices={patientAdditionalServices}
         patientPrescriptions={patientPrescriptions}
         patientReferrals={patientReferrals}
-        allServices={allServices}
-        allAdditionalServices={allAdditionalServices}
         refetchVisits={async () => {
           await refetchPatientVisits();
         }}

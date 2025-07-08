@@ -10,11 +10,10 @@ import { useFacilityStore } from 'shared/hooks/stores/useFacilityStore';
 import { VisitsFilters } from './VisitsTable';
 
 const generateVisitsFilterConfig = (
-  allServices: Service[],
+  services: Service[],
   allFacilities: FacilityInfoReturnDTO[],
-  isPatient: boolean,
-  hasPatientId: boolean,
-  hasDoctorId: boolean,
+  displayPatientColumn: boolean,
+  displayDoctorColumn: boolean,
 ): FilterConfig[] => [
   {
     name: 'status',
@@ -27,7 +26,7 @@ const generateVisitsFilterConfig = (
       { value: VisitWithDetailsStatus.PLANNED.toString(), label: 'Zaplanowana' },
     ],
   },
-  ...(!isPatient && !hasPatientId
+  ...(displayPatientColumn
     ? [
         {
           name: 'patientName',
@@ -41,7 +40,7 @@ const generateVisitsFilterConfig = (
     name: 'service',
     label: 'Usługa',
     type: 'select',
-    options: allServices.map((service) => ({
+    options: services.map((service) => ({
       value: service.name,
       label: service.name,
     })),
@@ -56,15 +55,15 @@ const generateVisitsFilterConfig = (
     type: 'select',
     width: '350px',
   },
-  ...(hasDoctorId
-    ? []
-    : [
+  ...(displayDoctorColumn
+    ? [
         {
           name: 'specialist',
           label: 'Specjalista',
           type: 'text',
         } as const,
-      ]),
+      ]
+    : []),
 
   {
     name: 'dateFrom',
@@ -81,17 +80,15 @@ const generateVisitsFilterConfig = (
 export const useVisitsTable = ({
   visits,
   filters,
-  allServices,
-  isPatient,
-  patientId,
-  doctorId,
+  services,
+  displayPatientColumn,
+  displayDoctorColumn,
 }: {
   visits: VisitWithDetails[];
   filters: VisitsFilters;
-  allServices: Service[];
-  isPatient: boolean;
-  patientId?: number;
-  doctorId?: number;
+  services: Service[];
+  displayPatientColumn: boolean;
+  displayDoctorColumn: boolean;
 }) => {
   const allFacilities = useFacilityStore((state) => state.facilities);
   const filterByStatus = useMemo(() => {
@@ -176,8 +173,13 @@ export const useVisitsTable = ({
 
   const visitsFilterConfig = useMemo(
     () =>
-      generateVisitsFilterConfig(allServices, allFacilities, isPatient, !!patientId, !!doctorId),
-    [allServices, isPatient, patientId, doctorId],
+      generateVisitsFilterConfig(
+        services,
+        allFacilities,
+        displayPatientColumn,
+        displayDoctorColumn,
+      ),
+    [services, displayPatientColumn, displayDoctorColumn],
   );
 
   return {

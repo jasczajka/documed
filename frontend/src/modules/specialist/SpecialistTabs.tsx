@@ -9,7 +9,6 @@ import {
   UploadWorkTimeDTO,
   VisitWithDetails,
 } from 'shared/api/generated/generated.schemas';
-import { useAllServicesStore } from 'shared/hooks/stores/useAllServicesStore';
 import { EditSpecializationsTab } from './tabs/EditSpecializationsTab';
 import { EditWorkTimeTab } from './tabs/EditWorkTimeTab';
 import { FreeDaysTab } from './tabs/FreeDaysTab';
@@ -54,7 +53,6 @@ export const SpecialistTabs: FC<SpecialistTabsProps> = ({
   onArchivalModeToggle,
   disabled = false,
 }) => {
-  const allServices = useAllServicesStore((state) => state.allServices);
   return (
     <Box
       sx={{
@@ -99,11 +97,12 @@ export const SpecialistTabs: FC<SpecialistTabsProps> = ({
           <VisitsTable
             doctorId={doctorId}
             visits={doctorVisits}
-            allServices={allServices}
             onCancel={handleCancelVisit}
             refetchVisits={refetchDoctorVisits}
             isArchivalVisitsOn={isArchivalVisitsOn}
             onArchivalModeToggle={onArchivalModeToggle}
+            displayPatientColumn
+            displayDoctorColumn={false}
           />
         )}
         {tabIndex === 2 && (

@@ -28,6 +28,18 @@ public class ServiceController {
     return new ResponseEntity<>(services, HttpStatus.OK);
   }
 
+  @GetMapping("/regular")
+  public ResponseEntity<List<Service>> getAllRegularServices() {
+    List<Service> services = serviceService.getAllRegular();
+    return new ResponseEntity<>(services, HttpStatus.OK);
+  }
+
+  @GetMapping("/additional")
+  public ResponseEntity<List<Service>> getAllAdditionalServices() {
+    List<Service> services = serviceService.getAllAdditional();
+    return new ResponseEntity<>(services, HttpStatus.OK);
+  }
+
   @GetMapping("/{id}")
   public ResponseEntity<Optional<Service>> getService(@PathVariable int id) {
     Optional<Service> service = serviceService.getById(id);

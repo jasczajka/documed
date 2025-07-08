@@ -5,10 +5,9 @@ import { AdditionalServiceFilters } from './AdditionalServicesTable';
 
 const generateAddionalServicesFilterConfig = (
   allAdditionalServices: Service[],
-  isPatient: boolean,
-  hasPatientId: boolean,
+  displayPatientColumn: boolean,
 ): FilterConfig[] => [
-  ...(!isPatient && !hasPatientId
+  ...(displayPatientColumn
     ? [
         {
           name: 'patientName',
@@ -50,15 +49,12 @@ export const useAdditionalServicesTable = ({
   additionalServices,
   filters,
   allAdditionalServices,
-  isPatient,
-  patientId,
+  displayPatientColumn,
 }: {
   additionalServices: AdditionalServiceWithDetails[];
   filters: AdditionalServiceFilters;
   allAdditionalServices: Service[];
-  isPatient: boolean;
-  patientId?: number;
-  doctorId?: number;
+  displayPatientColumn: boolean;
 }) => {
   const filterByPatientName = useMemo(() => {
     if (!filters.patientName) {
@@ -130,8 +126,8 @@ export const useAdditionalServicesTable = ({
   ]);
 
   const additionalServicesFilterConfig = useMemo(
-    () => generateAddionalServicesFilterConfig(allAdditionalServices, isPatient, !!patientId),
-    [allAdditionalServices, isPatient, patientId],
+    () => generateAddionalServicesFilterConfig(allAdditionalServices, displayPatientColumn),
+    [allAdditionalServices, displayPatientColumn],
   );
 
   return {

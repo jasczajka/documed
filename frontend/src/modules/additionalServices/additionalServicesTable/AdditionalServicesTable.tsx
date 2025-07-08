@@ -4,14 +4,11 @@ import { DataGrid, GridActionsCellItem, GridColDef } from '@mui/x-data-grid';
 import { endOfDay, format, startOfDay } from 'date-fns';
 import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
-import {
-  AdditionalServiceWithDetails,
-  FileInfoDTO,
-  Service,
-} from 'shared/api/generated/generated.schemas';
+import { AdditionalServiceWithDetails, FileInfoDTO } from 'shared/api/generated/generated.schemas';
 import { appConfig } from 'shared/appConfig';
 import { AdditionalServiceModal } from 'shared/components/AdditionalServiceModal';
 import { TableFilters } from 'shared/components/TableFilters';
+import { useServicesStore } from 'shared/hooks/stores/useServicesStore';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
@@ -28,13 +25,12 @@ export type AdditionalServiceFilters = {
 
 interface AdditionalServicesTableProps {
   additionalServices: AdditionalServiceWithDetails[];
-  allAdditionalServices: Service[];
   refetch: () => Promise<void>;
   patientId?: number;
-  doctorId?: number;
   loading?: boolean;
   isArchivalAdditionalServicesOn: boolean;
   onArchivalModeToggle: () => void;
+  displayPatientColumn: boolean;
 }
 
 const columns = (
@@ -52,7 +48,7 @@ const columns = (
     patientPesel?: string,
   ) => void,
   onNavigateToPatient: (id: number) => void,
-  isPatient: boolean,
+  displayPatientColumn: boolean,
 ): GridColDef<AdditionalServiceWithDetails>[] => [
   {
     field: 'index',
@@ -61,9 +57,8 @@ const columns = (
     valueGetter: (_value, row, _, apiRef) =>
       apiRef.current.getRowIndexRelativeToVisibleRows(row.id) + 1,
   },
-  ...(isPatient
-    ? []
-    : [
+  ...(displayPatientColumn
+    ? [
         {
           field: 'patientName',
           headerName: 'Pacjent',
@@ -81,7 +76,8 @@ const columns = (
             </Link>
           ),
         },
-      ]),
+      ]
+    : []),
   {
     field: 'date',
     headerName: 'Data',
@@ -138,15 +134,13 @@ const columns = (
 
 export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
   additionalServices,
-  allAdditionalServices,
   refetch,
-  patientId,
-  doctorId,
+  displayPatientColumn,
   isArchivalAdditionalServicesOn,
   onArchivalModeToggle,
 }) => {
-  const { isNurse, isDoctor, isPatient } = useAuth();
-  const { user } = useAuth();
+  const { isNurse, isDoctor, user } = useAuth();
+  const allAdditionalServices = useServicesStore((state) => state.addditionalServices);
   const navigate = useNavigate();
   const sitemap = useSitemap();
   const { openModal } = useModal();
@@ -160,7 +154,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
   });
 
   const { additionalServicesFilterConfig, filteredAdditionalServices } = useAdditionalServicesTable(
-    { additionalServices, filters, allAdditionalServices, isPatient, patientId, doctorId },
+    { additionalServices, filters, allAdditionalServices, displayPatientColumn },
   );
 
   const handleFilterChange = useCallback((name: keyof AdditionalServiceFilters, value: string) => {
@@ -256,7 +250,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
       <Paper sx={{ flexGrow: 1 }}>
         <DataGrid
           rows={filteredAdditionalServices}
-          columns={columns(handleEditClick, onNavigateToPatient, isPatient)}
+          columns={columns(handleEditClick, onNavigateToPatient, displayPatientColumn)}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },

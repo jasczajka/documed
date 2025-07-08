@@ -19,10 +19,10 @@ import {
   useScheduleVisit,
 } from 'shared/api/generated/visit-controller/visit-controller';
 import { appConfig } from 'shared/appConfig';
-import { useAllServicesStore } from 'shared/hooks/stores/useAllServicesStore';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { useDoctorsStore } from 'shared/hooks/stores/useDoctorsStore';
 import { useFacilityStore } from 'shared/hooks/stores/useFacilityStore';
+import { useServicesStore } from 'shared/hooks/stores/useServicesStore';
 import { useNotification } from 'shared/hooks/useNotification';
 import * as Yup from 'yup';
 import { PatientInfoPanel } from '../PatientInfoPanel';
@@ -77,7 +77,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
   const currentFacilityId = useAuthStore((state) => state.user?.facilityId);
   const allFacilities = useFacilityStore((state) => state.facilities);
   const allDoctors = useDoctorsStore((state) => state.doctors);
-  const allServices = useAllServicesStore((state) => state.allServices);
+  const regularServices = useServicesStore((state) => state.regularServices);
   const {
     control,
     handleSubmit,
@@ -105,7 +105,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
   const neededTimeSlots = useMemo(() => {
     return calculateNeededTimeSlots(
       selectedServiceId,
-      allServices,
+      regularServices,
       appConfig.timeSlotLengthInMinutes,
     );
   }, [selectedServiceId]);
@@ -147,7 +147,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
       return [];
     }
 
-    const service = allServices.find((s) => s.id === selectedServiceId);
+    const service = regularServices.find((s) => s.id === selectedServiceId);
     if (!service) {
       return [];
     }
@@ -171,14 +171,14 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
 
   const availableServices = useMemo(() => {
     if (!initialDoctorId) {
-      return allServices;
+      return regularServices;
     }
 
     const doctor = allDoctors.find((d) => d.id === initialDoctorId);
-    if (!doctor) return allServices;
+    if (!doctor) return regularServices;
 
     const doctorSpecializationIds = doctor.specializations.map((spec) => spec.id);
-    return allServices.filter((service) =>
+    return regularServices.filter((service) =>
       service.specializationIds.some((id) => doctorSpecializationIds.includes(id)),
     );
   }, [initialDoctorId]);
@@ -238,7 +238,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
                     refetchVisitCost();
                   }
                 }}
-                value={allServices.find((service) => service.id === field.value) ?? null}
+                value={regularServices.find((service) => service.id === field.value) ?? null}
                 noOptionsText="Brak opcji spełniających wyszukiwanie"
                 renderInput={(params) => (
                   <TextField
