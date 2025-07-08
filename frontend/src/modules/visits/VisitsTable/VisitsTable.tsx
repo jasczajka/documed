@@ -5,14 +5,11 @@ import { endOfDay, format, parse, startOfDay } from 'date-fns';
 import { getVisitStatusLabel } from 'modules/visit/utils';
 import { FC, useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
-import {
-  Service,
-  VisitWithDetails,
-  VisitWithDetailsStatus,
-} from 'shared/api/generated/generated.schemas';
+import { VisitWithDetails, VisitWithDetailsStatus } from 'shared/api/generated/generated.schemas';
 import { appConfig } from 'shared/appConfig';
 import { TableFilters } from 'shared/components/TableFilters';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
+import { useServicesStore } from 'shared/hooks/stores/useServicesStore';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useModal } from 'shared/hooks/useModal';
 import { useNotification } from 'shared/hooks/useNotification';
@@ -32,7 +29,6 @@ export type VisitsFilters = {
 
 interface VisitTableProps {
   visits: VisitWithDetails[];
-  allServices: Service[];
   onCancel: (id: number) => void;
   patientId?: number;
   patientPesel?: string;
@@ -41,12 +37,16 @@ interface VisitTableProps {
   refetchVisits: () => Promise<void>;
   isArchivalVisitsOn: boolean;
   onArchivalModeToggle: () => void;
+  displayPatientColumn: boolean;
+  displayDoctorColumn: boolean;
 }
 
 const columns = (
   onCancel: (id: number) => void,
   onNavigateToVisit: (id: number) => void,
   onNavigateToPatient: (id: number) => void,
+  displayPatientColumn: boolean,
+  displayDoctorColumn: boolean,
   isPatient: boolean,
   isDoctor: boolean,
   isWardClerk: boolean,
@@ -61,9 +61,8 @@ const columns = (
     valueGetter: (_value, row, _, apiRef) =>
       apiRef.current.getRowIndexRelativeToVisibleRows(row.id) + 1,
   },
-  ...(isPatient
-    ? []
-    : [
+  ...(displayPatientColumn
+    ? [
         {
           field: 'patientName',
           headerName: 'Pacjent',
@@ -81,7 +80,8 @@ const columns = (
             </Link>
           ),
         },
-      ]),
+      ]
+    : []),
   {
     field: 'date',
     headerName: 'Data',
@@ -129,13 +129,18 @@ const columns = (
     flex: 1,
     valueGetter: (_, row) => row.serviceName,
   },
-  {
-    field: 'specialist',
-    headerName: 'Specjalista',
-    minWidth: 200,
-    flex: 1,
-    valueGetter: (_, row) => row.doctorFullName,
-  },
+  ...(displayDoctorColumn
+    ? [
+        {
+          field: 'specialist',
+          headerName: 'Specjalista',
+          minWidth: 200,
+          flex: 1,
+          valueGetter: (_: undefined, row: VisitWithDetails) => row.doctorFullName,
+        },
+      ]
+    : []),
+
   {
     field: 'actions',
     headerName: 'Akcje',
@@ -210,16 +215,16 @@ const columns = (
 
 export const VisitsTable: FC<VisitTableProps> = ({
   visits,
-  allServices,
   onCancel,
   loading,
-  patientId,
-  doctorId,
   refetchVisits,
   isArchivalVisitsOn,
   onArchivalModeToggle,
+  displayPatientColumn,
+  displayDoctorColumn,
 }) => {
   const currentFacilityId = useAuthStore((state) => state.user?.facilityId);
+  const services = useServicesStore((state) => state.regularServices);
 
   const { isPatient, isDoctor, isWardClerk } = useAuth();
   const navigate = useNavigate();
@@ -239,10 +244,9 @@ export const VisitsTable: FC<VisitTableProps> = ({
   const { visitsFilterConfig, filteredVisits } = useVisitsTable({
     visits,
     filters,
-    allServices,
-    isPatient,
-    patientId,
-    doctorId,
+    services,
+    displayPatientColumn,
+    displayDoctorColumn,
   });
 
   const handleFilterChange = useCallback((name: keyof VisitsFilters, value: string) => {
@@ -348,6 +352,8 @@ export const VisitsTable: FC<VisitTableProps> = ({
             onCancel,
             onNavigateToVisit,
             onNavigateToPatient,
+            displayPatientColumn,
+            displayDoctorColumn,
             isPatient,
             isDoctor,
             isWardClerk,

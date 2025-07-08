@@ -4,11 +4,11 @@ import { lazy, useLayoutEffect, useMemo, useState } from 'react';
 import { createBrowserRouter, Navigate, RouteObject, RouterProvider } from 'react-router';
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { ProtectedRoute } from 'shared/components/ProtectedRoute';
-import { useAllServicesStore } from 'shared/hooks/stores/useAllServicesStore';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { useDoctorsStore } from 'shared/hooks/stores/useDoctorsStore';
 import { useFacilityStore } from 'shared/hooks/stores/useFacilityStore';
 import { useReferralTypesStore } from 'shared/hooks/stores/useReferralTypesStore';
+import { useServicesStore } from 'shared/hooks/stores/useServicesStore';
 import { useSpecializationsStore } from 'shared/hooks/stores/useSpecializationsStore';
 import { useSubscriptionStore } from 'shared/hooks/stores/useSubscriptionStore';
 import { useAuth } from 'shared/hooks/useAuth';
@@ -186,7 +186,7 @@ export const AppRouter = () => {
       await Promise.allSettled([
         useSubscriptionStore.getState().fetchSubscriptions(),
         useDoctorsStore.getState().fetchDoctors(),
-        useAllServicesStore.getState().fetchAllServices(),
+        useServicesStore.getState().fetchAllServices(),
         useSpecializationsStore.getState().fetchSpecializations(),
         useReferralTypesStore.getState().fetchReferralTypes(),
       ]);

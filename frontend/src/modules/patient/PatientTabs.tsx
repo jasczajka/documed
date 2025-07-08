@@ -19,7 +19,6 @@ import {
   PatientDetailsDTO,
   Prescription,
   ReturnReferralDTO,
-  Service,
   VisitWithDetails,
 } from 'shared/api/generated/generated.schemas';
 import { useCancelPlannedVisit } from 'shared/api/generated/visit-controller/visit-controller';
@@ -41,8 +40,6 @@ interface PatientTabsProps {
   patientAdditionalServices: AdditionalServiceWithDetails[];
   patientPrescriptions: Prescription[];
   patientReferrals: ReturnReferralDTO[];
-  allServices: Service[];
-  allAdditionalServices: Service[];
   refetchVisits: () => Promise<void>;
   refetchAdditionalServices: () => Promise<void>;
   refetchPatientInfo: () => Promise<void>;
@@ -60,8 +57,6 @@ export const PatientTabs: FC<PatientTabsProps> = ({
   patientAdditionalServices,
   patientPrescriptions,
   patientReferrals,
-  allServices,
-  allAdditionalServices,
   refetchVisits,
   refetchAdditionalServices,
   refetchPatientInfo,
@@ -131,7 +126,6 @@ export const PatientTabs: FC<PatientTabsProps> = ({
         {tabIndex === 1 && (
           <VisitsTable
             visits={patientVisits}
-            allServices={allServices}
             onCancel={handleCancelVisitClick}
             loading={isCancelVisitLoading}
             refetchVisits={async () => {
@@ -139,16 +133,18 @@ export const PatientTabs: FC<PatientTabsProps> = ({
             }}
             isArchivalVisitsOn={isArchivalModeOn}
             onArchivalModeToggle={onArchivalModeToggle}
+            displayPatientColumn={false}
+            displayDoctorColumn
           />
         )}
         {tabIndex === 2 && (
           <AdditionalServicesTable
             additionalServices={patientAdditionalServices}
-            allAdditionalServices={allAdditionalServices}
             loading={isCancelVisitLoading}
             refetch={refetchAdditionalServices}
             isArchivalAdditionalServicesOn={isArchivalModeOn}
             onArchivalModeToggle={onArchivalModeToggle}
+            displayPatientColumn={false}
           />
         )}
         {tabIndex === 3 && (
@@ -157,7 +153,6 @@ export const PatientTabs: FC<PatientTabsProps> = ({
         {tabIndex === 4 && (
           <SubscriptionTab
             patientSubscriptionId={patientSubscriptionId}
-            allServices={allServices}
             refetch={refetchPatientInfo}
           />
         )}

@@ -3,7 +3,7 @@ import { useChangePassword } from 'shared/api/generated/auth-controller/auth-con
 import { ChangePasswordRequestDTO } from 'shared/api/generated/generated.schemas';
 import { useGetPatientDetails } from 'shared/api/generated/patients-controller/patients-controller';
 import { SubscriptionServicesTable } from 'shared/components/SubscriptionServicesTable/SubscriptionServicesTable';
-import { useAllServicesStore } from 'shared/hooks/stores/useAllServicesStore';
+import { useServicesStore } from 'shared/hooks/stores/useServicesStore';
 import { useSubscriptionStore } from 'shared/hooks/stores/useSubscriptionStore';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useNotification } from 'shared/hooks/useNotification';
@@ -15,7 +15,10 @@ export const AccountTab = () => {
   const { data: patientInfo } = useGetPatientDetails(user!.id, { query: { enabled: isPatient } });
 
   const subscriptions = useSubscriptionStore((state) => state.subscriptions);
-  const allServices = useAllServicesStore((state) => state.allServices);
+  const allServices = [
+    ...useServicesStore((state) => state.regularServices),
+    ...useServicesStore((state) => state.addditionalServices),
+  ];
   const subscription = subscriptions.find((sub) => sub.id === patientInfo?.subscriptionId);
 
   const {

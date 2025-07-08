@@ -3,7 +3,6 @@ import { Box, Button, FormControl, MenuItem, Select, Typography } from '@mui/mat
 import { FC, useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useParams } from 'react-router';
-import { Service } from 'shared/api/generated/generated.schemas';
 import {
   removeUserSubscription,
   updateUserSubscription,
@@ -14,6 +13,7 @@ import {
 } from 'shared/api/generated/subscription-controller/subscription-controller';
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { SubscriptionServicesTable } from 'shared/components/SubscriptionServicesTable/SubscriptionServicesTable';
+import { useServicesStore } from 'shared/hooks/stores/useServicesStore';
 import { useNotification } from 'shared/hooks/useNotification';
 import * as Yup from 'yup';
 
@@ -26,15 +26,10 @@ const validationSchema = Yup.object({
 
 interface SubscriptionTabProps {
   patientSubscriptionId: number | null;
-  allServices: Service[];
   refetch: () => void;
 }
 
-export const SubscriptionTab: FC<SubscriptionTabProps> = ({
-  patientSubscriptionId,
-  allServices,
-  refetch,
-}) => {
+export const SubscriptionTab: FC<SubscriptionTabProps> = ({ patientSubscriptionId, refetch }) => {
   const {
     control,
     handleSubmit,
@@ -48,6 +43,10 @@ export const SubscriptionTab: FC<SubscriptionTabProps> = ({
   });
 
   const { id } = useParams<{ id: string }>();
+  const allServices = [
+    ...useServicesStore((state) => state.regularServices),
+    ...useServicesStore((state) => state.addditionalServices),
+  ];
   const patientId = Number(id);
 
   const { showNotification, NotificationComponent } = useNotification();

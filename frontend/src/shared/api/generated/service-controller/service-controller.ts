@@ -641,3 +641,217 @@ export const useDeleteService = <TError = ErrorType<unknown>, TContext = unknown
 
   return useMutation(mutationOptions, queryClient);
 };
+export const getAllRegularServices = (signal?: AbortSignal) => {
+  return customInstance<Service[]>({ url: `/api/services/regular`, method: 'GET', signal });
+};
+
+export const getGetAllRegularServicesQueryKey = () => {
+  return [`/api/services/regular`] as const;
+};
+
+export const getGetAllRegularServicesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAllRegularServices>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getAllRegularServices>>, TError, TData>
+  >;
+}) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetAllRegularServicesQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllRegularServices>>> = ({ signal }) =>
+    getAllRegularServices(signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAllRegularServices>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAllRegularServicesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAllRegularServices>>
+>;
+export type GetAllRegularServicesQueryError = ErrorType<unknown>;
+
+export function useGetAllRegularServices<
+  TData = Awaited<ReturnType<typeof getAllRegularServices>>,
+  TError = ErrorType<unknown>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllRegularServices>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllRegularServices>>,
+          TError,
+          Awaited<ReturnType<typeof getAllRegularServices>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAllRegularServices<
+  TData = Awaited<ReturnType<typeof getAllRegularServices>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllRegularServices>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllRegularServices>>,
+          TError,
+          Awaited<ReturnType<typeof getAllRegularServices>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAllRegularServices<
+  TData = Awaited<ReturnType<typeof getAllRegularServices>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllRegularServices>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useGetAllRegularServices<
+  TData = Awaited<ReturnType<typeof getAllRegularServices>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllRegularServices>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetAllRegularServicesQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+export const getAllAdditionalServices1 = (signal?: AbortSignal) => {
+  return customInstance<Service[]>({ url: `/api/services/additional`, method: 'GET', signal });
+};
+
+export const getGetAllAdditionalServices1QueryKey = () => {
+  return [`/api/services/additional`] as const;
+};
+
+export const getGetAllAdditionalServices1QueryOptions = <
+  TData = Awaited<ReturnType<typeof getAllAdditionalServices1>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof getAllAdditionalServices1>>, TError, TData>
+  >;
+}) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetAllAdditionalServices1QueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllAdditionalServices1>>> = ({
+    signal,
+  }) => getAllAdditionalServices1(signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAllAdditionalServices1>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAllAdditionalServices1QueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAllAdditionalServices1>>
+>;
+export type GetAllAdditionalServices1QueryError = ErrorType<unknown>;
+
+export function useGetAllAdditionalServices1<
+  TData = Awaited<ReturnType<typeof getAllAdditionalServices1>>,
+  TError = ErrorType<unknown>,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllAdditionalServices1>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllAdditionalServices1>>,
+          TError,
+          Awaited<ReturnType<typeof getAllAdditionalServices1>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAllAdditionalServices1<
+  TData = Awaited<ReturnType<typeof getAllAdditionalServices1>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllAdditionalServices1>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllAdditionalServices1>>,
+          TError,
+          Awaited<ReturnType<typeof getAllAdditionalServices1>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useGetAllAdditionalServices1<
+  TData = Awaited<ReturnType<typeof getAllAdditionalServices1>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllAdditionalServices1>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+export function useGetAllAdditionalServices1<
+  TData = Awaited<ReturnType<typeof getAllAdditionalServices1>>,
+  TError = ErrorType<unknown>,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAllAdditionalServices1>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getGetAllAdditionalServices1QueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}

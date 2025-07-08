@@ -1,12 +1,10 @@
 import { CardHeader } from '@mui/material';
 import AdditionalServicesTable from 'modules/additionalServices/additionalServicesTable/AdditionalServicesTable';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
   useGetAdditionalServicesByPatient,
   useGetAllAdditionalServices,
 } from 'shared/api/generated/additional-service-controller/additional-service-controller';
-import { ServiceType } from 'shared/api/generated/generated.schemas';
-import { useGetAllServices } from 'shared/api/generated/service-controller/service-controller';
 import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
 import { useAuth } from 'shared/hooks/useAuth';
 import { useNotification } from 'shared/hooks/useNotification';
@@ -56,24 +54,10 @@ const AdditionalServicesPage: FC = () => {
     },
   );
 
-  const {
-    data: allServices,
-    isLoading: isServicesLoading,
-    isError: isServicesError,
-  } = useGetAllServices();
-
   const additionalServices = isPatient ? patientAdditionalServices : allAdditionalServiceInstances;
-  const allAdditionalServices = useMemo(
-    () => allServices?.filter((service) => service.type === ServiceType.ADDITIONAL_SERVICE),
-    [allServices],
-  );
-  const isLoading =
-    isPatientAdditionalServicesLoading ||
-    isAllAdditionalServiceInstancesLoading ||
-    isServicesLoading ||
-    isServicesLoading;
-  const isError =
-    isPatientAdditionalServicesError || isAllAdditionalServiceInstancesError || isServicesError;
+
+  const isLoading = isPatientAdditionalServicesLoading || isAllAdditionalServiceInstancesLoading;
+  const isError = isPatientAdditionalServicesError || isAllAdditionalServiceInstancesError;
 
   useEffect(() => {
     if (isError) {
@@ -88,13 +72,12 @@ const AdditionalServicesPage: FC = () => {
   if (isError) {
     return <NotificationComponent />;
   }
-  if (additionalServices && allAdditionalServices) {
+  if (additionalServices) {
     return (
       <div className="flex flex-col">
         <CardHeader title={'Usługi dodatkowe'} />
         <AdditionalServicesTable
           additionalServices={additionalServices}
-          allAdditionalServices={allAdditionalServices}
           patientId={isPatient ? user.id : undefined}
           doctorId={isDoctor ? user.id : undefined}
           refetch={async () => {
@@ -107,6 +90,7 @@ const AdditionalServicesPage: FC = () => {
           }}
           isArchivalAdditionalServicesOn={isArchivalModeOn}
           onArchivalModeToggle={() => setIsArchivalModeOn((prev) => !prev)}
+          displayPatientColumn={!isPatient}
         />
       </div>
     );
