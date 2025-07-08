@@ -27,7 +27,6 @@ interface AdditionalServicesTableProps {
   additionalServices: AdditionalServiceWithDetails[];
   refetch: () => Promise<void>;
   patientId?: number;
-  doctorId?: number;
   loading?: boolean;
   isArchivalAdditionalServicesOn: boolean;
   onArchivalModeToggle: () => void;
@@ -59,8 +58,7 @@ const columns = (
       apiRef.current.getRowIndexRelativeToVisibleRows(row.id) + 1,
   },
   ...(displayPatientColumn
-    ? []
-    : [
+    ? [
         {
           field: 'patientName',
           headerName: 'Pacjent',
@@ -78,7 +76,8 @@ const columns = (
             </Link>
           ),
         },
-      ]),
+      ]
+    : []),
   {
     field: 'date',
     headerName: 'Data',
@@ -137,11 +136,10 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
   additionalServices,
   refetch,
   displayPatientColumn,
-  doctorId,
   isArchivalAdditionalServicesOn,
   onArchivalModeToggle,
 }) => {
-  const { isNurse, isDoctor, isPatient, user } = useAuth();
+  const { isNurse, isDoctor, user } = useAuth();
   const allAdditionalServices = useServicesStore((state) => state.addditionalServices);
   const navigate = useNavigate();
   const sitemap = useSitemap();
@@ -156,7 +154,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
   });
 
   const { additionalServicesFilterConfig, filteredAdditionalServices } = useAdditionalServicesTable(
-    { additionalServices, filters, allAdditionalServices, displayPatientColumn, doctorId },
+    { additionalServices, filters, allAdditionalServices, displayPatientColumn },
   );
 
   const handleFilterChange = useCallback((name: keyof AdditionalServiceFilters, value: string) => {
@@ -252,7 +250,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
       <Paper sx={{ flexGrow: 1 }}>
         <DataGrid
           rows={filteredAdditionalServices}
-          columns={columns(handleEditClick, onNavigateToPatient, isPatient)}
+          columns={columns(handleEditClick, onNavigateToPatient, displayPatientColumn)}
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },

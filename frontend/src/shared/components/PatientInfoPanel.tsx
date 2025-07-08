@@ -27,7 +27,7 @@ export const PatientInfoPanel: FC<PatientInfoPanelProps> = ({
     >
       {patientPesel && (
         <Typography>
-          Pesel <strong>{patientPesel}</strong>
+          Pesel: <strong>{patientPesel}</strong>
         </Typography>
       )}
       <Typography>

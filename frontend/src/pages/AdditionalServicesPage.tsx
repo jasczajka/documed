@@ -11,7 +11,7 @@ import { useNotification } from 'shared/hooks/useNotification';
 import { getYearAgoAsDateString } from 'shared/utils/getYearAgoAsDateString';
 
 const AdditionalServicesPage: FC = () => {
-  const { user, isPatient, isDoctor } = useAuth();
+  const { user, isPatient } = useAuth();
   const { showNotification, NotificationComponent } = useNotification();
   const [isArchivalModeOn, setIsArchivalModeOn] = useState(false);
 
@@ -79,7 +79,6 @@ const AdditionalServicesPage: FC = () => {
         <AdditionalServicesTable
           additionalServices={additionalServices}
           patientId={isPatient ? user.id : undefined}
-          doctorId={isDoctor ? user.id : undefined}
           refetch={async () => {
             if (isPatient) {
               refetchPatientAdditionalServices();

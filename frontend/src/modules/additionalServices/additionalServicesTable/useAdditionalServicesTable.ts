@@ -55,7 +55,6 @@ export const useAdditionalServicesTable = ({
   filters: AdditionalServiceFilters;
   allAdditionalServices: Service[];
   displayPatientColumn: boolean;
-  doctorId?: number;
 }) => {
   const filterByPatientName = useMemo(() => {
     if (!filters.patientName) {
