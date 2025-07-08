@@ -23,7 +23,11 @@ public class ServiceService {
   }
 
   public List<com.documed.backend.services.model.Service> getAllRegular() {
-    return serviceDAO.getAllRegular();
+    return serviceDAO.getByType(ServiceType.REGULAR_SERVICE);
+  }
+
+  public List<com.documed.backend.services.model.Service> getAllAdditional() {
+    return serviceDAO.getByType(ServiceType.ADDITIONAL_SERVICE);
   }
 
   public Optional<com.documed.backend.services.model.Service> getById(int id) {
@@ -49,9 +53,7 @@ public class ServiceService {
     com.documed.backend.services.model.Service createdService = serviceDAO.create(service);
     addSpecializationsToService(createdService.getId(), specializationIds);
 
-    if (type == ServiceType.REGULAR_SERVICE) {
-      subscriptionService.createSubscriptionToServiceForNewService(createdService.getId());
-    }
+    subscriptionService.createSubscriptionToServiceForNewService(createdService.getId());
 
     return createdService;
   }
