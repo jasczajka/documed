@@ -80,6 +80,11 @@
         role_attr_flags: SUPERUSER
       become_user: postgres
       
+    - name: Ensure cron is installed
+      package:
+        name: cron
+        state: present
+
     - name: Set pg_cron database in postgresql.conf
       lineinfile:
         path: /etc/postgresql/15/main/postgresql.conf
@@ -117,9 +122,9 @@
       cron:
         name: "Weekly PostgreSQL backup"
         user: admin 
-        minute: "*"
-        hour: "*"
-        weekday: "*"
+        minute: "0"
+        hour: "2"
+        weekday: "0"
         job: >-
           PGPASSWORD='{{ vault_postgres_admin_password }}' {{ pg_dump_path }} -Fc -U admin -d {{ cron_db }} > 
           {{ backup_dir }}/{{ cron_db }}_$(date +\%F).dump
