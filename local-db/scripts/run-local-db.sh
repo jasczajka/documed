@@ -4,24 +4,21 @@ CONTAINER_NAME="local-postgres"
 IMAGE="custom-postgres"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SQL_INIT_PATH="$SCRIPT_DIR/../../Configuration/ansible/queries/documed_ddl.sql"
+SQL_TEST_DATA_PATH="$SCRIPT_DIR/../../Configuration/ansible/queries/initial_load_test_data.sql"
 SQL_CRON_PATH="$SCRIPT_DIR/../../Configuration/ansible/queries/documed_cron_jobs_local_db.sql"
 
 INIT_SQL_ABS="$(realpath "$SQL_INIT_PATH")"
+TEST_DATA_SQL_ABS="$(realpath "$SQL_TEST_DATA_PATH")"
 CRON_SQL_ABS="$(realpath "$SQL_CRON_PATH")"
 
 DB_USER="admin"
 DB_PASSWORD="4444"
 DB_NAME="prod_db"
 
-if [ ! -f "$INIT_SQL_ABS" ]; then
-  echo "SQL init file not found at $SQL_INIT_PATH"
-  exit 1
-fi
+[[ -f "$INIT_SQL_ABS" ]] || { echo "SQL init file not found: $SQL_INIT_PATH"; exit 1; }
+[[ -f "$TEST_DATA_SQL_ABS" ]] || { echo "Test data SQL file not found: $SQL_TEST_DATA_PATH"; exit 1; }
+[[ -f "$CRON_SQL_ABS" ]] || { echo "Cron SQL file not found: $SQL_CRON_PATH"; exit 1; }
 
-if [ ! -f "$CRON_SQL_ABS" ]; then
-  echo "Cron SQL init file not found at $SQL_CRON_PATH"
-  exit 1
-fi
 
 # Build the custom Postgres image from Dockerfile if not already built
 if [[ "$(docker images -q $IMAGE)" == "" ]]; then
@@ -53,6 +50,13 @@ until docker exec $CONTAINER_NAME pg_isready -U $DB_USER -d $DB_NAME -t 60; do
   echo "Waiting for PostgreSQL to start..."
   sleep 2
 done
+
+
+echo "Loading test data..."
+cat "$TEST_DATA_SQL_ABS" \
+  | docker exec -i $CONTAINER_NAME \
+      psql -U $DB_USER -d $DB_NAME
+
 
 echo "Scheduling cron jobs..."
 cat "$CRON_SQL_ABS" \
