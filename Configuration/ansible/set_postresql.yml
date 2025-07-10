@@ -8,6 +8,7 @@
   vars:
     cron_db: "prod_db"
     backup_dir: "/var/backups/postgresql"
+    pg_dump_path: "/usr/bin/pg_dump"
 
   tasks:
     - name: Install PostgreSQL and required packages
@@ -40,6 +41,13 @@
         block: |
           host    all             all             0.0.0.0/0            md5
           host    all             all             ::/0                 md5
+
+    - name: Configure local backup authentication
+      blockinfile:
+        path: /etc/postgresql/15/main/pg_hba.conf
+        marker: "# {mark} Ansible managed block for local backup"
+        block: |
+          local   {{ cron_db }}    admin                   md5
 
     - name: Restart PostgreSQL
       service:
@@ -108,15 +116,14 @@
     - name: Schedule weekly pg_dump backup via cron on Sunday at 2:00
       cron:
         name: "Weekly PostgreSQL backup"
-        user: postgres
+        user: admin 
         minute: "*"
         hour: "*"
         weekday: "*"
-        # uncomment and remove above after testing
-        # minute: "0"
-        # hour: "2"
-        # weekday: "0"
-        job: "pg_dump -Fc -U postgres {{ cron_db }} > {{ backup_dir }}/{{ cron_db }}_$(date +\\%F_%H-%M).dump"
+        job: >-
+          PGPASSWORD='{{ vault_postgres_admin_password }}' {{ pg_dump_path }} -Fc -U admin -d {{ cron_db }} > 
+          {{ backup_dir }}/{{ cron_db }}_$(date +\%F).dump
+          2>> {{ backup_dir }}/backup_errors.log
       
     - name: Schedule jobs using existing SQL file
       postgresql_query:
