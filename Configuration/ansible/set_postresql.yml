@@ -42,13 +42,6 @@
           host    all             all             0.0.0.0/0            md5
           host    all             all             ::/0                 md5
 
-    - name: Configure local backup authentication
-      blockinfile:
-        path: /etc/postgresql/15/main/pg_hba.conf
-        marker: "# {mark} Ansible managed block for local backup"
-        block: |
-          local   {{ cron_db }}    admin                   md5
-
     - name: Restart PostgreSQL
       service:
         name: postgresql
@@ -110,25 +103,40 @@
         query: "{{ lookup('file', 'queries/documed_ddl.sql') }}"
       become_user: postgres
 
-    - name: Ensure backup directory exists
+    - name: Create pgbackup group
+      group:
+        name: pgbackup
+        state: present
+
+    - name: Add postgres and admin to pgbackup group
+      user:
+        name: "{{ item }}"
+        groups: pgbackup
+        append: yes
+      loop:
+        - postgres
+        - admin
+
+    - name: Ensure backup directory exists with secure permissions
       file:
         path: "{{ backup_dir }}"
         state: directory
         owner: postgres
-        group: postgres
-        mode: '0755'
+        group: pgbackup
+        mode: '0750'
 
     - name: Schedule weekly pg_dump backup via cron on Sunday at 2:00
       cron:
         name: "Weekly PostgreSQL backup"
-        user: admin 
+        user: postgres 
         minute: "0"
         hour: "2"
         weekday: "0"
         job: >-
-          PGPASSWORD='{{ vault_postgres_admin_password }}' {{ pg_dump_path }} -Fc -U admin -d {{ cron_db }} > 
-          {{ backup_dir }}/{{ cron_db }}_$(date +\%F).dump
-          2>> {{ backup_dir }}/backup_errors.log
+          /bin/bash -c '
+          export PATH=/usr/bin:/bin;
+          {{ pg_dump_path }} -Fc -d {{ cron_db }} -f "{{ backup_dir }}/{{ cron_db }}_$(date +\%F_\%H\%M\%S).dump"
+          ' >> {{ backup_dir }}/backup.log 2>&1
       
     - name: Schedule jobs using existing SQL file
       postgresql_query:
