@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.Objects;
 import lombok.NonNull;
 import org.springframework.jdbc.core.RowMapper;
 
@@ -16,7 +17,8 @@ public class AdditionalServiceWithDetailsRowMapper
     return AdditionalServiceWithDetails.builder()
         .id(rs.getInt("id"))
         .description(rs.getString("description"))
-        .date(getLocalDateOrNull(rs, "date"))
+        .date(Objects.requireNonNull(getLocalDateOrNull(rs, "date")))
+        .totalCost(rs.getBigDecimal("total_cost"))
         .fulfillerId(rs.getInt("fulfiller_id"))
         .fulfillerFullName(
             rs.getString("fulfiller_last_name") + " " + rs.getString("fulfiller_first_name"))

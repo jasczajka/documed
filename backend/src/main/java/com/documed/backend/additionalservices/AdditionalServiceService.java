@@ -10,10 +10,14 @@ import com.documed.backend.exceptions.InvalidAssignmentException;
 import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.notifications.NotificationService;
 import com.documed.backend.services.ServiceDAO;
+import com.documed.backend.services.ServiceService;
 import com.documed.backend.services.model.ServiceType;
 import com.documed.backend.users.UserDAO;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
+import com.documed.backend.users.services.SubscriptionService;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -31,6 +35,8 @@ public class AdditionalServiceService {
   private final UserDAO userDAO;
   private final ServiceDAO serviceDAO;
   private final NotificationService notificationService;
+  private final SubscriptionService subscriptionService;
+  private final ServiceService serviceService;
 
   public List<AdditionalServiceWithDetails> getAllWithDetailsBetweenDates(LocalDate startDate) {
     return additionalServiceDAO.findAllWithDetailsBetweenDates(startDate);
@@ -55,12 +61,6 @@ public class AdditionalServiceService {
   public List<AdditionalServiceWithDetails> getByServiceIdWithDetailsBetweenDates(
       int serviceId, LocalDate startDate) {
     return additionalServiceDAO.findByServiceIdWithDetailsBetweenDates(serviceId, startDate);
-  }
-
-  public List<AdditionalServiceWithDetails> getByPatientIdAndFulfillerIdWithDetailsBetweenDates(
-      int patientId, int fulfillerId, LocalDate startDate) {
-    return additionalServiceDAO.findByPatientIdAndFulfillerIdWithDetailsBetweenDates(
-        patientId, fulfillerId, startDate);
   }
 
   public List<AdditionalService> getAll() {
@@ -98,6 +98,8 @@ public class AdditionalServiceService {
       throw new InvalidAssignmentException("This service is not of type additional service");
     }
 
+    BigDecimal totalCost = calculateTotalCost(serviceId, patient);
+
     AdditionalService additionalService =
         AdditionalService.builder()
             .description(description)
@@ -105,6 +107,7 @@ public class AdditionalServiceService {
             .fulfillerId(fulfillerId)
             .patientId(patientId)
             .serviceId(serviceId)
+            .totalCost(totalCost)
             .build();
 
     return additionalServiceDAO.create(additionalService);
@@ -117,21 +120,6 @@ public class AdditionalServiceService {
     attachments.forEach(attachment -> s3Service.deleteFile(attachment.getId()));
 
     return additionalServiceDAO.delete(additionalServiceId);
-  }
-
-  public List<AdditionalService> getByFulfiller(int fulfillerId) {
-    userDAO.getById(fulfillerId).orElseThrow(() -> new NotFoundException("Fulfiller not found"));
-    return additionalServiceDAO.getByFulfillerId(fulfillerId);
-  }
-
-  public List<AdditionalService> getByService(int serviceId) {
-    serviceDAO.getById(serviceId).orElseThrow(() -> new NotFoundException("Service not found"));
-    return additionalServiceDAO.getByServiceId(serviceId);
-  }
-
-  public List<AdditionalService> getByPatient(int patientId) {
-    userDAO.getById(patientId).orElseThrow(() -> new NotFoundException("Patient not found"));
-    return additionalServiceDAO.getByPatientId(patientId);
   }
 
   @Transactional
@@ -168,6 +156,26 @@ public class AdditionalServiceService {
     if (patient.isEmailNotifications()) {
 
       notificationService.sendAdditionalServiceUpdateEmail(patient.getEmail(), id);
+    }
+  }
+
+  private BigDecimal calculateTotalCost(int serviceId, User patient) {
+
+    BigDecimal basicPrice = serviceService.getPriceForService(serviceId);
+    Integer subscriptionId = patient.getSubscriptionId();
+
+    if (subscriptionId == null) {
+      return basicPrice;
+    } else {
+      BigDecimal discount =
+          BigDecimal.valueOf(
+                  (100 - subscriptionService.getDiscountForService(serviceId, subscriptionId)))
+              .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+      if (discount.compareTo(BigDecimal.ZERO) > 0) {
+        return basicPrice.multiply(discount).setScale(2, RoundingMode.HALF_UP);
+      } else {
+        return basicPrice;
+      }
     }
   }
 }

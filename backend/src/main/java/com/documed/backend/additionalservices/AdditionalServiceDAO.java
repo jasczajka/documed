@@ -33,14 +33,15 @@ public class AdditionalServiceDAO implements FullDAO<AdditionalService, Addition
             .fulfillerId(rs.getInt("fulfiller_id"))
             .patientId(rs.getInt("patient_id"))
             .serviceId(rs.getInt("service_id"))
+            .totalCost(rs.getBigDecimal("total_cost"))
             .build();
   }
 
   @Override
   public AdditionalService create(AdditionalService additionalService) {
     String sql =
-        "INSERT INTO Additional_service (description, date, fulfiller_id, patient_id, service_id) "
-            + "VALUES (?, ?, ?, ?, ?) RETURNING id";
+        "INSERT INTO Additional_service (description, date, fulfiller_id, patient_id, service_id, total_cost) "
+            + "VALUES (?, ?, ?, ?, ?, ?) RETURNING id";
 
     Integer generatedId =
         jdbcTemplate.queryForObject(
@@ -50,7 +51,13 @@ public class AdditionalServiceDAO implements FullDAO<AdditionalService, Addition
             Date.valueOf(additionalService.getDate()),
             additionalService.getFulfillerId(),
             additionalService.getPatientId(),
-            additionalService.getServiceId());
+            additionalService.getServiceId(),
+            additionalService.getTotalCost());
+
+    if (generatedId == null) {
+      throw new CreationFailException("Failed to retrieve ID after insert.");
+    }
+
     return getById(generatedId)
         .orElseThrow(
             () -> new CreationFailException("Failed to retrieve created additional service"));
@@ -105,16 +112,6 @@ public class AdditionalServiceDAO implements FullDAO<AdditionalService, Addition
         sql, new AdditionalServiceWithDetailsRowMapper(), serviceId, startDate);
   }
 
-  public List<AdditionalServiceWithDetails> findByPatientIdAndFulfillerIdWithDetailsBetweenDates(
-      int patientId, int fulfillerId, LocalDate startDate) {
-    String sql =
-        ADDITIONAL_SERVICE_DETAILS_BASE_QUERY
-            + " WHERE a.patient_id = ? AND a.fulfiller_id = ? AND a.date >= ?"
-            + " ORDER BY a.date DESC, a.id DESC";
-    return jdbcTemplate.query(
-        sql, new AdditionalServiceWithDetailsRowMapper(), patientId, fulfillerId, startDate);
-  }
-
   @Override
   public Optional<AdditionalService> getById(int id) {
     String sql = "SELECT * FROM Additional_service WHERE id = ?";
@@ -124,21 +121,6 @@ public class AdditionalServiceDAO implements FullDAO<AdditionalService, Addition
   public List<AdditionalService> getAll() {
     String sql = "SELECT * FROM Additional_service";
     return jdbcTemplate.query(sql, rowMapper);
-  }
-
-  public List<AdditionalService> getByFulfillerId(int fulfillerId) {
-    String sql = "SELECT * FROM Additional_service WHERE fulfiller_id = ?";
-    return jdbcTemplate.query(sql, rowMapper, fulfillerId);
-  }
-
-  public List<AdditionalService> getByPatientId(int patientId) {
-    String sql = "SELECT * FROM Additional_service WHERE patient_id = ?";
-    return jdbcTemplate.query(sql, rowMapper, patientId);
-  }
-
-  public List<AdditionalService> getByServiceId(int serviceId) {
-    String sql = "SELECT * FROM Additional_service WHERE service_id = ?";
-    return jdbcTemplate.query(sql, rowMapper, serviceId);
   }
 
   public int updateDescription(int id, String description) {

@@ -1,6 +1,7 @@
 package com.documed.backend.additionalservices.model;
 
 import com.documed.backend.notifications.Notification;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
@@ -21,6 +22,8 @@ public class AdditionalService {
   private int patientId;
 
   private int serviceId;
+
+  private BigDecimal totalCost;
 
   private List<Notification> notifications;
 
