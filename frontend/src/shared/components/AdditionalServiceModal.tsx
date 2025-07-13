@@ -17,6 +17,7 @@ import {
   useUpdateAdditionalServiceDescription,
 } from 'shared/api/generated/additional-service-controller/additional-service-controller';
 import { FileInfoDTO, Service } from 'shared/api/generated/generated.schemas';
+import { useCalculateServiceCost } from 'shared/api/generated/service-controller/service-controller';
 import { appConfig } from 'shared/appConfig';
 import { useFileUpload } from 'shared/hooks/useFileUpload';
 import { useNotification } from 'shared/hooks/useNotification';
@@ -99,6 +100,12 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
   const [hasUnuploadedFiles, setHasUnuploadedFiles] = useState(false);
 
   const watchedDescription = useWatch({ control, name: 'description' });
+  const watchedCurrentlyChosenAdditionalServiceId = useWatch({ control, name: 'serviceId' });
+
+  const { data: additionalServiceCost } = useCalculateServiceCost(
+    { patientId: patientId, serviceId: watchedCurrentlyChosenAdditionalServiceId ?? -1 },
+    { query: { enabled: !!watchedCurrentlyChosenAdditionalServiceId } },
+  );
 
   const { mutateAsync: createAdditionalService, isPending: isCreateAdditionalServiceLoading } =
     useCreateAdditionalService();
@@ -211,6 +218,19 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
             )}
           />
         </Stack>
+        <TextField
+          label="Cena usługi"
+          value={
+            additionalServiceCost
+              ? `${additionalServiceCost.toFixed(2)} zł`
+              : 'Wybierz usługę, aby poznać cenę'
+          }
+          fullWidth
+          slotProps={{ input: { readOnly: true } }}
+          sx={{
+            pointerEvents: 'none',
+          }}
+        />
         <DialogContent sx={{ p: 0, paddingTop: 2 }}>
           <Controller
             name="description"

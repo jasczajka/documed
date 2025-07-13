@@ -21,7 +21,6 @@ import type {
 import { useMutation, useQuery } from '@tanstack/react-query';
 
 import type {
-  CalculateVisitCostParams,
   GetAllVisitsParams,
   GetVisitsByDoctorIdParams,
   GetVisitsByPatientIdParams,
@@ -1205,123 +1204,6 @@ export function useGetVisitsByDoctorId<
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
   const queryOptions = getGetVisitsByDoctorIdQueryOptions(id, params, options);
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
-    queryKey: DataTag<QueryKey, TData, TError>;
-  };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-}
-
-/**
- * @summary Calculate visit cost
- */
-export const calculateVisitCost = (params: CalculateVisitCostParams, signal?: AbortSignal) => {
-  return customInstance<number>({
-    url: `/api/visits/calculate-cost`,
-    method: 'GET',
-    params,
-    signal,
-  });
-};
-
-export const getCalculateVisitCostQueryKey = (params: CalculateVisitCostParams) => {
-  return [`/api/visits/calculate-cost`, ...(params ? [params] : [])] as const;
-};
-
-export const getCalculateVisitCostQueryOptions = <
-  TData = Awaited<ReturnType<typeof calculateVisitCost>>,
-  TError = ErrorType<unknown>,
->(
-  params: CalculateVisitCostParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof calculateVisitCost>>, TError, TData>>;
-  },
-) => {
-  const { query: queryOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getCalculateVisitCostQueryKey(params);
-
-  const queryFn: QueryFunction<Awaited<ReturnType<typeof calculateVisitCost>>> = ({ signal }) =>
-    calculateVisitCost(params, signal);
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof calculateVisitCost>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type CalculateVisitCostQueryResult = NonNullable<
-  Awaited<ReturnType<typeof calculateVisitCost>>
->;
-export type CalculateVisitCostQueryError = ErrorType<unknown>;
-
-export function useCalculateVisitCost<
-  TData = Awaited<ReturnType<typeof calculateVisitCost>>,
-  TError = ErrorType<unknown>,
->(
-  params: CalculateVisitCostParams,
-  options: {
-    query: Partial<UseQueryOptions<Awaited<ReturnType<typeof calculateVisitCost>>, TError, TData>> &
-      Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof calculateVisitCost>>,
-          TError,
-          Awaited<ReturnType<typeof calculateVisitCost>>
-        >,
-        'initialData'
-      >;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useCalculateVisitCost<
-  TData = Awaited<ReturnType<typeof calculateVisitCost>>,
-  TError = ErrorType<unknown>,
->(
-  params: CalculateVisitCostParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<Awaited<ReturnType<typeof calculateVisitCost>>, TError, TData>
-    > &
-      Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof calculateVisitCost>>,
-          TError,
-          Awaited<ReturnType<typeof calculateVisitCost>>
-        >,
-        'initialData'
-      >;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-export function useCalculateVisitCost<
-  TData = Awaited<ReturnType<typeof calculateVisitCost>>,
-  TError = ErrorType<unknown>,
->(
-  params: CalculateVisitCostParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof calculateVisitCost>>, TError, TData>>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-/**
- * @summary Calculate visit cost
- */
-
-export function useCalculateVisitCost<
-  TData = Awaited<ReturnType<typeof calculateVisitCost>>,
-  TError = ErrorType<unknown>,
->(
-  params: CalculateVisitCostParams,
-  options?: {
-    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof calculateVisitCost>>, TError, TData>>;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-  const queryOptions = getCalculateVisitCostQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;

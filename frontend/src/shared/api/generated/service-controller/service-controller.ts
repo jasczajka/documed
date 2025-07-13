@@ -20,7 +20,12 @@ import type {
 } from '@tanstack/react-query';
 import { useMutation, useQuery } from '@tanstack/react-query';
 
-import type { CreateServiceDTO, Service, Specialization } from '../generated.schemas';
+import type {
+  CalculateServiceCostParams,
+  CreateServiceDTO,
+  Service,
+  Specialization,
+} from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
@@ -738,6 +743,131 @@ export function useGetAllRegularServices<
   queryClient?: QueryClient,
 ): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
   const queryOptions = getGetAllRegularServicesQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+}
+
+/**
+ * @summary Calculate service cost
+ */
+export const calculateServiceCost = (params: CalculateServiceCostParams, signal?: AbortSignal) => {
+  return customInstance<number>({
+    url: `/api/services/calculate-cost`,
+    method: 'GET',
+    params,
+    signal,
+  });
+};
+
+export const getCalculateServiceCostQueryKey = (params: CalculateServiceCostParams) => {
+  return [`/api/services/calculate-cost`, ...(params ? [params] : [])] as const;
+};
+
+export const getCalculateServiceCostQueryOptions = <
+  TData = Awaited<ReturnType<typeof calculateServiceCost>>,
+  TError = ErrorType<unknown>,
+>(
+  params: CalculateServiceCostParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof calculateServiceCost>>, TError, TData>
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getCalculateServiceCostQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof calculateServiceCost>>> = ({ signal }) =>
+    calculateServiceCost(params, signal);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof calculateServiceCost>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type CalculateServiceCostQueryResult = NonNullable<
+  Awaited<ReturnType<typeof calculateServiceCost>>
+>;
+export type CalculateServiceCostQueryError = ErrorType<unknown>;
+
+export function useCalculateServiceCost<
+  TData = Awaited<ReturnType<typeof calculateServiceCost>>,
+  TError = ErrorType<unknown>,
+>(
+  params: CalculateServiceCostParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof calculateServiceCost>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof calculateServiceCost>>,
+          TError,
+          Awaited<ReturnType<typeof calculateServiceCost>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useCalculateServiceCost<
+  TData = Awaited<ReturnType<typeof calculateServiceCost>>,
+  TError = ErrorType<unknown>,
+>(
+  params: CalculateServiceCostParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof calculateServiceCost>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof calculateServiceCost>>,
+          TError,
+          Awaited<ReturnType<typeof calculateServiceCost>>
+        >,
+        'initialData'
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useCalculateServiceCost<
+  TData = Awaited<ReturnType<typeof calculateServiceCost>>,
+  TError = ErrorType<unknown>,
+>(
+  params: CalculateServiceCostParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof calculateServiceCost>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Calculate service cost
+ */
+
+export function useCalculateServiceCost<
+  TData = Awaited<ReturnType<typeof calculateServiceCost>>,
+  TError = ErrorType<unknown>,
+>(
+  params: CalculateServiceCostParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof calculateServiceCost>>, TError, TData>
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+  const queryOptions = getCalculateServiceCostQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;
