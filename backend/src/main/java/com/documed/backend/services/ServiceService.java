@@ -4,7 +4,9 @@ import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.services.model.ServiceType;
 import com.documed.backend.users.model.Specialization;
 import com.documed.backend.users.services.SubscriptionService;
+import com.documed.backend.users.services.UserService;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
@@ -17,6 +19,7 @@ public class ServiceService {
 
   private final ServiceDAO serviceDAO;
   private final SubscriptionService subscriptionService;
+  private final UserService userService;
 
   public List<com.documed.backend.services.model.Service> getAll() {
     return serviceDAO.getAll();
@@ -101,5 +104,25 @@ public class ServiceService {
         .getById(serviceId)
         .map(com.documed.backend.services.model.Service::getPrice)
         .orElseThrow(() -> new NotFoundException("Service not found"));
+  }
+
+  public BigDecimal calculateTotalCost(int serviceId, int patientId) {
+
+    BigDecimal basicPrice = this.getPriceForService(serviceId);
+    Integer subscriptionId = userService.getSubscriptionIdForPatient(patientId);
+
+    if (subscriptionId == null) {
+      return basicPrice;
+    } else {
+      BigDecimal discount =
+          BigDecimal.valueOf(
+                  (100 - subscriptionService.getDiscountForService(serviceId, subscriptionId)))
+              .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+      if (discount.compareTo(BigDecimal.ZERO) > 0) {
+        return basicPrice.multiply(discount).setScale(2, RoundingMode.HALF_UP);
+      } else {
+        return basicPrice;
+      }
+    }
   }
 }

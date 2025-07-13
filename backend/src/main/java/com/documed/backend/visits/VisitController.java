@@ -4,6 +4,7 @@ import com.documed.backend.auth.AuthService;
 import com.documed.backend.auth.annotations.DoctorOnly;
 import com.documed.backend.auth.annotations.DoctorOrPatient;
 import com.documed.backend.auth.exceptions.UnauthorizedException;
+import com.documed.backend.services.ServiceService;
 import com.documed.backend.users.model.UserRole;
 import com.documed.backend.visits.dtos.GiveFeedbackDTO;
 import com.documed.backend.visits.dtos.ScheduleVisitDTO;
@@ -14,7 +15,6 @@ import com.documed.backend.visits.model.Visit;
 import com.documed.backend.visits.model.VisitWithDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
@@ -32,6 +32,7 @@ public class VisitController {
 
   private final VisitService visitService;
   private final AuthService authService;
+  private final ServiceService serviceService;
 
   private static final Period DEFAULT_VISIT_LOOKBACK_PERIOD = Period.ofMonths(3);
 
@@ -187,14 +188,6 @@ public class VisitController {
     } else {
       return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
-  }
-
-  @GetMapping("/calculate-cost")
-  @Operation(summary = "Calculate visit cost")
-  public ResponseEntity<BigDecimal> calculateVisitCost(
-      @RequestParam int patientId, @RequestParam int serviceId) {
-    return new ResponseEntity<>(
-        visitService.calculateTotalCost(serviceId, patientId), HttpStatus.OK);
   }
 
   @Secured("PATIENT")

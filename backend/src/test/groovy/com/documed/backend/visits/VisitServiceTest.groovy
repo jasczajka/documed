@@ -32,7 +32,6 @@ class VisitServiceTest extends Specification {
 	def timeSlotService = Mock(TimeSlotService)
 	def authService = Mock(AuthService)
 	def serviceService = Mock(ServiceService)
-	def subscriptionService = Mock(SubscriptionService)
 	def userService = Mock(UserService)
 	def prescriptionService = Mock(PrescriptionService)
 	def referralService = Mock(ReferralService)
@@ -40,7 +39,7 @@ class VisitServiceTest extends Specification {
 
 
 	@Subject
-	def visitService = new VisitService(visitDAO, feedbackDAO, timeSlotService, authService, serviceService, userService, subscriptionService, prescriptionService, referralService, notificationService)
+	def visitService = new VisitService(visitDAO, feedbackDAO, timeSlotService, authService, serviceService, userService, prescriptionService, referralService, notificationService)
 
 	private VisitWithDetails buildVisitWithDetails(Map overrides = [:]) {
 		return VisitWithDetails.builder()
@@ -114,7 +113,7 @@ class VisitServiceTest extends Specification {
 
 		then:
 		1 * timeSlotService.getTimeSlotById(dto.firstTimeSlotId) >> Optional.of(slot)
-		1 * serviceService.getPriceForService(dto.serviceId) >> BigDecimal.valueOf(50)
+		1 * serviceService.calculateTotalCost(dto.serviceId, dto.patientId) >> BigDecimal.valueOf(50)
 		1 * visitDAO.create(_) >> createdVisit
 		1 * timeSlotService.reserveTimeSlotsForVisit(createdVisit, slot) >> timeRange
 		1 * visitDAO.updateWithTimeInfo(_) >> { Visit v ->
@@ -473,74 +472,7 @@ class VisitServiceTest extends Specification {
 	}
 
 
-	def "calculateTotalCost should return basic price when no subscription"() {
-		given:
-		def serviceId = 1
-		def patientId = 10
-		def basicPrice = BigDecimal.valueOf(100)
 
-		when:
-		def result = visitService.calculateTotalCost(serviceId, patientId)
-
-		then:
-		1 * serviceService.getPriceForService(serviceId) >> basicPrice
-		1 * userService.getSubscriptionIdForPatient(patientId) >> 0
-		result == basicPrice
-	}
-
-	def "calculateTotalCost should apply discount when subscription exists"() {
-		given:
-		def serviceId = 1
-		def patientId = 10
-		def subscriptionId = 5
-		def basicPrice = BigDecimal.valueOf(100)
-		def discount = 20
-
-		when:
-		def result = visitService.calculateTotalCost(serviceId, patientId)
-
-		then:
-		1 * serviceService.getPriceForService(serviceId) >> basicPrice
-		1 * userService.getSubscriptionIdForPatient(patientId) >> subscriptionId
-		1 * subscriptionService.getDiscountForService(serviceId, subscriptionId) >> discount
-		result == BigDecimal.valueOf(80)
-	}
-
-	def "calculateTotalCost should return basic price when discount is 0"() {
-		given:
-		def serviceId = 1
-		def patientId = 10
-		def subscriptionId = 3
-		def basicPrice = BigDecimal.valueOf(100)
-		def discount = 0
-
-		when:
-		def result = visitService.calculateTotalCost(serviceId, patientId)
-
-		then:
-		1 * serviceService.getPriceForService(serviceId) >> basicPrice
-		1 * userService.getSubscriptionIdForPatient(patientId) >> subscriptionId
-		1 * subscriptionService.getDiscountForService(serviceId, subscriptionId) >> discount
-		result == basicPrice
-	}
-
-	def "calculateTotalCost should return basic price when discount results in zero or negative multiplier"() {
-		given:
-		def serviceId = 1
-		def patientId = 10
-		def subscriptionId = 5
-		def basicPrice = BigDecimal.valueOf(100)
-		def discount = 105 // This makes (100 - 105) = -5 -> discount multiplier <= 0
-
-		when:
-		def result = visitService.calculateTotalCost(serviceId, patientId)
-
-		then:
-		1 * serviceService.getPriceForService(serviceId) >> basicPrice
-		1 * userService.getSubscriptionIdForPatient(patientId) >> subscriptionId
-		1 * subscriptionService.getDiscountForService(serviceId, subscriptionId) >> discount
-		result == basicPrice
-	}
 
 	def "closeVisit should remove empty prescription"() {
 		given:
