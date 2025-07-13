@@ -5,23 +5,29 @@ import com.documed.backend.services.model.ServiceType
 import com.documed.backend.users.model.Specialization
 import com.documed.backend.users.model.Subscription
 import com.documed.backend.users.services.SubscriptionService
+import com.documed.backend.users.services.UserService
 import spock.lang.Specification
 
 class ServiceServiceTest extends Specification {
 
 	def serviceDAO = Mock(ServiceDAO)
 	def subscriptionService = Mock(SubscriptionService)
-	def serviceService = new ServiceService(serviceDAO, subscriptionService)
+	def userService = Mock(UserService)
+	def serviceService = new ServiceService(serviceDAO, subscriptionService, userService)
+
+	private Service buildService(Map overrides = [:]) {
+		return Service.builder()
+				.id(overrides.id ?: 1)
+				.name(overrides.name ?: "Konsultacja")
+				.price(overrides.price ?: BigDecimal.valueOf(120))
+				.type(overrides.type ?: ServiceType.REGULAR_SERVICE)
+				.estimatedTime(overrides.estimatedTime ?: 45)
+				.build()
+	}
 
 	def "getAll returns all services"() {
 		given:
-		def service = Service.builder()
-				.id(1)
-				.name("Konsultacja")
-				.price(BigDecimal.valueOf(120))
-				.type(ServiceType.REGULAR_SERVICE)
-				.estimatedTime(45)
-				.build()
+		def service = buildService()
 		serviceDAO.getAll() >> [service]
 
 		when:
@@ -212,5 +218,78 @@ class ServiceServiceTest extends Specification {
 
 		then:
 		result == 1
+	}
+
+	def "calculateTotalCost should return basic price when no subscription"() {
+		given:
+		def serviceId = 1
+		def patientId = 10
+		def basicPrice = BigDecimal.valueOf(100)
+		def service = buildService(price: basicPrice)
+
+		when:
+		def result = serviceService.calculateTotalCost(serviceId, patientId)
+
+		then:
+		1 * serviceDAO.getById(serviceId) >> Optional.of(service)
+		1 * userService.getSubscriptionIdForPatient(patientId) >> 0
+		result == basicPrice
+	}
+
+	def "calculateTotalCost should apply discount when subscription exists"() {
+		given:
+		def serviceId = 1
+		def patientId = 10
+		def subscriptionId = 5
+		def basicPrice = BigDecimal.valueOf(100)
+		def discount = 20
+		def service = buildService(price: basicPrice)
+
+		when:
+		def result = serviceService.calculateTotalCost(serviceId, patientId)
+
+		then:
+		1 * serviceDAO.getById(serviceId) >> Optional.of(service)
+		1 * userService.getSubscriptionIdForPatient(patientId) >> subscriptionId
+		1 * subscriptionService.getDiscountForService(serviceId, subscriptionId) >> discount
+		result == BigDecimal.valueOf(80)
+	}
+
+	def "calculateTotalCost should return basic price when discount is 0"() {
+		given:
+		def serviceId = 1
+		def patientId = 10
+		def subscriptionId = 3
+		def basicPrice = BigDecimal.valueOf(100)
+		def discount = 0
+		def service = buildService(price: basicPrice)
+
+		when:
+		def result = serviceService.calculateTotalCost(serviceId, patientId)
+
+		then:
+		1 * serviceDAO.getById(serviceId) >> Optional.of(service)
+		1 * userService.getSubscriptionIdForPatient(patientId) >> subscriptionId
+		1 * subscriptionService.getDiscountForService(serviceId, subscriptionId) >> discount
+		result == basicPrice
+	}
+
+	def "calculateTotalCost should return basic price when discount results in zero or negative multiplier"() {
+		given:
+		def serviceId = 1
+		def patientId = 10
+		def subscriptionId = 5
+		def basicPrice = BigDecimal.valueOf(100)
+		def discount = 105
+		def service = buildService(price: basicPrice)
+
+		when:
+		def result = serviceService.calculateTotalCost(serviceId, patientId)
+
+		then:
+		1 * serviceDAO.getById(serviceId) >> Optional.of(service)
+		1 * userService.getSubscriptionIdForPatient(patientId) >> subscriptionId
+		1 * subscriptionService.getDiscountForService(serviceId, subscriptionId) >> discount
+		result == basicPrice
 	}
 }

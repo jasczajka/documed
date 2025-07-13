@@ -15,7 +15,6 @@ import com.documed.backend.schedules.model.TimeSlot;
 import com.documed.backend.services.ServiceService;
 import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
-import com.documed.backend.users.services.SubscriptionService;
 import com.documed.backend.users.services.UserService;
 import com.documed.backend.visits.dtos.ScheduleVisitDTO;
 import com.documed.backend.visits.dtos.UpdateVisitDTO;
@@ -25,7 +24,6 @@ import com.documed.backend.visits.model.Visit;
 import com.documed.backend.visits.model.VisitStatus;
 import com.documed.backend.visits.model.VisitWithDetails;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +44,6 @@ public class VisitService {
   private final AuthService authService;
   private final ServiceService serviceService;
   private final UserService userService;
-  private final SubscriptionService subscriptionService;
   private final PrescriptionService prescriptionService;
   private final ReferralService referralService;
   private final NotificationService notificationService;
@@ -131,7 +128,8 @@ public class VisitService {
   private Visit createVisit(ScheduleVisitDTO scheduleVisitDTO) {
 
     BigDecimal totalCost =
-        calculateTotalCost(scheduleVisitDTO.getServiceId(), scheduleVisitDTO.getPatientId());
+        serviceService.calculateTotalCost(
+            scheduleVisitDTO.getServiceId(), scheduleVisitDTO.getPatientId());
 
     Visit visit =
         Visit.builder()
@@ -186,26 +184,6 @@ public class VisitService {
     visit.setRecommendations(updateVisitDTO.getRecommendations());
 
     return visitDAO.update(visit);
-  }
-
-  public BigDecimal calculateTotalCost(int serviceId, int patientId) {
-
-    BigDecimal basicPrice = serviceService.getPriceForService(serviceId);
-    Integer subscriptionId = userService.getSubscriptionIdForPatient(patientId);
-
-    if (subscriptionId == null) {
-      return basicPrice;
-    } else {
-      BigDecimal discount =
-          BigDecimal.valueOf(
-                  (100 - subscriptionService.getDiscountForService(serviceId, subscriptionId)))
-              .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-      if (discount.compareTo(BigDecimal.ZERO) > 0) {
-        return basicPrice.multiply(discount).setScale(2, RoundingMode.HALF_UP);
-      } else {
-        return basicPrice;
-      }
-    }
   }
 
   @Transactional

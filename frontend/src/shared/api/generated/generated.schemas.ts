@@ -52,6 +52,7 @@ export interface AdditionalServiceWithDetails {
   patientFullName: string;
   patientPesel: string;
   serviceId: number;
+  totalCost: number;
   serviceName: string;
   attachments: FileInfoDTO[];
 }
@@ -558,7 +559,7 @@ export type GetVisitsByDoctorIdParams = {
   startDate?: string;
 };
 
-export type CalculateVisitCostParams = {
+export type CalculateServiceCostParams = {
   patientId: number;
   serviceId: number;
 };

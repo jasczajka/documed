@@ -4,6 +4,7 @@ import com.documed.backend.auth.annotations.AdminOnly;
 import com.documed.backend.services.dtos.CreateServiceDTO;
 import com.documed.backend.services.model.Service;
 import com.documed.backend.users.model.Specialization;
+import io.swagger.v3.oas.annotations.Operation;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
@@ -116,5 +117,13 @@ public class ServiceController {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
           .body("Failed to remove specialization from service.");
     }
+  }
+
+  @GetMapping("/calculate-cost")
+  @Operation(summary = "Calculate service cost")
+  public ResponseEntity<BigDecimal> calculateServiceCost(
+      @RequestParam int patientId, @RequestParam int serviceId) {
+    return new ResponseEntity<>(
+        serviceService.calculateTotalCost(serviceId, patientId), HttpStatus.OK);
   }
 }

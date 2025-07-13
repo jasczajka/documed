@@ -13,11 +13,9 @@ import {
 import { FC, useMemo, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { AvailableTimeSlotDTO, ScheduleVisitDTO } from 'shared/api/generated/generated.schemas';
+import { useCalculateServiceCost } from 'shared/api/generated/service-controller/service-controller';
 import { useGetAvailableFirstTimeSlotsByFacility } from 'shared/api/generated/time-slot-controller/time-slot-controller';
-import {
-  useCalculateVisitCost,
-  useScheduleVisit,
-} from 'shared/api/generated/visit-controller/visit-controller';
+import { useScheduleVisit } from 'shared/api/generated/visit-controller/visit-controller';
 import { appConfig } from 'shared/appConfig';
 import { useAuthStore } from 'shared/hooks/stores/useAuthStore';
 import { useDoctorsStore } from 'shared/hooks/stores/useDoctorsStore';
@@ -137,7 +135,7 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
     },
   );
 
-  const { data: visitCost, refetch: refetchVisitCost } = useCalculateVisitCost(
+  const { data: visitCost, refetch: refetchVisitCost } = useCalculateServiceCost(
     { patientId: patientId, serviceId: selectedServiceId ?? -1 },
     { query: { enabled: !!selectedServiceId } },
   );

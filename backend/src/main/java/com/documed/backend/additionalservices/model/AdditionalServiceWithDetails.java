@@ -2,6 +2,7 @@ package com.documed.backend.additionalservices.model;
 
 import com.documed.backend.attachments.dtos.FileInfoDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
@@ -36,6 +37,9 @@ public class AdditionalServiceWithDetails {
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull private Integer serviceId;
+
+  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+  @NonNull private BigDecimal totalCost;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String serviceName;

@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS Additional_service (
     fulfiller_id int  NOT NULL,
     patient_id int NOT NULL,
     service_id int  NOT NULL,
+    total_cost decimal(6,2)  NULL,
     CONSTRAINT Additional_service_pk PRIMARY KEY (id)
 );
 
