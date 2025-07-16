@@ -102,6 +102,7 @@ export const useAuth = () => {
     address: string;
     phoneNumber: string;
     pesel?: string;
+    passportNumber?: string;
     birthdate: string;
   }) => {
     const response = await requestRegisterMutation({ data: userData });

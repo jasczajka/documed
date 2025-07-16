@@ -1,5 +1,5 @@
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Box, Button, TextField, Typography } from '@mui/material';
+import { Box, Button, Checkbox, FormControlLabel, TextField, Typography } from '@mui/material';
 import dayjs from 'dayjs';
 import { FC } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -10,13 +10,15 @@ import { getBirthDateFromPESEL } from '../utils';
 export type FormData = {
   firstName: string;
   lastName: string;
-  pesel: string;
+  pesel?: string;
+  passportNumber?: string;
   birthdate: string;
   phoneNumber: string;
   email: string;
   address: string;
   password: string;
   confirmPassword: string;
+  noPesel: boolean;
 };
 
 const validationSchema = Yup.object({
@@ -30,9 +32,26 @@ const validationSchema = Yup.object({
       'Musisz mieć co najmniej 18 lat',
       (value) => dayjs().diff(dayjs(value, 'YYYY-MM-DD'), 'years') >= 18,
     ),
-  pesel: Yup.string()
-    .matches(/^\d{11}$/, 'PESEL musi mieć dokładnie 11 cyfr')
-    .required('PESEL jest wymagany'),
+  noPesel: Yup.boolean().required(),
+  pesel: Yup.string().when('noPesel', {
+    is: false,
+    then: (schema) =>
+      schema
+        .matches(/^\d{11}$/, 'PESEL musi mieć dokładnie 11 cyfr')
+        .required('PESEL jest wymagany'),
+    otherwise: (schema) => schema.notRequired(),
+  }),
+  passportNumber: Yup.string().when('noPesel', {
+    is: true,
+    then: (schema) =>
+      schema
+        .required('Numer paszportu jest wymagany, jeśli nie podano PESEL')
+        .matches(
+          /^[A-Za-z0-9]{9}$/,
+          'Numer paszportu musi mieć dokładnie 9 znaków alfanumerycznych',
+        ),
+    otherwise: (schema) => schema.notRequired(),
+  }),
   phoneNumber: Yup.string()
     .matches(/^\d{9}$/, 'Numer telefonu musi mieć dokładnie 9 cyfr')
     .required('Numer telefonu jest wymagany'),
@@ -58,20 +77,25 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onSubmit, error, loading }
     handleSubmit,
     formState: { errors },
     setValue,
-  } = useForm({
+    watch,
+  } = useForm<FormData>({
     resolver: yupResolver(validationSchema),
     defaultValues: {
       firstName: '',
       lastName: '',
       pesel: '',
+      passportNumber: '',
       birthdate: '',
       phoneNumber: '',
       email: '',
       address: '',
       password: '',
       confirmPassword: '',
+      noPesel: false,
     },
   });
+
+  const showNoPesel = watch('noPesel');
 
   return (
     <Box
@@ -116,32 +140,66 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onSubmit, error, loading }
           )}
         />
       </Box>
-
+      <Controller
+        name="noPesel"
+        control={control}
+        defaultValue={false}
+        render={({ field: { value, onChange } }) => (
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={value}
+                onChange={(e) => {
+                  onChange(e.target.checked); // update form state
+                  setValue('pesel', '');
+                  setValue('passportNumber', '');
+                }}
+              />
+            }
+            label="Nie posiadam numeru PESEL"
+          />
+        )}
+      />
       <Box sx={{ display: 'flex', width: '100%', gap: 6 }}>
-        <Controller
-          name="pesel"
-          control={control}
-          render={({ field }) => (
-            <TextField
-              {...field}
-              label="PESEL"
-              placeholder="Wprowadź swój PESEL"
-              error={!!errors.pesel}
-              helperText={errors.pesel?.message}
-              fullWidth
-              onChange={(e) => {
-                field.onChange(e);
-                const value = e.target.value;
-                field.onChange(value);
-
-                if (value.length === 11) {
-                  const date = getBirthDateFromPESEL(value);
-                  setValue('birthdate', dayjs(date).format('YYYY-MM-DD'));
-                }
-              }}
-            />
-          )}
-        />
+        {!showNoPesel ? (
+          <Controller
+            name="pesel"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="PESEL"
+                placeholder="Wprowadź swój PESEL"
+                error={!!errors.pesel}
+                helperText={errors.pesel?.message}
+                fullWidth
+                onChange={(e) => {
+                  const value = e.target.value;
+                  field.onChange(value);
+                  if (value.length === 11) {
+                    const date = getBirthDateFromPESEL(value);
+                    setValue('birthdate', dayjs(date).format('YYYY-MM-DD'));
+                  }
+                }}
+              />
+            )}
+          />
+        ) : (
+          <Controller
+            name="passportNumber"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                label="Numer paszportu"
+                placeholder="Wprowadź numer paszportu"
+                error={!!errors.passportNumber}
+                helperText={errors.passportNumber?.message}
+                fullWidth
+              />
+            )}
+          />
+        )}
 
         <Controller
           name="phoneNumber"
