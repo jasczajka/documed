@@ -567,8 +567,8 @@ const SingleVisitPage: FC = () => {
             }
           />
           <PatientInfoPanel
-            patientId={visitInfo.patientId}
             patientPesel={visitInfo.patientPesel}
+            patientPassportNumber={visitInfo.patientPassportNumber}
             patientFullName={visitInfo.patientFullName}
             patientAge={getAgeFromBirthDate(new Date(visitInfo.patientBirthDate))}
           />
