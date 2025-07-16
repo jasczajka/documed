@@ -140,26 +140,7 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onSubmit, error, loading }
           )}
         />
       </Box>
-      <Controller
-        name="noPesel"
-        control={control}
-        defaultValue={false}
-        render={({ field: { value, onChange } }) => (
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={value}
-                onChange={(e) => {
-                  onChange(e.target.checked); // update form state
-                  setValue('pesel', '');
-                  setValue('passportNumber', '');
-                }}
-              />
-            }
-            label="Nie posiadam numeru PESEL"
-          />
-        )}
-      />
+
       <Box sx={{ display: 'flex', width: '100%', gap: 6 }}>
         {!showNoPesel ? (
           <Controller
@@ -216,6 +197,27 @@ export const RegisterForm: FC<RegisterFormProps> = ({ onSubmit, error, loading }
           )}
         />
       </Box>
+      <Controller
+        name="noPesel"
+        control={control}
+        defaultValue={false}
+        render={({ field: { value, onChange } }) => (
+          <FormControlLabel
+            sx={{ mt: -8, mb: -4, pl: 2 }}
+            control={
+              <Checkbox
+                checked={value}
+                onChange={(e) => {
+                  onChange(e.target.checked);
+                  setValue('pesel', '');
+                  setValue('passportNumber', '');
+                }}
+              />
+            }
+            label="Nie posiadam numeru PESEL"
+          />
+        )}
+      />
       <Box sx={{ display: 'flex', width: '100%', gap: 6 }}>
         <Controller
           name="email"
