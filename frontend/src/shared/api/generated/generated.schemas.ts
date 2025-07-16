@@ -50,7 +50,8 @@ export interface AdditionalServiceWithDetails {
   fulfillerFullName: string;
   patientId: number;
   patientFullName: string;
-  patientPesel: string;
+  patientPesel?: string;
+  patientPassportNumber?: string;
   serviceId: number;
   totalCost: number;
   serviceName: string;
@@ -110,7 +111,8 @@ export interface VisitWithDetails {
   patientInformation?: string;
   patientId: number;
   patientFullName: string;
-  patientPesel: string;
+  patientPesel?: string;
+  patientPassportNumber?: string;
   patientBirthDate: string;
   doctorId: number;
   doctorFullName: string;
@@ -253,6 +255,8 @@ export interface PatientRegisterRequestDTO {
   lastName: string;
   /** @pattern ^\d{11}$ */
   pesel?: string;
+  /** @pattern ^[A-Za-z0-9]{9}$ */
+  passportNumber?: string;
   /**
    * @minLength 1
    * @pattern ^\d{9}$
@@ -287,6 +291,7 @@ export interface PendingUserDTO {
   lastName?: string;
   email?: string;
   pesel?: string;
+  passportNumber?: string;
   phoneNumber?: string;
   address?: string;
   birthDate?: string;
@@ -454,6 +459,7 @@ export interface PatientDetailsDTO {
   address: string;
   phoneNumber: string;
   pesel?: string;
+  passportNumber?: string;
   birthdate: string;
   subscriptionId?: number;
 }
