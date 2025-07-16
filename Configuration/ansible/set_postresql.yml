@@ -26,6 +26,17 @@
         regexp: '^#?listen_addresses\s*='
         line: "listen_addresses = '*'"
         state: present
+        
+    - name: Calculate 25% of total RAM in MB
+      set_fact:
+        shared_buffers_value: "{{ ((ansible_facts.memtotal_mb * 0.25) | int) }}MB"
+        
+    - name: Set shared_buffers in postgresql.conf to 25% of RAM memory
+      lineinfile:
+        path: /etc/postgresql/15/main/postgresql.conf
+        regexp: '^#?shared_buffers\s*='
+        line: "shared_buffers = {{ shared_buffers_value }}"
+        state: present
 
     - name: Enable pg_cron in shared_preload_libraries
       lineinfile:
