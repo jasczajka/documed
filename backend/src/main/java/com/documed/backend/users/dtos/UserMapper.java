@@ -14,6 +14,7 @@ public class UserMapper {
         .address(user.getAddress())
         .phoneNumber(user.getPhoneNumber())
         .pesel(user.getPesel())
+        .passportNumber(user.getPassportNumber())
         .subscriptionId(user.getSubscriptionId())
         .build();
   }

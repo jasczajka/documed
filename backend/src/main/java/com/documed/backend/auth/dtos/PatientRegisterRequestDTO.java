@@ -18,6 +18,11 @@ public class PatientRegisterRequestDTO {
 
   @Pattern(regexp = "^\\d{11}$", message = "PESEL musi mieć dokładnie 11 cyfr") private String pesel;
 
+  @Pattern(
+      regexp = "^[A-Za-z0-9]{9}$",
+      message = "Numer paszportu musi składać się z 9 liter lub cyfr")
+  private String passportNumber;
+
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @Pattern(regexp = "^\\d{9}$", message = "Numer telefonu musi mieć dokładnie 9 cyfr") @NotBlank(message = "Numer telefonu jest wymagany") private String phoneNumber;
 

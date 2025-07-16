@@ -208,6 +208,7 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
                p.last_name AS patient_last_name,
                p.birthdate AS patient_birth_date,
                p.pesel AS patient_pesel,
+               p.passport_number as patient_passport_number,
                d.first_name AS doctor_first_name,
                d.last_name AS doctor_last_name,
                s.id AS service_id,

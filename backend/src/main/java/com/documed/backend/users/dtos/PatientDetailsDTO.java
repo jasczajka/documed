@@ -28,6 +28,7 @@ public class PatientDetailsDTO {
   @NonNull private String phoneNumber;
 
   private String pesel;
+  private String passportNumber;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull LocalDate birthdate;

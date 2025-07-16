@@ -14,6 +14,7 @@ public class PendingUserDTO {
   private String lastName;
   private String email;
   private String pesel;
+  private String passportNumber;
   private String phoneNumber;
   private String address;
   private LocalDate birthDate;

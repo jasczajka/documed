@@ -26,6 +26,7 @@ public class AdditionalServiceWithDetailsRowMapper
         .patientFullName(
             rs.getString("patient_last_name") + " " + rs.getString("patient_first_name"))
         .patientPesel(rs.getString("patient_pesel"))
+        .patientPassportNumber(rs.getString("patient_passport_number"))
         .serviceId(rs.getInt("service_id"))
         .serviceName(rs.getString("service_name"))
         .build();
