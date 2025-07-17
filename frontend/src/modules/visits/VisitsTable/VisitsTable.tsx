@@ -90,7 +90,24 @@ const columns = (
       if (row.status === 'CANCELLED') {
         return 'Anulowana';
       }
+      return row.date ? new Date(row.date) : null;
+    },
+    valueFormatter: (_, row) => {
+      if (row.status === 'CANCELLED') {
+        return 'Anulowana';
+      }
       return row.date ? format(new Date(row.date), 'dd.MM.yyyy') : 'Brak daty';
+    },
+    sortComparator: (v1, v2) => {
+      if (!v1 && !v2) return 0;
+      if (!v1) return 1;
+      if (!v2) return -1;
+
+      if (v1 === 'Anulowana' && v2 === 'Anulowana') return 0;
+      if (v1 === 'Anulowana') return 1;
+      if (v2 === 'Anulowana') return -1;
+
+      return v1.getTime() - v2.getTime();
     },
   },
   {
