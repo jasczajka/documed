@@ -109,13 +109,17 @@ public class TimeSlotService {
   public List<TimeSlot> getAvailableFirstTimeSlotsByFacility(int neededTimeSlots, int facilityId) {
     List<TimeSlot> allSlots = timeSlotDAO.getAvailableFutureTimeSlotsByFacilityId(facilityId);
 
-    Map<LocalDate, List<TimeSlot>> slotsByDate =
+    Map<String, List<TimeSlot>> slotsByDateAndDoctor =
         allSlots.stream()
-            .collect(Collectors.groupingBy(TimeSlot::getDate, TreeMap::new, Collectors.toList()));
+            .collect(
+                Collectors.groupingBy(
+                    slot -> slot.getDate().toString() + "#" + slot.getDoctorId(),
+                    TreeMap::new,
+                    Collectors.toList()));
 
     Set<TimeSlot> result = new LinkedHashSet<>();
 
-    slotsByDate.forEach(
+    slotsByDateAndDoctor.forEach(
         (date, slotsForDate) -> {
           slotsForDate.sort(Comparator.comparing(TimeSlot::getStartTime));
 
