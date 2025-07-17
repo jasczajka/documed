@@ -3,6 +3,7 @@ package com.documed.backend.auth
 import com.documed.backend.auth.exceptions.*
 import com.documed.backend.auth.model.CurrentUser
 import com.documed.backend.auth.model.OtpPurpose
+import com.documed.backend.exceptions.InvalidAssignmentException
 import com.documed.backend.exceptions.NotFoundException
 import com.documed.backend.notifications.EmailFactory
 import com.documed.backend.notifications.EmailSenderService
@@ -46,6 +47,7 @@ class AuthServiceTest extends Specification {
 				.lastName(overrides.lastName ?: 'Last')
 				.email(overrides.email ?: 'user@example.com')
 				.pesel(overrides.pesel ?: '12345678901')
+				.passportNumber(overrides.pass ?: '123456789')
 				.phoneNumber(overrides.phoneNumber ?: '000000000')
 				.address(overrides.address ?: 'Addr')
 				.password(overrides.password ?: 'pass')
@@ -122,7 +124,7 @@ class AuthServiceTest extends Specification {
 		userService.getByEmail('u') >> Optional.of(existing)
 		otpService.generateOtp('u', OtpPurpose.REGISTRATION) >> null
 		when:
-		def result = authService.registerPatient('f','l','u','pes','pwd','PATIENT','phone','addr', LocalDate.now())
+		def result = authService.registerPatient('f','l','u','pes',null,'pwd','PATIENT','phone','addr', LocalDate.now())
 		then:
 		result.is(existing)
 		1 * otpService.generateOtp('u', OtpPurpose.REGISTRATION)
@@ -130,7 +132,7 @@ class AuthServiceTest extends Specification {
 
 	def "registerPatient throws when user exists active"() {
 		given: userService.getByEmail('u') >> Optional.of(buildPatient())
-		when: authService.registerPatient('f','l','u','pes','pwd','PATIENT','phone','addr', LocalDate.now())
+		when: authService.registerPatient('f','l','u','pes',null,'pwd','PATIENT','phone','addr', LocalDate.now())
 		then: thrown(UserAlreadyExistsException)
 	}
 
@@ -142,10 +144,38 @@ class AuthServiceTest extends Specification {
 		userService.createPendingUser(_ as User) >> pending
 		otpService.generateOtp('u', OtpPurpose.REGISTRATION) >> null
 		when:
-		def result = authService.registerPatient('fn','ln','u','pes','pwd','PATIENT','ph','ad', LocalDate.of(2000,1,1))
+		def result = authService.registerPatient('fn','ln','u','pes',null,'pwd','PATIENT','ph','ad', LocalDate.of(2000,1,1))
 		then:
 		result == pending
 		1 * otpService.generateOtp('u', OtpPurpose.REGISTRATION)
+	}
+
+	def "registerPatient creates new with passport number and no pesel"() {
+		given:
+		userService.getByEmail('u') >> Optional.empty()
+		passwordEncoder.encode('pwd') >> 'enc'
+		def pending = buildPatient(id: 10, firstName: 'fn', lastName: 'ln', email: 'u', pesel: null, passportNumber: '123456789', password: 'enc', accountStatus: AccountStatus.PENDING_CONFIRMATION, role: UserRole.PATIENT, birthDate: LocalDate.of(2000,1,1))
+		userService.createPendingUser(_ as User) >> pending
+		otpService.generateOtp('u', OtpPurpose.REGISTRATION) >> null
+		when:
+		def result = authService.registerPatient('fn','ln','u','pes',null,'pwd','PATIENT','ph','ad', LocalDate.of(2000,1,1))
+		then:
+		result == pending
+		1 * otpService.generateOtp('u', OtpPurpose.REGISTRATION)
+	}
+
+	def "registerPatient throws when new patient with no passport number and no pesel"() {
+		given:
+		userService.getByEmail('u') >> Optional.empty()
+		passwordEncoder.encode('pwd') >> 'enc'
+		userService.createPendingUser(_ as User) >> { User u -> u }
+		otpService.generateOtp('u', OtpPurpose.REGISTRATION) >> null
+
+		when:
+		authService.registerPatient('fn','ln','u',null,null,'pwd','PATIENT','ph','ad', LocalDate.of(2000,1,1))
+
+		then:
+		thrown(InvalidAssignmentException)
 	}
 
 	def "confirmRegistration validates OTP and returns DTO"() {

@@ -34,6 +34,7 @@ interface FormData {
 interface AdditionalServiceModalProps {
   patientId: number;
   patientPesel?: string;
+  patientPassportNumber?: string;
   fulfillerId: number;
   patientFullName: string;
   patientAge: number | null;
@@ -68,6 +69,7 @@ const validationSchema = Yup.object().shape({
 export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
   patientId,
   patientPesel,
+  patientPassportNumber,
   fulfillerId,
   patientFullName,
   patientAge,
@@ -185,8 +187,8 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
           Dodatkowa usługa
         </Typography>
         <PatientInfoPanel
-          patientId={patientId}
           patientPesel={patientPesel}
+          patientPassportNumber={patientPassportNumber}
           patientFullName={patientFullName}
           patientAge={patientAge}
         />

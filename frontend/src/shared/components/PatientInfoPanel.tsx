@@ -2,14 +2,15 @@ import { Box, Typography } from '@mui/material';
 import { FC } from 'react';
 
 export interface PatientInfoPanelProps {
-  patientId: number;
   patientPesel?: string;
+  patientPassportNumber?: string;
   patientFullName: string;
   patientAge: number | null;
 }
 
 export const PatientInfoPanel: FC<PatientInfoPanelProps> = ({
   patientPesel,
+  patientPassportNumber,
   patientFullName,
   patientAge,
 }) => {
@@ -28,6 +29,11 @@ export const PatientInfoPanel: FC<PatientInfoPanelProps> = ({
       {patientPesel && (
         <Typography>
           Pesel: <strong>{patientPesel}</strong>
+        </Typography>
+      )}
+      {patientPassportNumber && (
+        <Typography>
+          Numer paszportu: <strong>{patientPassportNumber}</strong>
         </Typography>
       )}
       <Typography>

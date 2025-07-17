@@ -174,12 +174,14 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
         description?: string;
       },
       patientPesel?: string,
+      patientPassportNumber?: string,
     ) => {
       openModal('editAdditionalServiceModal', (close) => (
         <AdditionalServiceModal
           allAdditionalServices={allAdditionalServices}
           patientId={patientId}
           patientPesel={patientPesel}
+          patientPassportNumber={patientPassportNumber}
           fulfillerId={fulfillerId}
           patientFullName={patientFullName}
           patientAge={patientAge}

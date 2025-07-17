@@ -117,6 +117,8 @@ export const PatientsTable: FC<PatientsTableProps> = ({ patients }) => {
               ? getAgeFromBirthDate(new Date(patientDetails.birthdate))
               : null
           }
+          patientPesel={patientDetails.pesel}
+          patientPassportNumber={patientDetails.passportNumber}
           onConfirm={async () => {
             close();
             showNotification('Umówiono wizytę', 'success');

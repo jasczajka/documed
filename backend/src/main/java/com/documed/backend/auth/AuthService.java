@@ -4,6 +4,7 @@ import com.documed.backend.auth.dtos.AuthResponseDTO;
 import com.documed.backend.auth.exceptions.*;
 import com.documed.backend.auth.model.CurrentUser;
 import com.documed.backend.auth.model.OtpPurpose;
+import com.documed.backend.exceptions.InvalidAssignmentException;
 import com.documed.backend.exceptions.NotFoundException;
 import com.documed.backend.notifications.NotificationService;
 import com.documed.backend.schedules.WorkTimeService;
@@ -81,6 +82,7 @@ public class AuthService {
       String lastName,
       String email,
       String pesel,
+      String passportNumber,
       String password,
       String role,
       String phoneNumber,
@@ -104,6 +106,7 @@ public class AuthService {
               .lastName(lastName)
               .email(email)
               .pesel(pesel)
+              .passportNumber(passportNumber)
               .phoneNumber(phoneNumber)
               .address(address)
               .password(passwordEncoder.encode(password))
@@ -113,6 +116,10 @@ public class AuthService {
               .build();
 
       User createdUser = userService.createPendingUser(user);
+
+      if (createdUser.getPesel() == null && createdUser.getPassportNumber() == null) {
+        throw new InvalidAssignmentException("Patient has to have either PESEL or passport number");
+      }
 
       otpService.generateOtp(email, OtpPurpose.REGISTRATION);
 

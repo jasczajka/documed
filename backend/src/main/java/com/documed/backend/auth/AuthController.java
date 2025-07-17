@@ -41,6 +41,7 @@ public class AuthController {
             request.getLastName(),
             request.getEmail(),
             request.getPesel(),
+            request.getPassportNumber(),
             request.getPassword(),
             String.valueOf(UserRole.PATIENT),
             request.getPhoneNumber(),
@@ -54,6 +55,7 @@ public class AuthController {
             .lastName(createdUser.getLastName())
             .email(createdUser.getEmail())
             .pesel(createdUser.getPesel())
+            .passportNumber(createdUser.getPassportNumber())
             .phoneNumber(createdUser.getPhoneNumber())
             .address(createdUser.getAddress())
             .birthDate(createdUser.getBirthDate())

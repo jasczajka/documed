@@ -41,6 +41,8 @@ interface ScheduleVisitModalProps {
   patientId: number;
   patientFullName: string;
   patientAge: number | null;
+  patientPesel?: string;
+  patientPassportNumber?: string;
   initialDoctorId?: number;
   confirmText?: string;
   cancelText?: string;
@@ -65,6 +67,8 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
   patientId,
   patientFullName,
   patientAge,
+  patientPesel,
+  patientPassportNumber,
   initialDoctorId,
   confirmText = 'Potwierdź',
   cancelText = 'Anuluj',
@@ -214,8 +218,9 @@ export const ScheduleVisitModal: FC<ScheduleVisitModalProps> = ({
           {title}
         </Typography>
         <PatientInfoPanel
-          patientId={patientId}
           patientFullName={patientFullName}
+          patientPesel={patientPesel}
+          patientPassportNumber={patientPassportNumber}
           patientAge={patientAge}
         />
         <Stack direction="row" spacing={8} width="100%">

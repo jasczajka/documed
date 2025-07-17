@@ -44,6 +44,7 @@ public class UserDAO implements FullDAO<User, User> {
               .birthDate(
                   rs.getDate("birthdate") != null ? rs.getDate("birthdate").toLocalDate() : null)
               .pesel(rs.getString("pesel"))
+              .passportNumber(rs.getString("passport_number"))
               .phoneNumber(rs.getString("phone_number"))
               .pwzNumber(rs.getString("pwz"))
               .subscriptionId(rs.getObject("subscription_id", Integer.class))
@@ -97,7 +98,7 @@ public class UserDAO implements FullDAO<User, User> {
     String sql =
         "UPDATE \"User\" SET first_name = ?, last_name = ?, email = ?, address = ?, "
             + "password = ?, account_status = ?, role = ?, "
-            + "pesel = ?, phone_number = ?, birthdate = ?, pwz = ? "
+            + "pesel = ?, passport_number = ?, phone_number = ?, birthdate = ?, pwz = ? "
             + "WHERE id = ?";
 
     int rowsAffected =
@@ -111,6 +112,7 @@ public class UserDAO implements FullDAO<User, User> {
             user.getAccountStatus().toString(),
             user.getRole().toString(),
             user.getPesel(),
+            user.getPassportNumber(),
             user.getPhoneNumber(),
             user.getBirthDate() != null ? java.sql.Date.valueOf(user.getBirthDate()) : null,
             user.getPwzNumber(),
@@ -156,8 +158,8 @@ public class UserDAO implements FullDAO<User, User> {
   public User createAndReturn(User user) {
     String sql =
         "INSERT INTO \"User\" (first_name, last_name, email, address, password, account_status, role, "
-            + "pesel, phone_number, birthdate, pwz) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
+            + "pesel, passport_number, phone_number, birthdate, pwz) "
+            + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) "
             + "RETURNING id";
 
     Integer generatedId =
@@ -172,6 +174,7 @@ public class UserDAO implements FullDAO<User, User> {
             user.getAccountStatus().toString(),
             user.getRole().toString(),
             user.getPesel(),
+            user.getPassportNumber(),
             user.getPhoneNumber(),
             user.getBirthDate() != null ? java.sql.Date.valueOf(user.getBirthDate()) : null,
             user.getPwzNumber());
@@ -367,9 +370,10 @@ public class UserDAO implements FullDAO<User, User> {
         SET
             first_name = '[deleted]',
             last_name = '[deleted]',
-            email = CONCAT('deleted_', id, '@example.com'),
+            email = CONCAT('deleted_', id, '@deleted.com'),
             address = '[deleted]',
             pesel = NULL,
+            passport_number = NULL,
             phone_number = NULL,
             account_status = 'DEACTIVATED',
             password = '[deleted]'

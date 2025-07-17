@@ -32,8 +32,9 @@ public class AdditionalServiceWithDetails {
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String patientFullName;
 
-  @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   private String patientPesel;
+
+  private String patientPassportNumber;
 
   @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
   @NonNull private Integer serviceId;

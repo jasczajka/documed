@@ -157,6 +157,8 @@ const SinglePatientPage: FC = () => {
         patientAge={
           patientDetails?.birthdate ? getAgeFromBirthDate(new Date(patientDetails.birthdate)) : null
         }
+        patientPesel={patientDetails?.pesel}
+        patientPassportNumber={patientDetails?.passportNumber}
         onConfirm={async () => {
           await refetchPatientVisits();
           close();
