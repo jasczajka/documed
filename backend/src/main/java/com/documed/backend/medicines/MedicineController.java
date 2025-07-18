@@ -1,6 +1,6 @@
 package com.documed.backend.medicines;
 
-import com.documed.backend.auth.annotations.AdminOnly;
+import com.documed.backend.auth.annotations.AdminOrLocalhost;
 import com.documed.backend.auth.annotations.DoctorOnly;
 import com.documed.backend.medicines.model.Medicine;
 import io.swagger.v3.oas.annotations.Operation;
@@ -54,7 +54,7 @@ public class MedicineController {
     return medicineService.getById(id);
   }
 
-  @AdminOnly
+  @AdminOrLocalhost
   @PostMapping
   @Operation(summary = "Import medicines from datasource")
   public ResponseEntity<String> importMedicines() {

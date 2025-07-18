@@ -14,6 +14,7 @@ import com.documed.backend.users.model.User;
 import com.documed.backend.users.model.UserRole;
 import com.documed.backend.users.services.UserService;
 import com.documed.backend.visits.FacilityService;
+import jakarta.servlet.http.HttpServletRequest;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +26,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Service
 public class AuthService {
@@ -303,6 +306,14 @@ public class AuthService {
       return currentUser.getRole();
     }
     return null;
+  }
+
+  public boolean isLocalRequest() {
+    ServletRequestAttributes attributes =
+        (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+    HttpServletRequest request = attributes.getRequest();
+    String ip = request.getRemoteAddr();
+    return "127.0.0.1".equals(ip) || "0:0:0:0:0:0:0:1".equals(ip) || "::1".equals(ip);
   }
 
   public Integer getCurrentFacilityId() {
