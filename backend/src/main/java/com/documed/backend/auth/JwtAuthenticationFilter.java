@@ -43,8 +43,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       return;
     }
 
-    final String requestUri = request.getRequestURI();
-    logger.info("Incoming request for URI: {}", requestUri);
+    String requestUri = request.getRequestURI();
+    String clientIp = getClientIp(request);
+    String remoteIp = request.getRemoteAddr();
+
+    logger.info(
+        "Incoming request for URI: {} | Client IP (from headers): {} | Remote IP (from socket): {}",
+        requestUri,
+        clientIp,
+        remoteIp);
 
     if (("/api/auth/login".equals(requestUri)
             || "/api/auth/request_registration".equals(requestUri)
@@ -146,5 +153,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     cookie.setAttribute("SameSite", "None");
     cookie.setSecure(true);
     response.addCookie(cookie);
+  }
+
+  private String getClientIp(HttpServletRequest request) {
+    String xForwardedFor = request.getHeader("X-Forwarded-For");
+    if (xForwardedFor != null
+        && !xForwardedFor.isEmpty()
+        && !"unknown".equalsIgnoreCase(xForwardedFor)) {
+      return xForwardedFor.split(",")[0].trim();
+    }
+
+    String xRealIp = request.getHeader("X-Real-IP");
+    if (xRealIp != null && !xRealIp.isEmpty() && !"unknown".equalsIgnoreCase(xRealIp)) {
+      return xRealIp;
+    }
+
+    return request.getRemoteAddr();
   }
 }
