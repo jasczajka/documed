@@ -120,6 +120,7 @@
         url: "{{ backend_api_url }}/api/medicines/import"
         method: POST
         status_code: 201
+        timeout: 120
 
     - name: Create pgbackup group
       group:
