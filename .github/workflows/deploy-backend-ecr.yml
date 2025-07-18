@@ -69,6 +69,7 @@ jobs:
 
             echo "Starting the new container..."
             docker run -d --name documed-backend -p 8080:8080 \
+              -e SPRING_DATASOURCE_IP_ADDRESS=${{ secrets.SPRING_DATASOURCE_IP_ADDRESS }} \
               -e SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }} \
               -e SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }} \
               -e SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }} \
