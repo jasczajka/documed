@@ -642,73 +642,123 @@ ADD CONSTRAINT unique_user_email
 UNIQUE (email);
 
 
--- Simple indexes @TODO - improve them
-CREATE INDEX IF NOT EXISTS idx_visit_status ON Visit(status);
-CREATE INDEX IF NOT EXISTS idx_visit_patient_id ON Visit(patient_id);
-CREATE INDEX IF NOT EXISTS idx_visit_doctor_id ON Visit(doctor_id);
+-- Indexes
+
+
+-- Visit table indexes
+
 CREATE INDEX IF NOT EXISTS idx_visit_facility_id ON Visit(facility_id);
 CREATE INDEX IF NOT EXISTS idx_visit_service_id ON Visit(service_id);
-CREATE INDEX IF NOT EXISTS idx_visit_patient_facility ON Visit(patient_id, facility_id);
-CREATE INDEX IF NOT EXISTS idx_visit_doctor_facility ON Visit(doctor_id, facility_id);
 CREATE INDEX IF NOT EXISTS idx_visit_doctor_status ON Visit(doctor_id, status);
 CREATE INDEX IF NOT EXISTS idx_visit_patient_status ON Visit(patient_id, status);
+-- For findByPatientIdAndFacilityIdWithDetailsBetweenDates
+CREATE INDEX IF NOT EXISTS idx_visit_patient_facility_date ON visit(patient_id, facility_id, date DESC);
+-- For findByDoctorIdAndFacilityIdWithDetailsBetweenDates
+CREATE INDEX IF NOT EXISTS idx_visit_doctor_facility_date ON visit(doctor_id, facility_id, date DESC);
+-- For findAllWithDetailsBetweenDates
+CREATE INDEX IF NOT EXISTS idx_visit_date ON visit(date DESC);
+-- For findPlannedWithDetailsByDate
+CREATE INDEX IF NOT EXISTS idx_visit_status_date ON visit(status, date) WHERE status = 'PLANNED';
 
--- Time_slot indexes (critical for visit scheduling)
-CREATE INDEX IF NOT EXISTS idx_time_slot_visit_id ON Time_slot(visit_id);
-CREATE INDEX IF NOT EXISTS idx_time_slot_doctor_id ON Time_slot(doctor_id);
-CREATE INDEX IF NOT EXISTS idx_time_slot_date ON Time_slot(date);
-CREATE INDEX IF NOT EXISTS idx_time_slot_is_busy ON Time_slot(is_busy) WHERE is_busy = false;
-CREATE INDEX IF NOT EXISTS idx_time_slot_doctor_date ON Time_slot(doctor_id, date);
+
+-- Time_slot table indexes - for timeslot scheduling
+
+-- For getSortedTimeSlotsForVisit
+CREATE INDEX IF NOT EXISTS idx_time_slot_visit_id ON time_slot(visit_id);
+-- For getAvailableTimeSlotsByDoctorAndDate
+CREATE INDEX IF NOT EXISTS idx_time_slot_doctor_date ON time_slot(doctor_id, date);
+-- For getAvailableFutureTimeSlotsByFacilityId
+CREATE INDEX IF NOT EXISTS idx_time_slot_facility_date ON time_slot(facility_id, date) WHERE is_busy = false;
+-- For is_busy filtering (partial index to help avoid scanning unnecessary rows)
+CREATE INDEX IF NOT EXISTS idx_time_slot_is_busy_false ON time_slot(is_busy) WHERE is_busy = false;
+-- For getVisitIdsByDoctorAndDateRange
+CREATE INDEX IF NOT EXISTS idx_time_slot_doctor_date_visit ON time_slot(doctor_id, date) WHERE visit_id IS NOT NULL;
+
+
+-- Worktime table indexes
+
+CREATE INDEX idx_worktime_user_id ON worktime(user_id);
+
+
+-- FreeDays table indexes
+
+CREATE INDEX idx_free_days_user_id ON free_days(user_id);
+
 
 -- User table indexes
+
 CREATE INDEX IF NOT EXISTS idx_user_role ON "User"(role);
 CREATE INDEX IF NOT EXISTS idx_user_email ON "User"(email);
+CREATE INDEX IF NOT EXISTS idx_user_pesel ON "User"(pesel);
 CREATE INDEX IF NOT EXISTS idx_user_account_status ON "User"(account_status);
 
+
 -- Service table indexes
+
 CREATE INDEX IF NOT EXISTS idx_service_type ON Service(type);
 
+
 -- Additional_service indexes
+
 CREATE INDEX IF NOT EXISTS idx_additional_service_patient_id ON Additional_service(patient_id);
 CREATE INDEX IF NOT EXISTS idx_additional_service_fulfiller_id ON Additional_service(fulfiller_id);
 CREATE INDEX IF NOT EXISTS idx_additional_service_service_id ON Additional_service(service_id);
+-- For findByPatientIdWithDetailsBetweenDates
+CREATE INDEX IF NOT EXISTS idx_additional_service_patient_date ON Additional_service(patient_id, date DESC);
+-- For findByFulfillerIdWithDetailsBetweenDates
+CREATE INDEX IF NOT EXISTS idx_additional_service_fulfiller_date ON Additional_service(fulfiller_id, date DESC);
+-- For findByServiceIdWithDetailsBetweenDates
+CREATE INDEX IF NOT EXISTS idx_additional_service_service_date ON Additional_service(service_id, date DESC);
+-- For findAllWithDetailsBetweenDates
+CREATE INDEX IF NOT EXISTS idx_additional_service_date ON Additional_service(date DESC);
+
 
 -- Prescription indexes
+
 CREATE INDEX IF NOT EXISTS idx_prescription_visit_id ON Prescription(visit_id);
 CREATE INDEX IF NOT EXISTS idx_prescription_status ON Prescription(status);
 CREATE INDEX IF NOT EXISTS idx_prescription_expiration_date ON Prescription(expiration_date);
 
+
 -- Referral indexes
+
 CREATE INDEX IF NOT EXISTS idx_referral_visit_id ON Referral(visit_id);
 CREATE INDEX IF NOT EXISTS idx_referral_expiration_date ON Referral(expiration_date);
 
+
 -- Feedback indexes
+
 CREATE INDEX IF NOT EXISTS idx_feedback_visit_id ON Feedback(visit_id);
 
+
 -- Attachment indexes
+
 CREATE INDEX IF NOT EXISTS idx_attachment_visit_id ON Attachment(visit_id);
 CREATE INDEX IF NOT EXISTS idx_attachment_additional_service_id ON Attachment(additional_service_id);
 CREATE INDEX IF NOT EXISTS idx_attachment_status ON Attachment(status);
 
 
 -- For doctor visit queries with status filtering
+
 CREATE INDEX IF NOT EXISTS idx_visit_doctor_status_date ON Visit(doctor_id, status) 
 INCLUDE (facility_id, service_id, patient_id);
 
+
 -- For patient visit queries with status filtering
+
 CREATE INDEX IF NOT EXISTS idx_visit_patient_status_date ON Visit(patient_id, status) 
 INCLUDE (facility_id, service_id, doctor_id);
 
--- For facility-based reporting
-CREATE INDEX IF NOT EXISTS idx_visit_facility_status_date ON Visit(facility_id, status) 
-INCLUDE (doctor_id, patient_id, service_id, total_cost);
 
--- For doctors query
+-- For getDoctorDetails
+
 CREATE INDEX IF NOT EXISTS idx_specialization_id ON Specialization(id);
 CREATE INDEX IF NOT EXISTS idx_doctor_spec_doctor_id ON doctor_specialization(doctor_id);
 CREATE INDEX IF NOT EXISTS idx_doctor_spec_spec_id ON doctor_specialization(specialization_id);
 CREATE INDEX IF NOT EXISTS idx_free_days_user_id ON free_days(user_id);
 
+
+-- Functions
 CREATE OR REPLACE FUNCTION cleanup_otps()
 RETURNS INTEGER AS $$
 DECLARE
@@ -790,4 +840,3 @@ EXECUTE FUNCTION set_notification_sent_at();
 
 
 -- End of file.
-
