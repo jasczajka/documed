@@ -9,6 +9,7 @@
     cron_db: "prod_db"
     backup_dir: "/var/backups/postgresql"
     pg_dump_path: "/usr/bin/pg_dump"
+    backend_api_url: "https://apidocumed.com"
 
   tasks:
     - name: Install PostgreSQL and required packages
@@ -114,6 +115,12 @@
         query: "{{ lookup('file', 'queries/documed_ddl.sql') }}"
       become_user: postgres
 
+    - name: Import medicines on startup
+      uri:
+        url: "{{ backend_api_url }}/api/medicines/import"
+        method: POST
+        status_code: 201
+
     - name: Create pgbackup group
       group:
         name: pgbackup
@@ -154,5 +161,3 @@
         db: "{{ cron_db }}"
         query: "{{ lookup('file', 'queries/documed_cron_jobs.sql') }}"
       become_user: postgres
-    
-      
