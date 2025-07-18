@@ -1,5 +1,6 @@
 package com.documed.backend.auth;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.firewall.HttpFirewall;
+import org.springframework.security.web.firewall.StrictHttpFirewall;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -49,6 +52,13 @@ public class SecurityConfig {
   }
 
   @Bean
+  public HttpFirewall allowForwardedForFirewall() {
+    StrictHttpFirewall firewall = new StrictHttpFirewall();
+    firewall.setAllowedHeaderNames(header -> true); // Allow X-Forwarded-For
+    return firewall;
+  }
+
+  @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
         .csrf(csrf -> csrf.disable())
@@ -73,8 +83,9 @@ public class SecurityConfig {
                   .requestMatchers("/api/medicines/import")
                   .access(
                       new WebExpressionAuthorizationManager(
-                          "hasIpAddress('" + dbServerIp + "') or hasRole('ADMINISTRATOR')"));
-
+                          "@securityConfig.checkIp(request, '"
+                              + dbServerIp
+                              + "') or hasRole('ADMINISTRATOR')"));
               if (env.acceptsProfiles("local")) {
                 auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**")
                     .permitAll();
@@ -101,5 +112,13 @@ public class SecurityConfig {
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
     return source;
+  }
+
+  public boolean checkIp(HttpServletRequest request, String allowedIp) {
+    String ip = request.getHeader("X-Forwarded-For");
+    if (ip == null) ip = request.getRemoteAddr();
+    else ip = ip.split(",")[0].trim();
+
+    return ip.equals(allowedIp);
   }
 }
