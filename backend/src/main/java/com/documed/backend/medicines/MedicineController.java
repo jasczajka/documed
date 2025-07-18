@@ -53,7 +53,7 @@ public class MedicineController {
     return medicineService.getById(id);
   }
 
-  @PostMapping
+  @PostMapping("/import")
   @Operation(summary = "Import medicines from datasource")
   public ResponseEntity<String> importMedicines() {
     medicineImportService.importMedicinesWeekly();
