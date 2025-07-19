@@ -114,14 +114,18 @@ public class MedicineImportService {
                       Row row = batch.get(index);
                       try {
                         ps.setString(1, getStringValue(row.getCell(0))); // id - column 1
-                        ps.setString(2, getStringValue(row.getCell(1))); // name - column 2
-                        ps.setString(3, getStringValue(row.getCell(2))); // common name - column 3
+                        ps.setString(
+                            2,
+                            trimToMaxLength(
+                                getStringValue(row.getCell(1)), 500)); // name - column 2
+                        ps.setString(
+                            3,
+                            trimToMaxLength(
+                                getStringValue(row.getCell(2)), 500)); // common name - column 3
                         ps.setString(
                             4,
-                            getStringValue(row.getCell(7)).length() > 100
-                                ? getStringValue(row.getCell(7)).substring(0, 100)
-                                : getStringValue(
-                                    row.getCell(7))); // dosage - column 8, trim to 100 characters
+                            trimToMaxLength(
+                                getStringValue(row.getCell(7)), 100)); // dosage - column 8
                         processed.incrementAndGet();
                       } catch (Exception e) {
                         logger.warn("Skipping row {}: {}", row.getRowNum(), e.getMessage());
@@ -157,5 +161,10 @@ public class MedicineImportService {
     return cell.getCellType() == CellType.NUMERIC
         ? String.valueOf((int) cell.getNumericCellValue())
         : cell.getStringCellValue();
+  }
+
+  private String trimToMaxLength(String value, int maxLength) {
+    if (value == null) return "";
+    return value.length() > maxLength ? value.substring(0, maxLength) : value;
   }
 }
