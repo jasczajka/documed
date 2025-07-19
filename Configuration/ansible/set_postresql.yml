@@ -156,7 +156,7 @@
           export PATH=/usr/bin:/bin;
           {{ pg_dump_path }} -Fc -d {{ prod_db_name }} -f "{{ backup_dir }}/{{ prod_db_name }}_$(date +\%F_\%H\%M\%S).dump"
           ' >> {{ backup_dir }}/backup.log 2>&1
-      
+
     - name: Schedule jobs in all databases from production DB
       postgresql_query:
         db: "{{ prod_db_name }}"
@@ -165,5 +165,9 @@
       loop:
         - "{{ prod_db_name }}"
         - "{{ test_db_name }}"
-    
-      
+
+    - name: Clear pg_cron jobs nodename to allow TCP connections from localhost
+      postgresql_query:
+        db: "{{ prod_db_name }}"
+        query: "UPDATE cron.job SET nodename = '';"
+      become_user: postgres
