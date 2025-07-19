@@ -6,9 +6,12 @@
     - vars/passwd.yml
     
   vars:
-    cron_db: "prod_db"
+    prod_db_name: "prod_db"
+    test_db_name: "test_db"
     backup_dir: "/var/backups/postgresql"
     pg_dump_path: "/usr/bin/pg_dump"
+    admin_password_hash: "$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS"  # hash for 'Password123' in bcrypt
+    admin_email: "admin@gmail.com"
 
   tasks:
     - name: Install PostgreSQL and required packages
@@ -58,32 +61,25 @@
         name: postgresql
         state: restarted
         
-    - name: Create prod database
+    - name: Create databases
       postgresql_db:
-        name: prod_db
+        name: "{{ item }}"
       become_user: postgres
-
-    - name: Create test database
-      postgresql_db:
-        name: test_db
-      become_user: postgres
+      loop:
+        - "{{ prod_db_name }}"
+        - "{{ test_db_name }}"
       
-    - name: Create user
+    - name: Create admin user in both databases
       postgresql_user:
         name: admin
         password: "{{ vault_postgres_admin_password }}"
-        db: prod_db
+        db: "{{ item }}"
         role_attr_flags: SUPERUSER
       become_user: postgres
+      loop:
+        - "{{ prod_db_name }}"
+        - "{{ test_db_name }}"
 
-    - name: Create user
-      postgresql_user:
-        name: admin
-        password: "{{ vault_postgres_admin_password }}"
-        db: test_db
-        role_attr_flags: SUPERUSER
-      become_user: postgres
-      
     - name: Ensure cron is installed
       package:
         name: cron
@@ -93,25 +89,37 @@
       lineinfile:
         path: /etc/postgresql/15/main/postgresql.conf
         regexp: '^#?cron\.database_name\s*='
-        line: "cron.database_name = '{{ cron_db }}'"
+        line: "cron.database_name = '{{ prod_db_name }}'"
         state: present
 
-    - name: Create pg_cron extension in db
+    - name: Create pg_cron extension in production database only
       postgresql_query:
-        db: "{{ cron_db }}"
+        db: "{{ prod_db_name }}"
         query: "CREATE EXTENSION IF NOT EXISTS pg_cron;"
       become_user: postgres
 
-    - name: Create tables in the test_db
+    - name: Create tables in both databases
       postgresql_query:
-        db: test_db
+        db: "{{ item }}"
         query: "{{ lookup('file', 'queries/documed_ddl.sql') }}"
       become_user: postgres
+      loop:
+        - "{{ prod_db_name }}"
+        - "{{ test_db_name }}"
 
-    - name: Create tables in the prod_db
+    - name: Insert admin user into prod_db
       postgresql_query:
-        db: prod_db
-        query: "{{ lookup('file', 'queries/documed_ddl.sql') }}"
+        db: "{{ prod_db_name }}"
+        query: >
+          INSERT INTO "User" (
+            first_name, last_name, pesel, passport_number, email, address, password,
+            phone_number, account_status, birthdate, pwz, role, subscription_id, email_notifications
+          )
+          VALUES (
+            'Admin', 'Adminski', NULL, NULL, '{{ admin_email }}', NULL,' {{ admin_password_hash }}'
+            ,'000000000', 'ACTIVE', '1990-01-01',
+            NULL, 'ADMINISTRATOR', NULL, true
+          );
       become_user: postgres
 
     - name: Create pgbackup group
@@ -136,7 +144,7 @@
         group: pgbackup
         mode: '0750'
 
-    - name: Schedule weekly pg_dump backup via cron on Sunday at 2:00
+    - name: Schedule weekly pg_dump backup via cron on Sunday at 2:00 on prod_db
       cron:
         name: "Weekly PostgreSQL backup"
         user: postgres 
@@ -146,13 +154,16 @@
         job: >-
           /bin/bash -c '
           export PATH=/usr/bin:/bin;
-          {{ pg_dump_path }} -Fc -d {{ cron_db }} -f "{{ backup_dir }}/{{ cron_db }}_$(date +\%F_\%H\%M\%S).dump"
+          {{ pg_dump_path }} -Fc -d {{ prod_db_name }} -f "{{ backup_dir }}/{{ prod_db_name }}_$(date +\%F_\%H\%M\%S).dump"
           ' >> {{ backup_dir }}/backup.log 2>&1
       
-    - name: Schedule jobs using existing SQL file
+    - name: Schedule jobs in all databases from production DB
       postgresql_query:
-        db: "{{ cron_db }}"
-        query: "{{ lookup('file', 'queries/documed_cron_jobs.sql') }}"
+        db: "{{ prod_db_name }}"
+        query: "{{ lookup('file', 'queries/documed_cron_jobs.sql') | replace('%TARGET_DB%', item) }}"
       become_user: postgres
+      loop:
+        - "{{ prod_db_name }}"
+        - "{{ test_db_name }}"
     
       
