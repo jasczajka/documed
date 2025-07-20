@@ -362,8 +362,7 @@ class VisitServiceTest extends Specification {
 
 		then:
 		1 * authService.getCurrentUserId() >> patientId
-		1 * authService.getCurrentFacilityId() >> facilityId
-		1 * visitDAO.findByPatientIdAndFacilityIdWithDetailsBetweenDates(patientId, facilityId, startDate) >> visits
+		1 * visitDAO.findByPatientIdWithDetailsBetweenDates(patientId, startDate) >> visits
 		result == visits
 	}
 

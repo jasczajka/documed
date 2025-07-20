@@ -69,9 +69,7 @@ public class VisitService {
   public List<VisitWithDetails> getVisitsForCurrentPatientWithDetailsBetweenDates(
       LocalDate startDate) {
     int patientId = authService.getCurrentUserId();
-    int facilityId = authService.getCurrentFacilityId();
-    return visitDAO.findByPatientIdAndFacilityIdWithDetailsBetweenDates(
-        patientId, facilityId, startDate);
+    return visitDAO.findByPatientIdWithDetailsBetweenDates(patientId, startDate);
   }
 
   public List<VisitWithDetails> getVisitsByPatientIdWithDetailsBetweenDates(
