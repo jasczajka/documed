@@ -116,7 +116,6 @@ INSERT INTO Specialization_Service (service_id, specialization_id) VALUES
 (20, 3),
 (21, 21);
 
-
 ---
 -- Tabela: Subscription
 INSERT INTO Subscription (name, price) VALUES
@@ -570,9 +569,6 @@ INSERT INTO Visit (status, interview, diagnosis, recommendations, total_cost, fa
 ('PLANNED', NULL, NULL, NULL, 200.00, 1, 19, 'Dostosowanie dawki insuliny.', 83, 9, CURRENT_DATE + INTERVAL '15 days', '09:00:00', '09:30:00'),
 ('PLANNED', NULL, NULL, NULL, 200.00, 2, 20, 'Zaburzenia równowagi, podejrzenie problemów z błędnikiem.', 84, 3, CURRENT_DATE + INTERVAL '15 days', '12:00:00', '12:30:00'),
 ('PLANNED', NULL, NULL, NULL, 200.00, 3, 21, 'Wstępne badanie zdolności do pracy, dla nowego pracownika.', 85, 15, CURRENT_DATE + INTERVAL '15 days', '15:00:00', '15:30:00'),
-
-
-
 ('PLANNED', NULL, NULL, NULL, 200.00, 1, 1, 'Pacjent po odczulaniu, wizyta kontrolna.', 86, 1, CURRENT_DATE + INTERVAL '16 days', '09:00:00', '09:30:00'),
 ('PLANNED', NULL, NULL, NULL, 250.00, 2, 2, 'Kardiologiczna ocena przed planowaną operacją niekardiologiczną.', 87, 16, CURRENT_DATE + INTERVAL '16 days', '12:00:00', '12:30:00'),
 ('PLANNED', NULL, NULL, NULL, 220.00, 3, 4, 'Usuwanie brodawek, zabieg dermatologiczny.', 88, 8, CURRENT_DATE + INTERVAL '16 days', '15:00:00', '15:30:00'),
@@ -619,9 +615,6 @@ INSERT INTO Visit (status, interview, diagnosis, recommendations, total_cost, fa
 ('PLANNED', NULL, NULL, NULL, 200.00, 2, 20, 'Konsultacja w sprawie implantu ślimakowego.', 59, 3, CURRENT_DATE + INTERVAL '30 days', '12:00:00', '12:30:00'),
 ('PLANNED', NULL, NULL, NULL, 200.00, 3, 21, 'Badanie lekarskie dla kandydatów do pracy na wysokościach.', 60, 15, CURRENT_DATE + INTERVAL '30 days', '15:00:00', '15:30:00'),
 
-
-
-
 ('CANCELLED', NULL, NULL, NULL, 200.00, 3, 9, 'Częste zawroty głowy', 92, 12, CURRENT_DATE + 5, '08:00', '08:30'),
 ('CANCELLED', NULL, NULL, NULL, 250.00, 1, 2, NULL, 93, 16, CURRENT_DATE + 6, '10:00', '10:30'),
 ('CANCELLED', NULL, NULL, NULL, 220.00, 2, 4, NULL, 94, 8, CURRENT_DATE + 7, '12:00', '12:30'),
@@ -660,61 +653,59 @@ BEGIN
     END LOOP;
 END $$;
 
-
 ---
 -- -- Tabela: Additional_service
-INSERT INTO Additional_service (description, date, fulfiller_id, patient_id, service_id) VALUES
-('W badaniu USG jamy brzusznej nie stwierdzono istotnych zmian patologicznych. Narządy miąższowe o prawidłowej echogeniczności i wielkości.', CURRENT_DATE - INTERVAL '17 days', 33, 42, 3),
-('Ciśnienie wewnątrzgałkowe: OP 16 mmHg, OL 17 mmHg (norma: 10-21 mmHg). Dno oka bez zmian patologicznych. Ostrość widzenia prawidłowa.', CURRENT_DATE - INTERVAL '18 days', 34, 43, 5),
-('Na zdjęciu RTG klatki piersiowej widoczne prawidłowo upowietrznione płuca, bez zmian ogniskowych i nacieków. Sylwetka serca prawidłowa.', CURRENT_DATE - INTERVAL '19 days', 35, 44, 10),
-('Wynik spirometrii w normie. FVC 95%, FEV1 92%. Nie stwierdzono obturacji ani restrykcji. Test wysiłkowy ujemny.', CURRENT_DATE - INTERVAL '20 days', 36, 45, 14),
-('Wyniki morfologii krwi: WBC 7.1 tys./µL, RBC 4.5 mln/µL, HGB 13.8 g/dL, PLT 280 tys./µL. Wszystkie parametry w granicach normy.', CURRENT_DATE - INTERVAL '21 days', 33, 46, 15),
-('Rytm zatokowy. HR 68/min. Bez zmian w odcinku ST-T. QRS wąskie. Bez zaburzeń rytmu serca.', CURRENT_DATE - INTERVAL '22 days', 34, 47, 17),
-('USG jamy brzusznej: Wątroba, pęcherzyk żółciowy, trzustka i śledziona bez zmian. Nerki prawidłowej wielkości i echogeniczności.', CURRENT_DATE - INTERVAL '23 days', 1, 48, 3),
-('Badanie okulistyczne: Brak wad refrakcji. Siatkówka prawidłowa. Pole widzenia bez ubytków. Zastosowano krople do rozszerzenia źrenic.', CURRENT_DATE - INTERVAL '24 days', 35, 49, 5),
-('RTG klatki piersiowej: Czyste pola płucne. Brak powiększonych węzłów chłonnych. Przepona wolna.', CURRENT_DATE - INTERVAL '25 days', 36, 50, 10),
-('Spirometria: FVC 89% normy, FEV1 85% normy. Wskazana kontrola za pół roku. Pacjentka paląca, zalecono rzucenie palenia.', CURRENT_DATE - INTERVAL '26 days', 33, 51, 14),
-('Morfologia krwi: Leukocyty 5.2 tys./µL, Neutrofile 60%, Limfocyty 30%. Bez odchyleń od normy.', CURRENT_DATE - INTERVAL '27 days', 2, 52, 15),
-('Badanie EKG: Rytm zatokowy 75/min. Odcinek PR i QT w normie. Bez istotnych zmian niedokrwiennych.', CURRENT_DATE - INTERVAL '28 days', 34, 53, 17),
-('USG jamy brzusznej: Moczowody nieposzerzone. Pęcherz moczowy o prawidłowej ścianie, bez złogów. Nie stwierdzono wolnego płynu.', CURRENT_DATE - INTERVAL '29 days', 35, 54, 3),
-('Ciśnienie wewnątrzgałkowe: OP 18 mmHg, OL 19 mmHg. Korekcja wady wzroku nie jest konieczna.', CURRENT_DATE - INTERVAL '30 days', 36, 55, 5),
-('Morfologia krwi: Wszystkie parametry w normie, bez cech anemii czy stanu zapalnego.', CURRENT_DATE - INTERVAL '31 days', 33, 56, 15),
-('Szczegółowe badanie USG jamy brzusznej z oceną przepływów. Bez zmian.', CURRENT_DATE - INTERVAL '1 day', 34, 57, 3),
-('Kontrolne badanie okulistyczne po leczeniu zapalenia spojówek. Poprawa stanu.', CURRENT_DATE - INTERVAL '2 days', 35, 58, 5),
-('RTG klatki piersiowej - ocena po infekcji. Obraz radiologiczny w normie.', CURRENT_DATE - INTERVAL '3 days', 36, 59, 10),
-('Test spirometryczny: wynik zbliżony do poprzedniego, bez istotnych zmian.', CURRENT_DATE - INTERVAL '4 days', 33, 60, 14),
-('Morfologia kontrolna: brak odchyleń, parametry w zakresie referencyjnym.', CURRENT_DATE - INTERVAL '5 days', 34, 61, 15),
-('EKG spoczynkowe: rytm zatokowy, bez cech niedokrwienia.', CURRENT_DATE - INTERVAL '6 days', 35, 62, 17),
-('USG jamy brzusznej - ocena wątroby i pęcherzyka żółciowego. Wynik prawidłowy.', CURRENT_DATE - INTERVAL '7 days', 1, 63, 3),
-('Okulistyczne badanie dna oka. Bez patologii.', CURRENT_DATE - INTERVAL '8 days', 36, 64, 5),
-('RTG klatki piersiowej - diagnostyka kaszlu. Płuca czyste.', CURRENT_DATE - INTERVAL '9 days', 33, 65, 10),
-('Spirometria - ocena pojemności życiowej płuc. Wynik dobry.', CURRENT_DATE - INTERVAL '10 days', 34, 66, 14),
-('Morfologia krwi z rozmazem: wszystkie frakcje leukocytów w normie.', CURRENT_DATE - INTERVAL '11 days', 35, 67, 15),
-('EKG po wysiłku: brak arytmii, prawidłowa reakcja serca na obciążenie.', CURRENT_DATE - INTERVAL '12 days', 36, 68, 17),
-('USG nerek i dróg moczowych. Nie stwierdzono kamicy ani zastoju.', CURRENT_DATE - INTERVAL '13 days', 33, 69, 3),
-('Pomiar ciśnienia wewnątrzgałkowego. Wskazania do kontroli za 6 miesięcy.', CURRENT_DATE - INTERVAL '14 days', 34, 70, 5),
-('Morfologia krwi: Wyniki nie wykazują żadnych niepokojących zmian.', CURRENT_DATE - INTERVAL '15 days', 2, 71, 15),
-('Kontrolne USG tarczycy - bez nowych zmian ogniskowych.', CURRENT_DATE - INTERVAL '32 days', 35, 72, 3),
-('Badanie okulistyczne u pacjenta z cukrzycą. Stan siatkówki stabilny.', CURRENT_DATE - INTERVAL '33 days', 36, 73, 5),
-('RTG kręgosłupa szyjnego - ocena po urazie. Bez cech złamania.', CURRENT_DATE - INTERVAL '34 days', 33, 74, 10),
-('Spirometria z próbą rozkurczową. Nieznaczna poprawa parametrów.', CURRENT_DATE - INTERVAL '35 days', 34, 75, 14),
-('Morfologia krwi obwodowej. Wszystkie wskaźniki w normie.', CURRENT_DATE - INTERVAL '36 days', 35, 76, 15),
-('EKG - badanie kontrolne. Rytm zatokowy, bez arytmii.', CURRENT_DATE - INTERVAL '37 days', 36, 77, 17),
-('USG piersi - badanie przesiewowe. Wynik prawidłowy, bez zmian podejrzanych.', CURRENT_DATE - INTERVAL '38 days', 1, 78, 3),
-('Pomiar ostrości widzenia. Wymagana korekcja okularowa.', CURRENT_DATE - INTERVAL '39 days', 33, 79, 5),
-('RTG stawu kolanowego. Brak zmian zwyrodnieniowych.', CURRENT_DATE - INTERVAL '40 days', 34, 80, 10),
-('Morfologia krwi - kontrola po leczeniu anemii. Poziom hemoglobiny wzrósł.', CURRENT_DATE - INTERVAL '41 days', 35, 81, 15),
-('Badanie słuchu u dziecka - audiometria tonalna. Wynik prawidłowy dla wieku.', CURRENT_DATE - INTERVAL '42 days', 36, 100, 3),
-('Kontrolne badanie stóp u diabetyka. Brak zmian troficznych.', CURRENT_DATE - INTERVAL '43 days', 33, 101, 14),
-('Ocena stanu skóry po zabiegu dermatologicznym. Prawidłowe gojenie.', CURRENT_DATE - INTERVAL '44 days', 34, 102, 15),
-('EKG po rekonwalescencji. Rytm miarowy, bez nieprawidłowości.', CURRENT_DATE - INTERVAL '45 days', 35, 103, 17),
-('USG jamy brzusznej - ocena trzustki. Nie stwierdzono patologii.', CURRENT_DATE - INTERVAL '46 days', 2, 104, 3),
-('Badanie dna oka pod kątem jaskry. Ciśnienie w normie.', CURRENT_DATE - INTERVAL '47 days', 36, 105, 5),
-('RTG klatki piersiowej w projekcji bocznej. Bez cech płynu w opłucnej.', CURRENT_DATE - INTERVAL '48 days', 33, 106, 10),
-('Spirometria - ocena po rehabilitacji pulmonologicznej. Poprawa FEV1.', CURRENT_DATE - INTERVAL '49 days', 34, 107, 14),
-('Morfologia krwi - kontrola poziomu płytek krwi. W normie.', CURRENT_DATE - INTERVAL '3 days', 35, 108, 15),
-('EKG - diagnostyka bólu w klatce piersiowej. Bez zmian ischemicznych.', CURRENT_DATE - INTERVAL '6 days', 36, 109, 17);
-
+INSERT INTO Additional_service (description, date, fulfiller_id, patient_id, service_id, total_cost) VALUES
+('W badaniu USG jamy brzusznej nie stwierdzono istotnych zmian patologicznych. Narządy miąższowe o prawidłowej echogeniczności i wielkości.', CURRENT_DATE - INTERVAL '17 days', 33, 42, 3, 180.00),
+('Ciśnienie wewnątrzgałkowe: OP 16 mmHg, OL 17 mmHg (norma: 10-21 mmHg). Dno oka bez zmian patologicznych. Ostrość widzenia prawidłowa.', CURRENT_DATE - INTERVAL '18 days', 34, 43, 5, 150.00),
+('Na zdjęciu RTG klatki piersiowej widoczne prawidłowo upowietrznione płuca, bez zmian ogniskowych i nacieków. Sylwetka serca prawidłowa.', CURRENT_DATE - INTERVAL '19 days', 35, 44, 10, 100.00),
+('Wynik spirometrii w normie. FVC 95%, FEV1 92%. Nie stwierdzono obturacji ani restrykcji. Test wysiłkowy ujemny.', CURRENT_DATE - INTERVAL '20 days', 36, 45, 14, 120.00),
+('Wyniki morfologii krwi: WBC 7.1 tys./µL, RBC 4.5 mln/µL, HGB 13.8 g/dL, PLT 280 tys./µL. Wszystkie parametry w granicach normy.', CURRENT_DATE - INTERVAL '21 days', 33, 46, 15, 100.00),
+('Rytm zatokowy. HR 68/min. Bez zmian w odcinku ST-T. QRS wąskie. Bez zaburzeń rytmu serca.', CURRENT_DATE - INTERVAL '22 days', 34, 47, 17, 210.00),
+('USG jamy brzusznej: Wątroba, pęcherzyk żółciowy, trzustka i śledziona bez zmian. Nerki prawidłowej wielkości i echogeniczności.', CURRENT_DATE - INTERVAL '23 days', 1, 48, 3, 180.00),
+('Badanie okulistyczne: Brak wad refrakcji. Siatkówka prawidłowa. Pole widzenia bez ubytków. Zastosowano krople do rozszerzenia źrenic.', CURRENT_DATE - INTERVAL '24 days', 35, 49, 5, 150.00),
+('RTG klatki piersiowej: Czyste pola płucne. Brak powiększonych węzłów chłonnych. Przepona wolna.', CURRENT_DATE - INTERVAL '25 days', 36, 50, 10, 100.00),
+('Spirometria: FVC 89% normy, FEV1 85% normy. Wskazana kontrola za pół roku. Pacjentka paląca, zalecono rzucenie palenia.', CURRENT_DATE - INTERVAL '26 days', 33, 51, 14, 120.00),
+('Morfologia krwi: Leukocyty 5.2 tys./µL, Neutrofile 60%, Limfocyty 30%. Bez odchyleń od normy.', CURRENT_DATE - INTERVAL '27 days', 2, 52, 15, 100.00),
+('Badanie EKG: Rytm zatokowy 75/min. Odcinek PR i QT w normie. Bez istotnych zmian niedokrwiennych.', CURRENT_DATE - INTERVAL '28 days', 34, 53, 17, 210.00),
+('USG jamy brzusznej: Moczowody nieposzerzone. Pęcherz moczowy o prawidłowej ścianie, bez złogów. Nie stwierdzono wolnego płynu.', CURRENT_DATE - INTERVAL '29 days', 35, 54, 3, 180.00),
+('Ciśnienie wewnątrzgałkowe: OP 18 mmHg, OL 19 mmHg. Korekcja wady wzroku nie jest konieczna.', CURRENT_DATE - INTERVAL '30 days', 36, 55, 5, 150.00),
+('Morfologia krwi: Wszystkie parametry w normie, bez cech anemii czy stanu zapalnego.', CURRENT_DATE - INTERVAL '31 days', 33, 56, 15, 100.00),
+('Szczegółowe badanie USG jamy brzusznej z oceną przepływów. Bez zmian.', CURRENT_DATE - INTERVAL '1 day', 34, 57, 3, 180.00),
+('Kontrolne badanie okulistyczne po leczeniu zapalenia spojówek. Poprawa stanu.', CURRENT_DATE - INTERVAL '2 days', 35, 58, 5, 150.00),
+('RTG klatki piersiowej - ocena po infekcji. Obraz radiologiczny w normie.', CURRENT_DATE - INTERVAL '3 days', 36, 59, 10, 100.00),
+('Test spirometryczny: wynik zbliżony do poprzedniego, bez istotnych zmian.', CURRENT_DATE - INTERVAL '4 days', 33, 60, 14, 120.00),
+('Morfologia kontrolna: brak odchyleń, parametry w zakresie referencyjnym.', CURRENT_DATE - INTERVAL '5 days', 34, 61, 15, 100.00),
+('EKG spoczynkowe: rytm zatokowy, bez cech niedokrwienia.', CURRENT_DATE - INTERVAL '6 days', 35, 62, 17, 210.00),
+('USG jamy brzusznej - ocena wątroby i pęcherzyka żółciowego. Wynik prawidłowy.', CURRENT_DATE - INTERVAL '7 days', 1, 63, 3, 180.00),
+('Okulistyczne badanie dna oka. Bez patologii.', CURRENT_DATE - INTERVAL '8 days', 36, 64, 5, 150.00),
+('RTG klatki piersiowej - diagnostyka kaszlu. Płuca czyste.', CURRENT_DATE - INTERVAL '9 days', 33, 65, 10, 100.00),
+('Spirometria - ocena pojemności życiowej płuc. Wynik dobry.', CURRENT_DATE - INTERVAL '10 days', 34, 66, 14, 120.00),
+('Morfologia krwi z rozmazem: wszystkie frakcje leukocytów w normie.', CURRENT_DATE - INTERVAL '11 days', 35, 67, 15, 100.00),
+('EKG po wysiłku: brak arytmii, prawidłowa reakcja serca na obciążenie.', CURRENT_DATE - INTERVAL '12 days', 36, 68, 17, 210.00),
+('USG nerek i dróg moczowych. Nie stwierdzono kamicy ani zastoju.', CURRENT_DATE - INTERVAL '13 days', 33, 69, 3, 180.00),
+('Pomiar ciśnienia wewnątrzgałkowego. Wskazania do kontroli za 6 miesięcy.', CURRENT_DATE - INTERVAL '14 days', 34, 70, 5, 150.00),
+('Morfologia krwi: Wyniki nie wykazują żadnych niepokojących zmian.', CURRENT_DATE - INTERVAL '15 days', 2, 71, 15, 100.00),
+('Kontrolne USG tarczycy - bez nowych zmian ogniskowych.', CURRENT_DATE - INTERVAL '32 days', 35, 72, 3, 180.00),
+('Badanie okulistyczne u pacjenta z cukrzycą. Stan siatkówki stabilny.', CURRENT_DATE - INTERVAL '33 days', 36, 73, 5, 150.00),
+('RTG kręgosłupa szyjnego - ocena po urazie. Bez cech złamania.', CURRENT_DATE - INTERVAL '34 days', 33, 74, 10, 100.00),
+('Spirometria z próbą rozkurczową. Nieznaczna poprawa parametrów.', CURRENT_DATE - INTERVAL '35 days', 34, 75, 14, 120.00),
+('Morfologia krwi obwodowej. Wszystkie wskaźniki w normie.', CURRENT_DATE - INTERVAL '36 days', 35, 76, 15, 100.00),
+('EKG - badanie kontrolne. Rytm zatokowy, bez arytmii.', CURRENT_DATE - INTERVAL '37 days', 36, 77, 17, 210.00),
+('USG piersi - badanie przesiewowe. Wynik prawidłowy, bez zmian podejrzanych.', CURRENT_DATE - INTERVAL '38 days', 1, 78, 3, 180.00),
+('Pomiar ostrości widzenia. Wymagana korekcja okularowa.', CURRENT_DATE - INTERVAL '39 days', 33, 79, 5, 150.00),
+('RTG stawu kolanowego. Brak zmian zwyrodnieniowych.', CURRENT_DATE - INTERVAL '40 days', 34, 80, 10, 100.00),
+('Morfologia krwi - kontrola po leczeniu anemii. Poziom hemoglobiny wzrósł.', CURRENT_DATE - INTERVAL '41 days', 35, 81, 15, 100.00),
+('Badanie słuchu u dziecka - audiometria tonalna. Wynik prawidłowy dla wieku.', CURRENT_DATE - INTERVAL '42 days', 36, 100, 3, 180.00),
+('Kontrolne badanie stóp u diabetyka. Brak zmian troficznych.', CURRENT_DATE - INTERVAL '43 days', 33, 101, 14, 120.00),
+('Ocena stanu skóry po zabiegu dermatologicznym. Prawidłowe gojenie.', CURRENT_DATE - INTERVAL '44 days', 34, 102, 15, 100.00),
+('EKG po rekonwalescencji. Rytm miarowy, bez nieprawidłowości.', CURRENT_DATE - INTERVAL '45 days', 35, 103, 17, 210.00),
+('USG jamy brzusznej - ocena trzustki. Nie stwierdzono patologii.', CURRENT_DATE - INTERVAL '46 days', 2, 104, 3, 180.00),
+('Badanie dna oka pod kątem jaskry. Ciśnienie w normie.', CURRENT_DATE - INTERVAL '47 days', 36, 105, 5, 150.00),
+('RTG klatki piersiowej w projekcji bocznej. Bez cech płynu w opłucnej.', CURRENT_DATE - INTERVAL '48 days', 33, 106, 10, 100.00),
+('Spirometria - ocena po rehabilitacji pulmonologicznej. Poprawa FEV1.', CURRENT_DATE - INTERVAL '49 days', 34, 107, 14, 120.00),
+('Morfologia krwi - kontrola poziomu płytek krwi. W normie.', CURRENT_DATE - INTERVAL '3 days', 35, 108, 15, 100.00),
+('EKG - diagnostyka bólu w klatce piersiowej. Bez zmian ischemicznych.', CURRENT_DATE - INTERVAL '6 days', 36, 109, 17, 210.00);
 
 ---
 -- Tabela: Feedback
@@ -770,6 +761,7 @@ INSERT INTO Prescription (visit_id, date, status, expiration_date) VALUES
 (14, (SELECT date FROM Visit WHERE id = 14), 'ISSUED', CURRENT_DATE + INTERVAL '40 days'),
 (15, (SELECT date FROM Visit WHERE id = 15), 'ISSUED', CURRENT_DATE + INTERVAL '40 days');
 
+---
 INSERT INTO medicine_prescription (medicine_id, prescription_id, amount) VALUES
 (100000801, 1, 3),
 (100000037, 1, 1),
@@ -794,5 +786,3 @@ INSERT INTO medicine_prescription (medicine_id, prescription_id, amount) VALUES
 (100001700, 14, 2),
 (100001864, 14, 1),
 (100001901, 15, 2);
-
-
