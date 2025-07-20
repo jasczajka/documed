@@ -22,7 +22,7 @@ type NewSubscriptionFormData = {
 const validationSchema = Yup.object({
   name: Yup.string()
     .required('Nazwa subskrypcji jest wymagana')
-    .max(50, 'Nazwa subsrykpcji może mieć maksymalnie 50 znaków'),
+    .max(50, 'Nazwa subskrypcji może mieć maksymalnie 50 znaków'),
   price: Yup.number().required('Cena subskrypcji jest wymagana').min(0, 'Cena musi być dodatnia'),
 });
 
@@ -31,9 +31,10 @@ export const DiscountsTab = () => {
   const { showNotification, NotificationComponent } = useNotification();
 
   const {
-    control: formControl,
+    control,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<NewSubscriptionFormData>({
     resolver: yupResolver(validationSchema),
     defaultValues: {
@@ -89,6 +90,8 @@ export const DiscountsTab = () => {
     try {
       await createSubscription({ params: { name: data.name, price: data.price } });
       await refetchAllSubscriptions();
+      showNotification('Udało się dodać abonament!', 'success');
+      reset();
     } catch (error) {
       showNotification('Błąd podczas dodawania abonamentu', 'error');
       console.error(error);
@@ -150,7 +153,7 @@ export const DiscountsTab = () => {
           <Typography variant="h6">Dodaj subskrypcję</Typography>
           <Controller
             name="name"
-            control={formControl}
+            control={control}
             render={({ field }) => (
               <TextField
                 {...field}
@@ -163,7 +166,7 @@ export const DiscountsTab = () => {
           />
           <Controller
             name="price"
-            control={formControl}
+            control={control}
             render={({ field }) => (
               <TextField
                 {...field}
