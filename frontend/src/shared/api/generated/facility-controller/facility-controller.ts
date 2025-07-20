@@ -8,20 +8,92 @@ import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from '@tanstack/react-query';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
-import type { FacilityInfoReturnDTO } from '../generated.schemas';
+import type { CreateFacilityDTO, FacilityInfoReturnDTO } from '../generated.schemas';
 
 import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
 
+export const createFacility = (createFacilityDTO: CreateFacilityDTO, signal?: AbortSignal) => {
+  return customInstance<FacilityInfoReturnDTO>({
+    url: `/api/facilities/create`,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    data: createFacilityDTO,
+    signal,
+  });
+};
+
+export const getCreateFacilityMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createFacility>>,
+    TError,
+    { data: CreateFacilityDTO },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createFacility>>,
+  TError,
+  { data: CreateFacilityDTO },
+  TContext
+> => {
+  const mutationKey = ['createFacility'];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createFacility>>,
+    { data: CreateFacilityDTO }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createFacility(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateFacilityMutationResult = NonNullable<Awaited<ReturnType<typeof createFacility>>>;
+export type CreateFacilityMutationBody = CreateFacilityDTO;
+export type CreateFacilityMutationError = ErrorType<unknown>;
+
+export const useCreateFacility = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createFacility>>,
+      TError,
+      { data: CreateFacilityDTO },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createFacility>>,
+  TError,
+  { data: CreateFacilityDTO },
+  TContext
+> => {
+  const mutationOptions = getCreateFacilityMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
 export const getAllFacilities = (signal?: AbortSignal) => {
   return customInstance<FacilityInfoReturnDTO[]>({ url: `/api/facilities`, method: 'GET', signal });
 };
