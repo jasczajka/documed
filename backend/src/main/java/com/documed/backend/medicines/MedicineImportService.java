@@ -157,10 +157,18 @@ public class MedicineImportService {
   }
 
   private String getStringValue(Cell cell) {
-    if (cell == null || cell.getCellType() == CellType.BLANK) return "";
-    return cell.getCellType() == CellType.NUMERIC
-        ? String.valueOf((int) cell.getNumericCellValue())
-        : cell.getStringCellValue();
+    if (cell == null) return "-";
+    return switch (cell.getCellType()) {
+      case STRING -> {
+        String value = cell.getStringCellValue().trim();
+        yield value.isEmpty() ? "-" : value;
+      }
+      case NUMERIC -> String.valueOf((int) cell.getNumericCellValue());
+      case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
+      case FORMULA -> cell.getCellFormula();
+      case BLANK -> "-";
+      default -> "-";
+    };
   }
 
   private String trimToMaxLength(String value, int maxLength) {
