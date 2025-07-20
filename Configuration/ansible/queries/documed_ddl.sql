@@ -677,12 +677,12 @@ CREATE INDEX IF NOT EXISTS idx_time_slot_doctor_date_visit ON time_slot(doctor_i
 
 -- Worktime table indexes
 
-CREATE INDEX idx_worktime_user_id ON worktime(user_id);
+CREATE INDEX IF NOT EXISTS idx_worktime_user_id ON worktime(user_id);
 
 
 -- FreeDays table indexes
 
-CREATE INDEX idx_free_days_user_id ON free_days(user_id);
+CREATE INDEX IF NOT EXISTS idx_free_days_user_id ON free_days(user_id);
 
 
 -- User table indexes
