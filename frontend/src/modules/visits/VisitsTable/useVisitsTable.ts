@@ -14,6 +14,7 @@ const generateVisitsFilterConfig = (
   allFacilities: FacilityInfoReturnDTO[],
   displayPatientColumn: boolean,
   displayDoctorColumn: boolean,
+  disableFacilityFilter: boolean,
 ): FilterConfig[] => [
   {
     name: 'status',
@@ -54,6 +55,7 @@ const generateVisitsFilterConfig = (
     })),
     type: 'select',
     width: '350px',
+    disabled: disableFacilityFilter,
   },
   ...(displayDoctorColumn
     ? [
@@ -83,12 +85,14 @@ export const useVisitsTable = ({
   services,
   displayPatientColumn,
   displayDoctorColumn,
+  disableFacilityFilter,
 }: {
   visits: VisitWithDetails[];
   filters: VisitsFilters;
   services: Service[];
   displayPatientColumn: boolean;
   displayDoctorColumn: boolean;
+  disableFacilityFilter: boolean;
 }) => {
   const allFacilities = useFacilityStore((state) => state.facilities);
   const filterByStatus = useMemo(() => {
@@ -178,6 +182,7 @@ export const useVisitsTable = ({
         allFacilities,
         displayPatientColumn,
         displayDoctorColumn,
+        disableFacilityFilter,
       ),
     [services, displayPatientColumn, displayDoctorColumn],
   );

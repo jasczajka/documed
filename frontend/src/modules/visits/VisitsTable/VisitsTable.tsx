@@ -39,6 +39,7 @@ interface VisitTableProps {
   onArchivalModeToggle: () => void;
   displayPatientColumn: boolean;
   displayDoctorColumn: boolean;
+  disableFacilityFilter?: boolean;
 }
 
 const columns = (
@@ -239,6 +240,7 @@ export const VisitsTable: FC<VisitTableProps> = ({
   onArchivalModeToggle,
   displayPatientColumn,
   displayDoctorColumn,
+  disableFacilityFilter = false,
 }) => {
   const currentFacilityId = useAuthStore((state) => state.user?.facilityId);
   const services = useServicesStore((state) => state.regularServices);
@@ -264,6 +266,7 @@ export const VisitsTable: FC<VisitTableProps> = ({
     services,
     displayPatientColumn,
     displayDoctorColumn,
+    disableFacilityFilter,
   });
 
   const handleFilterChange = useCallback((name: keyof VisitsFilters, value: string) => {
@@ -331,16 +334,16 @@ export const VisitsTable: FC<VisitTableProps> = ({
   );
 
   const resetFilters = useCallback(() => {
-    setFilters({
+    setFilters((prev) => ({
       status: '',
       patientName: '',
       service: '',
       specialist: '',
       dateFrom: '',
       dateTo: '',
-      facilityId: '',
-    });
-  }, []);
+      facilityId: disableFacilityFilter ? prev.facilityId : '',
+    }));
+  }, [disableFacilityFilter]);
 
   return (
     <Box sx={{ height: '100%', width: '100%', display: 'flex', flexDirection: 'column', p: 2 }}>

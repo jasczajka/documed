@@ -653,6 +653,8 @@ CREATE INDEX IF NOT EXISTS idx_visit_doctor_status ON Visit(doctor_id, status);
 CREATE INDEX IF NOT EXISTS idx_visit_patient_status ON Visit(patient_id, status);
 -- For findByPatientIdAndFacilityIdWithDetailsBetweenDates
 CREATE INDEX IF NOT EXISTS idx_visit_patient_facility_date ON visit(patient_id, facility_id, date DESC);
+-- For findByPatientIdWithDetailsBetweenDates
+CREATE INDEX IF NOT EXISTS idx_visit_patient_date ON visit(patient_id, date DESC);
 -- For findByDoctorIdAndFacilityIdWithDetailsBetweenDates
 CREATE INDEX IF NOT EXISTS idx_visit_doctor_facility_date ON visit(doctor_id, facility_id, date DESC);
 -- For findAllWithDetailsBetweenDates

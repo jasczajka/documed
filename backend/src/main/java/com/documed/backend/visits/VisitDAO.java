@@ -136,6 +136,15 @@ public class VisitDAO implements FullDAO<Visit, Visit> {
         sql, new VisitWithDetailsRowMapper(), patientId, facilityId, startDate);
   }
 
+  public List<VisitWithDetails> findByPatientIdWithDetailsBetweenDates(
+      int patientId, LocalDate startDate) {
+    String sql =
+        VISIT_DETAILS_BASE_QUERY
+            + " WHERE v.patient_id = ? AND v.date >= ?"
+            + " ORDER BY v.date DESC, v.start_time DESC";
+    return jdbcTemplate.query(sql, new VisitWithDetailsRowMapper(), patientId, startDate);
+  }
+
   public List<VisitWithDetails> findByDoctorIdAndFacilityIdWithDetailsBetweenDates(
       int doctorId, int facilityId, LocalDate startDate) {
     String sql =

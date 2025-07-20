@@ -188,6 +188,7 @@ const VisitsPage: FC = () => {
           onArchivalModeToggle={() => setIsArchivalVisitsOn((prev) => !prev)}
           displayPatientColumn={!isPatient}
           displayDoctorColumn={!isDoctor}
+          disableFacilityFilter={!isPatient}
         />
       </div>
     );

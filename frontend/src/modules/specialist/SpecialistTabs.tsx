@@ -103,6 +103,7 @@ export const SpecialistTabs: FC<SpecialistTabsProps> = ({
             onArchivalModeToggle={onArchivalModeToggle}
             displayPatientColumn
             displayDoctorColumn={false}
+            disableFacilityFilter
           />
         )}
         {tabIndex === 2 && (

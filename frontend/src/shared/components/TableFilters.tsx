@@ -7,6 +7,7 @@ export type FilterConfig = {
   type: 'text' | 'select' | 'datetime';
   options?: { value: string; label: string }[];
   width?: number | string;
+  disabled?: boolean;
 };
 
 interface TableFiltersProps<T extends Record<string, string>> {
@@ -80,6 +81,7 @@ export const TableFilters = <T extends Record<string, string>>({
                   slotProps={{
                     popper: { style: { width: 'fit-content' } },
                   }}
+                  disabled={filter.disabled}
                 />
               );
             }
@@ -95,11 +97,19 @@ export const TableFilters = <T extends Record<string, string>>({
                       shrink: true,
                     },
                   }}
+                  disabled={filter.disabled}
                 />
               );
             case 'text':
             default:
-              return <TextField key={filter.name} {...commonProps} onChange={handleInputChange} />;
+              return (
+                <TextField
+                  key={filter.name}
+                  {...commonProps}
+                  onChange={handleInputChange}
+                  disabled={filter.disabled}
+                />
+              );
           }
         })}
       </Stack>
