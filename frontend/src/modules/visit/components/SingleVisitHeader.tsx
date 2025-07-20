@@ -2,7 +2,6 @@ import { Box, Typography } from '@mui/material';
 import { FC } from 'react';
 
 interface SingleVisitHeaderProps {
-  visitId: number;
   doctorFullName: string;
   serviceTypeName: string;
   visitStatusLabel: string;
@@ -11,7 +10,6 @@ interface SingleVisitHeaderProps {
 }
 
 export const SingleVisitHeader: FC<SingleVisitHeaderProps> = ({
-  visitId,
   doctorFullName,
   serviceTypeName,
   visitStatusLabel,
@@ -26,7 +24,7 @@ export const SingleVisitHeader: FC<SingleVisitHeaderProps> = ({
       }}
     >
       <Typography sx={{ paddingBottom: 2 }} variant="h4">
-        {`Wizyta #${visitId}`}{' '}
+        Wizyta
       </Typography>
       <Typography>
         Specjalista:{' '}

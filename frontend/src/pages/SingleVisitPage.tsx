@@ -557,7 +557,6 @@ const SingleVisitPage: FC = () => {
       >
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           <SingleVisitHeader
-            visitId={visitInfo.id}
             doctorFullName={visitInfo.doctorFullName}
             serviceTypeName={visitInfo.serviceName}
             visitStatusLabel={visitStatusLabel}
