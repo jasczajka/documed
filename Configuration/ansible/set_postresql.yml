@@ -111,14 +111,9 @@
       postgresql_query:
         db: "{{ prod_db_name }}"
         query: >
-          INSERT INTO "User" (
-            first_name, last_name, pesel, passport_number, email, address, password,
-            phone_number, account_status, birthdate, pwz, role, subscription_id, email_notifications
-          )
+          INSERT INTO "User" (id, first_name, last_name, email, password, account_status, role)
           VALUES (
-            'Admin', 'Adminski', NULL, NULL, '{{ admin_email }}', NULL,' {{ admin_password_hash }}'
-            ,'000000000', 'ACTIVE', '1990-01-01',
-            NULL, 'ADMINISTRATOR', NULL, true
+            999, 'Admin', 'Adminski', '{{ admin_email }}', '{{ admin_password_hash }}', 'ACTIVE', 'ADMINISTRATOR'
           );
       become_user: postgres
 
