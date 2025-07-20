@@ -238,6 +238,17 @@ export interface Prescription {
   issuingDoctorFullName: string;
 }
 
+export interface CreateFacilityDTO {
+  address: string;
+  city: string;
+}
+
+export interface FacilityInfoReturnDTO {
+  id: number;
+  address: string;
+  city: string;
+}
+
 export interface ResetPasswordConfirmDTO {
   /** @minLength 1 */
   email: string;
@@ -496,12 +507,6 @@ export interface MedicineWithAmount {
   amount: number;
 }
 
-export interface FacilityInfoReturnDTO {
-  id: number;
-  address: string;
-  city: string;
-}
-
 export interface DoctorDetailsDTO {
   id: number;
   firstName: string;
@@ -533,13 +538,6 @@ export type AddMedicineToPrescriptionParams = {
   amount?: number;
 };
 
-export type GetAllMedicinesParams = {
-  /**
-   * Maximum results to return
-   */
-  limit?: number;
-};
-
 export type GetAllAdditionalServicesParams = {
   startDate?: string;
 };
@@ -568,6 +566,13 @@ export type GetVisitsByDoctorIdParams = {
 export type CalculateServiceCostParams = {
   patientId: number;
   serviceId: number;
+};
+
+export type GetAllMedicinesParams = {
+  /**
+   * Maximum results to return
+   */
+  limit?: number;
 };
 
 export type SearchMedicinesParams = {

@@ -4,11 +4,10 @@ import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Service } from 'shared/api/generated/generated.schemas';
 import {
-  useGetAllServices,
   useUpdateServicePrice,
   useUpdateServiceTime,
 } from 'shared/api/generated/service-controller/service-controller';
-import { FullPageLoadingSpinner } from 'shared/components/FullPageLoadingSpinner';
+import { useServicesStore } from 'shared/hooks/stores/useServicesStore';
 import { useNotification } from 'shared/hooks/useNotification';
 import { mapApiError } from 'shared/utils/mapApiError';
 import * as Yup from 'yup';
@@ -26,7 +25,8 @@ const validationSchema = Yup.object({
 });
 
 export const EditServiceTab = () => {
-  const { data: services, isLoading: isServicesLoading, refetch } = useGetAllServices();
+  const { regularServices, addditionalServices, fetchAllServices } = useServicesStore();
+  const services = [...regularServices, ...addditionalServices];
   const [selectedService, setSelectedService] = useState<Service | null>(null);
 
   const { showNotification, NotificationComponent } = useNotification();
@@ -56,7 +56,7 @@ export const EditServiceTab = () => {
           data: data.price,
         }),
       ]);
-      await refetch();
+      await fetchAllServices();
       showNotification('Usługa została zaktualizowana pomyślnie!', 'success');
     } catch (error) {
       const errorResult = mapApiError(error);
@@ -79,10 +79,6 @@ export const EditServiceTab = () => {
       });
     }
   }, [selectedService, reset]);
-
-  if (!services || isServicesLoading) {
-    return <FullPageLoadingSpinner />;
-  }
 
   return (
     <Box
