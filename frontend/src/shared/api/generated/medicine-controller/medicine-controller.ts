@@ -26,6 +26,62 @@ import type { ErrorType } from '../../axios-instance';
 import { customInstance } from '../../axios-instance';
 
 /**
+ * @summary Import medicines from datasource
+ */
+export const importMedicines = (signal?: AbortSignal) => {
+  return customInstance<string>({ url: `/api/medicines/import`, method: 'POST', signal });
+};
+
+export const getImportMedicinesMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof importMedicines>>,
+    TError,
+    void,
+    TContext
+  >;
+}): UseMutationOptions<Awaited<ReturnType<typeof importMedicines>>, TError, void, TContext> => {
+  const mutationKey = ['importMedicines'];
+  const { mutation: mutationOptions } = options
+    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
+
+  const mutationFn: MutationFunction<Awaited<ReturnType<typeof importMedicines>>, void> = () => {
+    return importMedicines();
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ImportMedicinesMutationResult = NonNullable<
+  Awaited<ReturnType<typeof importMedicines>>
+>;
+
+export type ImportMedicinesMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Import medicines from datasource
+ */
+export const useImportMedicines = <TError = ErrorType<unknown>, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof importMedicines>>,
+      TError,
+      void,
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<Awaited<ReturnType<typeof importMedicines>>, TError, void, TContext> => {
+  const mutationOptions = getImportMedicinesMutationOptions(options);
+
+  return useMutation(mutationOptions, queryClient);
+};
+/**
  * @summary Get all medicines (full version)
  */
 export const getAllMedicines = (params?: GetAllMedicinesParams, signal?: AbortSignal) => {
@@ -133,62 +189,6 @@ export function useGetAllMedicines<
   return query;
 }
 
-/**
- * @summary Import medicines from datasource
- */
-export const importMedicines = (signal?: AbortSignal) => {
-  return customInstance<string>({ url: `/api/medicines`, method: 'POST', signal });
-};
-
-export const getImportMedicinesMutationOptions = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof importMedicines>>,
-    TError,
-    void,
-    TContext
-  >;
-}): UseMutationOptions<Awaited<ReturnType<typeof importMedicines>>, TError, void, TContext> => {
-  const mutationKey = ['importMedicines'];
-  const { mutation: mutationOptions } = options
-    ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey } };
-
-  const mutationFn: MutationFunction<Awaited<ReturnType<typeof importMedicines>>, void> = () => {
-    return importMedicines();
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type ImportMedicinesMutationResult = NonNullable<
-  Awaited<ReturnType<typeof importMedicines>>
->;
-
-export type ImportMedicinesMutationError = ErrorType<unknown>;
-
-/**
- * @summary Import medicines from datasource
- */
-export const useImportMedicines = <TError = ErrorType<unknown>, TContext = unknown>(
-  options?: {
-    mutation?: UseMutationOptions<
-      Awaited<ReturnType<typeof importMedicines>>,
-      TError,
-      void,
-      TContext
-    >;
-  },
-  queryClient?: QueryClient,
-): UseMutationResult<Awaited<ReturnType<typeof importMedicines>>, TError, void, TContext> => {
-  const mutationOptions = getImportMedicinesMutationOptions(options);
-
-  return useMutation(mutationOptions, queryClient);
-};
 /**
  * @summary Get medicine by ID
  */

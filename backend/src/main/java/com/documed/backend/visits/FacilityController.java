@@ -1,13 +1,15 @@
 package com.documed.backend.visits;
 
+import com.documed.backend.auth.annotations.AdminOnly;
+import com.documed.backend.visits.dtos.CreateFacilityDTO;
 import com.documed.backend.visits.dtos.FacilityInfoReturnDTO;
 import com.documed.backend.visits.model.Facility;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -35,5 +37,13 @@ public class FacilityController {
 
       return ResponseEntity.ok(dtos);
     }
+  }
+
+  @AdminOnly
+  @PostMapping("/create")
+  public ResponseEntity<FacilityInfoReturnDTO> createFacility(
+      @RequestBody @Valid CreateFacilityDTO createFacilityDTO) {
+
+    return new ResponseEntity<>(facilityService.create(createFacilityDTO), HttpStatus.CREATED);
   }
 }

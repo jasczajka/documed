@@ -5,6 +5,7 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { ServiceType } from 'shared/api/generated/generated.schemas';
 import { useCreateService } from 'shared/api/generated/service-controller/service-controller';
 import { SpecializationSelect } from 'shared/components/SpecializationSelect';
+import { useServicesStore } from 'shared/hooks/stores/useServicesStore';
 import { useSpecializationsStore } from 'shared/hooks/stores/useSpecializationsStore';
 import { useNotification } from 'shared/hooks/useNotification';
 import { mapApiError } from 'shared/utils/mapApiError';
@@ -34,7 +35,8 @@ const validationSchema = Yup.object({
 });
 
 export const AddServiceTab: FC = () => {
-  const specializations = useSpecializationsStore((state) => state.specializations);
+  const { specializations, fetchSpecializations } = useSpecializationsStore();
+  const fetchAllServices = useServicesStore((state) => state.fetchAllServices);
   const { showNotification, NotificationComponent } = useNotification();
 
   const methods = useForm({
@@ -59,6 +61,7 @@ export const AddServiceTab: FC = () => {
     mutation: {
       onSuccess: () => {
         showNotification('Usługa została dodana pomyślnie!', 'success');
+        fetchSpecializations();
         reset();
       },
       onError: (error) => {
@@ -76,6 +79,8 @@ export const AddServiceTab: FC = () => {
   const onSubmit = async (data: FormData) => {
     try {
       await createService({ data });
+      await fetchAllServices();
+      showNotification('Udało się dodać usługę!', 'success');
     } catch {
       showNotification('Nie udało się stworzyć usługi', 'error');
     }
