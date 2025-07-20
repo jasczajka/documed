@@ -11,6 +11,8 @@
     backup_dir: "/var/backups/postgresql"
     pg_dump_path: "/usr/bin/pg_dump"
     admin_password_hash: "$2a$10$2bv1RJMphiI3vSubTl9Q3OJg7ukLpsLU6V6j5/ueyG2LnVRUHS4MS"  # hash for 'Password123' in bcrypt
+    first_facility_city: "Warszawa"             #insert facility city name
+    first_facility_address: "ul. Koszykowa 86"  #insert facility address here
 
   tasks:
     - name: Install PostgreSQL and required packages
@@ -113,7 +115,17 @@
           INSERT INTO "User" (id, first_name, last_name, email, password, account_status, role)
           VALUES (
             999, 'Admin', 'Admin', 'admin@documed.pl', '{{ admin_password_hash }}', 'ACTIVE', 'ADMINISTRATOR'
-          ) ON CONFLICT (id) DO NOTHING;;
+          ) ON CONFLICT (id) DO NOTHING;
+      become_user: postgres
+      
+    - name: Insert first facility into prod_db
+      postgresql_query:
+        db: "{{ prod_db_name }}"
+        query: >
+          INSERT INTO Facility (id, address, city)
+          VALUES (
+            1, '{{ first_facility_city }}', '{{ first_facility_address }}'
+          ) ON CONFLICT (id) DO NOTHING;
       become_user: postgres
 
     - name: Create pgbackup group
