@@ -381,12 +381,11 @@ class VisitServiceTest extends Specification {
 		def result = visitService.getVisitsByPatientIdWithDetailsBetweenDates(patientId, startDate)
 
 		then:
-		1 * authService.getCurrentFacilityId() >> facilityId
-		1 * visitDAO.findByPatientIdAndFacilityIdWithDetailsBetweenDates(patientId, facilityId, startDate) >> visits
+		1 * visitDAO.findByPatientIdWithDetailsBetweenDates(patientId, startDate) >> visits
 		result == visits
 	}
 
-	def "getVisitsByDoctorIdWithDetailsBetweenDates should return visits for specified doctor within date range"() {
+	def "getVisitsForCurrentFacilityByDoctorIdWithDetailsBetweenDates should return visits for specified doctor within date range"() {
 		given:
 		def doctorId = 5
 		def facilityId = 1
@@ -398,7 +397,7 @@ class VisitServiceTest extends Specification {
 		]
 
 		when:
-		def result = visitService.getVisitsByDoctorIdWithDetailsBetweenDates(doctorId, startDate)
+		def result = visitService.getVisitsForCurrentFacilityByDoctorIdWithDetailsBetweenDates(doctorId, startDate)
 
 		then:
 		1 * authService.getCurrentFacilityId() >> facilityId
@@ -406,7 +405,7 @@ class VisitServiceTest extends Specification {
 		result == visits
 	}
 
-	def "getVisitsForCurrentDoctorWithDetailsBetweenDates should return doctor's visits within date range"() {
+	def "getVisitsForCurrentDoctorForCurrentFacilityWithDetailsBetweenDates should return doctor's visits within date range"() {
 		given:
 		def doctorId = 5
 		def facilityId = 1
@@ -418,7 +417,7 @@ class VisitServiceTest extends Specification {
 		]
 
 		when:
-		def result = visitService.getVisitsForCurrentDoctorWithDetailsBetweenDates(startDate)
+		def result = visitService.getVisitsForCurrentDoctorForCurrentFacilityWithDetailsBetweenDates(startDate)
 
 		then:
 		1 * authService.getCurrentUserId() >> doctorId
