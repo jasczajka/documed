@@ -151,7 +151,8 @@ public class VisitController {
     LocalDate resolvedStart = resolveStartDate(startDate);
 
     List<VisitWithDetails> visits =
-        visitService.getVisitsByDoctorIdWithDetailsBetweenDates(doctorId, resolvedStart);
+        visitService.getVisitsForCurrentFacilityByDoctorIdWithDetailsBetweenDates(
+            doctorId, resolvedStart);
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
@@ -164,7 +165,8 @@ public class VisitController {
     LocalDate resolvedStart = resolveStartDate(startDate);
 
     List<VisitWithDetails> visits =
-        visitService.getVisitsForCurrentDoctorWithDetailsBetweenDates(resolvedStart);
+        visitService.getVisitsForCurrentDoctorForCurrentFacilityWithDetailsBetweenDates(
+            resolvedStart);
     return new ResponseEntity<>(visits, HttpStatus.OK);
   }
 
