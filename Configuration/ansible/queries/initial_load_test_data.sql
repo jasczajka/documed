@@ -391,7 +391,22 @@ INSERT INTO Doctor_Specialization (doctor_id, specialization_id) VALUES
 (28, 38),
 (28, 9),
 (29, 39),
-(30, 41);
+(30, 41),
+(2, 18),
+(4, 11),
+(6, 10),
+(14, 3),
+(19, 21),
+(20, 10),
+(21, 18),
+(24, 13),
+(25, 25),
+(26, 1),
+(27, 16),
+(29, 27),
+(5, 1),
+(30, 3);
+
 
 -- Przypisanie nieobsadzonych specjalizacji lekarzom
 INSERT INTO Doctor_Specialization (doctor_id, specialization_id)
@@ -723,7 +738,7 @@ INSERT INTO Feedback (rating, text, visit_id) VALUES
 ---
 -- Tabela: Referral
 INSERT INTO Referral (visit_id, diagnosis, type, expiration_date, status) VALUES
-(1, 'REUMATOLOG: Podejrzenie dny moczanowej', 'TO_SPECIALIST', '2026-10-01', 'ISSUED'),
+(1, 'REUMATOLOG: Podejrzenie dny moczanowej', 'TO_SPECIALIST', '2024-10-01', 'ISSUED'),
 (2, 'Ostre zapalenie wyrostka robaczkowego', 'TO_HOSPITAL', '2026-09-15', 'ISSUED'),
 (3, 'Ciągłe zmęczenie, podejrzenie anemii', 'FOR_DIAGNOSTICS', '2026-11-20', 'ISSUED'),
 (4, 'Stan po złamaniu kończyny dolnej', 'FOR_REHABILITATION', '2027-01-05', 'ISSUED'),
