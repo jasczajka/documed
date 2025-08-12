@@ -251,7 +251,7 @@ export const AdditionalServicesTable: FC<AdditionalServicesTableProps> = ({
               color="primary"
             />
           }
-          label="Pokaż archiwalne usługi dodatkowe"
+          label="Pokaż archiwalne usługi dodatkowe (starsze niż 3 miesiące)"
         />
       </Box>
       <TableFilters<AdditionalServiceFilters>

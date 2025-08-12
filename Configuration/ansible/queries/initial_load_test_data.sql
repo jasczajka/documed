@@ -391,7 +391,22 @@ INSERT INTO Doctor_Specialization (doctor_id, specialization_id) VALUES
 (28, 38),
 (28, 9),
 (29, 39),
-(30, 41);
+(30, 41),
+(2, 18),
+(4, 11),
+(6, 10),
+(14, 3),
+(19, 21),
+(20, 10),
+(21, 18),
+(24, 13),
+(25, 25),
+(26, 1),
+(27, 16),
+(29, 27),
+(5, 1),
+(30, 3);
+
 
 -- Przypisanie nieobsadzonych specjalizacji lekarzom
 INSERT INTO Doctor_Specialization (doctor_id, specialization_id)
@@ -502,8 +517,8 @@ AND ts.date BETWEEN fd.start_date AND fd.end_date;
 -- Statusy: PLANNED, IN_PROGRESS, CANCELLED, CLOSED
 
 INSERT INTO Visit (status, interview, diagnosis, recommendations, total_cost, facility_id, service_id, patient_information, patient_id, doctor_id, date, start_time, end_time) VALUES
-('CLOSED', 'Pacjent zgłasza duszność przy wysiłku, która nasila się podczas wchodzenia po schodach. Odczuwa również zmęczenie i lekkie zawroty głowy.', 'Zdiagnozowano łagodne nadciśnienie.', 'kontrola ciśnienia, ograniczenie soli.', 250.00, 1, 2, 'Duszność przy wysiłku', 42, 16, CURRENT_DATE - 10, '10:00', '10:30'),
-('CLOSED', 'Pacjentka skarży się na uporczywy świąd skóry, zwłaszcza w nocy. Zauważyła suchość i zaczerwienienia na ramionach i nogach. Objawy nasilają się po kąpieli.', 'Zdiagnozowano atopowe zapalenie skóry.', 'krem sterydowy 2x dziennie.', 220.00, 2, 4, 'Świąd skóry', 43, 8, CURRENT_DATE - 8, '12:00', '12:30'),
+('CLOSED', 'Pacjent zgłasza duszność przy wysiłku, która nasila się podczas wchodzenia po schodach. Odczuwa również zmęczenie i lekkie zawroty głowy.', 'Zdiagnozowano łagodne nadciśnienie.', 'kontrola ciśnienia, ograniczenie soli.', 250.00, 1, 2, 'Duszność przy wysiłku', 42, 16, CURRENT_DATE - 120, '10:00', '10:30'),
+('CLOSED', 'Pacjentka skarży się na uporczywy świąd skóry, zwłaszcza w nocy. Zauważyła suchość i zaczerwienienia na ramionach i nogach. Objawy nasilają się po kąpieli.', 'Zdiagnozowano atopowe zapalenie skóry.', 'krem sterydowy 2x dziennie.', 220.00, 2, 4, 'Świąd skóry', 42, 8, CURRENT_DATE - 8, '12:00', '12:30'),
 ('CLOSED', 'Pacjent odczuwał nieregularne kołatanie serca, szczególnie w sytuacjach stresowych. Zgłasza również uczucie lęku i niepokoju. Nie zaobserwował omdleń.', 'Niewielkie zaburzenia rytmu serca.', 'EKG, unikanie kofeiny.', 250.00, 1, 2, 'Kołatanie serca', 44, 16, CURRENT_DATE - 12, '09:00', '09:30'),
 ('CLOSED', 'Dziecko ma kaszel od 2 dni, głównie suchy, nasilający się w nocy. Zgłasza również katar i lekki ból gardła. Bez gorączki.', 'Infekcja górnych dróg oddechowych.', 'syrop wykrztuśny, odpoczynek.', 190.00, 3, 12, 'Kaszel u dziecka', 45, 22, CURRENT_DATE - 5, '11:00', '11:30'),
 ('CLOSED', 'Pacjentka zgłasza nieregularne cykle miesiączkowe, o różnej długości i nasileniu krwawienia. Odczuwa również bóle podbrzusza w trakcie cyklu.', 'Nie stwierdzono nieprawidłowości w badaniu.', 'obserwacja przez 3 miesiące.', 200.00, 2, 9, 'Nieregularne miesiączki', 46, 12, CURRENT_DATE - 6, '14:00', '14:30'),
@@ -524,7 +539,7 @@ INSERT INTO Visit (status, interview, diagnosis, recommendations, total_cost, fa
 ('CLOSED', 'Silny ból ucha, nasilający się w nocy. Odczuwa również osłabienie słuchu i szumy w uchu. Bez gorączki.', 'Zapalenie ucha środkowego.', 'antybiotyk, kontrola za 7 dni.', 180.00, 3, 11, 'Ból ucha', 61, 11, CURRENT_DATE - 10, '15:00', '15:30'),
 
 -- Zaplanowane wizyty (PLANNED)
-('PLANNED', NULL, NULL, NULL, 200.00, 1, 1, 'Pacjent zgłasza nawracające alergie sezonowe, prosi o konsultację specjalisty.', 41, 1, CURRENT_DATE + INTERVAL '1 days', '09:00:00', '09:30:00'),
+('PLANNED', NULL, NULL, NULL, 200.00, 1, 1, 'Pacjent zgłasza nawracające alergie sezonowe, prosi o konsultację specjalisty.', 42, 1, CURRENT_DATE + INTERVAL '1 days', '09:00:00', '09:30:00'),
 ('PLANNED', NULL, NULL, NULL, 250.00, 2, 2, 'Wizyta kontrolna po niedawnym zawale, monitoring stanu serca.', 42, 16, CURRENT_DATE + INTERVAL '1 days', '12:00:00', '12:30:00'),
 ('PLANNED', NULL, NULL, NULL, 220.00, 3, 4, 'Nowe zmiany skórne, wymagana pilna diagnostyka.', 46, 8, CURRENT_DATE + INTERVAL '1 days', '15:00:00', '15:30:00'),
 ('PLANNED', NULL, NULL, NULL, 240.00, 1, 6, 'Chroniczne bóle głowy i zawroty, skierowanie od lekarza rodzinnego.', 44, 17, CURRENT_DATE + INTERVAL '2 days', '09:00:00', '09:30:00'),
@@ -594,7 +609,7 @@ INSERT INTO Visit (status, interview, diagnosis, recommendations, total_cost, fa
 ('PLANNED', NULL, NULL, NULL, 180.00, 2, 11, 'Chrapanie i bezdechy senne, konsultacja laryngologiczna.', 108, 11, CURRENT_DATE + INTERVAL '23 days', '12:00:00', '12:30:00'),
 ('PLANNED', NULL, NULL, NULL, 190.00, 3, 12, 'Wizyta u pediatry w sprawie wysypki alergicznej u dziecka.', 109, 22, CURRENT_DATE + INTERVAL '23 days', '15:00:00', '15:30:00'),
 ('PLANNED', NULL, NULL, NULL, 250.00, 1, 13, 'Napady lęku panicznego, konieczna kontynuacja terapii.', 110, 23, CURRENT_DATE + INTERVAL '24 days', '09:00:00', '09:30:00'),
-('PLANNED', NULL, NULL, NULL, 230.00, 2, 16, 'Obrzęki nóg, podejrzenie problemów z nerkami.', 41, 16, CURRENT_DATE + INTERVAL '24 days', '12:00:00', '12:30:00'),
+('PLANNED', NULL, NULL, NULL, 230.00, 2, 16, 'Obrzęki nóg, podejrzenie problemów z nerkami.', 42, 16, CURRENT_DATE + INTERVAL '24 days', '12:00:00', '12:30:00'),
 ('PLANNED', NULL, NULL, NULL, 200.00, 3, 18, 'Ból jąder, wymagana pilna diagnostyka urologiczna.', 42, 13, CURRENT_DATE + INTERVAL '24 days', '15:00:00', '15:30:00'),
 ('PLANNED', NULL, NULL, NULL, 200.00, 1, 19, 'Konsultacja dietetyczna dla pacjenta z insulinoopornością.', 43, 9, CURRENT_DATE + INTERVAL '25 days', '09:00:00', '09:30:00'),
 ('PLANNED', NULL, NULL, NULL, 200.00, 2, 20, 'Zaburzenia mowy po udarze, konsultacja audiologiczna.', 44, 3, CURRENT_DATE + INTERVAL '25 days', '12:00:00', '12:30:00'),
@@ -657,8 +672,8 @@ END $$;
 -- -- Tabela: Additional_service
 INSERT INTO Additional_service (description, date, fulfiller_id, patient_id, service_id, total_cost) VALUES
 ('W badaniu USG jamy brzusznej nie stwierdzono istotnych zmian patologicznych. Narządy miąższowe o prawidłowej echogeniczności i wielkości.', CURRENT_DATE - INTERVAL '17 days', 33, 42, 3, 180.00),
-('Ciśnienie wewnątrzgałkowe: OP 16 mmHg, OL 17 mmHg (norma: 10-21 mmHg). Dno oka bez zmian patologicznych. Ostrość widzenia prawidłowa.', CURRENT_DATE - INTERVAL '18 days', 34, 43, 5, 150.00),
-('Na zdjęciu RTG klatki piersiowej widoczne prawidłowo upowietrznione płuca, bez zmian ogniskowych i nacieków. Sylwetka serca prawidłowa.', CURRENT_DATE - INTERVAL '19 days', 35, 44, 10, 100.00),
+('Ciśnienie wewnątrzgałkowe: OP 16 mmHg, OL 17 mmHg (norma: 10-21 mmHg). Dno oka bez zmian patologicznych. Ostrość widzenia prawidłowa.', CURRENT_DATE - INTERVAL '18 days', 34, 42, 5, 150.00),
+('Na zdjęciu RTG klatki piersiowej widoczne prawidłowo upowietrznione płuca, bez zmian ogniskowych i nacieków. Sylwetka serca prawidłowa.', CURRENT_DATE - INTERVAL '120 days', 32, 42, 10, 100.00),
 ('Wynik spirometrii w normie. FVC 95%, FEV1 92%. Nie stwierdzono obturacji ani restrykcji. Test wysiłkowy ujemny.', CURRENT_DATE - INTERVAL '20 days', 36, 45, 14, 120.00),
 ('Wyniki morfologii krwi: WBC 7.1 tys./µL, RBC 4.5 mln/µL, HGB 13.8 g/dL, PLT 280 tys./µL. Wszystkie parametry w granicach normy.', CURRENT_DATE - INTERVAL '21 days', 33, 46, 15, 100.00),
 ('Rytm zatokowy. HR 68/min. Bez zmian w odcinku ST-T. QRS wąskie. Bez zaburzeń rytmu serca.', CURRENT_DATE - INTERVAL '22 days', 34, 47, 17, 210.00),
@@ -723,7 +738,7 @@ INSERT INTO Feedback (rating, text, visit_id) VALUES
 ---
 -- Tabela: Referral
 INSERT INTO Referral (visit_id, diagnosis, type, expiration_date, status) VALUES
-(1, 'REUMATOLOG: Podejrzenie dny moczanowej', 'TO_SPECIALIST', '2026-10-01', 'ISSUED'),
+(1, 'REUMATOLOG: Podejrzenie dny moczanowej', 'TO_SPECIALIST', '2024-10-01', 'ISSUED'),
 (2, 'Ostre zapalenie wyrostka robaczkowego', 'TO_HOSPITAL', '2026-09-15', 'ISSUED'),
 (3, 'Ciągłe zmęczenie, podejrzenie anemii', 'FOR_DIAGNOSTICS', '2026-11-20', 'ISSUED'),
 (4, 'Stan po złamaniu kończyny dolnej', 'FOR_REHABILITATION', '2027-01-05', 'ISSUED'),

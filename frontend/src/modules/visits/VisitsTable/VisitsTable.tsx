@@ -355,7 +355,7 @@ export const VisitsTable: FC<VisitTableProps> = ({
           control={
             <Switch checked={isArchivalVisitsOn} onChange={onArchivalModeToggle} color="primary" />
           }
-          label="Pokaż archiwalne wizyty"
+          label="Pokaż archiwalne wizyty (starsze niż 3 miesiące)"
         />
       </Box>
       <TableFilters<VisitsFilters>
