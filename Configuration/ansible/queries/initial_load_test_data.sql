@@ -524,7 +524,7 @@ INSERT INTO Visit (status, interview, diagnosis, recommendations, total_cost, fa
 ('CLOSED', 'Silny ból ucha, nasilający się w nocy. Odczuwa również osłabienie słuchu i szumy w uchu. Bez gorączki.', 'Zapalenie ucha środkowego.', 'antybiotyk, kontrola za 7 dni.', 180.00, 3, 11, 'Ból ucha', 61, 11, CURRENT_DATE - 10, '15:00', '15:30'),
 
 -- Zaplanowane wizyty (PLANNED)
-('PLANNED', NULL, NULL, NULL, 200.00, 1, 1, 'Pacjent zgłasza nawracające alergie sezonowe, prosi o konsultację specjalisty.', 41, 1, CURRENT_DATE + INTERVAL '1 days', '09:00:00', '09:30:00'),
+('PLANNED', NULL, NULL, NULL, 200.00, 1, 1, 'Pacjent zgłasza nawracające alergie sezonowe, prosi o konsultację specjalisty.', 42, 1, CURRENT_DATE + INTERVAL '1 days', '09:00:00', '09:30:00'),
 ('PLANNED', NULL, NULL, NULL, 250.00, 2, 2, 'Wizyta kontrolna po niedawnym zawale, monitoring stanu serca.', 42, 16, CURRENT_DATE + INTERVAL '1 days', '12:00:00', '12:30:00'),
 ('PLANNED', NULL, NULL, NULL, 220.00, 3, 4, 'Nowe zmiany skórne, wymagana pilna diagnostyka.', 46, 8, CURRENT_DATE + INTERVAL '1 days', '15:00:00', '15:30:00'),
 ('PLANNED', NULL, NULL, NULL, 240.00, 1, 6, 'Chroniczne bóle głowy i zawroty, skierowanie od lekarza rodzinnego.', 44, 17, CURRENT_DATE + INTERVAL '2 days', '09:00:00', '09:30:00'),
@@ -594,7 +594,7 @@ INSERT INTO Visit (status, interview, diagnosis, recommendations, total_cost, fa
 ('PLANNED', NULL, NULL, NULL, 180.00, 2, 11, 'Chrapanie i bezdechy senne, konsultacja laryngologiczna.', 108, 11, CURRENT_DATE + INTERVAL '23 days', '12:00:00', '12:30:00'),
 ('PLANNED', NULL, NULL, NULL, 190.00, 3, 12, 'Wizyta u pediatry w sprawie wysypki alergicznej u dziecka.', 109, 22, CURRENT_DATE + INTERVAL '23 days', '15:00:00', '15:30:00'),
 ('PLANNED', NULL, NULL, NULL, 250.00, 1, 13, 'Napady lęku panicznego, konieczna kontynuacja terapii.', 110, 23, CURRENT_DATE + INTERVAL '24 days', '09:00:00', '09:30:00'),
-('PLANNED', NULL, NULL, NULL, 230.00, 2, 16, 'Obrzęki nóg, podejrzenie problemów z nerkami.', 41, 16, CURRENT_DATE + INTERVAL '24 days', '12:00:00', '12:30:00'),
+('PLANNED', NULL, NULL, NULL, 230.00, 2, 16, 'Obrzęki nóg, podejrzenie problemów z nerkami.', 42, 16, CURRENT_DATE + INTERVAL '24 days', '12:00:00', '12:30:00'),
 ('PLANNED', NULL, NULL, NULL, 200.00, 3, 18, 'Ból jąder, wymagana pilna diagnostyka urologiczna.', 42, 13, CURRENT_DATE + INTERVAL '24 days', '15:00:00', '15:30:00'),
 ('PLANNED', NULL, NULL, NULL, 200.00, 1, 19, 'Konsultacja dietetyczna dla pacjenta z insulinoopornością.', 43, 9, CURRENT_DATE + INTERVAL '25 days', '09:00:00', '09:30:00'),
 ('PLANNED', NULL, NULL, NULL, 200.00, 2, 20, 'Zaburzenia mowy po udarze, konsultacja audiologiczna.', 44, 3, CURRENT_DATE + INTERVAL '25 days', '12:00:00', '12:30:00'),
