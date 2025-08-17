@@ -240,6 +240,7 @@ const SingleVisitPage: FC = () => {
 
   const saveMedicinesToPrescription = async () => {
     let prescriptionId: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const operations: Promise<any>[] = [];
 
     if (!visitPrescription) {
@@ -329,6 +330,7 @@ const SingleVisitPage: FC = () => {
   };
 
   const saveReferrals = async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const operations: Promise<any>[] = [];
 
     referralOperations.toAdd.forEach((referralToCreate) => {

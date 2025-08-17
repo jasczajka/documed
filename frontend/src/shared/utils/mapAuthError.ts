@@ -53,7 +53,7 @@ export const mapAuthError = (error: any): ApiError => {
     case 409:
       return {
         status,
-        message: 'Istnieje już użytkownik z podanym numerem PESEL lub adresem e-mail.',
+        message: 'Istnieje już użytkownik z podanym numerem PESEL, PWZ lub adresem e-mail.',
         code: 'CONFLICT',
       };
     case 500:
