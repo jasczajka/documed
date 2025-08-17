@@ -154,7 +154,11 @@ public class AuthService {
       List<Integer> specializationIds) {
     try {
       if (userDAO.getByEmail(email).isPresent()) {
-        throw new UserAlreadyExistsException("User with given email  already exists");
+        throw new ConflictException("User with given email already exists");
+      }
+
+      if (userDAO.getByPwz(pwz).isPresent()) {
+        throw new ConflictException("User with given pwz already exists");
       }
 
       User user =

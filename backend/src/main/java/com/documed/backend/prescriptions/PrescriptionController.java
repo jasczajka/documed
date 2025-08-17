@@ -18,6 +18,7 @@ import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @AllArgsConstructor
@@ -73,7 +74,7 @@ public class PrescriptionController {
     return ResponseEntity.ok(prescriptions);
   }
 
-  @DoctorOrPatient
+  @PreAuthorize("hasAnyRole('PATIENT', 'DOCTOR', 'NURSE')")
   @GetMapping("/{prescription_id}/medicines")
   public ResponseEntity<List<MedicineWithAmount>> getMedicinesForPrescription(
       @PathVariable("prescription_id") int prescriptionId) {
