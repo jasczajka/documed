@@ -146,6 +146,7 @@ public class TimeSlotService {
     return previousTimeSlot.getEndTime().equals(currentTimeSlot.getStartTime());
   }
 
+  @Transactional
   public void releaseTimeSlotsForVisit(int visitId) {
     if (!timeSlotDAO.releaseTimeSlotsForVisit(visitId)) {
       throw new CancelVisitException("Failed to release time slots for visit");

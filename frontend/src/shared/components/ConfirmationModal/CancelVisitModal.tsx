@@ -5,10 +5,11 @@ import ConfirmationModal from 'shared/components/ConfirmationModal/ConfirmationM
 interface CancelVisitModalProps {
   visitId: number;
   onClose: () => void;
+  onError: () => void;
   onSuccess: () => void;
 }
 
-const CancelVisitModal: FC<CancelVisitModalProps> = ({ visitId, onClose, onSuccess }) => {
+const CancelVisitModal: FC<CancelVisitModalProps> = ({ visitId, onClose, onError, onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const { mutateAsync: cancelVisit } = useCancelPlannedVisit();
 
@@ -18,6 +19,8 @@ const CancelVisitModal: FC<CancelVisitModalProps> = ({ visitId, onClose, onSucce
       await cancelVisit({ id: visitId });
       onSuccess();
       onClose();
+    } catch {
+      onError();
     } finally {
       setLoading(false);
     }

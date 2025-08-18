@@ -41,7 +41,7 @@ const columns = (
     headerName: 'Imię i nazwisko',
     minWidth: 200,
     flex: 1,
-    valueGetter: (_value, row) => `${row.lastName} ${row.firstName}`,
+    valueGetter: (_, row) => `${row.lastName} ${row.firstName}`,
     renderCell: ({ row }) => (
       <Link
         component="button"

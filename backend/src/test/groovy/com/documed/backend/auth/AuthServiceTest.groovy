@@ -193,7 +193,7 @@ class AuthServiceTest extends Specification {
 	def "registerDoctor throws when email exists"() {
 		given: userDAO.getByEmail('e') >> Optional.of(buildDoctor(email: 'e'))
 		when: authService.registerDoctor('fn','ln','e','pwz','pw','ph',[1, 2])
-		then: thrown(UserAlreadyExistsException)
+		then: thrown(ConflictException)
 	}
 
 	def "registerDoctor creates and returns DTO"() {
@@ -202,11 +202,11 @@ class AuthServiceTest extends Specification {
 		authServiceSpy.getCurrentFacilityId() >> 1
 
 		userDAO.getByEmail('e') >> Optional.empty()
+		userDAO.getByPwz('pwz') >> Optional.empty()
 		passwordEncoder.encode('pw') >> 'enc'
 		def doc = buildDoctor(id:1, email:'e', password:'enc', pwzNumber:'pwz')
 		userDAO.createAndReturn(_ as User) >> doc
 		userService.addSpecializationsToUser(1, [1, 2]) >> null
-		workTimeService.createWorkTimeForNewUser(1, 1) >> []
 
 		when:
 		def dto = authServiceSpy.registerDoctor('fn', 'ln', 'e', 'pwz', 'pw', 'ph', [1, 2])

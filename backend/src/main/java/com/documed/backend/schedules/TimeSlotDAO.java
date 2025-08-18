@@ -149,7 +149,6 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
 
   public boolean releaseTimeSlotsForVisit(int visitId) {
     String sql = "UPDATE time_slot SET is_busy = false, visit_id = null WHERE visit_id = ?";
-
     return jdbcTemplate.update(sql, visitId) > 0;
   }
 
@@ -179,7 +178,7 @@ public class TimeSlotDAO implements FullDAO<TimeSlot, TimeSlot> {
       int doctorId, LocalDate fromDate, LocalDate toDate) {
     String sql =
         """
-            SELECT visit_id FROM time_slot WHERE doctor_id = ? AND date BETWEEN ? AND ? AND visit_id IS NOT NULL
+            SELECT DISTINCT visit_id FROM time_slot WHERE doctor_id = ? AND date BETWEEN ? AND ? AND visit_id IS NOT NULL
             """;
     return jdbcTemplate.queryForList(sql, Integer.class, doctorId, fromDate, toDate);
   }

@@ -120,6 +120,9 @@ const SingleSpecialistPage: FC = () => {
       <CancelVisitModal
         visitId={visitId}
         onClose={close}
+        onError={() => {
+          showNotification('Nie udało się odwołać wizyty.', 'error');
+        }}
         onSuccess={() => {
           refetchDoctorVisits();
           showNotification('Pomyślnie odwołano wizytę!', 'success');

@@ -74,6 +74,9 @@ export const PatientTabs: FC<PatientTabsProps> = ({
       <CancelVisitModal
         visitId={visitId}
         onClose={close}
+        onError={() => {
+          showNotification('Nie udało się odwołać wizyty.', 'error');
+        }}
         onSuccess={() => {
           refetchVisits();
           showNotification('Pomyślnie odwołano wizytę!', 'success');

@@ -64,6 +64,7 @@ const columns = (
           headerName: 'Pacjent',
           minWidth: 200,
           flex: 1,
+          valueGetter: (_: undefined, row: AdditionalServiceWithDetails) => row.patientFullName,
           renderCell: ({ row }: { row: AdditionalServiceWithDetails }) => (
             <Link
               component="button"

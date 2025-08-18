@@ -150,6 +150,15 @@ public class UserDAO implements FullDAO<User, User> {
     }
   }
 
+  public Optional<User> getByPwz(String pwz) {
+    String sql = "SELECT * FROM \"User\" WHERE pwz = ? AND account_status != 'DEACTIVATED'";
+    try {
+      return Optional.of(jdbcTemplate.queryForObject(sql, userRowMapper, pwz));
+    } catch (EmptyResultDataAccessException e) {
+      return Optional.empty();
+    }
+  }
+
   public List<User> getAllByRole(UserRole role) {
     String sql = "SELECT * FROM \"User\" WHERE role = ? AND account_status != 'DEACTIVATED'";
     return jdbcTemplate.query(sql, userRowMapper, role.toString());
