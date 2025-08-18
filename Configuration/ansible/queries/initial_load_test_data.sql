@@ -420,7 +420,7 @@ SELECT (SELECT id FROM "User" WHERE role = 'DOCTOR' ORDER BY random() LIMIT 1),
 
 
 ---
--- Tabela: Worktime (Poniedziałek=1, Wtorek=2, ..., Niedziela=7)
+-- Tabela: Worktime (Poniedziałek=1, Wtorek=2, ..., Niedziela=0)
 DO $$
 DECLARE
     doctor RECORD;
@@ -444,8 +444,8 @@ BEGIN
                     EXIT WHEN end_hour > start_hour;
                 END LOOP;
 
-                start_time := make_time(start_hour, 0, 0);
-                end_time := make_time(end_hour, 0, 0);
+                start_time := make_time(8, 0, 0);
+                end_time := make_time(18, 0, 0);
             END IF;
 
             random_facility_id := FLOOR(RANDOM() * 3 + 1);
@@ -460,7 +460,7 @@ $$;
 ---
 -- Tabela: Free_days
 INSERT INTO Free_days (user_id, start_date, end_date) VALUES
-(1, CURRENT_DATE + INTERVAL '3 days', CURRENT_DATE + INTERVAL '14 days'), -- Urlop dr. Kowalskiego
+(1, CURRENT_DATE + INTERVAL '6 days', CURRENT_DATE + INTERVAL '14 days'), -- Urlop dr. Kowalskiego
 (2, CURRENT_DATE + INTERVAL '5 days', CURRENT_DATE + INTERVAL '7 days'), -- Dzień wolny dr. Nowak
 (22, CURRENT_DATE + INTERVAL '7 days', CURRENT_DATE + INTERVAL '7 days');
 
@@ -469,7 +469,7 @@ INSERT INTO Free_days (user_id, start_date, end_date) VALUES
 DO $$
 DECLARE
     slot_date DATE := CURRENT_DATE - INTERVAL '7 days';
-    end_date DATE := CURRENT_DATE + INTERVAL '21 days';
+    end_date DATE := CURRENT_DATE + INTERVAL '31 days';
     wt RECORD;
     slot_start TIME;
     slot_end TIME;
@@ -554,7 +554,7 @@ INSERT INTO Visit (status, interview, diagnosis, recommendations, total_cost, fa
 ('PLANNED', NULL, NULL, NULL, 200.00, 1, 19, 'Monitorowanie poziomu glukozy u pacjenta z nowo zdiagnozowaną cukrzycą.', 53, 9, CURRENT_DATE + INTERVAL '5 days', '09:00:00', '09:30:00'),
 ('PLANNED', NULL, NULL, NULL, 200.00, 2, 20, 'Podejrzenie ubytku słuchu po ekspozycji na hałas.', 54, 3, CURRENT_DATE + INTERVAL '5 days', '12:00:00', '12:30:00'),
 ('PLANNED', NULL, NULL, NULL, 200.00, 3, 21, 'Obowiązkowe badanie okresowe dla pracownika biurowego.', 55, 15, CURRENT_DATE + INTERVAL '5 days', '15:00:00', '15:30:00'),
-('PLANNED', NULL, NULL, NULL, 200.00, 1, 1, 'Pacjent ze zdiagnozowaną alergią na pyłki, prośba o dostosowanie leczenia.', 56, 1, CURRENT_DATE + INTERVAL '6 days', '09:00:00', '09:30:00'),
+('PLANNED', NULL, NULL, NULL, 200.00, 1, 1, 'Pacjent ze zdiagnozowaną alergią na pyłki, prośba o dostosowanie leczenia.', 56, 1, CURRENT_DATE + INTERVAL '2 days', '09:00:00', '09:30:00'),
 ('PLANNED', NULL, NULL, NULL, 250.00, 2, 2, 'Bóle w klatce piersiowej, pilna diagnostyka kardiologiczna.', 57, 16, CURRENT_DATE + INTERVAL '6 days', '12:00:00', '12:30:00'),
 ('PLANNED', NULL, NULL, NULL, 220.00, 3, 4, 'Silny świąd i zaczerwienienie skóry, podejrzenie egzemy.', 58, 8, CURRENT_DATE + INTERVAL '6 days', '15:00:00', '15:30:00'),
 ('PLANNED', NULL, NULL, NULL, 240.00, 1, 6, 'Osłabienie siły mięśniowej, prośba o konsultację neurologiczną.', 59, 17, CURRENT_DATE + INTERVAL '7 days', '09:00:00', '09:30:00'),
@@ -569,7 +569,7 @@ INSERT INTO Visit (status, interview, diagnosis, recommendations, total_cost, fa
 ('PLANNED', NULL, NULL, NULL, 200.00, 1, 19, 'Edukacja na temat diety dla diabetyków.', 68, 9, CURRENT_DATE + INTERVAL '10 days', '09:00:00', '09:30:00'),
 ('PLANNED', NULL, NULL, NULL, 200.00, 2, 20, 'Rehabilitacja słuchu po założeniu aparatu.', 69, 3, CURRENT_DATE + INTERVAL '10 days', '12:00:00', '12:30:00'),
 ('PLANNED', NULL, NULL, NULL, 200.00, 3, 21, 'Badanie psychotechniczne dla zawodowego kierowcy.', 70, 15, CURRENT_DATE + INTERVAL '10 days', '15:00:00', '15:30:00'),
-('PLANNED', NULL, NULL, NULL, 200.00, 1, 1, 'Pacjent z alergią pokarmową, prośba o dietę eliminacyjną.', 71, 1, CURRENT_DATE + INTERVAL '11 days', '09:00:00', '09:30:00'),
+('PLANNED', NULL, NULL, NULL, 200.00, 1, 1, 'Pacjent z alergią pokarmową, prośba o dietę eliminacyjną.', 71, 1, CURRENT_DATE + INTERVAL '16 days', '11:00:00', '11:30:00'),
 ('PLANNED', NULL, NULL, NULL, 250.00, 2, 2, 'Kontrola ciśnienia krwi i cholesterolu.', 72, 16, CURRENT_DATE + INTERVAL '11 days', '12:00:00', '12:30:00'),
 ('PLANNED', NULL, NULL, NULL, 220.00, 3, 4, 'Podejrzenie zakażenia skórnego, konieczna szybka diagnoza.', 73, 8, CURRENT_DATE + INTERVAL '11 days', '15:00:00', '15:30:00'),
 ('PLANNED', NULL, NULL, NULL, 240.00, 1, 6, 'Udar w przeszłości, wizyta kontrolna neurologiczna.', 74, 17, CURRENT_DATE + INTERVAL '12 days', '09:00:00', '09:30:00'),
@@ -594,7 +594,7 @@ INSERT INTO Visit (status, interview, diagnosis, recommendations, total_cost, fa
 ('PLANNED', NULL, NULL, NULL, 180.00, 2, 11, 'Ocena stanu błon śluzowych gardła i krtani.', 93, 11, CURRENT_DATE + INTERVAL '18 days', '12:00:00', '12:30:00'),
 ('PLANNED', NULL, NULL, NULL, 190.00, 3, 12, 'Wizyta u pediatry w sprawie problemów z mową u dziecka (5 lat).', 94, 22, CURRENT_DATE + INTERVAL '18 days', '15:00:00', '15:30:00'),
 ('PLANNED', NULL, NULL, NULL, 250.00, 1, 13, 'Bezsenność, trudności w radzeniu sobie ze stresem.', 95, 23, CURRENT_DATE + INTERVAL '19 days', '09:00:00', '09:30:00'),
-('PLANNED', NULL, NULL, NULL, 230.00, 2, 16, 'Objawy niewydolności nerek, pierwsza wizyta u nefrologa.', 96, 16, CURRENT_DATE + INTERVAL '19 days', '12:00:00', '12:30:00'),
+('PLANNED', NULL, NULL, NULL, 230.00, 2, 16, 'Objawy niewydolności nerek, pierwsza wizyta u nefrologa.', 96, 16, CURRENT_DATE + INTERVAL '19 days', '15:00:00', '15:30:00'),
 ('PLANNED', NULL, NULL, NULL, 200.00, 3, 18, 'Ból podczas oddawania moczu, podejrzenie zapalenia.', 97, 13, CURRENT_DATE + INTERVAL '19 days', '15:00:00', '15:30:00'),
 ('PLANNED', NULL, NULL, NULL, 200.00, 1, 19, 'Profilaktyka cukrzycy typu 2 w rodzinie obciążonej.', 98, 9, CURRENT_DATE + INTERVAL '20 days', '09:00:00', '09:30:00'),
 ('PLANNED', NULL, NULL, NULL, 200.00, 2, 20, 'Kontrola protezy słuchowej.', 99, 3, CURRENT_DATE + INTERVAL '20 days', '12:00:00', '12:30:00'),
@@ -636,6 +636,20 @@ INSERT INTO Visit (status, interview, diagnosis, recommendations, total_cost, fa
 ('CANCELLED', NULL, NULL, NULL, 210.00, 1, 8, NULL, 95, 10, CURRENT_DATE + 8, '09:00', '09:30'),
 ('CANCELLED', NULL, NULL, NULL, 250.00, 2, 2, NULL, 96, 16, CURRENT_DATE + 9, '14:30', '15:00');
 
+-- Przesunięcie weekendowych wizyt
+DO $$
+DECLARE
+    v RECORD;
+BEGIN
+    FOR v IN
+        SELECT * FROM Visit
+        WHERE status = 'PLANNED'
+    LOOP
+        IF extract(DOW from v.date) IN (6, 0) THEN
+            UPDATE visit SET date = v.date + 2 WHERE id = v.id;
+        END IF;
+    END LOOP;
+END $$;
 
 -- Zajęcie timeslotów
 DO $$
