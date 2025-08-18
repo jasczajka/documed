@@ -651,6 +651,7 @@ BEGIN
     END LOOP;
 END $$;
 
+
 -- Zajęcie timeslotów
 DO $$
 DECLARE
