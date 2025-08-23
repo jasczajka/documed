@@ -99,6 +99,8 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
 
   const [onConfirmLoading, setOnConfirmLoading] = useState(false);
   const [fileIdsToDeleteOnConfirm, setFileIdsToDeleteOnConfirm] = useState<number[]>([]);
+  const [fileIdsToAttachToNewAdditionalService, setFileIdsToAttachToNewAdditionalService] =
+    useState<number[]>([]);
   const [hasUnuploadedFiles, setHasUnuploadedFiles] = useState(false);
 
   const watchedDescription = useWatch({ control, name: 'description' });
@@ -132,7 +134,13 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
     if (mode === 'create') {
       try {
         await createAdditionalService({
-          data: { ...data, date: new Date().toISOString(), patientId, fulfillerId },
+          data: {
+            ...data,
+            date: new Date().toISOString(),
+            patientId,
+            fulfillerId,
+            attachmentIds: fileIdsToAttachToNewAdditionalService,
+          },
         });
       } catch (err) {
         console.warn(err);
@@ -257,6 +265,9 @@ export const AdditionalServiceModal: FC<AdditionalServiceModalProps> = ({
           onConfirmUpload={async (file) => {
             setOnConfirmLoading(true);
             const res = await uploadFile(file, undefined, existingServiceData?.id);
+            if (mode === 'create') {
+              setFileIdsToAttachToNewAdditionalService((prev) => [...prev, res.fileId]);
+            }
             if (refetch) {
               await refetch();
             }
