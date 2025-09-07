@@ -41,6 +41,7 @@ public class MedicineImportService {
   }
 
   private static final Path LOCAL_FILE_PATH = Path.of("data", "medicinal-products.xlsx");
+  private static final Integer BATCH_SIZE = 200;
 
   private static final Logger logger = LoggerFactory.getLogger(MedicineImportService.class);
 
@@ -80,72 +81,48 @@ public class MedicineImportService {
         status -> {
           try (InputStream fileIn = Files.newInputStream(LOCAL_FILE_PATH);
               Workbook workbook =
-                  StreamingReader.builder().rowCacheSize(100).bufferSize(4096).open(fileIn)) {
+                  StreamingReader.builder()
+                      .rowCacheSize(100) // only cache 100 rows at a time
+                      .bufferSize(4096)
+                      .open(fileIn)) {
 
             Sheet sheet = workbook.getSheetAt(0);
-            int totalRows = sheet.getLastRowNum();
-            AtomicInteger processed = new AtomicInteger(0);
-            AtomicInteger skipped = new AtomicInteger(0);
-
-            List<Row> rows = new ArrayList<>();
             Iterator<Row> iterator = sheet.iterator();
-            if (iterator.hasNext()) iterator.next(); // Skip header row
-            iterator.forEachRemaining(rows::add);
+
+            if (iterator.hasNext()) iterator.next(); // skip header
 
             String upsertSql =
                 """
-                    INSERT INTO medicine (id, name, common_name, dosage)
-                    VALUES (?, ?, ?, ?)
-                    ON CONFLICT (id) DO UPDATE SET
-                        name = EXCLUDED.name,
-                        common_name = EXCLUDED.common_name,
-                        dosage = EXCLUDED.dosage
-                    """;
+                INSERT INTO medicine (id, name, common_name, dosage)
+                VALUES (?, ?, ?, ?)
+                ON CONFLICT (id) DO UPDATE SET
+                    name = EXCLUDED.name,
+                    common_name = EXCLUDED.common_name,
+                    dosage = EXCLUDED.dosage
+                """;
 
-            int batchSize = 500;
-            for (int i = 0; i < rows.size(); i += batchSize) {
-              List<Row> batch = rows.subList(i, Math.min(i + batchSize, rows.size()));
+            List<Row> batch = new ArrayList<>(BATCH_SIZE);
+            AtomicInteger processed = new AtomicInteger(0);
+            AtomicInteger skipped = new AtomicInteger(0);
 
-              jdbcTemplate.batchUpdate(
-                  upsertSql,
-                  new BatchPreparedStatementSetter() {
-                    @Override
-                    public void setValues(PreparedStatement ps, int index) throws SQLException {
-                      Row row = batch.get(index);
-                      try {
-                        ps.setString(1, getStringValue(row.getCell(0))); // id - column 1
-                        ps.setString(
-                            2,
-                            trimToMaxLength(
-                                getStringValue(row.getCell(1)), 500)); // name - column 2
-                        ps.setString(
-                            3,
-                            trimToMaxLength(
-                                getStringValue(row.getCell(2)), 500)); // common name - column 3
-                        ps.setString(
-                            4,
-                            trimToMaxLength(
-                                getStringValue(row.getCell(7)), 100)); // dosage - column 8
-                        processed.incrementAndGet();
-                      } catch (Exception e) {
-                        logger.warn("Skipping row {}: {}", row.getRowNum(), e.getMessage());
-                        skipped.incrementAndGet();
-                        ps.setString(1, "");
-                        ps.setString(2, "");
-                        ps.setString(3, "");
-                        ps.setString(4, "");
-                      }
-                    }
+            while (iterator.hasNext()) {
+              batch.add(iterator.next());
 
-                    @Override
-                    public int getBatchSize() {
-                      return batch.size();
-                    }
-                  });
+              if (batch.size() >= BATCH_SIZE) {
+                processBatch(batch, upsertSql, processed, skipped);
+                batch.clear();
+                logMemoryUsage("After processing " + processed.get() + " rows");
+              }
+            }
+
+            // process remaining rows
+            if (!batch.isEmpty()) {
+              processBatch(batch, upsertSql, processed, skipped);
+              logMemoryUsage("After processing all remaining rows");
             }
 
             logger.info("Import completed in {} ms", System.currentTimeMillis() - startTime);
-            logger.info("Processed: {}, Skipped: {}, Total: {}", processed, skipped, totalRows);
+            logger.info("Processed: {}, Skipped: {}", processed.get(), skipped.get());
 
           } catch (Exception e) {
             status.setRollbackOnly();
@@ -153,6 +130,38 @@ public class MedicineImportService {
             throw new RuntimeException("Import failed", e);
           }
           return null;
+        });
+  }
+
+  private void processBatch(
+      List<Row> batch, String upsertSql, AtomicInteger processed, AtomicInteger skipped) {
+    jdbcTemplate.batchUpdate(
+        upsertSql,
+        new BatchPreparedStatementSetter() {
+          @Override
+          public void setValues(PreparedStatement ps, int index) throws SQLException {
+            Row row = batch.get(index);
+            try {
+              ps.setString(1, getStringValue(row.getCell(0)));
+              ps.setString(2, trimToMaxLength(getStringValue(row.getCell(1)), 500));
+              ps.setString(3, trimToMaxLength(getStringValue(row.getCell(2)), 500));
+              ps.setString(4, trimToMaxLength(getStringValue(row.getCell(7)), 100));
+              processed.incrementAndGet();
+
+            } catch (Exception e) {
+              logger.warn("Skipping row {}: {}", row.getRowNum(), e.getMessage());
+              skipped.incrementAndGet();
+              ps.setString(1, "");
+              ps.setString(2, "");
+              ps.setString(3, "");
+              ps.setString(4, "");
+            }
+          }
+
+          @Override
+          public int getBatchSize() {
+            return batch.size();
+          }
         });
   }
 
@@ -174,5 +183,15 @@ public class MedicineImportService {
   private String trimToMaxLength(String value, int maxLength) {
     if (value == null) return "";
     return value.length() > maxLength ? value.substring(0, maxLength) : value;
+  }
+
+  private void logMemoryUsage(String context) {
+    Runtime runtime = Runtime.getRuntime();
+    long usedMemory = (runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024);
+    long totalMemory = runtime.totalMemory() / (1024 * 1024);
+    long maxMemory = runtime.maxMemory() / (1024 * 1024);
+
+    logger.info(
+        "{} | Used: {} MB, Total: {} MB, Max: {} MB", context, usedMemory, totalMemory, maxMemory);
   }
 }
